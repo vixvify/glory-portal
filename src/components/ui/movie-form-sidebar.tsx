@@ -10,6 +10,7 @@ import { Movie, Category, AgeRating, University } from "@/core/domain/movie";
 import { parseSchema } from "@/lib/validation";
 import { createMovieSchema } from "@/core/schema/movie";
 import { LOCALIZATION } from "@/core/constants/localization";
+import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 
 interface MovieFormSidebarProps {
   isOpen: boolean;
@@ -286,7 +287,7 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                 {...register("category", { required: LOCALIZATION.MOVIE_FORM.CATEGORY_REQUIRED })}
                 options={categories.map((cat) => ({
                   value: cat.name,
-                  label: cat.name,
+                  label: CATEGORY_TITLE_MAPPING[cat.name] || cat.name,
                 }))}
               />
 

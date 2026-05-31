@@ -1,21 +1,16 @@
 import { ApiResponse } from "../interface/response";
 import { MovieRepository } from "@/core/ports/movie.repository";
-import { Movie } from "@/core/domain/movie";
+import { Movie, MovieFilterParams } from "@/core/domain/movie";
 import httpClient from "@/lib/http";
 
 export class MovieRepositoryImpl implements MovieRepository {
-  async getAllMovies(): Promise<ApiResponse<Movie[]>> {
-    const response = await httpClient.get<Movie[]>("/movie/all");
+  async getMovies(params?: MovieFilterParams): Promise<ApiResponse<Movie[]>> {
+    const response = await httpClient.get<Movie[]>("/movie", { params });
     return response;
   }
 
   async getMovieById(id: string): Promise<ApiResponse<Movie>> {
     const response = await httpClient.get<Movie>(`/movie/${id}`);
-    return response;
-  }
-
-  async searchMovies(query: string): Promise<ApiResponse<Movie[]>> {
-    const response = await httpClient.get<Movie[]>(`/movie/search?q=${query}`);
     return response;
   }
 

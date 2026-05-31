@@ -1,4 +1,9 @@
-import { Movie, CreateMovie, UpdateMovie } from "../domain/movie";
+import {
+  Movie,
+  CreateMovie,
+  UpdateMovie,
+  MovieFilterParams,
+} from "../domain/movie";
 import { MovieRepository } from "../ports/movie.repository";
 import { parseSchema } from "@/lib/validation";
 import { createMovieSchema, updateMovieSchema } from "../schema/movie";
@@ -6,15 +11,15 @@ import { parseStringOrArray } from "@/utils/parser";
 
 export class MovieService {
   constructor(private readonly movieRepository: MovieRepository) {}
-  async getAllMovies(): Promise<Movie[]> {
+  async getMovies(params?: MovieFilterParams): Promise<Movie[]> {
     try {
-      const response = await this.movieRepository.getAllMovies();
+      const response = await this.movieRepository.getMovies(params);
       if (response.error) {
         throw new Error(response.error);
       }
       return response.data;
     } catch (error) {
-      console.error("Error in getAllMovies:", error);
+      console.error("Error in getMovies:", error);
       throw error;
     }
   }
@@ -27,18 +32,6 @@ export class MovieService {
       return response.data;
     } catch (error) {
       console.error(`Error in getMovieById (id: ${id}):`, error);
-      throw error;
-    }
-  }
-  async searchMovies(query: string): Promise<Movie[]> {
-    try {
-      const response = await this.movieRepository.searchMovies(query);
-      if (response.error) {
-        throw new Error(response.error);
-      }
-      return response.data;
-    } catch (error) {
-      console.error(`Error in searchMovies (query: ${query}):`, error);
       throw error;
     }
   }

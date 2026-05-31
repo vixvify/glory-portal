@@ -112,3 +112,21 @@ export interface UpdateCrewMember {
   name: string;
   photo?: File | string | null;
 }
+
+export interface MovieFilterParams {
+  search?: string;
+  searchby?: string;
+  page?: number | string;
+  pagenumber?: number | string;
+  sort?: string;
+  sortby?: string;
+}
+
+export interface CrewFilterParams {
+  search?: string;
+  searchby?: string;
+  page?: number | string;
+  pagenumber?: number | string;
+  sort?: string;
+  sortby?: string;
+}

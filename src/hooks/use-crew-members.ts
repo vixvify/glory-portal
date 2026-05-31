@@ -4,20 +4,13 @@ import {
   CrewMember,
   CreateCrewMember,
   UpdateCrewMember,
+  CrewFilterParams,
 } from "@/core/domain/movie";
 
-export function useCrewMembersQuery() {
+export function useCrewMembersQuery(params?: CrewFilterParams) {
   return useQuery<CrewMember[], Error>({
-    queryKey: ["crewMembers"],
-    queryFn: () => crewMemberService.getAllCrewMembers(),
-  });
-}
-
-export function useSearchCrewMembersQuery(query: string, enabled = true) {
-  return useQuery<CrewMember[], Error>({
-    queryKey: ["crewMembers", "search", query],
-    queryFn: () => crewMemberService.searchCrewMembers(query),
-    enabled: enabled && query !== undefined,
+    queryKey: params ? ["crewMembers", params] : ["crewMembers"],
+    queryFn: () => crewMemberService.getCrewMembers(params),
   });
 }
 

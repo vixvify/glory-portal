@@ -1,17 +1,11 @@
 import { ApiResponse } from "../interface/response";
 import { CrewMemberRepository } from "@/core/ports/crew-member.repository";
-import { CrewMember } from "@/core/domain/movie";
+import { CrewMember, CrewFilterParams } from "@/core/domain/movie";
 import httpClient from "@/lib/http";
 
 export class CrewMemberRepositoryImpl implements CrewMemberRepository {
-  async getAllCrewMembers(): Promise<ApiResponse<CrewMember[]>> {
-    return await httpClient.get<CrewMember[]>("/crew-members/all");
-  }
-
-  async searchCrewMembers(query: string): Promise<ApiResponse<CrewMember[]>> {
-    return await httpClient.get<CrewMember[]>(
-      `/crew-members/search?q=${query}`,
-    );
+  async getCrewMembers(params?: CrewFilterParams): Promise<ApiResponse<CrewMember[]>> {
+    return await httpClient.get<CrewMember[]>("/crew-members", { params });
   }
 
   async getCrewMemberById(id: string): Promise<ApiResponse<CrewMember>> {

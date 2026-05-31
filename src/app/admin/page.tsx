@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import Navbar from "@/components/ui/navbar";
 import {
@@ -8,6 +8,8 @@ import {
   CreateMovie,
   UpdateMovie,
   CrewMember,
+  MovieFilterParams,
+  CrewFilterParams,
 } from "@/core/domain/movie";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -39,6 +41,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import { ConfirmModal } from "@/components/modal/confirm-modal";
 import { ImageCropper } from "@/components/modal/image-cropper";
 import { LOCALIZATION } from "@/core/constants/localization";
+import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 import { StatsCard } from "@/components/ui/stats-card";
 import { SearchInput } from "@/components/ui/search-input";
 import { FilterSelect } from "@/components/ui/filter-select";
@@ -71,6 +74,7 @@ type Sortby = "title" | "year" | "views";
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<"movies" | "crew">("movies");
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeSearchQuery, setActiveSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [sortBy, setSortBy] = useState<Sortby>("title");
   const { currentUser, showToast } = useAppStore();
@@ -83,9 +87,25 @@ export default function AdminPage() {
   const [isDeletingLocal, setIsDeletingLocal] = useState(false);
 
   const [crewSearchQuery, setCrewSearchQuery] = useState("");
+  const [activeCrewSearchQuery, setActiveCrewSearchQuery] = useState("");
   const [isCrewFormOpen, setIsCrewFormOpen] = useState(false);
   const [editingCrew, setEditingCrew] = useState<CrewMember | null>(null);
   const [deleteCrewId, setDeleteCrewId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setActiveSearchQuery(searchQuery);
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setActiveCrewSearchQuery(crewSearchQuery);
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [crewSearchQuery]);
+
   const [crewNameInput, setCrewNameInput] = useState("");
   const [crewPhotoInput, setCrewPhotoInput] = useState<File | null>(null);
   const [crewPhotoName, setCrewPhotoName] = useState<string | null>(null);
@@ -114,11 +134,39 @@ export default function AdminPage() {
     }
   }, [isCrewFormOpen]);
 
-  const { data: movies = [], isLoading: isMoviesLoading } = useMoviesQuery();
+  const movieParams = useMemo(() => {
+    const params: MovieFilterParams = {
+      sortby: sortBy,
+      sort: sortBy === "title" ? "asc" : "desc",
+    };
+    if (activeSearchQuery.trim()) {
+      params.search = activeSearchQuery.trim();
+    } else if (categoryFilter) {
+      params.search = categoryFilter;
+      params.searchby = "category";
+    }
+    return params;
+  }, [activeSearchQuery, categoryFilter, sortBy]);
+
+  const crewParams = useMemo(() => {
+    if (activeCrewSearchQuery.trim()) {
+      return { search: activeCrewSearchQuery.trim() };
+    }
+    return undefined;
+  }, [activeCrewSearchQuery]);
+
+  const { data: movies = [], isLoading: isMoviesLoading } =
+    useMoviesQuery(movieParams);
   const { data: availableCategories = [] } = useCategoriesQuery();
   const { data: availableAgeRatings = [] } = useAgeRatingsQuery();
   const { data: availableUniversities = [] } = useUniversitiesQuery();
-  const { data: availableCrew = [] } = useCrewMembersQuery();
+  const { data: availableCrew = [], isLoading: isCrewLoading } =
+    useCrewMembersQuery(crewParams);
+
+  const isSearchingMovies =
+    searchQuery.trim() !== activeSearchQuery.trim() || isMoviesLoading;
+  const isSearchingCrew =
+    crewSearchQuery.trim() !== activeCrewSearchQuery.trim() || isCrewLoading;
 
   const crewOptions = availableCrew.map((c) => ({
     id: c.id,
@@ -228,9 +276,7 @@ export default function AdminPage() {
       setEditingMovie(null);
     } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error
-          ? err.message
-          : LOCALIZATION.ERRORS.SAVE_MOVIE;
+        err instanceof Error ? err.message : LOCALIZATION.ERRORS.SAVE_MOVIE;
       showToast(errorMessage, "error");
       console.error(err);
     } finally {
@@ -337,53 +383,15 @@ export default function AdminPage() {
     }
   };
 
-  const getFilteredAndSortedCrew = () => {
-    let list = [...availableCrew];
-    if (crewSearchQuery.trim() !== "") {
-      const q = crewSearchQuery.toLowerCase();
-      list = list.filter((c) => c.name.toLowerCase().includes(q));
-    }
-    list.sort((a, b) => a.name.localeCompare(b.name, "th"));
-    return list;
-  };
-
-  const filteredCrew = getFilteredAndSortedCrew();
-
   const totalViews = movies.reduce((sum, m) => sum + (m.views || 0), 0);
 
-  const getFilteredAndSortedMovies = () => {
-    let list = [...movies];
+  const isInitialLoading =
+    isMoviesLoading &&
+    movies.length === 0 &&
+    !searchQuery.trim() &&
+    !categoryFilter;
 
-    if (searchQuery.trim() !== "") {
-      const q = searchQuery.toLowerCase();
-      list = list.filter(
-        (m) =>
-          m.title.toLowerCase().includes(q) ||
-          m.category.toLowerCase().includes(q) ||
-          m.description.toLowerCase().includes(q),
-      );
-    }
-
-    if (categoryFilter !== "") {
-      list = list.filter((m) => m.category === categoryFilter);
-    }
-
-    list.sort((a, b) => {
-      if (sortBy === "year") {
-        return b.year - a.year;
-      }
-      if (sortBy === "views") {
-        return (b.views || 0) - (a.views || 0);
-      }
-      return a.title.localeCompare(b.title);
-    });
-
-    return list;
-  };
-
-  const filteredMovies = getFilteredAndSortedMovies();
-
-  if (isMoviesLoading) {
+  if (isInitialLoading) {
     return <Loading />;
   }
 
@@ -412,10 +420,13 @@ export default function AdminPage() {
                 href="/"
                 className="hover:text-brand transition-colors flex items-center gap-1"
               >
-                <ArrowBackIcon className="text-sm" /> {LOCALIZATION.ADMIN.BACK_HOME}
+                <ArrowBackIcon className="text-sm" />{" "}
+                {LOCALIZATION.ADMIN.BACK_HOME}
               </Link>
               <span>/</span>
-              <span className="text-zinc-300">{LOCALIZATION.ADMIN.DASHBOARD_TITLE}</span>
+              <span className="text-zinc-300">
+                {LOCALIZATION.ADMIN.DASHBOARD_TITLE}
+              </span>
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-wide bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent">
               {LOCALIZATION.ADMIN.DASHBOARD_TITLE}
@@ -427,7 +438,9 @@ export default function AdminPage() {
             className="flex items-center justify-center gap-2"
           >
             <AddIcon className="text-lg" />
-            {activeTab === "movies" ? LOCALIZATION.ADMIN.ADD_MOVIE : LOCALIZATION.ADMIN.ADD_CREW}
+            {activeTab === "movies"
+              ? LOCALIZATION.ADMIN.ADD_MOVIE
+              : LOCALIZATION.ADMIN.ADD_CREW}
           </Button>
         </div>
 
@@ -504,7 +517,7 @@ export default function AdminPage() {
                     { value: "", label: LOCALIZATION.ADMIN.FILTER_ALL },
                     ...availableCategories.map((cat) => ({
                       value: cat.name,
-                      label: cat.name,
+                      label: CATEGORY_TITLE_MAPPING[cat.name] || cat.name,
                     })),
                   ]}
                 />
@@ -522,11 +535,17 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <MovieTable
-              movies={filteredMovies}
-              onEdit={handleOpenEdit}
-              onDelete={setDeleteMovieId}
-            />
+            {isSearchingMovies ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="w-10 h-10 border-4 border-zinc-700 border-t-white rounded-full animate-spin" />
+              </div>
+            ) : (
+              <MovieTable
+                movies={movies}
+                onEdit={handleOpenEdit}
+                onDelete={setDeleteMovieId}
+              />
+            )}
           </div>
         ) : (
           <div className="bg-card border border-zinc-800/35 rounded-2xl shadow-xl overflow-hidden backdrop-blur-md animate-fade-in">
@@ -538,12 +557,18 @@ export default function AdminPage() {
               />
             </div>
 
-            <CrewTable
-              crew={filteredCrew}
-              movies={movies}
-              onEdit={handleOpenEditCrew}
-              onDelete={setDeleteCrewId}
-            />
+            {isSearchingCrew ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="w-10 h-10 border-4 border-zinc-700 border-t-white rounded-full animate-spin" />
+              </div>
+            ) : (
+              <CrewTable
+                crew={availableCrew}
+                movies={movies}
+                onEdit={handleOpenEditCrew}
+                onDelete={setDeleteCrewId}
+              />
+            )}
           </div>
         )}
       </main>

@@ -2,34 +2,22 @@ import {
   CrewMember,
   CreateCrewMember,
   UpdateCrewMember,
+  CrewFilterParams,
 } from "../domain/movie";
 import { CrewMemberRepository } from "../ports/crew-member.repository";
 
 export class CrewMemberService {
   constructor(private readonly crewMemberRepository: CrewMemberRepository) {}
 
-  async getAllCrewMembers(): Promise<CrewMember[]> {
+  async getCrewMembers(params?: CrewFilterParams): Promise<CrewMember[]> {
     try {
-      const response = await this.crewMemberRepository.getAllCrewMembers();
+      const response = await this.crewMemberRepository.getCrewMembers(params);
       if (response.error) {
         throw new Error(response.error);
       }
       return response.data;
     } catch (error) {
-      console.error("Error in getAllCrewMembers:", error);
-      throw error;
-    }
-  }
-
-  async searchCrewMembers(query: string): Promise<CrewMember[]> {
-    try {
-      const response = await this.crewMemberRepository.searchCrewMembers(query);
-      if (response.error) {
-        throw new Error(response.error);
-      }
-      return response.data;
-    } catch (error) {
-      console.error(`Error in searchCrewMembers (query: ${query}):`, error);
+      console.error("Error in getCrewMembers:", error);
       throw error;
     }
   }

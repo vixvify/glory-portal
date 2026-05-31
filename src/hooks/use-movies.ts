@@ -1,11 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { movieService } from "@/infra/container";
-import { Movie, CreateMovie, UpdateMovie } from "@/core/domain/movie";
+import { Movie, CreateMovie, UpdateMovie, MovieFilterParams } from "@/core/domain/movie";
 
-export function useMoviesQuery() {
+export function useMoviesQuery(params?: MovieFilterParams) {
   return useQuery<Movie[], Error>({
-    queryKey: ["movies"],
-    queryFn: () => movieService.getAllMovies(),
+    queryKey: params ? ["movies", params] : ["movies"],
+    queryFn: () => movieService.getMovies(params),
   });
 }
 

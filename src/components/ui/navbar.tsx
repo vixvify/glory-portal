@@ -9,6 +9,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Button } from "@/components/ui/button";
 import { User } from "@/core/domain/user";
 import { Category } from "@/core/domain/movie";
+import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 
 interface NavbarProps {
   searchQuery: string;
@@ -140,7 +141,7 @@ export default function Navbar({
                       className={`w-full text-left px-3 py-2 text-xs rounded-lg cursor-pointer transition-colors ${selectedCategory === cat.name ? "bg-zinc-800/60 text-brand font-bold" : "text-zinc-300 hover:bg-zinc-800/40 hover:text-white"
                         }`}
                     >
-                      {cat.name}
+                      {CATEGORY_TITLE_MAPPING[cat.name] || cat.name}
                     </button>
                   ))}
                 </div>

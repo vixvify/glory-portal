@@ -9,7 +9,7 @@ import MovieRankRow from "@/components/movie/movie-rank-row";
 import MovieDetailsModal from "@/components/movie/movie-details-modal";
 import TrailerModal from "@/components/modal/trailer-modal";
 import AuthModal from "@/components/modal/auth-modal";
-import { Movie } from "@/core/domain/movie";
+import { Movie, MovieFilterParams } from "@/core/domain/movie";
 import { User } from "@/core/domain/user";
 import { useAppStore } from "@/store/use-store";
 import Loading from "./loading";
@@ -36,8 +36,81 @@ import { useLogoutMutation } from "@/hooks/use-auth";
 import CrewRow from "@/components/movie/crew-row";
 import { CrewMember } from "@/core/domain/movie";
 
+interface UniversityMovieRowProps {
+  universityName: string;
+  title: string;
+  onMovieClick: (movie: Movie) => void;
+  onPlayClick: (movie: Movie) => void;
+  favorites: Movie[];
+  onToggleFavorite: (movieId: string) => void;
+}
+
+const UniversityMovieRow: React.FC<UniversityMovieRowProps> = ({
+  universityName,
+  title,
+  onMovieClick,
+  onPlayClick,
+  favorites,
+  onToggleFavorite,
+}) => {
+  const { data: movies = [] } = useMoviesQuery({
+    search: universityName,
+    searchby: "university",
+  });
+
+  if (movies.length === 0) return null;
+
+  return (
+    <MovieRow
+      title={title}
+      movies={movies}
+      onMovieClick={onMovieClick}
+      onPlayClick={onPlayClick}
+      favorites={favorites}
+      onToggleFavorite={onToggleFavorite}
+    />
+  );
+};
+
+interface CategoryMovieRowProps {
+  categoryName: string;
+  title: string;
+  onMovieClick: (movie: Movie) => void;
+  onPlayClick: (movie: Movie) => void;
+  favorites: Movie[];
+  onToggleFavorite: (movieId: string) => void;
+}
+
+const CategoryMovieRow: React.FC<CategoryMovieRowProps> = ({
+  categoryName,
+  title,
+  onMovieClick,
+  onPlayClick,
+  favorites,
+  onToggleFavorite,
+}) => {
+  const { data: movies = [] } = useMoviesQuery({
+    search: categoryName,
+    searchby: "category",
+  });
+
+  if (movies.length === 0) return null;
+
+  return (
+    <MovieRow
+      title={title}
+      movies={movies}
+      onMovieClick={onMovieClick}
+      onPlayClick={onPlayClick}
+      favorites={favorites}
+      onToggleFavorite={onToggleFavorite}
+    />
+  );
+};
+
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeSearchQuery, setActiveSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showMyListOnly, setShowMyListOnly] = useState(false);
 
@@ -49,10 +122,53 @@ export default function HomePage() {
 
   const { currentUser, setCurrentUser, showToast } = useAppStore();
 
-  const { data: allMovies = [], isLoading: isMoviesLoading } = useMoviesQuery();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setActiveSearchQuery(searchQuery);
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const movieParams = useMemo(() => {
+    if (activeSearchQuery.trim()) {
+      return { search: activeSearchQuery.trim() };
+    }
+    if (selectedCategory) {
+      return { search: selectedCategory, searchby: "category" };
+    }
+    return undefined;
+  }, [activeSearchQuery, selectedCategory]);
+
+  const { data: allMovies = [], isLoading: isMoviesLoading } =
+    useMoviesQuery(movieParams);
+
+  const isSearching =
+    searchQuery.trim() !== activeSearchQuery.trim() || isMoviesLoading;
+
+  const { data: recommendedMovies = [] } = useMoviesQuery({
+    sort: "desc",
+    sortby: "matchRate",
+    page: 1,
+    pagenumber: 5,
+  });
+
+  const { data: popularMovies = [] } = useMoviesQuery({
+    sort: "desc",
+    sortby: "views",
+    page: 1,
+    pagenumber: 10,
+  });
+
   const { data: categories = [] } = useCategoriesQuery();
   const { data: universities = [] } = useUniversitiesQuery();
-  const { data: crewMembers = [] } = useCrewMembersQuery();
+  const { data: directorsList = [] } = useCrewMembersQuery({
+    search: "director",
+    searchby: "role",
+  });
+  const { data: actorsList = [] } = useCrewMembersQuery({
+    search: "cast",
+    searchby: "role",
+  });
   const { data: serverFavorites } = useFavoritesQuery(!!currentUser);
 
   const [localFavorites, setLocalFavorites] = useState<Movie[] | null>(null);
@@ -196,99 +312,16 @@ export default function HomePage() {
   }, [selectedMovie, allMovies]);
 
   const filteredMovies = useMemo(() => {
-    let list = allMovies;
-
     if (showMyListOnly) {
-      list = favorites;
-    } else if (selectedCategory) {
-      list = list.filter((m) => m.category === selectedCategory);
+      return favorites;
     }
-
-    if (searchQuery.trim() !== "") {
-      const q = searchQuery.toLowerCase();
-      list = list.filter(
-        (m) =>
-          m.title.toLowerCase().includes(q) ||
-          m.category.toLowerCase().includes(q) ||
-          m.description.toLowerCase().includes(q),
-      );
-    }
-
-    return list;
-  }, [allMovies, showMyListOnly, favorites, selectedCategory, searchQuery]);
+    return allMovies;
+  }, [allMovies, showMyListOnly, favorites]);
 
   const isBrowsingRowView =
     !searchQuery && !selectedCategory && !showMyListOnly;
 
-  const recommendedMovies = useMemo(() => {
-    return [...allMovies].sort((a, b) => b.matchRate - a.matchRate).slice(0, 5);
-  }, [allMovies]);
-
-  const popularMovies = useMemo(() => {
-    return [...allMovies].sort((a, b) => (b.views || 0) - (a.views || 0));
-  }, [allMovies]);
-
-  const moviesByUniversity = useMemo(() => {
-    const map: Record<string, Movie[]> = {};
-    for (const movie of allMovies) {
-      if (movie.university) {
-        if (!map[movie.university]) {
-          map[movie.university] = [];
-        }
-        map[movie.university].push(movie);
-      }
-    }
-    return map;
-  }, [allMovies]);
-
-  const moviesByCategory = useMemo(() => {
-    const map: Record<string, Movie[]> = {};
-    for (const movie of allMovies) {
-      if (movie.category) {
-        if (!map[movie.category]) {
-          map[movie.category] = [];
-        }
-        map[movie.category].push(movie);
-      }
-    }
-    return map;
-  }, [allMovies]);
-
-  const directorsList = useMemo(() => {
-    const directorIds = new Set<string>();
-    const list: CrewMember[] = [];
-    for (const movie of allMovies) {
-      if (!movie.crew) continue;
-      for (const c of movie.crew) {
-        if (c.role.toLowerCase() === "director" && c.crewMember) {
-          if (!directorIds.has(c.crewMember.id)) {
-            directorIds.add(c.crewMember.id);
-            list.push(c.crewMember);
-          }
-        }
-      }
-    }
-    return list;
-  }, [allMovies]);
-
-  const actorsList = useMemo(() => {
-    const actorIds = new Set<string>();
-    const list: CrewMember[] = [];
-    for (const movie of allMovies) {
-      if (!movie.crew) continue;
-      for (const c of movie.crew) {
-        if (c.role.toLowerCase() === "cast" && c.crewMember) {
-          if (!actorIds.has(c.crewMember.id)) {
-            actorIds.add(c.crewMember.id);
-            list.push(c.crewMember);
-          }
-        }
-      }
-    }
-    return list;
-  }, [allMovies]);
-
-  if (isMoviesLoading) {
+  if (isMoviesLoading && isBrowsingRowView) {
     return <Loading />;
   }
 
@@ -336,22 +369,17 @@ export default function HomePage() {
               />
             )}
 
-            {universities.map((uni) => {
-              const uniMovies = moviesByUniversity[uni.name] || [];
-              if (uniMovies.length === 0) return null;
-
-              return (
-                <MovieRow
-                  key={uni.id}
-                  title={`ผลงานภาพยนตร์จาก ${uni.name}`}
-                  movies={uniMovies}
-                  onMovieClick={setSelectedMovie}
-                  onPlayClick={handlePlayTrailer}
-                  favorites={favorites}
-                  onToggleFavorite={handleToggleFavorite}
-                />
-              );
-            })}
+            {universities.map((uni) => (
+              <UniversityMovieRow
+                key={uni.id}
+                universityName={uni.name}
+                title={`ผลงานภาพยนตร์จาก ${uni.name}`}
+                onMovieClick={setSelectedMovie}
+                onPlayClick={handlePlayTrailer}
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+              />
+            ))}
 
             {directorsList.length > 0 && (
               <CrewRow
@@ -373,24 +401,17 @@ export default function HomePage() {
               />
             )}
 
-            {categories.map((category) => {
-              const categoryMovies = moviesByCategory[category.name] || [];
-              if (categoryMovies.length === 0) return null;
-
-              const displayTitle = CATEGORY_TITLE_MAPPING[category.name];
-
-              return (
-                <MovieRow
-                  key={category.id}
-                  title={displayTitle}
-                  movies={categoryMovies}
-                  onMovieClick={setSelectedMovie}
-                  onPlayClick={handlePlayTrailer}
-                  favorites={favorites}
-                  onToggleFavorite={handleToggleFavorite}
-                />
-              );
-            })}
+            {categories.map((category) => (
+              <CategoryMovieRow
+                key={category.id}
+                categoryName={category.name}
+                title={CATEGORY_TITLE_MAPPING[category.name]}
+                onMovieClick={setSelectedMovie}
+                onPlayClick={handlePlayTrailer}
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+              />
+            ))}
           </div>
         </main>
       ) : (
@@ -408,7 +429,11 @@ export default function HomePage() {
             </span>
           </div>
 
-          {filteredMovies.length === 0 ? (
+          {isSearching ? (
+            <div className="flex items-center justify-center py-24">
+              <div className="w-12 h-12 border-4 border-zinc-700 border-t-white rounded-full animate-spin" />
+            </div>
+          ) : filteredMovies.length === 0 ? (
             <div className="text-center py-24 space-y-4">
               <p className="text-lg text-zinc-400 font-light">
                 ไม่พบผลลัพธ์ที่ตรงกัน
