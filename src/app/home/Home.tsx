@@ -17,10 +17,7 @@ import { Toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 import { useMoviesQuery } from "@/hooks/use-movies";
-import {
-  useToggleFavoriteMutation,
-  useFavoritesQuery,
-} from "@/hooks/use-favorites";
+import { useToggleFavoriteMutation } from "@/hooks/use-favorites";
 import {
   useMovieUserRatingQuery,
   useAddRatingMutation,
@@ -32,6 +29,7 @@ import CrewRow from "@/components/movie/crew-row";
 import { Category } from "@/core/domain/movie";
 import { University } from "@/core/domain/movie";
 import { CrewMember } from "@/core/domain/movie";
+import Pagination from "@/components/ui/pagination";
 
 interface Props {
   recommendedMovies: Movie[];
@@ -43,6 +41,7 @@ interface Props {
   universityMoviesMap: Record<string, Movie[]>;
   categoryMoviesMap: Record<string, Movie[]>;
   initialAllMovies: Movie[];
+  serverFavorites: Movie[];
 }
 
 export default function HomePage(props: Props) {
@@ -56,11 +55,19 @@ export default function HomePage(props: Props) {
     universityMoviesMap,
     categoryMoviesMap,
     initialAllMovies,
+    serverFavorites,
   } = props;
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSearchQuery, setActiveSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showMyListOnly, setShowMyListOnly] = useState(false);
+
+  const [gridPage, setGridPage] = useState(1);
+  const GRID_PAGE_SIZE = 12;
+
+  useEffect(() => {
+    setGridPage(1);
+  }, [searchQuery, selectedCategory, showMyListOnly]);
 
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [isPlayingTrailer, setIsPlayingTrailer] = useState(false);
@@ -79,10 +86,15 @@ export default function HomePage(props: Props) {
 
   const movieParams = useMemo(() => {
     if (activeSearchQuery.trim()) {
-      return { search: activeSearchQuery.trim() };
+      return { search: activeSearchQuery.trim(), page: 1, pagenumber: 1000 };
     }
     if (selectedCategory) {
-      return { search: selectedCategory, searchby: "category" };
+      return {
+        search: selectedCategory,
+        searchby: "category",
+        page: 1,
+        pagenumber: 1000,
+      };
     }
     return undefined;
   }, [activeSearchQuery, selectedCategory]);
@@ -96,8 +108,6 @@ export default function HomePage(props: Props) {
     searchQuery.trim() !== activeSearchQuery.trim() || isMoviesLoading;
 
   const [localFavorites, setLocalFavorites] = useState<Movie[] | null>(null);
-
-  const { data: serverFavorites = [] } = useFavoritesQuery(!!currentUser);
 
   useEffect(() => {
     if (!currentUser) {
@@ -244,6 +254,11 @@ export default function HomePage(props: Props) {
     return allMovies;
   }, [allMovies, showMyListOnly, favorites]);
 
+  const paginatedFilteredMovies = useMemo(() => {
+    const startIndex = (gridPage - 1) * GRID_PAGE_SIZE;
+    return filteredMovies.slice(startIndex, startIndex + GRID_PAGE_SIZE);
+  }, [filteredMovies, gridPage]);
+
   const isBrowsingRowView =
     !searchQuery && !selectedCategory && !showMyListOnly;
 
@@ -376,13 +391,23 @@ export default function HomePage(props: Props) {
               </Button>
             </div>
           ) : (
-            <MovieGrid
-              movies={filteredMovies}
-              onMovieClick={setSelectedMovie}
-              onPlayClick={handlePlayTrailer}
-              favorites={favorites}
-              onToggleFavorite={handleToggleFavorite}
-            />
+            <div className="flex flex-col gap-8 pb-10">
+              <MovieGrid
+                movies={paginatedFilteredMovies}
+                onMovieClick={setSelectedMovie}
+                onPlayClick={handlePlayTrailer}
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+              />
+              <div className="flex justify-center border-t border-zinc-800/40 pt-4">
+                <Pagination
+                  currentPage={gridPage}
+                  totalItems={filteredMovies.length}
+                  pageSize={GRID_PAGE_SIZE}
+                  onPageChange={setGridPage}
+                />
+              </div>
+            </div>
           )}
         </main>
       )}

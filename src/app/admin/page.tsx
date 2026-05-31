@@ -157,6 +157,7 @@ export default function AdminPage() {
 
   const { data: movies = [], isLoading: isMoviesLoading } =
     useMoviesQuery(movieParams);
+
   const { data: availableCategories = [] } = useCategoriesQuery();
   const { data: availableAgeRatings = [] } = useAgeRatingsQuery();
   const { data: availableUniversities = [] } = useUniversitiesQuery();

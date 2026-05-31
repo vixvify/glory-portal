@@ -1,73 +1,100 @@
+"use client";
+
+import { useQueries } from "@tanstack/react-query";
+import { movieService } from "@/infra/container";
+import { useMoviesQuery } from "@/hooks/use-movies";
+import { useFavoritesQuery } from "@/hooks/use-favorites";
 import {
-  movieService,
-  masterDataService,
-  crewMemberService,
-} from "@/infra/container";
+  useCategoriesQuery,
+  useUniversitiesQuery,
+} from "@/hooks/use-master-data";
+import { useCrewMembersQuery } from "@/hooks/use-crew-members";
+import { useAppStore } from "@/store/use-store";
 import HomePage from "./home/Home";
 
-export const dynamic = "force-dynamic";
+export default function Page() {
+  const { currentUser } = useAppStore();
 
-export default async function Page() {
-  const [
-    recommendedMovies,
-    popularMovies,
-    categories,
-    universities,
-    directorsList,
-    actorsList,
-    allMovies,
-  ] = await Promise.all([
-    movieService.getMovies({
-      sort: "desc",
-      sortby: "matchRate",
-      page: 1,
-      pagenumber: 5,
-    }),
-    movieService.getMovies({
-      sort: "desc",
-      sortby: "views",
-      page: 1,
-      pagenumber: 10,
-    }),
-    masterDataService.getCategories(),
-    masterDataService.getUniversities(),
-    crewMemberService.getCrewMembers({
-      search: "director",
-      searchby: "role",
-    }),
-    crewMemberService.getCrewMembers({
-      search: "cast",
-      searchby: "role",
-    }),
-    movieService.getMovies(),
-  ]);
+  const { data: recommendedMovies = [] } = useMoviesQuery({
+    sort: "desc",
+    sortby: "matchRate",
+    page: 1,
+    pagenumber: 5,
+  });
 
-  const universityMoviesList = await Promise.all(
-    universities.map(async (uni) => {
-      const movies = await movieService.getMovies({
-        search: uni.name,
-        searchby: "university",
-      });
-      return { id: uni.id, movies };
-    }),
-  );
+  const { data: popularMovies = [] } = useMoviesQuery({
+    sort: "desc",
+    sortby: "views",
+    page: 1,
+    pagenumber: 10,
+  });
 
-  const categoryMoviesList = await Promise.all(
-    categories.map(async (category) => {
-      const movies = await movieService.getMovies({
-        search: category.name,
-        searchby: "category",
-      });
-      return { id: category.id, movies };
-    }),
-  );
+  const { data: categories = [] } = useCategoriesQuery();
+  const { data: universities = [] } = useUniversitiesQuery();
+
+  const { data: directorsList = [] } = useCrewMembersQuery({
+    search: "director",
+    searchby: "role",
+  });
+
+  const { data: actorsList = [] } = useCrewMembersQuery({
+    search: "cast",
+    searchby: "role",
+  });
+
+  const { data: serverFavorites = [] } = useFavoritesQuery(!!currentUser);
+
+  const universityMovieQueries = useQueries({
+    queries: universities.map((uni) => ({
+      queryKey: [
+        "movies",
+        { search: uni.name, searchby: "university", page: 1, pagenumber: 10 },
+      ],
+      queryFn: () =>
+        movieService.getMovies({
+          search: uni.name,
+          searchby: "university",
+          page: 1,
+          pagenumber: 10,
+        }),
+    })),
+  });
+
+  const categoryMovieQueries = useQueries({
+    queries: categories.map((category) => ({
+      queryKey: [
+        "movies",
+        {
+          search: category.name,
+          searchby: "category",
+          page: 1,
+          pagenumber: 10,
+        },
+      ],
+      queryFn: () =>
+        movieService.getMovies({
+          search: category.name,
+          searchby: "category",
+          page: 1,
+          pagenumber: 10,
+        }),
+    })),
+  });
+
+  const { data: allMovies = [] } = useMoviesQuery();
 
   const universityMoviesMap = Object.fromEntries(
-    universityMoviesList.map((item) => [item.id, item.movies]),
+    universities.map((uni, index) => [
+      uni.id,
+      universityMovieQueries[index]?.data || [],
+    ]),
   );
 
   const categoryMoviesMap = Object.fromEntries(
-    categoryMoviesList.map((item) => [item.id, item.movies]),
+    categories.map((category, index) => [
+      category.id,
+      categoryMovieQueries[index]?.data || [],
+    ]),
   );
 
   return (
@@ -81,6 +108,7 @@ export default async function Page() {
       universityMoviesMap={universityMoviesMap}
       categoryMoviesMap={categoryMoviesMap}
       initialAllMovies={allMovies}
+      serverFavorites={serverFavorites}
     />
   );
 }
