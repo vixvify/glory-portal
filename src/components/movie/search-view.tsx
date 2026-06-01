@@ -1,0 +1,83 @@
+import { Movie } from "@/core/domain/movie";
+import MovieGrid from "./movie-grid";
+import { Button } from "../ui/button";
+import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
+
+interface SearchViewProps {
+  searchQuery: string;
+  showMyListOnly: boolean;
+  selectedCategory: string | null;
+  filteredMovies: Movie[];
+  isSearching: boolean;
+  handlePlayTrailer: (movie: Movie) => void;
+  setSelectedMovie: (movie: Movie) => void;
+  handleToggleFavorite: (movieId: string) => void;
+  favorites: Movie[];
+  setSearchQuery: (query: string) => void;
+  setSelectedCategory: (category: string | null) => void;
+  setShowMyListOnly: (showMyListOnly: boolean) => void;
+}
+
+export default function SearchView({
+  searchQuery,
+  showMyListOnly,
+  selectedCategory,
+  filteredMovies,
+  isSearching,
+  handlePlayTrailer,
+  setSelectedMovie,
+  handleToggleFavorite,
+  favorites,
+  setSearchQuery,
+  setSelectedCategory,
+  setShowMyListOnly,
+}: SearchViewProps) {
+  return (
+    <main className="flex-1 px-6 md:px-16 pt-28 space-y-8 animate-fade-in">
+      <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+        <h2 className="text-2xl md:text-3xl font-extrabold tracking-wide">
+          {searchQuery
+            ? `ผลลัพธ์การค้นหา "${searchQuery}"`
+            : showMyListOnly
+              ? "รายการของฉัน"
+              : `${CATEGORY_TITLE_MAPPING[selectedCategory || ""]}`}
+        </h2>
+        <span className="text-sm text-zinc-400">
+          {filteredMovies.length} เรื่อง
+        </span>
+      </div>
+
+      {isSearching ? (
+        <div className="flex items-center justify-center py-24">
+          <div className="w-12 h-12 border-4 border-zinc-700 border-t-white rounded-full animate-spin" />
+        </div>
+      ) : filteredMovies.length === 0 ? (
+        <div className="text-center py-24 space-y-4">
+          <p className="text-lg text-zinc-400 font-light">
+            ไม่พบผลลัพธ์ที่ตรงกัน
+          </p>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setSearchQuery("");
+              setSelectedCategory(null);
+              setShowMyListOnly(false);
+            }}
+          >
+            ล้างตัวกรอง
+          </Button>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-8 pb-10">
+          <MovieGrid
+            movies={filteredMovies}
+            onMovieClick={setSelectedMovie}
+            onPlayClick={handlePlayTrailer}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
+          />
+        </div>
+      )}
+    </main>
+  );
+}

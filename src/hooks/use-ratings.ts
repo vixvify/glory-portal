@@ -7,7 +7,7 @@ export function useMovieUserRatingQuery(
   userId: string,
   enabled = true,
 ) {
-  return useQuery<Rating[], Error>({
+  return useQuery<Rating, Error>({
     queryKey: ["movie-rating", movieId, userId],
     queryFn: () => ratingService.getRatingByMovieAndUser({ movieId, userId }),
     enabled: enabled && !!movieId && !!userId,

@@ -2,10 +2,6 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import Navbar from "@/components/ui/navbar";
-import MovieHero from "@/components/movie/movie-hero";
-import MovieGrid from "@/components/movie/movie-grid";
-import MovieRow from "@/components/movie/movie-row";
-import MovieRankRow from "@/components/movie/movie-rank-row";
 import MovieDetailsModal from "@/components/movie/movie-details-modal";
 import TrailerModal from "@/components/modal/trailer-modal";
 import AuthModal from "@/components/modal/auth-modal";
@@ -14,8 +10,6 @@ import { User } from "@/core/domain/user";
 import { useAppStore } from "@/store/use-store";
 import Loading from "../loading";
 import { Toast } from "@/components/ui/toast";
-import { Button } from "@/components/ui/button";
-import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 import { useMoviesQuery } from "@/hooks/use-movies";
 import { useToggleFavoriteMutation } from "@/hooks/use-favorites";
 import {
@@ -25,11 +19,12 @@ import {
   useDeleteRatingMutation,
 } from "@/hooks/use-ratings";
 import { useLogoutMutation } from "@/hooks/use-auth";
-import CrewRow from "@/components/movie/crew-row";
 import { Category } from "@/core/domain/movie";
 import { University } from "@/core/domain/movie";
 import { CrewMember } from "@/core/domain/movie";
-import Pagination from "@/components/ui/pagination";
+import { useDebounce } from "@/hooks/use-debounce";
+import HomeView from "@/components/movie/home-view";
+import SearchView from "@/components/movie/search-view";
 
 interface Props {
   recommendedMovies: Movie[];
@@ -41,7 +36,7 @@ interface Props {
   universityMoviesMap: Record<string, Movie[]>;
   categoryMoviesMap: Record<string, Movie[]>;
   initialAllMovies: Movie[];
-  serverFavorites: Movie[];
+  favorites: Movie[];
 }
 
 export default function HomePage(props: Props) {
@@ -55,45 +50,27 @@ export default function HomePage(props: Props) {
     universityMoviesMap,
     categoryMoviesMap,
     initialAllMovies,
-    serverFavorites,
+    favorites,
   } = props;
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeSearchQuery, setActiveSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showMyListOnly, setShowMyListOnly] = useState(false);
-
-  const [gridPage, setGridPage] = useState(1);
-  const GRID_PAGE_SIZE = 12;
-
-  useEffect(() => {
-    setGridPage(1);
-  }, [searchQuery, selectedCategory, showMyListOnly]);
-
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [isPlayingTrailer, setIsPlayingTrailer] = useState(false);
   const [trailerMovie, setTrailerMovie] = useState<Movie | null>(null);
-
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
   const { currentUser, setCurrentUser, showToast } = useAppStore();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setActiveSearchQuery(searchQuery);
-    }, 200);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
+  const activeSearchQuery = useDebounce(searchQuery, 200);
   const movieParams = useMemo(() => {
     if (activeSearchQuery.trim()) {
-      return { search: activeSearchQuery.trim(), page: 1, pagenumber: 1000 };
+      return { search: activeSearchQuery.trim() };
     }
     if (selectedCategory) {
       return {
         search: selectedCategory,
         searchby: "category",
-        page: 1,
-        pagenumber: 1000,
       };
     }
     return undefined;
@@ -101,41 +78,36 @@ export default function HomePage(props: Props) {
 
   const { data: fetchedMovies = [], isLoading: isMoviesLoading } =
     useMoviesQuery(movieParams);
-
-  const allMovies = movieParams ? fetchedMovies : initialAllMovies;
-
-  const isSearching =
-    searchQuery.trim() !== activeSearchQuery.trim() || isMoviesLoading;
-
-  const [localFavorites, setLocalFavorites] = useState<Movie[] | null>(null);
-
-  useEffect(() => {
-    if (!currentUser) {
-      setLocalFavorites(null);
-      setShowMyListOnly(false);
-    }
-  }, [currentUser]);
-
-  useEffect(() => {
-    if (serverFavorites) {
-      setLocalFavorites(null);
-    }
-  }, [serverFavorites]);
-
-  const favorites = localFavorites ?? serverFavorites;
-
-  const { data: userRatings = [] } = useMovieUserRatingQuery(
+  const { data: userRatings } = useMovieUserRatingQuery(
     selectedMovie?.id || "",
     currentUser?.id || "",
     !!selectedMovie && !!currentUser,
   );
-  const currentUserRating = userRatings.length > 0 ? userRatings[0] : null;
-
   const toggleFavoriteMutation = useToggleFavoriteMutation();
   const addRatingMutation = useAddRatingMutation();
   const updateRatingMutation = useUpdateRatingMutation();
   const deleteRatingMutation = useDeleteRatingMutation();
   const logoutMutation = useLogoutMutation();
+
+  const moviesData = movieParams ? fetchedMovies : initialAllMovies;
+
+  const activeMovieForModal = useMemo(() => {
+    if (!selectedMovie) return null;
+    return moviesData.find((m) => m.id === selectedMovie.id) || selectedMovie;
+  }, [selectedMovie, moviesData]);
+
+  const filteredMovies = useMemo(() => {
+    if (showMyListOnly) {
+      return favorites;
+    }
+    return moviesData;
+  }, [moviesData, showMyListOnly, favorites]);
+
+  useEffect(() => {
+    if (!currentUser) {
+      setShowMyListOnly(false);
+    }
+  }, [currentUser]);
 
   const handleLoginSuccess = useCallback(
     (user: User) => {
@@ -155,16 +127,6 @@ export default function HomePage(props: Props) {
         return;
       }
       const isCurrentlyFavorite = favorites.some((m) => m.id === movieId);
-      const previousFavorites = [...favorites];
-
-      const targetMovie = allMovies.find((m) => m.id === movieId);
-      const updatedFavorites = isCurrentlyFavorite
-        ? favorites.filter((m) => m.id !== movieId)
-        : targetMovie
-          ? [...favorites, targetMovie]
-          : favorites;
-
-      setLocalFavorites(updatedFavorites);
 
       toggleFavoriteMutation.mutate(
         { movieId, isFavorite: isCurrentlyFavorite },
@@ -177,13 +139,12 @@ export default function HomePage(props: Props) {
             }
           },
           onError: () => {
-            setLocalFavorites(previousFavorites);
             showToast("เกิดข้อผิดพลาดในการปรับปรุงรายการโปรด", "error");
           },
         },
       );
     },
-    [currentUser, favorites, allMovies, toggleFavoriteMutation, showToast],
+    [currentUser, favorites, moviesData, toggleFavoriteMutation, showToast],
   );
 
   const handleAddRating = useCallback(
@@ -242,22 +203,8 @@ export default function HomePage(props: Props) {
     setIsPlayingTrailer(true);
   }, []);
 
-  const activeMovieForModal = useMemo(() => {
-    if (!selectedMovie) return null;
-    return allMovies.find((m) => m.id === selectedMovie.id) || selectedMovie;
-  }, [selectedMovie, allMovies]);
-
-  const filteredMovies = useMemo(() => {
-    if (showMyListOnly) {
-      return favorites;
-    }
-    return allMovies;
-  }, [allMovies, showMyListOnly, favorites]);
-
-  const paginatedFilteredMovies = useMemo(() => {
-    const startIndex = (gridPage - 1) * GRID_PAGE_SIZE;
-    return filteredMovies.slice(startIndex, startIndex + GRID_PAGE_SIZE);
-  }, [filteredMovies, gridPage]);
+  const isSearching =
+    searchQuery.trim() !== activeSearchQuery.trim() || isMoviesLoading;
 
   const isBrowsingRowView =
     !searchQuery && !selectedCategory && !showMyListOnly;
@@ -282,134 +229,37 @@ export default function HomePage(props: Props) {
       />
 
       {isBrowsingRowView ? (
-        <main className="flex-1 flex flex-col">
-          <MovieHero
-            movies={recommendedMovies}
-            onPlayClick={handlePlayTrailer}
-            onInfoClick={setSelectedMovie}
-          />
-
-          <div className="relative z-20 px-6 md:px-16 space-y-12 -mt-6 md:-mt-10">
-            <MovieRankRow
-              title="10 อันดับหนังยอดนิยม"
-              movies={popularMovies}
-              onMovieClick={setSelectedMovie}
-              onPlayClick={handlePlayTrailer}
-              favorites={favorites}
-              onToggleFavorite={handleToggleFavorite}
-            />
-
-            {favorites.length > 0 && (
-              <MovieRow
-                title="รายการโปรดของคุณ"
-                movies={favorites}
-                onMovieClick={setSelectedMovie}
-                onPlayClick={handlePlayTrailer}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-              />
-            )}
-
-            {universities.map((uni) => (
-              <MovieRow
-                key={uni.id}
-                title={`ผลงานภาพยนตร์จาก ${uni.name}`}
-                movies={universityMoviesMap[uni.id] || []}
-                onMovieClick={setSelectedMovie}
-                onPlayClick={handlePlayTrailer}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-              />
-            ))}
-
-            {directorsList.length > 0 && (
-              <CrewRow
-                title="ผู้กำกับยอดนิยม"
-                crew={directorsList}
-                onCrewClick={(member) => {
-                  setSearchQuery(member.name);
-                }}
-              />
-            )}
-
-            {actorsList.length > 0 && (
-              <CrewRow
-                title="นักแสดงและทีมงาน"
-                crew={actorsList}
-                onCrewClick={(member) => {
-                  setSearchQuery(member.name);
-                }}
-              />
-            )}
-
-            {categories.map((category) => (
-              <MovieRow
-                key={category.id}
-                title={CATEGORY_TITLE_MAPPING[category.name]}
-                movies={categoryMoviesMap[category.id] || []}
-                onMovieClick={setSelectedMovie}
-                onPlayClick={handlePlayTrailer}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-              />
-            ))}
-          </div>
-        </main>
+        <HomeView
+          recommendedMovies={recommendedMovies}
+          popularMovies={popularMovies}
+          categories={categories}
+          universities={universities}
+          directorsList={directorsList}
+          actorsList={actorsList}
+          universityMoviesMap={universityMoviesMap}
+          categoryMoviesMap={categoryMoviesMap}
+          initialAllMovies={initialAllMovies}
+          favorites={favorites}
+          handlePlayTrailer={handlePlayTrailer}
+          setSelectedMovie={setSelectedMovie}
+          handleToggleFavorite={handleToggleFavorite}
+          setSearchQuery={setSearchQuery}
+        />
       ) : (
-        <main className="flex-1 px-6 md:px-16 pt-28 space-y-8 animate-fade-in">
-          <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
-            <h2 className="text-2xl md:text-3xl font-extrabold tracking-wide">
-              {searchQuery
-                ? `ผลลัพธ์การค้นหา "${searchQuery}"`
-                : showMyListOnly
-                  ? "รายการของฉัน"
-                  : `${CATEGORY_TITLE_MAPPING[selectedCategory || ""]}`}
-            </h2>
-            <span className="text-sm text-zinc-400">
-              {filteredMovies.length} เรื่อง
-            </span>
-          </div>
-
-          {isSearching ? (
-            <div className="flex items-center justify-center py-24">
-              <div className="w-12 h-12 border-4 border-zinc-700 border-t-white rounded-full animate-spin" />
-            </div>
-          ) : filteredMovies.length === 0 ? (
-            <div className="text-center py-24 space-y-4">
-              <p className="text-lg text-zinc-400 font-light">
-                ไม่พบผลลัพธ์ที่ตรงกัน
-              </p>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  setSearchQuery("");
-                  setSelectedCategory(null);
-                  setShowMyListOnly(false);
-                }}
-              >
-                ล้างตัวกรอง
-              </Button>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-8 pb-10">
-              <MovieGrid
-                movies={paginatedFilteredMovies}
-                onMovieClick={setSelectedMovie}
-                onPlayClick={handlePlayTrailer}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-              />
-              <div className="flex justify-center border-t border-zinc-800/40 pt-4">
-                <Pagination
-                  currentPage={gridPage}
-                  totalItems={filteredMovies.length}
-                  pageSize={GRID_PAGE_SIZE}
-                  onPageChange={setGridPage}
-                />
-              </div>
-            </div>
-          )}
-        </main>
+        <SearchView
+          searchQuery={searchQuery}
+          showMyListOnly={showMyListOnly}
+          selectedCategory={selectedCategory}
+          filteredMovies={filteredMovies}
+          isSearching={isSearching}
+          handlePlayTrailer={handlePlayTrailer}
+          setSelectedMovie={setSelectedMovie}
+          handleToggleFavorite={handleToggleFavorite}
+          favorites={favorites}
+          setSearchQuery={setSearchQuery}
+          setSelectedCategory={setSelectedCategory}
+          setShowMyListOnly={setShowMyListOnly}
+        />
       )}
 
       {activeMovieForModal && (
@@ -425,7 +275,7 @@ export default function HomePage(props: Props) {
           onAddRating={handleAddRating}
           onUpdateRating={handleUpdateRating}
           onDeleteRating={handleDeleteRating}
-          userRating={currentUserRating}
+          userRating={userRatings || null}
           currentUser={currentUser}
           onSignInClick={() => setIsAuthOpen(true)}
         />

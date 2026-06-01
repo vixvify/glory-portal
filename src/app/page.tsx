@@ -108,7 +108,7 @@ export default function Page() {
       universityMoviesMap={universityMoviesMap}
       categoryMoviesMap={categoryMoviesMap}
       initialAllMovies={allMovies}
-      serverFavorites={serverFavorites}
+      favorites={serverFavorites}
     />
   );
 }

@@ -24,8 +24,8 @@ export class RatingRepositoryImpl implements RatingRepository {
 
   async getRatingByMovieAndUser(
     data: RatingCheckInput,
-  ): Promise<ApiResponse<Rating[]>> {
-    return await httpClient.get<Rating[]>(`/movie/ratings`, {
+  ): Promise<ApiResponse<Rating>> {
+    return await httpClient.get<Rating>(`/movie/ratings`, {
       params: data,
     });
   }

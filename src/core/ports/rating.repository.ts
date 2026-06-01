@@ -6,7 +6,5 @@ export interface RatingRepository {
   checkRating(data: RatingCheckInput): Promise<ApiResponse<boolean>>;
   deleteRating(data: RatingCheckInput): Promise<ApiResponse<void>>;
   updateRating(data: RatingInput): Promise<ApiResponse<void>>;
-  getRatingByMovieAndUser(
-    data: RatingCheckInput,
-  ): Promise<ApiResponse<Rating[]>>;
+  getRatingByMovieAndUser(data: RatingCheckInput): Promise<ApiResponse<Rating>>;
 }
