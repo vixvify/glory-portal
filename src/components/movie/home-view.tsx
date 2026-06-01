@@ -70,23 +70,11 @@ export default function HomeView({
         ))}
 
         {directorsList.length > 0 && (
-          <CrewRow
-            title="ผู้กำกับยอดนิยม"
-            crew={directorsList}
-            onCrewClick={(member) => {
-              setSearchQuery(member.name);
-            }}
-          />
+          <CrewRow title="ผู้กำกับยอดนิยม" crew={directorsList} />
         )}
 
         {actorsList.length > 0 && (
-          <CrewRow
-            title="นักแสดงและทีมงาน"
-            crew={actorsList}
-            onCrewClick={(member) => {
-              setSearchQuery(member.name);
-            }}
-          />
+          <CrewRow title="นักแสดงและทีมงาน" crew={actorsList} />
         )}
 
         {categories.map((category) => (

@@ -28,17 +28,19 @@ function MovieCard({
   const { currentUser } = useAppStore();
 
   const handlePlay = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     onPlayClick(movie);
   };
 
   const handleToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     onToggleFavorite(movie.id);
   };
 
   return (
-    <div className="group relative cursor-pointer bg-zinc-900 rounded-xl overflow-hidden shadow-lg border border-zinc-800/80 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-105 md:hover:scale-112 hover:shadow-2xl hover:shadow-black/50 hover:border-zinc-700/60 z-10 hover:z-20 flex flex-col h-full">
+    <div className="group relative cursor-pointer bg-zinc-900 rounded-xl overflow-hidden shadow-lg border border-zinc-800/80 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:shadow-2xl hover:shadow-black/50 hover:border-zinc-700/60 z-10 hover:z-20 flex flex-col h-full">
       <div className="relative aspect-video w-full overflow-hidden bg-zinc-950">
         <Image
           src={movie.thumbnail}

@@ -9,10 +9,9 @@ import { CrewMember } from "@/core/domain/movie";
 interface CrewRowProps {
   title: string;
   crew: CrewMember[];
-  onCrewClick: (crew: CrewMember) => void;
 }
 
-export default function CrewRow({ title, crew, onCrewClick }: CrewRowProps) {
+export default function CrewRow({ title, crew }: CrewRowProps) {
   const rowRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
@@ -68,7 +67,6 @@ export default function CrewRow({ title, crew, onCrewClick }: CrewRowProps) {
           {crew.map((member) => (
             <div
               key={member.id}
-              onClick={() => onCrewClick(member)}
               className="flex-none w-32 sm:w-40 flex flex-col items-center select-none group/item cursor-pointer snap-start"
             >
               <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-2 border-zinc-800/60 group-hover/item:border-brand/80 transition-all duration-300 shadow-md relative aspect-square">
