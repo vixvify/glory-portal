@@ -5,11 +5,11 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Movie } from "@/core/domain/movie";
 import MovieCard from "@/components/movie/movie-card";
+import Link from "next/link";
 
 interface MovieRowProps {
   title: string;
   movies: Movie[];
-  onMovieClick: (movie: Movie) => void;
   onPlayClick: (movie: Movie) => void;
   favorites: Movie[];
   onToggleFavorite: (movieId: string) => void;
@@ -18,7 +18,6 @@ interface MovieRowProps {
 export default function MovieRow({
   title,
   movies,
-  onMovieClick,
   onPlayClick,
   favorites,
   onToggleFavorite,
@@ -76,18 +75,16 @@ export default function MovieRow({
           className="flex overflow-x-auto gap-4 py-4 px-1.5 no-scrollbar scroll-smooth snap-x snap-mandatory"
         >
           {movies.map((movie) => (
-            <div
-              key={movie.id}
-              className="flex-none w-[200px] sm:w-[240px] md:w-[280px] snap-start"
-            >
-              <MovieCard
-                movie={movie}
-                onClick={onMovieClick}
-                onPlayClick={onPlayClick}
-                isFavorite={favorites.some((fav) => fav.id === movie.id)}
-                onToggleFavorite={onToggleFavorite}
-              />
-            </div>
+            <Link href={`/movies/${movie.id}`} key={movie.id}>
+              <div className="flex-none w-[200px] sm:w-[240px] md:w-[280px] snap-start">
+                <MovieCard
+                  movie={movie}
+                  onPlayClick={onPlayClick}
+                  isFavorite={favorites.some((fav) => fav.id === movie.id)}
+                  onToggleFavorite={onToggleFavorite}
+                />
+              </div>
+            </Link>
           ))}
         </div>
 

@@ -13,6 +13,7 @@ import { Movie } from "@/core/domain/movie";
 import { User } from "@/core/domain/user";
 import { Rating } from "@/core/domain/rating";
 import { Button } from "@/components/ui/button";
+import { calculateRatingStats } from "@/utils/rating";
 
 interface MovieDetailsModalProps {
   isOpen: boolean;
@@ -66,9 +67,7 @@ export default function MovieDetailsModal({
 
   if (!isOpen) return null;
 
-  const totalScore = movie.ratings.reduce((sum, r) => sum + r.stars, 0);
-  const averageRating =
-    movie.ratings.length > 0 ? totalScore / movie.ratings.length : 0;
+  const { averageRating } = calculateRatingStats(movie.ratings);
 
   const directors = useMemo(
     () =>

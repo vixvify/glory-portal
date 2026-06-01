@@ -14,6 +14,14 @@ export function useMoviesQuery(params?: MovieFilterParams) {
   });
 }
 
+export function useMovieQueryById(id?: string) {
+  return useQuery<Movie, Error>({
+    queryKey: ["movie", id],
+    queryFn: () => movieService.getMovieById(id!),
+    enabled: !!id,
+  });
+}
+
 export function useCreateMovieMutation() {
   const queryClient = useQueryClient();
   return useMutation<Movie, Error, CreateMovie>({

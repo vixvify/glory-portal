@@ -2,14 +2,12 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import Navbar from "@/components/ui/navbar";
 import {
   Movie,
   CreateMovie,
   UpdateMovie,
   CrewMember,
   MovieFilterParams,
-  CrewFilterParams,
 } from "@/core/domain/movie";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -49,6 +47,7 @@ import { MovieFormSidebar } from "@/components/ui/movie-form-sidebar";
 import { MovieTable } from "@/components/ui/movie-table";
 import { CrewTable } from "@/components/ui/crew-table";
 import { CrewFormModal } from "@/components/modal/crew-form-modal";
+import { useDebounce } from "@/hooks/use-debounce";
 
 type ValidatedMoviePayload = {
   title: string;
@@ -69,12 +68,16 @@ type ValidatedMoviePayload = {
   btsPhotos?: (File | string)[];
 };
 
+type ValidatedCrewPayload = {
+  name: string;
+  photoUrl: File | string | null;
+};
+
 type Sortby = "title" | "year" | "views";
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<"movies" | "crew">("movies");
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeSearchQuery, setActiveSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [sortBy, setSortBy] = useState<Sortby>("title");
   const { currentUser, showToast } = useAppStore();
@@ -87,24 +90,12 @@ export default function AdminPage() {
   const [isDeletingLocal, setIsDeletingLocal] = useState(false);
 
   const [crewSearchQuery, setCrewSearchQuery] = useState("");
-  const [activeCrewSearchQuery, setActiveCrewSearchQuery] = useState("");
   const [isCrewFormOpen, setIsCrewFormOpen] = useState(false);
   const [editingCrew, setEditingCrew] = useState<CrewMember | null>(null);
   const [deleteCrewId, setDeleteCrewId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setActiveSearchQuery(searchQuery);
-    }, 200);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setActiveCrewSearchQuery(crewSearchQuery);
-    }, 200);
-    return () => clearTimeout(timer);
-  }, [crewSearchQuery]);
+  const activeSearchQuery = useDebounce(searchQuery, 200);
+  const activeCrewSearchQuery = useDebounce(crewSearchQuery, 200);
 
   const [crewNameInput, setCrewNameInput] = useState("");
   const [crewPhotoInput, setCrewPhotoInput] = useState<File | null>(null);
@@ -398,20 +389,6 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-background text-white flex flex-col font-sans select-none pb-20">
-      <Navbar
-        searchQuery=""
-        onSearchChange={() => {}}
-        selectedCategory={null}
-        onCategoryChange={() => {}}
-        showMyListOnly={false}
-        onMyListOnlyChange={() => {}}
-        currentUser={currentUser}
-        onSignOut={() => {
-          logoutMutation.mutate();
-        }}
-        onSignInClick={() => {}}
-        categories={availableCategories}
-      />
 
       <main className="flex-1 px-6 md:px-16 pt-28 max-w-7xl mx-auto w-full space-y-8 animate-fade-in">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

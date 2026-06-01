@@ -5,42 +5,28 @@ import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 
 interface SearchViewProps {
   searchQuery: string;
-  showMyListOnly: boolean;
-  selectedCategory: string | null;
   filteredMovies: Movie[];
   isSearching: boolean;
   handlePlayTrailer: (movie: Movie) => void;
-  setSelectedMovie: (movie: Movie) => void;
   handleToggleFavorite: (movieId: string) => void;
   favorites: Movie[];
   setSearchQuery: (query: string) => void;
-  setSelectedCategory: (category: string | null) => void;
-  setShowMyListOnly: (showMyListOnly: boolean) => void;
 }
 
 export default function SearchView({
   searchQuery,
-  showMyListOnly,
-  selectedCategory,
   filteredMovies,
   isSearching,
   handlePlayTrailer,
-  setSelectedMovie,
   handleToggleFavorite,
   favorites,
   setSearchQuery,
-  setSelectedCategory,
-  setShowMyListOnly,
 }: SearchViewProps) {
   return (
     <main className="flex-1 px-6 md:px-16 pt-28 space-y-8 animate-fade-in">
       <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
         <h2 className="text-2xl md:text-3xl font-extrabold tracking-wide">
-          {searchQuery
-            ? `ผลลัพธ์การค้นหา "${searchQuery}"`
-            : showMyListOnly
-              ? "รายการของฉัน"
-              : `${CATEGORY_TITLE_MAPPING[selectedCategory || ""]}`}
+          {`ผลลัพธ์การค้นหา ${searchQuery}`}
         </h2>
         <span className="text-sm text-zinc-400">
           {filteredMovies.length} เรื่อง
@@ -60,8 +46,6 @@ export default function SearchView({
             variant="secondary"
             onClick={() => {
               setSearchQuery("");
-              setSelectedCategory(null);
-              setShowMyListOnly(false);
             }}
           >
             ล้างตัวกรอง
@@ -71,7 +55,6 @@ export default function SearchView({
         <div className="flex flex-col gap-8 pb-10">
           <MovieGrid
             movies={filteredMovies}
-            onMovieClick={setSelectedMovie}
             onPlayClick={handlePlayTrailer}
             favorites={favorites}
             onToggleFavorite={handleToggleFavorite}

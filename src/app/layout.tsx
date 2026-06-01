@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Kanit } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
+import Navbar from "@/components/ui/navbar";
 
 const kanit = Kanit({
   subsets: ["latin"],
@@ -26,7 +27,10 @@ export default function RootLayout({
       className={`${kanit.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Providers>{children}</Providers>
+        <Providers>
+          <Navbar />
+          {children}
+        </Providers>
       </body>
     </html>
   );

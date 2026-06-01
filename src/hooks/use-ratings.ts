@@ -20,6 +20,7 @@ export function useAddRatingMutation() {
     mutationFn: (data) => ratingService.addRating(data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["movies"] });
+      queryClient.invalidateQueries({ queryKey: ["movie", variables.movieId] });
       queryClient.invalidateQueries({
         queryKey: ["movie-rating", variables.movieId, variables.userId],
       });
@@ -33,6 +34,7 @@ export function useUpdateRatingMutation() {
     mutationFn: (data) => ratingService.updateRating(data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["movies"] });
+      queryClient.invalidateQueries({ queryKey: ["movie", variables.movieId] });
       queryClient.invalidateQueries({
         queryKey: ["movie-rating", variables.movieId, variables.userId],
       });
@@ -46,6 +48,7 @@ export function useDeleteRatingMutation() {
     mutationFn: (data) => ratingService.deleteRating(data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["movies"] });
+      queryClient.invalidateQueries({ queryKey: ["movie", variables.movieId] });
       queryClient.invalidateQueries({
         queryKey: ["movie-rating", variables.movieId, variables.userId],
       });

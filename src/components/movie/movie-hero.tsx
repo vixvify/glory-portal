@@ -8,14 +8,14 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Movie } from "@/core/domain/movie";
 import { Button } from "@/components/ui/button";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
+import Link from "next/link";
 
 interface Props {
   movies: Movie[];
   onPlayClick: (movie: Movie) => void;
-  onInfoClick: (movie: Movie) => void;
 }
 
-export default function MovieHero({ movies, onPlayClick, onInfoClick }: Props) {
+export default function MovieHero({ movies, onPlayClick }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -155,14 +155,15 @@ export default function MovieHero({ movies, onPlayClick, onInfoClick }: Props) {
             เล่น
           </Button>
 
-          <Button
-            variant="outline"
-            onClick={() => onInfoClick(currentMovie)}
-            className="bg-zinc-600/20 backdrop-blur-md hover:bg-zinc-600/45 active:scale-95 font-bold px-6 md:px-8 py-2.5 md:py-3.5 flex items-center gap-2 border border-zinc-500/25"
-          >
-            <InfoOutlinedIcon className="text-xl md:text-2xl" />
-            ข้อมูลเพิ่มเติม
-          </Button>
+          <Link href={`/movies/${currentMovie.id}`}>
+            <Button
+              variant="outline"
+              className="bg-zinc-600/20 backdrop-blur-md hover:bg-zinc-600/45 active:scale-95 font-bold px-6 md:px-8 py-2.5 md:py-3.5 flex items-center gap-2 border border-zinc-500/25"
+            >
+              <InfoOutlinedIcon className="text-xl md:text-2xl" />
+              ข้อมูลเพิ่มเติม
+            </Button>
+          </Link>
         </div>
       </div>
 

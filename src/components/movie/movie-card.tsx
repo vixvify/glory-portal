@@ -9,10 +9,10 @@ import StarIcon from "@mui/icons-material/Star";
 import { Movie } from "../../core/domain/movie";
 import { useAppStore } from "@/store/use-store";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
+import { calculateRatingStats } from "@/utils/rating";
 
 interface Props {
   movie: Movie;
-  onClick: (movie: Movie) => void;
   onPlayClick: (movie: Movie) => void;
   isFavorite: boolean;
   onToggleFavorite: (movieId: string) => void;
@@ -20,19 +20,12 @@ interface Props {
 
 function MovieCard({
   movie,
-  onClick,
   onPlayClick,
   isFavorite,
   onToggleFavorite,
 }: Props) {
-  const totalScore = movie.ratings.reduce((sum, r) => sum + r.stars, 0);
-  const averageRating =
-    movie.ratings.length > 0 ? totalScore / movie.ratings.length : 0;
+  const { averageRating } = calculateRatingStats(movie.ratings);
   const { currentUser } = useAppStore();
-
-  const handleClick = () => {
-    onClick(movie);
-  };
 
   const handlePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -45,10 +38,7 @@ function MovieCard({
   };
 
   return (
-    <div
-      onClick={handleClick}
-      className="group relative cursor-pointer bg-zinc-900 rounded-xl overflow-hidden shadow-lg border border-zinc-800/80 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-105 md:hover:scale-112 hover:shadow-2xl hover:shadow-black/50 hover:border-zinc-700/60 z-10 hover:z-20 flex flex-col h-full"
-    >
+    <div className="group relative cursor-pointer bg-zinc-900 rounded-xl overflow-hidden shadow-lg border border-zinc-800/80 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-105 md:hover:scale-112 hover:shadow-2xl hover:shadow-black/50 hover:border-zinc-700/60 z-10 hover:z-20 flex flex-col h-full">
       <div className="relative aspect-video w-full overflow-hidden bg-zinc-950">
         <Image
           src={movie.thumbnail}

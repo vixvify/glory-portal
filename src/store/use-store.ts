@@ -15,17 +15,27 @@ interface AppState {
 
   showToast: (
     message: string,
-    type?: "success" | "error" | "info" | "warning"
+    type?: "success" | "error" | "info" | "warning",
   ) => void;
 
   hideToast: () => void;
+
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  isAuthOpen: boolean;
+  setIsAuthOpen: (open: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()((set, get) => ({
   currentUser: null,
   toast: null,
+  searchQuery: "",
+  isAuthOpen: false,
 
   setCurrentUser: (user) => set({ currentUser: user }),
+
+  setSearchQuery: (query) => set({ searchQuery: query }),
+  setIsAuthOpen: (open) => set({ isAuthOpen: open }),
 
   checkAuth: async () => {
     try {
