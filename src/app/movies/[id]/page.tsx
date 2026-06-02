@@ -204,15 +204,17 @@ export default function MovieDetails() {
                         className="w-12 h-12 rounded-full object-cover bg-zinc-800 border border-zinc-700/50 group-hover:border-brand/40 transition-colors"
                       />
                       <div>
-                        <p className="font-bold text-zinc-200 group-hover:text-white transition-colors">
+                        <p className="font-bold text-zinc-200 group-hover:text-brand transition-colors flex items-center gap-1.5">
                           {member.crewMember?.name}
+                          {member.crewMember?.userId && (
+                            <span
+                              className="w-1.5 h-1.5 bg-emerald-500 rounded-full"
+                              title="ผู้ใช้งานระบบ"
+                            />
+                          )}
                         </p>
-                        <p className="text-[10px] text-brand uppercase tracking-widest font-semibold mt-0.5">
-                          {member.role === "director"
-                            ? "ผู้กำกับ"
-                            : member.role === "cast"
-                              ? "นักแสดง"
-                              : member.role}
+                        <p className="text-[10px] text-brand uppercase tracking-widest font-medium mt-0.5">
+                          {member.role}
                         </p>
                       </div>
                     </div>

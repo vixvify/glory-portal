@@ -65,12 +65,25 @@ export const CrewTable: React.FC<CrewTableProps> = ({
                       </div>
                     )}
                     <div>
-                      <h4 className="font-bold text-white group-hover/row:text-brand transition-colors">
+                      <h4 className="font-bold text-white group-hover/row:text-brand transition-colors flex items-center gap-1.5">
                         {member.name}
+                        {member.userId && (
+                          <span
+                            className="w-1.5 h-1.5 bg-emerald-500 rounded-full"
+                            title="ผู้ใช้ในระบบ (Linked Account)"
+                          />
+                        )}
                       </h4>
-                      <p className="text-[10px] text-zinc-500 font-mono">
-                        ID: {member.id}
-                      </p>
+                      <div className="flex flex-col gap-0.5 mt-0.5">
+                        {member.email && (
+                          <p className="text-[10px] text-zinc-400 font-medium">
+                            {member.email}
+                          </p>
+                        )}
+                        <p className="text-[9px] text-zinc-500 font-mono">
+                          ID: {member.id}
+                        </p>
+                      </div>
                     </div>
                   </td>
 

@@ -34,11 +34,13 @@ export class CrewMemberService {
       throw error;
     }
   }
-
   async createCrewMember(crewMember: CreateCrewMember): Promise<CrewMember> {
     try {
       const formData = new FormData();
       formData.append("name", crewMember.name);
+      if (crewMember.email) {
+        formData.append("email", crewMember.email);
+      }
       if (crewMember.photo) {
         formData.append("photo", crewMember.photo);
       }
@@ -61,6 +63,9 @@ export class CrewMemberService {
     try {
       const formData = new FormData();
       formData.append("name", crewMember.name);
+      if (crewMember.email !== undefined && crewMember.email !== null) {
+        formData.append("email", crewMember.email);
+      }
       if (crewMember.photo instanceof File) {
         formData.append("photo", crewMember.photo);
       } else if (typeof crewMember.photo === "string") {
@@ -79,7 +84,6 @@ export class CrewMemberService {
       throw error;
     }
   }
-
   async deleteCrewMember(id: string): Promise<void> {
     try {
       const response = await this.crewMemberRepository.deleteCrewMember(id);

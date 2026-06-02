@@ -17,15 +17,15 @@ export interface AgeRating {
   name: string;
   createdAt: Date;
 }
-
 export interface CrewMember {
   id: string;
   name: string;
+  email?: string | null;
   photoUrl?: string | null;
+  userId?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
-
 export interface MovieCrew {
   id: string;
   movieId: string;
@@ -102,17 +102,17 @@ export interface UpdateMovie {
   btsVideo?: string | string[] | null;
   btsPhotos?: FileList | File[] | string | string[] | null;
 }
-
 export interface CreateCrewMember {
   name: string;
+  email?: string;
   photo?: File | null;
 }
 
 export interface UpdateCrewMember {
   name: string;
+  email?: string | null;
   photo?: File | string | null;
 }
-
 export interface MovieFilterParams {
   search?: string;
   searchby?: string;

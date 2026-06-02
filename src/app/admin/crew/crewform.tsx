@@ -23,6 +23,7 @@ interface CrewFormProps {
 
 type CrewFormInputs = {
   name: string;
+  email?: string;
   photo?: File | null;
 };
 
@@ -59,6 +60,7 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
 
       reset({
         name: editingCrew.name,
+        email: editingCrew.email || "",
         photo: null,
       });
     } else {
@@ -69,6 +71,7 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
 
       reset({
         name: "",
+        email: "",
         photo: null,
       });
     }
@@ -83,6 +86,7 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
           id: editingCrew.id,
           crewMember: {
             name: data.name.trim(),
+            email: data.email?.trim() || null,
             photo: crewPhotoInput || editingCrew.photoUrl || null,
           },
         });
@@ -90,6 +94,7 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
       } else {
         await createCrewMutation.mutateAsync({
           name: data.name.trim(),
+          email: data.email?.trim() || undefined,
           photo: crewPhotoInput,
         });
         showToast(LOCALIZATION.TOAST.ADD_CREW_SUCCESS, "success");
@@ -105,6 +110,8 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
       setIsSavingLocal(false);
     }
   };
+
+
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-brand selection:text-black pb-20">
@@ -142,6 +149,15 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
                 required: "กรุณาระบุชื่อทีมงานหรือนักแสดง",
               })}
             />
+
+            <Input
+              label={LOCALIZATION.CREW_FORM.EMAIL_LABEL}
+              placeholder={LOCALIZATION.CREW_FORM.EMAIL_PLACEHOLDER}
+              error={errors.email?.message}
+              type="email"
+              {...register("email")}
+            />
+
 
             <div className="space-y-2">
               <label className="text-xs font-semibold text-zinc-300">
