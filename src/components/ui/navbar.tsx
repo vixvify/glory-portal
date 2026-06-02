@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import SearchIcon from "@mui/icons-material/Search";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import CloseIcon from "@mui/icons-material/Close";
 import { Button } from "@/components/ui/button";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
@@ -188,11 +187,6 @@ export default function Navbar() {
             </>
           )}
         </div>
-
-        <button className="text-zinc-300 hover:text-white transition-colors relative cursor-pointer hidden sm:block">
-          <NotificationsIcon className="text-xl" />
-          <span className="absolute -top-1 -right-1 w-2 h-2 bg-brand rounded-full" />
-        </button>
 
         {currentUser ? (
           <div className="relative">
