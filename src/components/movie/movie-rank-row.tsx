@@ -74,19 +74,17 @@ export default function MovieRankRow({
 
         <div
           ref={rowRef}
-          className="flex overflow-x-auto gap-6 py-6 px-3 no-scrollbar scroll-smooth snap-x snap-mandatory overflow-y-visible"
+          className="flex overflow-x-auto gap-6 pt-6 pb-16 px-4 no-scrollbar scroll-smooth snap-x snap-mandatory overflow-y-hidden"
         >
           {topTenMovies.map((movie, index) => {
-            const isDoubleDigit = index >= 9;
-            const scale = (1 - index * 0.045) * (isDoubleDigit ? 0.75 : 1);
             return (
               <Link href={`/movies/${movie.id}`} key={movie.id}>
                 <div className="flex-none w-[210px] sm:w-[250px] md:w-[290px] relative snap-start group/rank flex items-end h-[180px] sm:h-[220px] md:h-[260px] select-none">
                   <div
-                    className="absolute left-[-15px] sm:left-[-22px] md:left-[-28px] bottom-[-1.5rem] sm:bottom-[-2.2rem] md:bottom-[-2.8rem] z-0 select-none text-stroke-netflix font-black leading-none flex items-end transition-all duration-300 group-hover/rank:scale-[1.08] group-hover/rank:-translate-y-1.5"
+                    className="absolute left-[-25px] sm:left-[-22px] md:left-[-28px] bottom-[-1.5rem] sm:bottom-[-2.2rem] md:bottom-[-2.8rem] z-0 select-none text-stroke-netflix font-black leading-none flex items-end transition-all duration-300 group-hover/rank:scale-[1.08] group-hover/rank:-translate-y-1.5"
                     style={{
                       fontSize: "clamp(7rem, 15vw, 14.5rem)",
-                      transform: `scale(${scale})`,
+                      transform: `scale(0.8)`,
                       transformOrigin: "bottom left",
                     }}
                   >
