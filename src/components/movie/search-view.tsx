@@ -1,13 +1,12 @@
 import { Movie } from "@/core/domain/movie";
 import MovieGrid from "./movie-grid";
 import { Button } from "../ui/button";
-import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 
 interface SearchViewProps {
   searchQuery: string;
   filteredMovies: Movie[];
   isSearching: boolean;
-  handlePlayTrailer: (movie: Movie) => void;
+  handlePlayMovie: (movie: Movie) => void;
   handleToggleFavorite: (movieId: string) => void;
   favorites: Movie[];
   setSearchQuery: (query: string) => void;
@@ -17,7 +16,7 @@ export default function SearchView({
   searchQuery,
   filteredMovies,
   isSearching,
-  handlePlayTrailer,
+  handlePlayMovie,
   handleToggleFavorite,
   favorites,
   setSearchQuery,
@@ -55,7 +54,7 @@ export default function SearchView({
         <div className="flex flex-col gap-8 pb-10">
           <MovieGrid
             movies={filteredMovies}
-            onPlayClick={handlePlayTrailer}
+            onPlayClick={handlePlayMovie}
             favorites={favorites}
             onToggleFavorite={handleToggleFavorite}
           />

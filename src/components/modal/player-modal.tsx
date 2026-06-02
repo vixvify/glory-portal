@@ -3,19 +3,19 @@
 import { useEffect } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 
-interface TrailerModalProps {
+interface PlayerModalProps {
   isOpen: boolean;
   onClose: () => void;
   youtubeUrl: string;
   movieTitle: string;
 }
 
-export default function TrailerModal({
+export default function PlayerModal({
   isOpen,
   onClose,
   youtubeUrl,
   movieTitle,
-}: TrailerModalProps) {
+}: PlayerModalProps) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -30,7 +30,8 @@ export default function TrailerModal({
   if (!isOpen) return null;
 
   const getYouTubeEmbedUrl = (url: string) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const regExp =
+      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
     const videoId = match && match[2].length === 11 ? match[2] : null;
 
@@ -44,15 +45,12 @@ export default function TrailerModal({
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 md:p-10 bg-black/85 backdrop-blur-md animate-fade-in transition-all duration-300">
-      <div 
-        className="absolute inset-0 cursor-pointer" 
-        onClick={onClose} 
-      />
+      <div className="absolute inset-0 cursor-pointer" onClick={onClose} />
 
       <div className="relative w-full max-w-5xl bg-[#181818] rounded-2xl overflow-hidden shadow-2xl border border-zinc-800 animate-scale-up z-10">
         <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-[#181818]">
           <h3 className="text-lg font-bold text-white tracking-wide">
-            Trailer - {movieTitle}
+            {movieTitle}
           </h3>
           <button
             onClick={onClose}
@@ -65,7 +63,7 @@ export default function TrailerModal({
         <div className="relative w-full pb-[56.25%] bg-black">
           <iframe
             src={embedUrl}
-            title={`${movieTitle} Trailer`}
+            title={movieTitle}
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen

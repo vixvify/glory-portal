@@ -25,6 +25,8 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useMovieUserRatingQuery } from "@/hooks/use-ratings";
 import { calculateRatingStats } from "@/utils/rating";
 import Loading from "@/app/loading";
+import PlayerModal from "@/components/modal/player-modal";
+import { useMoviePlayer } from "@/hooks/use-movie-player";
 
 export default function MovieDetails() {
   const params = useParams<{ id: string }>();
@@ -46,6 +48,7 @@ export default function MovieDetails() {
   );
 
   const [selectedStars, setSelectedStars] = useState(0);
+  const { isPlayingMovie, playingMovie, playMovie, stopMovie } = useMoviePlayer();
 
   useEffect(() => {
     if (userRating) {
@@ -143,9 +146,13 @@ export default function MovieDetails() {
                 </h1>
 
                 <div className="flex flex-wrap items-center gap-3">
-                  <Button variant="white" size="md">
+                  <Button
+                    variant="white"
+                    size="md"
+                    onClick={() => movie && playMovie(movie)}
+                  >
                     <PlayArrowIcon className="text-xl mr-1.5" />
-                    เล่นตัวอย่าง
+                    เล่น
                   </Button>
 
                   <button className="flex items-center justify-center w-11 h-11 rounded-full border border-zinc-700 bg-zinc-900/60 hover:bg-zinc-800 text-emerald-400 cursor-pointer transition-colors">
@@ -470,6 +477,14 @@ export default function MovieDetails() {
           </div>
         </div>
       </div>
+      {isPlayingMovie && playingMovie && (
+        <PlayerModal
+          isOpen={isPlayingMovie}
+          onClose={stopMovie}
+          youtubeUrl={playingMovie.youtubeUrl}
+          movieTitle={playingMovie.title}
+        />
+      )}
     </div>
   );
 }

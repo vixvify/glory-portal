@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useMoviesQuery } from "@/hooks/use-movies";
 import {
@@ -10,10 +10,10 @@ import {
 import { useAppStore } from "@/store/use-store";
 import MovieGrid from "@/components/movie/movie-grid";
 import Loading from "@/app/loading";
-import TrailerModal from "@/components/modal/trailer-modal";
+import PlayerModal from "@/components/modal/player-modal";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useMoviePlayer } from "@/hooks/use-movie-player";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
-import { Movie } from "@/core/domain/movie";
 
 export default function CategoryPage() {
   const params = useParams<{ category: string }>();
@@ -22,8 +22,12 @@ export default function CategoryPage() {
     ? decodeURIComponent(params.category)
     : "";
 
-  const [isPlayingTrailer, setIsPlayingTrailer] = useState(false);
-  const [trailerMovie, setTrailerMovie] = useState<Movie | null>(null);
+  const {
+    isPlayingMovie,
+    playingMovie,
+    playMovie: handlePlayMovie,
+    stopMovie,
+  } = useMoviePlayer();
 
   const { currentUser, showToast } = useAppStore();
 
@@ -60,11 +64,6 @@ export default function CategoryPage() {
     },
     [currentUser, favorites, toggleFavoriteMutation, showToast],
   );
-
-  const handlePlayTrailer = useCallback((movie: Movie) => {
-    setTrailerMovie(movie);
-    setIsPlayingTrailer(true);
-  }, []);
 
   if (isLoading) {
     return <Loading />;
@@ -103,7 +102,7 @@ export default function CategoryPage() {
           <div className="pb-10">
             <MovieGrid
               movies={movies}
-              onPlayClick={handlePlayTrailer}
+              onPlayClick={handlePlayMovie}
               favorites={favorites}
               onToggleFavorite={handleToggleFavorite}
             />
@@ -111,12 +110,12 @@ export default function CategoryPage() {
         )}
       </main>
 
-      {trailerMovie && (
-        <TrailerModal
-          isOpen={isPlayingTrailer}
-          onClose={() => setIsPlayingTrailer(false)}
-          youtubeUrl={trailerMovie.youtubeUrl}
-          movieTitle={trailerMovie.title}
+      {playingMovie && (
+        <PlayerModal
+          isOpen={isPlayingMovie}
+          onClose={stopMovie}
+          youtubeUrl={playingMovie.youtubeUrl}
+          movieTitle={playingMovie.title}
         />
       )}
     </div>

@@ -16,7 +16,7 @@ interface HomeViewProps {
   categoryMoviesMap: Record<string, Movie[]>;
   initialAllMovies: Movie[];
   favorites: Movie[];
-  handlePlayTrailer: (movie: Movie) => void;
+  handlePlayMovie: (movie: Movie) => void;
   handleToggleFavorite: (movieId: string) => void;
   setSearchQuery: (query: string) => void;
 }
@@ -31,19 +31,19 @@ export default function HomeView({
   universityMoviesMap,
   categoryMoviesMap,
   favorites,
-  handlePlayTrailer,
+  handlePlayMovie,
   handleToggleFavorite,
   setSearchQuery,
 }: HomeViewProps) {
   return (
     <main className="flex-1 flex flex-col">
-      <MovieHero movies={recommendedMovies} onPlayClick={handlePlayTrailer} />
+      <MovieHero movies={recommendedMovies} onPlayClick={handlePlayMovie} />
 
       <div className="relative z-20 px-6 md:px-16 space-y-12 -mt-6 md:-mt-10">
         <MovieRankRow
           title="10 อันดับหนังยอดนิยม"
           movies={popularMovies}
-          onPlayClick={handlePlayTrailer}
+          onPlayClick={handlePlayMovie}
           favorites={favorites}
           onToggleFavorite={handleToggleFavorite}
         />
@@ -52,7 +52,7 @@ export default function HomeView({
           <MovieRow
             title="รายการโปรดของคุณ"
             movies={favorites}
-            onPlayClick={handlePlayTrailer}
+            onPlayClick={handlePlayMovie}
             favorites={favorites}
             onToggleFavorite={handleToggleFavorite}
           />
@@ -63,7 +63,7 @@ export default function HomeView({
             key={uni.id}
             title={`ผลงานภาพยนตร์จาก ${uni.name}`}
             movies={universityMoviesMap[uni.id] || []}
-            onPlayClick={handlePlayTrailer}
+            onPlayClick={handlePlayMovie}
             favorites={favorites}
             onToggleFavorite={handleToggleFavorite}
           />
@@ -82,7 +82,7 @@ export default function HomeView({
             key={category.id}
             title={CATEGORY_TITLE_MAPPING[category.name]}
             movies={categoryMoviesMap[category.id] || []}
-            onPlayClick={handlePlayTrailer}
+            onPlayClick={handlePlayMovie}
             favorites={favorites}
             onToggleFavorite={handleToggleFavorite}
           />

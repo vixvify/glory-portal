@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
-import TrailerModal from "@/components/modal/trailer-modal";
+import { useMemo, useCallback } from "react";
+import PlayerModal from "@/components/modal/player-modal";
 import AuthModal from "@/components/modal/auth-modal";
+import { useMoviePlayer } from "@/hooks/use-movie-player";
 import { Movie } from "@/core/domain/movie";
 import { User } from "@/core/domain/user";
 import { useAppStore } from "@/store/use-store";
@@ -10,7 +11,6 @@ import Loading from "../loading";
 import { Toast } from "@/components/ui/toast";
 import { useMoviesQuery } from "@/hooks/use-movies";
 import { useToggleFavoriteMutation } from "@/hooks/use-favorites";
-import { useLogoutMutation } from "@/hooks/use-auth";
 import { Category } from "@/core/domain/movie";
 import { University } from "@/core/domain/movie";
 import { CrewMember } from "@/core/domain/movie";
@@ -54,8 +54,12 @@ export default function HomePage(props: Props) {
     setIsAuthOpen,
   } = useAppStore();
 
-  const [isPlayingTrailer, setIsPlayingTrailer] = useState(false);
-  const [trailerMovie, setTrailerMovie] = useState<Movie | null>(null);
+  const {
+    isPlayingMovie,
+    playingMovie,
+    playMovie: handlePlayMovie,
+    stopMovie,
+  } = useMoviePlayer();
 
   const activeSearchQuery = useDebounce(searchQuery, 200);
 
@@ -107,11 +111,6 @@ export default function HomePage(props: Props) {
     [currentUser, favorites, moviesData, toggleFavoriteMutation, showToast],
   );
 
-  const handlePlayTrailer = useCallback((movie: Movie) => {
-    setTrailerMovie(movie);
-    setIsPlayingTrailer(true);
-  }, []);
-
   const isSearching =
     searchQuery.trim() !== activeSearchQuery.trim() || isMoviesLoading;
 
@@ -133,7 +132,7 @@ export default function HomePage(props: Props) {
           categoryMoviesMap={categoryMoviesMap}
           initialAllMovies={initialAllMovies}
           favorites={favorites}
-          handlePlayTrailer={handlePlayTrailer}
+          handlePlayMovie={handlePlayMovie}
           handleToggleFavorite={handleToggleFavorite}
           setSearchQuery={setSearchQuery}
         />
@@ -142,19 +141,19 @@ export default function HomePage(props: Props) {
           searchQuery={searchQuery}
           filteredMovies={moviesData}
           isSearching={isSearching}
-          handlePlayTrailer={handlePlayTrailer}
+          handlePlayMovie={handlePlayMovie}
           handleToggleFavorite={handleToggleFavorite}
           favorites={favorites}
           setSearchQuery={setSearchQuery}
         />
       )}
 
-      {trailerMovie && (
-        <TrailerModal
-          isOpen={isPlayingTrailer}
-          onClose={() => setIsPlayingTrailer(false)}
-          youtubeUrl={trailerMovie.youtubeUrl}
-          movieTitle={trailerMovie.title}
+      {playingMovie && (
+        <PlayerModal
+          isOpen={isPlayingMovie}
+          onClose={stopMovie}
+          youtubeUrl={playingMovie.youtubeUrl}
+          movieTitle={playingMovie.title}
         />
       )}
 

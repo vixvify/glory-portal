@@ -81,7 +81,11 @@ export default function MovieRankRow({
               <Link href={`/movies/${movie.id}`} key={movie.id}>
                 <div className="flex-none w-[210px] sm:w-[250px] md:w-[290px] relative snap-start group/rank flex items-end h-[180px] sm:h-[220px] md:h-[260px] select-none">
                   <div
-                    className="absolute left-[-25px] sm:left-[-22px] md:left-[-28px] bottom-[-1.5rem] sm:bottom-[-2.2rem] md:bottom-[-2.8rem] z-0 select-none text-stroke-netflix font-black leading-none flex items-end transition-all duration-300 group-hover/rank:scale-[1.08] group-hover/rank:-translate-y-1.5"
+                    className={`absolute ${
+                      index === 0
+                        ? "left-0"
+                        : "left-[-25px] sm:left-[-22px] md:left-[-28px]"
+                    } bottom-[-1.5rem] sm:bottom-[-2.2rem] md:bottom-[-2.8rem] z-0 select-none text-stroke-netflix font-black leading-none flex items-end transition-all duration-300 group-hover/rank:scale-[1.08] group-hover/rank:-translate-y-1.5`}
                     style={{
                       fontSize: "clamp(7rem, 15vw, 14.5rem)",
                       transform: `scale(0.8)`,

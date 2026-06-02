@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   useFavoritesQuery,
@@ -9,17 +9,21 @@ import {
 import { useAppStore } from "@/store/use-store";
 import MovieGrid from "@/components/movie/movie-grid";
 import Loading from "@/app/loading";
-import TrailerModal from "@/components/modal/trailer-modal";
+import PlayerModal from "@/components/modal/player-modal";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useMoviePlayer } from "@/hooks/use-movie-player";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import LockIcon from "@mui/icons-material/Lock";
-import { Movie } from "@/core/domain/movie";
 import { Button } from "@/components/ui/button";
 
 export default function FavoritesPage() {
   const router = useRouter();
-  const [isPlayingTrailer, setIsPlayingTrailer] = useState(false);
-  const [trailerMovie, setTrailerMovie] = useState<Movie | null>(null);
+  const {
+    isPlayingMovie,
+    playingMovie,
+    playMovie: handlePlayMovie,
+    stopMovie,
+  } = useMoviePlayer();
 
   const { currentUser, showToast, setIsAuthOpen } = useAppStore();
 
@@ -52,11 +56,6 @@ export default function FavoritesPage() {
     },
     [currentUser, favorites, toggleFavoriteMutation, showToast],
   );
-
-  const handlePlayTrailer = useCallback((movie: Movie) => {
-    setTrailerMovie(movie);
-    setIsPlayingTrailer(true);
-  }, []);
 
   if (isLoading && currentUser) {
     return <Loading />;
@@ -131,7 +130,7 @@ export default function FavoritesPage() {
           <div className="pb-10">
             <MovieGrid
               movies={favorites}
-              onPlayClick={handlePlayTrailer}
+              onPlayClick={handlePlayMovie}
               favorites={favorites}
               onToggleFavorite={handleToggleFavorite}
             />
@@ -139,12 +138,12 @@ export default function FavoritesPage() {
         )}
       </main>
 
-      {trailerMovie && (
-        <TrailerModal
-          isOpen={isPlayingTrailer}
-          onClose={() => setIsPlayingTrailer(false)}
-          youtubeUrl={trailerMovie.youtubeUrl}
-          movieTitle={trailerMovie.title}
+      {playingMovie && (
+        <PlayerModal
+          isOpen={isPlayingMovie}
+          onClose={stopMovie}
+          youtubeUrl={playingMovie.youtubeUrl}
+          movieTitle={playingMovie.title}
         />
       )}
     </div>
