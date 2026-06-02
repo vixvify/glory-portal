@@ -37,6 +37,15 @@ export interface CrewMember {
   userId?: string | null;
   createdAt: Date;
   updatedAt: Date;
+  movieCrews?: {
+    id: string;
+    movieId: string;
+    crewMemberId: string;
+    role: string;
+    movie?: Movie;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }[];
 }
 export interface MovieCrew {
   id: string;

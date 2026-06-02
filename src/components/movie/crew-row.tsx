@@ -5,6 +5,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PersonIcon from "@mui/icons-material/Person";
 import { CrewMember } from "@/core/domain/movie";
+import Link from "next/link";
 
 interface CrewRowProps {
   title: string;
@@ -65,7 +66,8 @@ export default function CrewRow({ title, crew }: CrewRowProps) {
           className="flex overflow-x-auto gap-6 py-4 px-1.5 no-scrollbar scroll-smooth snap-x snap-mandatory"
         >
           {crew.map((member) => (
-            <div
+            <Link
+              href={`/crew/${member.id}`}
               key={member.id}
               className="flex-none w-32 sm:w-40 flex flex-col items-center select-none group/item cursor-pointer snap-start"
             >
@@ -77,7 +79,7 @@ export default function CrewRow({ title, crew }: CrewRowProps) {
                     className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-300"
                   />
                 ) : (
-                  <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-zinc-550 group-hover/item:text-brand transition-colors">
+                  <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-zinc-555 group-hover/item:text-brand transition-colors">
                     <PersonIcon className="text-4xl sm:text-5xl" />
                   </div>
                 )}
@@ -85,7 +87,7 @@ export default function CrewRow({ title, crew }: CrewRowProps) {
               <span className="mt-2.5 text-xs sm:text-sm font-semibold text-zinc-400 group-hover/item:text-white transition-colors truncate w-full text-center">
                 {member.name}
               </span>
-            </div>
+            </Link>
           ))}
         </div>
 

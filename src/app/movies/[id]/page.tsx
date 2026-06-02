@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import Link from "next/link";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CheckIcon from "@mui/icons-material/Check";
 import StarIcon from "@mui/icons-material/Star";
@@ -243,9 +244,10 @@ export default function MovieDetails() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {movie?.crew && movie.crew.length > 0 ? (
                   movie.crew.map((member) => (
-                    <div
+                    <Link
+                      href={`/crew/${member.crewMember?.id}`}
                       key={member.id}
-                      className="flex items-center gap-3.5 bg-zinc-900/30 border border-zinc-800/40 p-3 rounded-2xl transition-all hover:bg-zinc-900/60 hover:border-zinc-700/40 group"
+                      className="flex items-center gap-3.5 bg-zinc-900/30 border border-zinc-800/40 p-3 rounded-2xl transition-all hover:bg-zinc-900/60 hover:border-zinc-700/40 group block cursor-pointer"
                     >
                       <img
                         src={
@@ -270,7 +272,7 @@ export default function MovieDetails() {
                           {member.role}
                         </p>
                       </div>
-                    </div>
+                    </Link>
                   ))
                 ) : (
                   <p className="text-xs text-zinc-550 italic font-light col-span-2">

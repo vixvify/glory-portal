@@ -11,35 +11,12 @@ import AddIcon from "@mui/icons-material/Add";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Loading from "@/app/loading";
 import { StatsCard } from "@/components/ui/stats-card";
-import { useMoviesQuery } from "@/hooks/use-movies";
-import {
-  useCategoriesQuery,
-  useAgeRatingsQuery,
-  useUniversitiesQuery,
-} from "@/hooks/use-master-data";
-import { useCrewMembersQuery } from "@/hooks/use-crew-members";
+import { useAdminStatsQuery } from "@/hooks/use-admin";
 
 export default function AdminPage() {
-  const { data: movies = [], isLoading: isMoviesLoading } = useMoviesQuery();
-  const { data: availableCategories = [], isLoading: isCategoriesLoading } =
-    useCategoriesQuery();
-  const { data: availableAgeRatings = [], isLoading: isAgeRatingsLoading } =
-    useAgeRatingsQuery();
-  const { data: availableUniversities = [], isLoading: isUniversitiesLoading } =
-    useUniversitiesQuery();
-  const { data: availableCrew = [], isLoading: isCrewLoading } =
-    useCrewMembersQuery();
+  const { data: stats, isLoading: isStatsLoading } = useAdminStatsQuery();
 
-  const isInitialLoading =
-    isMoviesLoading ||
-    isCategoriesLoading ||
-    isAgeRatingsLoading ||
-    isUniversitiesLoading ||
-    isCrewLoading;
-
-  const totalViews = useMemo(() => {
-    return movies.reduce((sum, m) => sum + (m.views || 0), 0);
-  }, [movies]);
+  const isInitialLoading = isStatsLoading;
 
   if (isInitialLoading) {
     return <Loading />;
@@ -70,24 +47,24 @@ export default function AdminPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           <StatsCard
             title="จำนวนเรื่องทั้งหมด"
-            value={movies.length}
+            value={stats?.totalMovies ?? 0}
             icon={<MovieIcon className="text-2xl" />}
           />
           <StatsCard
             title="หมวดหมู่ภาพยนตร์"
-            value={availableCategories.length}
+            value={stats?.totalCategories ?? 0}
             icon={<CategoryIcon className="text-2xl" />}
             iconClassName="bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
           />
           <StatsCard
             title="ยอดเข้าชมรวม"
-            value={totalViews.toLocaleString()}
+            value={(stats?.totalViews ?? 0).toLocaleString()}
             icon={<VisibilityIcon className="text-2xl" />}
             iconClassName="bg-cyan-500/10 border-cyan-500/20 text-cyan-400"
           />
           <StatsCard
             title="ทีมงานและนักแสดง"
-            value={availableCrew.length}
+            value={stats?.totalCrew ?? 0}
             icon={<PeopleIcon className="text-2xl" />}
             iconClassName="bg-violet-500/10 border-violet-500/20 text-violet-400"
           />

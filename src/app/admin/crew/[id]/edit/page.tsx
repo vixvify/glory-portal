@@ -25,4 +25,3 @@ export default function EditCrewPage() {
 
   return <CrewForm editingCrew={crew} />;
 }
-
