@@ -7,12 +7,17 @@ import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import MovieIcon from "@mui/icons-material/Movie";
-import { Button } from "./button";
-import { Input } from "./input";
-import { Select } from "./select";
-import { CreatableSearchSelect } from "./search-select";
-import Loading from "@/app/loading";
-import { Movie } from "@/core/domain/movie";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { CreatableSearchSelect } from "@/components/ui/search-select";
+import {
+  Movie,
+  Category,
+  AgeRating,
+  University,
+  CrewMember,
+} from "@/core/domain/movie";
 import { parseSchema } from "@/lib/validation";
 import { createMovieSchema } from "@/core/schema/movie";
 import { LOCALIZATION } from "@/core/constants/localization";
@@ -22,16 +27,14 @@ import {
   useCreateMovieMutation,
   useUpdateMovieMutation,
 } from "@/hooks/use-movies";
-import {
-  useCategoriesQuery,
-  useAgeRatingsQuery,
-  useUniversitiesQuery,
-} from "@/hooks/use-master-data";
-import { useCrewMembersQuery } from "@/hooks/use-crew-members";
 import { CreateMovie, UpdateMovie } from "@/core/domain/movie";
 
 interface MovieFormProps {
   editingMovie?: Movie | null;
+  categories: Category[];
+  ageRatings: AgeRating[];
+  universities: University[];
+  availableCrew: CrewMember[];
 }
 
 type MovieFormInputs = {
@@ -55,6 +58,10 @@ type MovieFormInputs = {
 
 export const MovieForm: React.FC<MovieFormProps> = ({
   editingMovie = null,
+  categories,
+  ageRatings,
+  universities,
+  availableCrew,
 }) => {
   const router = useRouter();
   const { showToast } = useAppStore();
@@ -80,15 +87,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({
   const [castMembers, setCastMembers] = useState<
     Array<{ id: string; name: string }>
   >([{ id: "", name: "" }]);
-
-  const { data: categories = [], isLoading: isCategoriesLoading } =
-    useCategoriesQuery();
-  const { data: ageRatings = [], isLoading: isAgeRatingsLoading } =
-    useAgeRatingsQuery();
-  const { data: universities = [], isLoading: isUniversitiesLoading } =
-    useUniversitiesQuery();
-  const { data: availableCrew = [], isLoading: isCrewLoading } =
-    useCrewMembersQuery();
 
   const createMovieMutation = useCreateMovieMutation();
   const updateMovieMutation = useUpdateMovieMutation();
@@ -333,16 +331,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({
       setIsSavingLocal(false);
     }
   };
-
-  const isMasterLoading =
-    isCategoriesLoading ||
-    isAgeRatingsLoading ||
-    isUniversitiesLoading ||
-    isCrewLoading;
-
-  if (isMasterLoading) {
-    return <Loading />;
-  }
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-brand selection:text-black pb-20">
@@ -836,7 +824,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                             <CloseIcon className="text-xs" />
                           </button>
                         </div>
-                        <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-black/75 rounded text-[8px] text-zinc-400 font-bold uppercase tracking-wider scale-90 origin-bottom-left">
+                        <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-black/75 rounded text-[8px] text-zinc-405 font-bold uppercase tracking-wider scale-90 origin-bottom-left">
                           {LOCALIZATION.MOVIE_FORM.BTS_STATUS_SAVED}
                         </span>
                       </div>
@@ -881,7 +869,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                   />
                   <div className="w-full bg-black/40 border border-zinc-800 border-dashed rounded-xl px-4 py-6 text-sm text-zinc-405 flex flex-col items-center justify-center gap-1.5 transition-colors group-hover/file:border-brand/60">
-                    <div className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-zinc-400 group-hover/file:bg-brand/10 group-hover/file:border-brand/30 group-hover/file:text-brand transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-zinc-450 group-hover/file:bg-brand/10 group-hover/file:border-brand/30 group-hover/file:text-brand transition-colors">
                       <AddIcon className="text-sm" />
                     </div>
                     <span className="text-xs text-zinc-400 font-semibold group-hover/file:text-zinc-200 transition-colors">

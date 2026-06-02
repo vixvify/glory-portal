@@ -3,23 +3,57 @@
 import { useParams } from "next/navigation";
 import { useMovieQueryById } from "@/hooks/use-movies";
 import Loading from "@/app/loading";
-import { MovieForm } from "@/components/ui/movie-form";
+import {
+  useCategoriesQuery,
+  useAgeRatingsQuery,
+  useUniversitiesQuery,
+} from "@/hooks/use-master-data";
+import { useCrewMembersQuery } from "@/hooks/use-crew-members";
+import { MovieForm } from "../../movieform";
 
 export default function EditMoviePage() {
   const params = useParams<{ id: string }>();
-  const { data: movie, isLoading } = useMovieQueryById(params.id);
+  const { data: movie, isLoading: isMovieLoading } = useMovieQueryById(
+    params.id,
+  );
+  const { data: categories = [], isLoading: isCategoriesLoading } =
+    useCategoriesQuery();
+  const { data: ageRatings = [], isLoading: isAgeRatingsLoading } =
+    useAgeRatingsQuery();
+  const { data: universities = [], isLoading: isUniversitiesLoading } =
+    useUniversitiesQuery();
+  const { data: availableCrew = [], isLoading: isCrewLoading } =
+    useCrewMembersQuery();
 
-  if (isLoading) {
+  const isMasterLoading =
+    isMovieLoading ||
+    isCategoriesLoading ||
+    isAgeRatingsLoading ||
+    isUniversitiesLoading ||
+    isCrewLoading;
+
+  if (isMasterLoading) {
     return <Loading />;
   }
 
   if (!movie) {
     return (
       <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center">
-        <p className="text-zinc-400 font-light">ไม่พบข้อมูลภาพยนตร์สั้นที่ต้องการแก้ไข</p>
+        <p className="text-zinc-400 font-light">
+          ไม่พบข้อมูลภาพยนตร์สั้นที่ต้องการแก้ไข
+        </p>
       </div>
     );
   }
 
-  return <MovieForm editingMovie={movie} />;
+  return (
+    <MovieForm
+      editingMovie={movie}
+      categories={categories}
+      ageRatings={ageRatings}
+      universities={universities}
+      availableCrew={availableCrew}
+    />
+  );
 }
+

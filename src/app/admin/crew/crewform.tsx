@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PeopleIcon from "@mui/icons-material/People";
-import { Button } from "./button";
-import { Input } from "./input";
-import { ImageCropper } from "../modal/image-cropper";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ImageCropper } from "@/components/modal/image-cropper";
 import { CrewMember } from "@/core/domain/movie";
 import { LOCALIZATION } from "@/core/constants/localization";
 import { useAppStore } from "@/store/use-store";
@@ -171,7 +171,7 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
                   )}
                 />
 
-                <div className="w-full bg-black/40 border border-zinc-800 group-hover/file:border-brand rounded-xl px-4 py-3 text-sm text-zinc-405 flex items-center justify-between transition-colors">
+                <div className="w-full bg-black/40 border border-zinc-800 group-hover/file:border-brand rounded-xl px-4 py-3 text-sm text-zinc-450 flex items-center justify-between transition-colors">
                   <span
                     className={
                       crewPhotoName
