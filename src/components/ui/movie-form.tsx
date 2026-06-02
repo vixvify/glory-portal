@@ -1,29 +1,40 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import MovieIcon from "@mui/icons-material/Movie";
 import { Button } from "./button";
 import { Input } from "./input";
 import { Select } from "./select";
 import { CreatableSearchSelect } from "./search-select";
-import { Movie, Category, AgeRating, University } from "@/core/domain/movie";
+import Loading from "@/app/loading";
+import { Movie } from "@/core/domain/movie";
 import { parseSchema } from "@/lib/validation";
 import { createMovieSchema } from "@/core/schema/movie";
 import { LOCALIZATION } from "@/core/constants/localization";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
+import { useAppStore } from "@/store/use-store";
+import {
+  useCreateMovieMutation,
+  useUpdateMovieMutation,
+} from "@/hooks/use-movies";
+import {
+  useCategoriesQuery,
+  useAgeRatingsQuery,
+  useUniversitiesQuery,
+} from "@/hooks/use-master-data";
+import { useCrewMembersQuery } from "@/hooks/use-crew-members";
+import { CreateMovie, UpdateMovie } from "@/core/domain/movie";
 
-interface MovieFormSidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (validatedData: any) => void;
-  editingMovie: Movie | null;
-  categories: Category[];
-  ageRatings: AgeRating[];
-  universities: University[];
-  crewOptions: any[];
+interface MovieFormProps {
+  editingMovie?: Movie | null;
 }
 
-type MovieForm = {
+type MovieFormInputs = {
   title: string;
   description: string;
   category: string;
@@ -42,16 +53,12 @@ type MovieForm = {
   btsPhotos?: FileList | File[] | string | null;
 };
 
-export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
-  isOpen,
-  onClose,
-  onSubmit,
-  editingMovie,
-  categories,
-  ageRatings,
-  universities,
-  crewOptions,
+export const MovieForm: React.FC<MovieFormProps> = ({
+  editingMovie = null,
 }) => {
+  const router = useRouter();
+  const { showToast } = useAppStore();
+
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const [existingBtsPhotos, setExistingBtsPhotos] = useState<string[]>([]);
   const [newBtsPhotosFiles, setNewBtsPhotosFiles] = useState<File[]>([]);
@@ -59,6 +66,7 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
   const [movieCoverPreview, setMovieCoverPreview] = useState<string | null>(
     null,
   );
+  const [isSavingLocal, setIsSavingLocal] = useState(false);
 
   const [directors, setDirectors] = useState<
     Array<{ id: string; name: string }>
@@ -73,6 +81,24 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
     Array<{ id: string; name: string }>
   >([{ id: "", name: "" }]);
 
+  const { data: categories = [], isLoading: isCategoriesLoading } =
+    useCategoriesQuery();
+  const { data: ageRatings = [], isLoading: isAgeRatingsLoading } =
+    useAgeRatingsQuery();
+  const { data: universities = [], isLoading: isUniversitiesLoading } =
+    useUniversitiesQuery();
+  const { data: availableCrew = [], isLoading: isCrewLoading } =
+    useCrewMembersQuery();
+
+  const createMovieMutation = useCreateMovieMutation();
+  const updateMovieMutation = useUpdateMovieMutation();
+
+  const crewOptions = availableCrew.map((c) => ({
+    id: c.id,
+    name: c.name,
+    photoUrl: c.photoUrl,
+  }));
+
   const {
     register,
     handleSubmit,
@@ -80,127 +106,123 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
     reset,
     control,
     formState: { errors },
-  } = useForm<MovieForm>();
+  } = useForm<MovieFormInputs>();
 
   useEffect(() => {
-    if (isOpen) {
-      if (editingMovie) {
-        setSelectedFileName(null);
-        setMovieCoverPreview(
-          typeof editingMovie.thumbnail === "string"
-            ? editingMovie.thumbnail
-            : null,
-        );
-        setExistingBtsPhotos(editingMovie.bts?.btsPhotos || []);
-        setNewBtsPhotosFiles([]);
-        setBtsVideos(
-          editingMovie.bts?.btsVideo && editingMovie.bts.btsVideo.length > 0
-            ? editingMovie.bts.btsVideo
-            : [""],
-        );
+    if (editingMovie) {
+      setSelectedFileName(null);
+      setMovieCoverPreview(
+        typeof editingMovie.thumbnail === "string"
+          ? editingMovie.thumbnail
+          : null,
+      );
+      setExistingBtsPhotos(editingMovie.bts?.btsPhotos || []);
+      setNewBtsPhotosFiles([]);
+      setBtsVideos(
+        editingMovie.bts?.btsVideo && editingMovie.bts.btsVideo.length > 0
+          ? editingMovie.bts.btsVideo
+          : [""],
+      );
 
-        const movieDirectors =
-          editingMovie.crew
-            ?.filter((c) => c.role.toLowerCase() === "director")
-            .map((c) => ({
-              id: c.crewMember?.id || "",
-              name: c.crewMember?.name || "",
-            }))
-            .filter((x): x is { id: string; name: string } => !!x.name) || [];
+      const movieDirectors =
+        editingMovie.crew
+          ?.filter((c) => c.role.toLowerCase() === "director")
+          .map((c) => ({
+            id: c.crewMember?.id || "",
+            name: c.crewMember?.name || "",
+          }))
+          .filter((x): x is { id: string; name: string } => !!x.name) || [];
 
-        const movieProducers =
-          editingMovie.crew
-            ?.filter((c) => c.role.toLowerCase() === "producer")
-            .map((c) => ({
-              id: c.crewMember?.id || "",
-              name: c.crewMember?.name || "",
-            }))
-            .filter((x): x is { id: string; name: string } => !!x.name) || [];
+      const movieProducers =
+        editingMovie.crew
+          ?.filter((c) => c.role.toLowerCase() === "producer")
+          .map((c) => ({
+            id: c.crewMember?.id || "",
+            name: c.crewMember?.name || "",
+          }))
+          .filter((x): x is { id: string; name: string } => !!x.name) || [];
 
-        const movieWriters =
-          editingMovie.crew
-            ?.filter((c) => c.role.toLowerCase() === "writer")
-            .map((c) => ({
-              id: c.crewMember?.id || "",
-              name: c.crewMember?.name || "",
-            }))
-            .filter((x): x is { id: string; name: string } => !!x.name) || [];
+      const movieWriters =
+        editingMovie.crew
+          ?.filter((c) => c.role.toLowerCase() === "writer")
+          .map((c) => ({
+            id: c.crewMember?.id || "",
+            name: c.crewMember?.name || "",
+          }))
+          .filter((x): x is { id: string; name: string } => !!x.name) || [];
 
-        const movieCast =
-          editingMovie.crew
-            ?.filter((c) => c.role.toLowerCase() === "cast")
-            .map((c) => ({
-              id: c.crewMember?.id || "",
-              name: c.crewMember?.name || "",
-            }))
-            .filter((x): x is { id: string; name: string } => !!x.name) || [];
+      const movieCast =
+        editingMovie.crew
+          ?.filter((c) => c.role.toLowerCase() === "cast")
+          .map((c) => ({
+            id: c.crewMember?.id || "",
+            name: c.crewMember?.name || "",
+          }))
+          .filter((x): x is { id: string; name: string } => !!x.name) || [];
 
-        setDirectors(
-          movieDirectors.length > 0 ? movieDirectors : [{ id: "", name: "" }],
-        );
-        setProducers(
-          movieProducers.length > 0 ? movieProducers : [{ id: "", name: "" }],
-        );
-        setWriters(
-          movieWriters.length > 0 ? movieWriters : [{ id: "", name: "" }],
-        );
-        setCastMembers(
-          movieCast.length > 0 ? movieCast : [{ id: "", name: "" }],
-        );
+      setDirectors(
+        movieDirectors.length > 0 ? movieDirectors : [{ id: "", name: "" }],
+      );
+      setProducers(
+        movieProducers.length > 0 ? movieProducers : [{ id: "", name: "" }],
+      );
+      setWriters(
+        movieWriters.length > 0 ? movieWriters : [{ id: "", name: "" }],
+      );
+      setCastMembers(movieCast.length > 0 ? movieCast : [{ id: "", name: "" }]);
 
-        reset({
-          title: editingMovie.title,
-          description: editingMovie.description,
-          category: editingMovie.category,
-          thumbnail: null,
-          youtubeUrl: editingMovie.youtubeUrl,
-          year: editingMovie.year,
-          matchRate: editingMovie.matchRate,
-          ageRating: editingMovie.ageRating,
-          duration: editingMovie.duration,
-          university: editingMovie.university || "",
-          director: "",
-          producer: "",
-          writer: "",
-          cast: "",
-          btsVideo: editingMovie.bts?.btsVideo
-            ? editingMovie.bts.btsVideo.join(", ")
-            : "",
-          btsPhotos: editingMovie.bts?.btsPhotos
-            ? editingMovie.bts.btsPhotos.join(", ")
-            : "",
-        });
-      } else {
-        setSelectedFileName(null);
-        setMovieCoverPreview(null);
-        setExistingBtsPhotos([]);
-        setNewBtsPhotosFiles([]);
-        setBtsVideos([""]);
-        setDirectors([{ id: "", name: "" }]);
-        setProducers([{ id: "", name: "" }]);
-        setWriters([{ id: "", name: "" }]);
-        setCastMembers([{ id: "", name: "" }]);
-        reset({
-          title: "",
-          description: "",
-          category: "Action",
-          thumbnail: null,
-          youtubeUrl: "",
-          year: new Date().getFullYear(),
-          matchRate: 98,
-          ageRating: "PG",
-          duration: 120,
-          university: "",
-          director: "",
-          producer: "",
-          writer: "",
-          cast: "",
-          btsVideo: "",
-          btsPhotos: "",
-        });
-      }
+      reset({
+        title: editingMovie.title,
+        description: editingMovie.description,
+        category: editingMovie.category,
+        thumbnail: null,
+        youtubeUrl: editingMovie.youtubeUrl,
+        year: editingMovie.year,
+        matchRate: editingMovie.matchRate,
+        ageRating: editingMovie.ageRating,
+        duration: editingMovie.duration,
+        university: editingMovie.university || "",
+        director: "",
+        producer: "",
+        writer: "",
+        cast: "",
+        btsVideo: editingMovie.bts?.btsVideo
+          ? editingMovie.bts.btsVideo.join(", ")
+          : "",
+        btsPhotos: editingMovie.bts?.btsPhotos
+          ? editingMovie.bts.btsPhotos.join(", ")
+          : "",
+      });
+    } else {
+      setSelectedFileName(null);
+      setMovieCoverPreview(null);
+      setExistingBtsPhotos([]);
+      setNewBtsPhotosFiles([]);
+      setBtsVideos([""]);
+      setDirectors([{ id: "", name: "" }]);
+      setProducers([{ id: "", name: "" }]);
+      setWriters([{ id: "", name: "" }]);
+      setCastMembers([{ id: "", name: "" }]);
+      reset({
+        title: "",
+        description: "",
+        category: "Action",
+        thumbnail: null,
+        youtubeUrl: "",
+        year: new Date().getFullYear(),
+        matchRate: 98,
+        ageRating: "PG",
+        duration: 120,
+        university: "",
+        director: "",
+        producer: "",
+        writer: "",
+        cast: "",
+        btsVideo: "",
+        btsPhotos: "",
+      });
     }
-  }, [isOpen, editingMovie, reset]);
+  }, [editingMovie, reset]);
 
   const handleBtsFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -217,74 +239,155 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
     setNewBtsPhotosFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const onLocalSubmit = (data: MovieForm) => {
-    const activeVideos = btsVideos.map((v) => v.trim()).filter(Boolean);
-    const thumbnailFile = data.thumbnail;
-    const validated = parseSchema(createMovieSchema, {
-      ...data,
-      thumbnail: thumbnailFile || editingMovie?.thumbnail,
-      year: Number(data.year),
-      matchRate: Number(data.matchRate),
-      duration: Number(data.duration),
-      btsVideo: activeVideos.join(","),
-      btsPhotos: editingMovie
-        ? [...existingBtsPhotos, ...newBtsPhotosFiles]
-        : newBtsPhotosFiles,
-      director: directors
-        .filter((d) => d.name.trim() !== "")
-        .map((d) => d.id || d.name.trim()),
-      producer: producers
-        .filter((p) => p.name.trim() !== "")
-        .map((p) => p.id || p.name.trim()),
-      writer: writers
-        .filter((w) => w.name.trim() !== "")
-        .map((w) => w.id || w.name.trim()),
-      cast: castMembers
-        .filter((c) => c.name.trim() !== "")
-        .map((c) => c.id || c.name.trim()),
-    });
-    onSubmit(validated);
+  const onSubmitForm = async (data: MovieFormInputs) => {
+    try {
+      setIsSavingLocal(true);
+      const activeVideos = btsVideos.map((v) => v.trim()).filter(Boolean);
+      const thumbnailFile = data.thumbnail;
+
+      const validated = parseSchema(createMovieSchema, {
+        ...data,
+        thumbnail: thumbnailFile || editingMovie?.thumbnail,
+        year: Number(data.year),
+        matchRate: Number(data.matchRate),
+        duration: Number(data.duration),
+        btsVideo: activeVideos.join(","),
+        btsPhotos: editingMovie
+          ? [...existingBtsPhotos, ...newBtsPhotosFiles]
+          : newBtsPhotosFiles,
+        director: directors
+          .filter((d) => d.name.trim() !== "")
+          .map((d) => d.id || d.name.trim()),
+        producer: producers
+          .filter((p) => p.name.trim() !== "")
+          .map((p) => p.id || p.name.trim()),
+        writer: writers
+          .filter((w) => w.name.trim() !== "")
+          .map((w) => w.id || w.name.trim()),
+        cast: castMembers
+          .filter((c) => c.name.trim() !== "")
+          .map((c) => c.id || c.name.trim()),
+      });
+
+      if (editingMovie) {
+        const updatedPayload: UpdateMovie = {
+          title: validated.title,
+          description: validated.description,
+          category: validated.category,
+          thumbnail:
+            validated.thumbnail instanceof File ||
+            typeof validated.thumbnail === "string"
+              ? validated.thumbnail
+              : editingMovie.thumbnail,
+          youtubeUrl: validated.youtubeUrl,
+          year: validated.year,
+          matchRate: validated.matchRate,
+          ageRating: validated.ageRating,
+          duration: validated.duration,
+          university: validated.university || null,
+          director: validated.director || null,
+          producer: validated.producer || null,
+          writer: validated.writer || null,
+          cast: validated.cast || null,
+          btsVideo: validated.btsVideo || null,
+          btsPhotos: (validated.btsPhotos as UpdateMovie["btsPhotos"]) || null,
+        };
+
+        await updateMovieMutation.mutateAsync({
+          id: editingMovie.id,
+          movie: updatedPayload,
+        });
+        showToast(LOCALIZATION.TOAST.EDIT_MOVIE_SUCCESS, "success");
+      } else {
+        const createPayload: CreateMovie = {
+          title: validated.title,
+          description: validated.description,
+          category: validated.category,
+          thumbnail: validated.thumbnail as File,
+          youtubeUrl: validated.youtubeUrl,
+          year: validated.year,
+          matchRate: validated.matchRate,
+          ageRating: validated.ageRating,
+          duration: validated.duration,
+          university: validated.university || undefined,
+          director: validated.director || undefined,
+          producer: validated.producer || undefined,
+          writer: validated.writer || undefined,
+          cast: validated.cast || undefined,
+          btsVideo: validated.btsVideo || undefined,
+          btsPhotos:
+            (validated.btsPhotos as CreateMovie["btsPhotos"]) || undefined,
+        };
+
+        await createMovieMutation.mutateAsync(createPayload);
+        showToast(LOCALIZATION.TOAST.ADD_MOVIE_SUCCESS, "success");
+      }
+
+      router.push("/admin/movies");
+    } catch (err: unknown) {
+      const errMsg =
+        err instanceof Error ? err.message : LOCALIZATION.ERRORS.SAVE_MOVIE;
+      showToast(errMsg, "error");
+      console.error(err);
+    } finally {
+      setIsSavingLocal(false);
+    }
   };
 
-  if (!isOpen) return null;
+  const isMasterLoading =
+    isCategoriesLoading ||
+    isAgeRatingsLoading ||
+    isUniversitiesLoading ||
+    isCrewLoading;
+
+  if (isMasterLoading) {
+    return <Loading />;
+  }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-end animate-fade-in bg-black/60 backdrop-blur-sm">
-      <div className="w-full max-w-xl h-full bg-card border-l border-zinc-800/40 p-6 md:p-8 flex flex-col justify-between shadow-2xl relative overflow-y-auto animate-slide-left">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full hover:bg-zinc-800/60 text-zinc-400 hover:text-white transition-colors cursor-pointer"
-        >
-          <CloseIcon />
-        </button>
-
-        <div className="space-y-6 flex-1 pr-1.5">
-          <div>
-            <h3 className="text-xl font-bold bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
-              {editingMovie ? LOCALIZATION.MOVIE_FORM.EDIT_TITLE : LOCALIZATION.MOVIE_FORM.ADD_TITLE}
-            </h3>
-            <p className="text-xs text-zinc-400 mt-1 font-light">
-              {LOCALIZATION.MOVIE_FORM.SUBTITLE}
-            </p>
+    <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-brand selection:text-black pb-20">
+      <main className="max-w-4xl mx-auto w-full px-6 md:px-16 pt-28 space-y-8 animate-fade-in">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-xs text-zinc-500">
+            <button
+              onClick={() => router.push("/admin/movies")}
+              className="hover:text-brand transition-colors flex items-center gap-1 bg-transparent border-0 p-0 text-zinc-500 cursor-pointer"
+            >
+              <ArrowBackIcon className="text-sm" /> ระบบจัดการข้อมูลภาพยนตร์
+            </button>
+            <span>/</span>
+            <span className="text-zinc-300">
+              {editingMovie ? "แก้ไขข้อมูลภาพยนตร์" : "สร้างภาพยนตร์ใหม่"}
+            </span>
           </div>
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-wide bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent flex items-center gap-2">
+            <MovieIcon className="text-brand" />{" "}
+            {editingMovie ? "แก้ไขข้อมูลภาพยนตร์" : "สร้างภาพยนตร์ใหม่"}
+          </h1>
+          <p className="text-xs text-zinc-400 font-light">
+            กรอกข้อมูลรายละเอียดของภาพยนตร์สั้น ลิงก์ตัวอย่าง อัปโหลดใบปิด
+            และจัดการรายชื่อทีมงานทั้งหมด
+          </p>
+        </div>
 
-          <form
-            id="movie-form"
-            onSubmit={handleSubmit(onLocalSubmit)}
-            className="space-y-5"
-          >
+        <div className="bg-card border border-zinc-800/35 rounded-3xl p-6 md:p-8 shadow-xl backdrop-blur-md">
+          <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6">
             <Input
               label={LOCALIZATION.MOVIE_FORM.TITLE_LABEL}
               placeholder={LOCALIZATION.MOVIE_FORM.TITLE_PLACEHOLDER}
               error={errors.title?.message}
-              {...register("title", { required: LOCALIZATION.MOVIE_FORM.TITLE_REQUIRED })}
+              {...register("title", {
+                required: LOCALIZATION.MOVIE_FORM.TITLE_REQUIRED,
+              })}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <Select
                 label={LOCALIZATION.MOVIE_FORM.CATEGORY_LABEL}
                 error={errors.category?.message}
-                {...register("category", { required: LOCALIZATION.MOVIE_FORM.CATEGORY_REQUIRED })}
+                {...register("category", {
+                  required: LOCALIZATION.MOVIE_FORM.CATEGORY_REQUIRED,
+                })}
                 options={categories.map((cat) => ({
                   value: cat.name,
                   label: CATEGORY_TITLE_MAPPING[cat.name] || cat.name,
@@ -304,7 +407,7 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <Input
                 label={LOCALIZATION.MOVIE_FORM.YEAR_LABEL}
                 type="number"
@@ -312,8 +415,14 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                 error={errors.year?.message}
                 {...register("year", {
                   required: LOCALIZATION.MOVIE_FORM.YEAR_REQUIRED,
-                  min: { value: 1900, message: LOCALIZATION.MOVIE_FORM.YEAR_MIN },
-                  max: { value: 2100, message: LOCALIZATION.MOVIE_FORM.YEAR_MAX },
+                  min: {
+                    value: 1900,
+                    message: LOCALIZATION.MOVIE_FORM.YEAR_MIN,
+                  },
+                  max: {
+                    value: 2100,
+                    message: LOCALIZATION.MOVIE_FORM.YEAR_MAX,
+                  },
                 })}
               />
 
@@ -325,7 +434,10 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                 {...register("matchRate", {
                   required: LOCALIZATION.MOVIE_FORM.MATCH_REQUIRED,
                   min: { value: 0, message: LOCALIZATION.MOVIE_FORM.MATCH_MIN },
-                  max: { value: 100, message: LOCALIZATION.MOVIE_FORM.MATCH_MAX },
+                  max: {
+                    value: 100,
+                    message: LOCALIZATION.MOVIE_FORM.MATCH_MAX,
+                  },
                 })}
               />
 
@@ -339,7 +451,7 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
               />
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label className="text-xs font-semibold text-zinc-300">
                 {LOCALIZATION.MOVIE_FORM.COVER_LABEL}
               </label>
@@ -372,11 +484,7 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                   )}
                 />
                 <div
-                  className={`w-full bg-black/40 border ${
-                    errors.thumbnail
-                      ? "border-red-500"
-                      : "border-zinc-800 group-hover/file:border-brand"
-                  } rounded-xl px-4 py-3 text-sm text-zinc-405 flex items-center justify-between transition-colors`}
+                  className={`w-full bg-black/40 border ${errors.thumbnail ? "border-red-500" : "border-zinc-800 group-hover/file:border-brand"} rounded-xl px-4 py-3 text-sm text-zinc-405 flex items-center justify-between transition-colors`}
                 >
                   <span
                     className={
@@ -385,15 +493,17 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                         : "text-zinc-400"
                     }
                   >
-                    {selectedFileName || LOCALIZATION.MOVIE_FORM.COVER_PLACEHOLDER}
+                    {selectedFileName ||
+                      LOCALIZATION.MOVIE_FORM.COVER_PLACEHOLDER}
                   </span>
                   <span className="px-3 py-1 bg-zinc-800 text-zinc-300 rounded-lg text-xs font-semibold group-hover/file:bg-brand group-hover/file:text-white transition-colors">
                     {LOCALIZATION.MOVIE_FORM.COVER_BROWSE}
                   </span>
                 </div>
               </div>
+
               {movieCoverPreview && (
-                <div className="mt-2.5 relative rounded-xl overflow-hidden border border-zinc-800 bg-black/40 aspect-[16/9] w-full max-w-[240px] group/preview">
+                <div className="mt-3 relative rounded-xl overflow-hidden border border-zinc-800 bg-black/40 aspect-[16/9] w-full max-w-[280px] group/preview">
                   <img
                     src={movieCoverPreview}
                     alt="Cover Preview"
@@ -411,12 +521,13 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                           : null,
                       );
                     }}
-                    className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500 hover:text-white text-zinc-400 rounded-full transition-colors cursor-pointer border-0 shadow-md opacity-0 group-hover/preview:opacity-100"
+                    className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500 hover:text-white text-zinc-405 rounded-full transition-colors cursor-pointer border-0 shadow-md opacity-0 group-hover/preview:opacity-100"
                   >
                     <CloseIcon className="text-[10px]" />
                   </button>
                 </div>
               )}
+
               {errors.thumbnail && (
                 <span className="text-[10px] text-red-500 block pl-1 font-semibold">
                   {errors.thumbnail.message}
@@ -424,11 +535,11 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
               )}
               {editingMovie && typeof editingMovie.thumbnail === "string" && (
                 <p className="text-[10px] text-zinc-500 pl-1 leading-relaxed">
-                  Current:{" "}
+                  รูปปัจจุบัน:{" "}
                   <span className="text-brand font-medium truncate max-w-[200px] inline-block align-bottom">
                     {editingMovie.thumbnail.split("/").pop()}
                   </span>{" "}
-                  (Leave blank to keep existing)
+                  (เว้นว่างไว้หากต้องการใช้รูปเดิม)
                 </p>
               )}
             </div>
@@ -442,8 +553,8 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
               })}
             />
 
-            <div className="border-t border-zinc-800/60 pt-4 mt-2 space-y-4">
-              <h4 className="text-xs font-bold text-brand uppercase tracking-wider">
+            <div className="border-t border-zinc-800/60 pt-6 mt-4 space-y-6">
+              <h4 className="text-sm font-bold text-brand uppercase tracking-wider">
                 {LOCALIZATION.MOVIE_FORM.CREW_SECTION_TITLE}
               </h4>
 
@@ -466,17 +577,19 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                 ))}
               </Select>
 
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-300">
                   {LOCALIZATION.MOVIE_FORM.DIRECTOR_LABEL}
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {directors.map((director, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
                       <CreatableSearchSelect
                         value={director}
                         options={crewOptions}
-                        placeholder={LOCALIZATION.MOVIE_FORM.DIRECTOR_PLACEHOLDER}
+                        placeholder={
+                          LOCALIZATION.MOVIE_FORM.DIRECTOR_PLACEHOLDER
+                        }
                         onChange={(val) => {
                           const newDirectors = [...directors];
                           newDirectors[idx] = val;
@@ -487,11 +600,10 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                         <Button
                           type="button"
                           variant="secondary"
-                          size="sm"
                           onClick={() =>
                             setDirectors(directors.filter((_, i) => i !== idx))
                           }
-                          className="p-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto"
+                          className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto"
                         >
                           <CloseIcon className="text-sm" />
                         </Button>
@@ -504,24 +616,27 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                     onClick={() =>
                       setDirectors([...directors, { id: "", name: "" }])
                     }
-                    className="py-1.5 px-3 text-[11px] h-8 w-fit flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold"
+                    className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
                   >
-                    <AddIcon className="text-xs" /> {LOCALIZATION.MOVIE_FORM.DIRECTOR_ADD}
+                    <AddIcon className="text-sm" />{" "}
+                    {LOCALIZATION.MOVIE_FORM.DIRECTOR_ADD}
                   </Button>
                 </div>
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-300">
                   {LOCALIZATION.MOVIE_FORM.PRODUCER_LABEL}
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {producers.map((producer, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
                       <CreatableSearchSelect
                         value={producer}
                         options={crewOptions}
-                        placeholder={LOCALIZATION.MOVIE_FORM.PRODUCER_PLACEHOLDER}
+                        placeholder={
+                          LOCALIZATION.MOVIE_FORM.PRODUCER_PLACEHOLDER
+                        }
                         onChange={(val) => {
                           const newProducers = [...producers];
                           newProducers[idx] = val;
@@ -532,11 +647,10 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                         <Button
                           type="button"
                           variant="secondary"
-                          size="sm"
                           onClick={() =>
                             setProducers(producers.filter((_, i) => i !== idx))
                           }
-                          className="p-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto"
+                          className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto"
                         >
                           <CloseIcon className="text-sm" />
                         </Button>
@@ -549,18 +663,19 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                     onClick={() =>
                       setProducers([...producers, { id: "", name: "" }])
                     }
-                    className="py-1.5 px-3 text-[11px] h-8 w-fit flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold"
+                    className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
                   >
-                    <AddIcon className="text-xs" /> {LOCALIZATION.MOVIE_FORM.PRODUCER_ADD}
+                    <AddIcon className="text-sm" />{" "}
+                    {LOCALIZATION.MOVIE_FORM.PRODUCER_ADD}
                   </Button>
                 </div>
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-300">
                   {LOCALIZATION.MOVIE_FORM.WRITER_LABEL}
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {writers.map((writer, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
                       <CreatableSearchSelect
@@ -577,11 +692,10 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                         <Button
                           type="button"
                           variant="secondary"
-                          size="sm"
                           onClick={() =>
                             setWriters(writers.filter((_, i) => i !== idx))
                           }
-                          className="p-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto"
+                          className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto"
                         >
                           <CloseIcon className="text-sm" />
                         </Button>
@@ -594,18 +708,19 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                     onClick={() =>
                       setWriters([...writers, { id: "", name: "" }])
                     }
-                    className="py-1.5 px-3 text-[11px] h-8 w-fit flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold"
+                    className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
                   >
-                    <AddIcon className="text-xs" /> {LOCALIZATION.MOVIE_FORM.WRITER_ADD}
+                    <AddIcon className="text-sm" />{" "}
+                    {LOCALIZATION.MOVIE_FORM.WRITER_ADD}
                   </Button>
                 </div>
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-300">
                   {LOCALIZATION.MOVIE_FORM.CAST_LABEL}
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {castMembers.map((actor, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
                       <CreatableSearchSelect
@@ -622,13 +737,12 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                         <Button
                           type="button"
                           variant="secondary"
-                          size="sm"
                           onClick={() =>
                             setCastMembers(
                               castMembers.filter((_, i) => i !== idx),
                             )
                           }
-                          className="p-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto"
+                          className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto"
                         >
                           <CloseIcon className="text-sm" />
                         </Button>
@@ -641,9 +755,10 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                     onClick={() =>
                       setCastMembers([...castMembers, { id: "", name: "" }])
                     }
-                    className="py-1.5 px-3 text-[11px] h-8 w-fit flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold"
+                    className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
                   >
-                    <AddIcon className="text-xs" /> {LOCALIZATION.MOVIE_FORM.CAST_ADD}
+                    <AddIcon className="text-sm" />{" "}
+                    {LOCALIZATION.MOVIE_FORM.CAST_ADD}
                   </Button>
                 </div>
               </div>
@@ -652,12 +767,14 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                 <label className="text-xs font-semibold text-zinc-300">
                   {LOCALIZATION.MOVIE_FORM.BTS_VIDEO_LABEL}
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {btsVideos.map((videoUrl, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
                       <Input
                         type="text"
-                        placeholder={LOCALIZATION.MOVIE_FORM.BTS_VIDEO_PLACEHOLDER}
+                        placeholder={
+                          LOCALIZATION.MOVIE_FORM.BTS_VIDEO_PLACEHOLDER
+                        }
                         value={videoUrl}
                         onChange={(e) => {
                           const newVideos = [...btsVideos];
@@ -670,11 +787,10 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                         <Button
                           type="button"
                           variant="secondary"
-                          size="sm"
-                          onClick={() => {
-                            setBtsVideos(btsVideos.filter((_, i) => i !== idx));
-                          }}
-                          className="p-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all h-auto"
+                          onClick={() =>
+                            setBtsVideos(btsVideos.filter((_, i) => i !== idx))
+                          }
+                          className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all h-auto"
                         >
                           <CloseIcon className="text-sm" />
                         </Button>
@@ -685,9 +801,10 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                     type="button"
                     variant="secondary"
                     onClick={() => setBtsVideos([...btsVideos, ""])}
-                    className="py-1.5 px-3 text-xs w-fit flex items-center gap-1.5"
+                    className="py-2 px-4 text-xs w-fit flex items-center gap-1.5 rounded-xl bg-zinc-900 border border-zinc-800"
                   >
-                    <AddIcon className="text-xs" /> {LOCALIZATION.MOVIE_FORM.BTS_VIDEO_ADD}
+                    <AddIcon className="text-sm" />{" "}
+                    {LOCALIZATION.MOVIE_FORM.BTS_VIDEO_ADD}
                   </Button>
                 </div>
               </div>
@@ -699,7 +816,7 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
 
                 {(existingBtsPhotos.length > 0 ||
                   newBtsPhotosFiles.length > 0) && (
-                  <div className="grid grid-cols-4 gap-2 mb-3">
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-3">
                     {existingBtsPhotos.map((url, idx) => (
                       <div
                         key={`existing-${idx}`}
@@ -763,14 +880,14 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                     onChange={handleBtsFileChange}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                   />
-                  <div className="w-full bg-black/40 border border-zinc-800 border-dashed rounded-xl px-4 py-4 text-sm text-zinc-405 flex flex-col items-center justify-center gap-1.5 transition-colors group-hover/file:border-brand/60">
+                  <div className="w-full bg-black/40 border border-zinc-800 border-dashed rounded-xl px-4 py-6 text-sm text-zinc-405 flex flex-col items-center justify-center gap-1.5 transition-colors group-hover/file:border-brand/60">
                     <div className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-zinc-400 group-hover/file:bg-brand/10 group-hover/file:border-brand/30 group-hover/file:text-brand transition-colors">
                       <AddIcon className="text-sm" />
                     </div>
                     <span className="text-xs text-zinc-400 font-semibold group-hover/file:text-zinc-200 transition-colors">
                       {LOCALIZATION.MOVIE_FORM.BTS_PHOTO_PLACEHOLDER}
                     </span>
-                    <span className="text-[10px] text-zinc-500">
+                    <span className="text-[10px] text-zinc-550">
                       {LOCALIZATION.MOVIE_FORM.BTS_PHOTO_SUBTEXT}
                     </span>
                   </div>
@@ -778,19 +895,17 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
               </div>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2 pt-4 border-t border-zinc-800/60">
               <label className="text-xs font-semibold text-zinc-300">
                 {LOCALIZATION.MOVIE_FORM.DESC_LABEL}
               </label>
               <textarea
-                rows={4}
+                rows={5}
                 placeholder={LOCALIZATION.MOVIE_FORM.DESC_PLACEHOLDER}
                 {...register("description", {
                   required: LOCALIZATION.MOVIE_FORM.DESC_REQUIRED,
                 })}
-                className={`w-full bg-black/40 border ${
-                  errors.description ? "border-red-500" : "border-zinc-800"
-                } rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-brand transition-colors resize-none`}
+                className={`w-full bg-black/40 border ${errors.description ? "border-red-500" : "border-zinc-800 focus:border-brand"} rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors resize-none`}
               />
               {errors.description && (
                 <span className="text-[10px] text-red-500 block pl-1 font-semibold">
@@ -798,27 +913,51 @@ export const MovieFormSidebar: React.FC<MovieFormSidebarProps> = ({
                 </span>
               )}
             </div>
+
+            <div className="pt-6 border-t border-zinc-800/40 flex items-center gap-4">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => router.push("/admin/movies")}
+                className="flex-1 py-3 text-sm font-semibold rounded-xl"
+              >
+                {LOCALIZATION.MOVIE_FORM.CANCEL}
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1 py-3 text-sm font-semibold rounded-xl"
+              >
+                {editingMovie
+                  ? LOCALIZATION.MOVIE_FORM.SAVE
+                  : LOCALIZATION.MOVIE_FORM.ADD}
+              </Button>
+            </div>
           </form>
         </div>
+      </main>
 
-        <div className="pt-6 border-t border-zinc-800/40 flex items-center gap-3">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={onClose}
-            className="flex-1 py-3 text-sm font-semibold rounded-xl"
-          >
-            {LOCALIZATION.MOVIE_FORM.CANCEL}
-          </Button>
-          <Button
-            type="submit"
-            form="movie-form"
-            className="flex-1 py-3 text-sm font-semibold rounded-xl"
-          >
-            {editingMovie ? LOCALIZATION.MOVIE_FORM.SAVE : LOCALIZATION.MOVIE_FORM.ADD}
-          </Button>
+      {isSavingLocal && (
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/70 backdrop-blur-md animate-fade-in">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="relative w-20 h-20">
+              <div className="absolute inset-0 rounded-full border-4 border-zinc-800/60" />
+              <div className="absolute inset-0 rounded-full border-4 border-brand border-t-transparent animate-spin" />
+            </div>
+            <div className="space-y-1.5 text-center">
+              <h3 className="text-xl font-bold tracking-wide text-white">
+                {editingMovie
+                  ? LOCALIZATION.LOADING.SAVE_MOVIE
+                  : LOCALIZATION.LOADING.SAVE_MOVIE}
+              </h3>
+              <p className="text-xs text-zinc-400 font-light">
+                {editingMovie
+                  ? LOCALIZATION.LOADING.SUB_SAVE_MOVIE
+                  : LOCALIZATION.LOADING.SUB_SAVE_MOVIE}
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

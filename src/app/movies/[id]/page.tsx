@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useMovieUserRatingQuery } from "@/hooks/use-ratings";
 import { calculateRatingStats } from "@/utils/rating";
+import Loading from "@/app/loading";
 
 export default function MovieDetails() {
   const params = useParams<{ id: string }>();
@@ -34,13 +35,13 @@ export default function MovieDetails() {
     deleteRatingMutation.isPending;
   const { currentUser, showToast } = useAppStore();
 
-  const { data: movie } = useMovieQueryById(params.id);
+  const { data: movie, isLoading } = useMovieQueryById(params.id);
   const { data: userRating } = useMovieUserRatingQuery(
     movie?.id ?? "",
     currentUser?.id ?? "",
   );
 
-  const [selectedStars, setSelectedStars] = useState(5);
+  const [selectedStars, setSelectedStars] = useState(0);
 
   useEffect(() => {
     if (userRating) {
@@ -100,6 +101,11 @@ export default function MovieDetails() {
     },
     [deleteRatingMutation, showToast],
   );
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-brand selection:text-black">
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-28 pb-16 space-y-10 animate-fade-in">

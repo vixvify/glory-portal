@@ -14,6 +14,14 @@ export function useCrewMembersQuery(params?: CrewFilterParams) {
   });
 }
 
+export function useCrewMemberQueryById(id?: string) {
+  return useQuery<CrewMember, Error>({
+    queryKey: ["crewMember", id],
+    queryFn: () => crewMemberService.getCrewMemberById(id!),
+    enabled: !!id,
+  });
+}
+
 export function useCreateCrewMemberMutation() {
   const queryClient = useQueryClient();
   return useMutation<CrewMember, Error, CreateCrewMember>({
