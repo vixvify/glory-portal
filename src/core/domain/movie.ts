@@ -17,6 +17,18 @@ export interface AgeRating {
   name: string;
   createdAt: Date;
 }
+
+export interface Language {
+  id: string;
+  name: string;
+  createdAt: Date;
+}
+
+export interface TargetGroup {
+  id: string;
+  name: string;
+  createdAt: Date;
+}
 export interface CrewMember {
   id: string;
   name: string;
@@ -59,6 +71,11 @@ export interface Movie {
   ageRating: string;
   duration: number;
   university?: string | null;
+  facebook?: string | null;
+  instagram?: string | null;
+  email?: string | null;
+  language?: string | null;
+  targetGroup?: string | null;
   crew: MovieCrew[];
   bts?: MovieBts | null;
   createdAt: Date;
@@ -76,6 +93,11 @@ export interface CreateMovie {
   ageRating: string;
   duration: number;
   university?: string;
+  facebook?: string;
+  instagram?: string;
+  email?: string;
+  language?: string;
+  targetGroup?: string;
   director?: string | string[];
   producer?: string | string[];
   writer?: string | string[];
@@ -95,6 +117,11 @@ export interface UpdateMovie {
   ageRating: string;
   duration: number;
   university?: string | null;
+  facebook?: string | null;
+  instagram?: string | null;
+  email?: string | null;
+  language?: string | null;
+  targetGroup?: string | null;
   director?: string | string[] | null;
   producer?: string | string[] | null;
   writer?: string | string[] | null;

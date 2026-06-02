@@ -5,6 +5,9 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CheckIcon from "@mui/icons-material/Check";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import EmailIcon from "@mui/icons-material/Email";
 import { User } from "@/core/domain/user";
 import { Button } from "@/components/ui/button";
 import {
@@ -147,6 +150,42 @@ export default function MovieDetails() {
                   <button className="flex items-center justify-center w-11 h-11 rounded-full border border-zinc-700 bg-zinc-900/60 hover:bg-zinc-800 text-emerald-400 cursor-pointer transition-colors">
                     <CheckIcon className="text-xl" />
                   </button>
+
+                  {(movie?.facebook || movie?.instagram || movie?.email) && (
+                    <div className="flex items-center gap-3.5 ml-2 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full border border-zinc-800/40">
+                      {movie.facebook && (
+                        <a
+                          href={movie.facebook}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-zinc-400 hover:text-[#1877F2] transition-colors hover:scale-110 duration-200"
+                          title="Facebook"
+                        >
+                          <FacebookIcon className="text-xl" />
+                        </a>
+                      )}
+                      {movie.instagram && (
+                        <a
+                          href={movie.instagram}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-zinc-400 hover:text-[#E1306C] transition-colors hover:scale-110 duration-200"
+                          title="Instagram"
+                        >
+                          <InstagramIcon className="text-xl" />
+                        </a>
+                      )}
+                      {movie.email && (
+                        <a
+                          href={`mailto:${movie.email}`}
+                          className="text-zinc-400 hover:text-brand transition-colors hover:scale-110 duration-200"
+                          title="Email"
+                        >
+                          <EmailIcon className="text-xl" />
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -171,6 +210,20 @@ export default function MovieDetails() {
               <span className="px-2.5 py-0.5 text-xs font-semibold bg-brand/10 border border-brand/20 text-brand rounded-full">
                 {movie?.category}
               </span>
+              {movie?.language && (
+                <>
+                  <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
+                  <span className="text-zinc-400">ภาษา: {movie.language}</span>
+                </>
+              )}
+              {movie?.targetGroup && (
+                <>
+                  <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
+                  <span className="px-2.5 py-0.5 text-xs font-semibold bg-zinc-900/80 border border-zinc-800 text-zinc-300 rounded-full">
+                    กลุ่มเป้าหมาย: {movie.targetGroup}
+                  </span>
+                </>
+              )}
             </div>
 
             <div className="space-y-3">

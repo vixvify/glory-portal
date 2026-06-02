@@ -5,6 +5,8 @@ import {
   useCategoriesQuery,
   useAgeRatingsQuery,
   useUniversitiesQuery,
+  useLanguagesQuery,
+  useTargetGroupsQuery,
 } from "@/hooks/use-master-data";
 import { useCrewMembersQuery } from "@/hooks/use-crew-members";
 import { MovieForm } from "../movieform";
@@ -16,6 +18,10 @@ export default function CreateMoviePage() {
     useAgeRatingsQuery();
   const { data: universities = [], isLoading: isUniversitiesLoading } =
     useUniversitiesQuery();
+  const { data: languages = [], isLoading: isLanguagesLoading } =
+    useLanguagesQuery();
+  const { data: targetGroups = [], isLoading: isTargetGroupsLoading } =
+    useTargetGroupsQuery();
   const { data: availableCrew = [], isLoading: isCrewLoading } =
     useCrewMembersQuery();
 
@@ -23,6 +29,8 @@ export default function CreateMoviePage() {
     isCategoriesLoading ||
     isAgeRatingsLoading ||
     isUniversitiesLoading ||
+    isLanguagesLoading ||
+    isTargetGroupsLoading ||
     isCrewLoading;
 
   if (isMasterLoading) {
@@ -34,6 +42,8 @@ export default function CreateMoviePage() {
       categories={categories}
       ageRatings={ageRatings}
       universities={universities}
+      languages={languages}
+      targetGroups={targetGroups}
       availableCrew={availableCrew}
     />
   );

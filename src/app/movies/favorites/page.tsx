@@ -90,7 +90,9 @@ export default function FavoritesPage() {
               <LockIcon className="text-3xl" />
             </div>
             <div className="space-y-2">
-              <h2 className="text-xl font-bold tracking-wide">เข้าสู่ระบบเพื่อดูรายการของฉัน</h2>
+              <h2 className="text-xl font-bold tracking-wide">
+                เข้าสู่ระบบเพื่อดูรายการของฉัน
+              </h2>
               <p className="text-sm text-zinc-450 font-light leading-relaxed">
                 บันทึกภาพยนตร์เรื่องโปรดของคุณไว้ที่นี่เพื่อรับชมภายหลังและติดตามรายการที่ชื่นชอบทั้งหมด
               </p>
@@ -109,9 +111,12 @@ export default function FavoritesPage() {
               <FavoriteIcon className="text-3xl" />
             </div>
             <div className="space-y-2">
-              <h2 className="text-xl font-bold tracking-wide">ยังไม่มีรายการของฉัน</h2>
+              <h2 className="text-xl font-bold tracking-wide">
+                ยังไม่มีรายการของฉัน
+              </h2>
               <p className="text-sm text-zinc-450 font-light leading-relaxed">
-                เพิ่มภาพยนตร์ที่คุณชอบลงในรายการโปรดโดยกดปุ่มเครื่องหมายบวก (+) เพื่อแสดงข้อมูลในหน้านี้
+                เพิ่มภาพยนตร์ที่คุณชอบลงในรายการโปรดโดยกดปุ่มเครื่องหมายบวก (+)
+                เพื่อแสดงข้อมูลในหน้านี้
               </p>
             </div>
             <Button

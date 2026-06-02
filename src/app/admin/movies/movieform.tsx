@@ -17,6 +17,8 @@ import {
   AgeRating,
   University,
   CrewMember,
+  Language,
+  TargetGroup,
 } from "@/core/domain/movie";
 import { parseSchema } from "@/lib/validation";
 import { createMovieSchema } from "@/core/schema/movie";
@@ -34,6 +36,8 @@ interface MovieFormProps {
   categories: Category[];
   ageRatings: AgeRating[];
   universities: University[];
+  languages: Language[];
+  targetGroups: TargetGroup[];
   availableCrew: CrewMember[];
 }
 
@@ -48,6 +52,11 @@ type MovieFormInputs = {
   ageRating: string;
   duration: number;
   university?: string;
+  facebook?: string;
+  instagram?: string;
+  email?: string;
+  language?: string;
+  targetGroup?: string;
   director?: string;
   producer?: string;
   writer?: string;
@@ -61,6 +70,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
   categories,
   ageRatings,
   universities,
+  languages,
+  targetGroups,
   availableCrew,
 }) => {
   const router = useRouter();
@@ -180,6 +191,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         ageRating: editingMovie.ageRating,
         duration: editingMovie.duration,
         university: editingMovie.university || "",
+        facebook: editingMovie.facebook || "",
+        instagram: editingMovie.instagram || "",
+        email: editingMovie.email || "",
+        language: editingMovie.language || "",
+        targetGroup: editingMovie.targetGroup || "",
         director: "",
         producer: "",
         writer: "",
@@ -212,6 +228,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         ageRating: "PG",
         duration: 120,
         university: "",
+        facebook: "",
+        instagram: "",
+        email: "",
+        language: "",
+        targetGroup: "",
         director: "",
         producer: "",
         writer: "",
@@ -249,6 +270,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         year: Number(data.year),
         matchRate: Number(data.matchRate),
         duration: Number(data.duration),
+        facebook: data.facebook || null,
+        instagram: data.instagram || null,
+        email: data.email || null,
+        language: data.language || null,
+        targetGroup: data.targetGroup || null,
         btsVideo: activeVideos.join(","),
         btsPhotos: editingMovie
           ? [...existingBtsPhotos, ...newBtsPhotosFiles]
@@ -283,6 +309,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           ageRating: validated.ageRating,
           duration: validated.duration,
           university: validated.university || null,
+          facebook: validated.facebook || null,
+          instagram: validated.instagram || null,
+          email: validated.email || null,
+          language: validated.language || null,
+          targetGroup: validated.targetGroup || null,
           director: validated.director || null,
           producer: validated.producer || null,
           writer: validated.writer || null,
@@ -308,6 +339,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           ageRating: validated.ageRating,
           duration: validated.duration,
           university: validated.university || undefined,
+          facebook: validated.facebook || undefined,
+          instagram: validated.instagram || undefined,
+          email: validated.email || undefined,
+          language: validated.language || undefined,
+          targetGroup: validated.targetGroup || undefined,
           director: validated.director || undefined,
           producer: validated.producer || undefined,
           writer: validated.writer || undefined,
@@ -392,6 +428,34 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   value: rating.name,
                   label: rating.name,
                 }))}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <Select
+                label={LOCALIZATION.MOVIE_FORM.LANGUAGE_LABEL}
+                error={errors.language?.message}
+                {...register("language")}
+                options={[
+                  { value: "", label: LOCALIZATION.MOVIE_FORM.LANGUAGE_SELECT_PLACEHOLDER },
+                  ...languages.map((lang) => ({
+                    value: lang.name,
+                    label: lang.name,
+                  }))
+                ]}
+              />
+
+              <Select
+                label={LOCALIZATION.MOVIE_FORM.TARGET_GROUP_LABEL}
+                error={errors.targetGroup?.message}
+                {...register("targetGroup")}
+                options={[
+                  { value: "", label: LOCALIZATION.MOVIE_FORM.TARGET_GROUP_SELECT_PLACEHOLDER },
+                  ...targetGroups.map((tg) => ({
+                    value: tg.name,
+                    label: tg.name,
+                  }))
+                ]}
               />
             </div>
 
@@ -540,6 +604,29 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 required: LOCALIZATION.MOVIE_FORM.YOUTUBE_REQUIRED,
               })}
             />
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <Input
+                label={LOCALIZATION.MOVIE_FORM.FACEBOOK_LABEL}
+                placeholder={LOCALIZATION.MOVIE_FORM.FACEBOOK_PLACEHOLDER}
+                error={errors.facebook?.message}
+                {...register("facebook")}
+              />
+
+              <Input
+                label={LOCALIZATION.MOVIE_FORM.INSTAGRAM_LABEL}
+                placeholder={LOCALIZATION.MOVIE_FORM.INSTAGRAM_PLACEHOLDER}
+                error={errors.instagram?.message}
+                {...register("instagram")}
+              />
+
+              <Input
+                label={LOCALIZATION.MOVIE_FORM.EMAIL_LABEL}
+                placeholder={LOCALIZATION.MOVIE_FORM.EMAIL_PLACEHOLDER}
+                error={errors.email?.message}
+                {...register("email")}
+              />
+            </div>
 
             <div className="border-t border-zinc-800/60 pt-6 mt-4 space-y-6">
               <h4 className="text-sm font-bold text-brand uppercase tracking-wider">
