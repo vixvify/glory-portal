@@ -101,7 +101,7 @@ export default function AdminMoviesPage() {
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-wide bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent flex items-center gap-2">
               <MovieIcon className="text-brand" />{" "}
-              {LOCALIZATION.ADMIN.TAB_MOVIES(movies.length)}
+              ภาพยนตร์ ({movies.length})
             </h1>
           </div>
 
@@ -110,7 +110,7 @@ export default function AdminMoviesPage() {
             className="flex items-center justify-center gap-2"
           >
             <AddIcon className="text-lg" />
-            {LOCALIZATION.ADMIN.ADD_MOVIE}
+            เพิ่มภาพยนตร์ใหม่
           </Button>
         </div>
 
@@ -119,16 +119,16 @@ export default function AdminMoviesPage() {
             <SearchInput
               value={searchQuery}
               onChange={setSearchQuery}
-              placeholder={LOCALIZATION.ADMIN.SEARCH_MOVIE_PLACEHOLDER}
+              placeholder="ค้นหาจากชื่อเรื่อง หมวดหมู่ หรือเรื่องย่อ..."
             />
 
             <div className="flex items-center gap-3 self-end md:self-auto">
               <FilterSelect
-                label={LOCALIZATION.ADMIN.FILTER_LABEL}
+                label="หมวดหมู่:"
                 value={categoryFilter}
                 onChange={setCategoryFilter}
                 options={[
-                  { value: "", label: LOCALIZATION.ADMIN.FILTER_ALL },
+                  { value: "", label: "ทุกหมวดหมู่" },
                   ...availableCategories.map((cat) => ({
                     value: cat.name,
                     label: CATEGORY_TITLE_MAPPING[cat.name] || cat.name,
@@ -137,13 +137,13 @@ export default function AdminMoviesPage() {
               />
 
               <FilterSelect
-                label={LOCALIZATION.ADMIN.SORT_LABEL}
+                label="เรียงตาม:"
                 value={sortBy}
                 onChange={(val) => setSortBy(val as Sortby)}
                 options={[
-                  { value: "title", label: LOCALIZATION.ADMIN.SORT_ALPHA },
-                  { value: "year", label: LOCALIZATION.ADMIN.SORT_YEAR },
-                  { value: "views", label: LOCALIZATION.ADMIN.SORT_VIEWS },
+                  { value: "title", label: "ตามตัวอักษร" },
+                  { value: "year", label: "ปีที่ฉาย" },
+                  { value: "views", label: "ยอดความนิยม" },
                 ]}
               />
             </div>

@@ -128,8 +128,8 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
         <div className="bg-card border border-zinc-800/35 rounded-3xl p-6 md:p-8 shadow-xl backdrop-blur-md">
           <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-5">
             <Input
-              label={LOCALIZATION.CREW_FORM.NAME_LABEL}
-              placeholder={LOCALIZATION.CREW_FORM.NAME_PLACEHOLDER}
+              label="ชื่อ-นามสกุล"
+              placeholder="เช่น สมชาย ใจดี"
               error={errors.name?.message}
               {...register("name", {
                 required: "กรุณาระบุชื่อทีมงานหรือนักแสดง",
@@ -137,8 +137,8 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
             />
 
             <Input
-              label={LOCALIZATION.CREW_FORM.EMAIL_LABEL}
-              placeholder={LOCALIZATION.CREW_FORM.EMAIL_PLACEHOLDER}
+              label="อีเมล (ถ้ามีบัญชีในระบบ)"
+              placeholder="ระบุอีเมลเพื่อเชื่อมโยงกับบัญชีผู้ใช้..."
               error={errors.email?.message}
               type="email"
               {...register("email")}
@@ -146,7 +146,7 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
 
             <div className="space-y-2">
               <label className="text-xs font-semibold text-zinc-300">
-                {LOCALIZATION.CREW_FORM.PHOTO_LABEL}
+                รูปภาพประจำตัว
               </label>
 
               <div className="relative group/file">
@@ -180,10 +180,10 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
                         : "text-zinc-400"
                     }
                   >
-                    {crewPhotoName || LOCALIZATION.CREW_FORM.PHOTO_PLACEHOLDER}
+                    {crewPhotoName || "เลือกรูปภาพประจำตัว..."}
                   </span>
                   <span className="px-3 py-1 bg-zinc-800 text-zinc-300 rounded-lg text-xs font-semibold group-hover/file:bg-brand group-hover/file:text-white transition-colors">
-                    {LOCALIZATION.CREW_FORM.BROWSE}
+                    เลือกไฟล์
                   </span>
                 </div>
               </div>
@@ -212,12 +212,12 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs text-zinc-300 font-semibold">
-                      {LOCALIZATION.CREW_FORM.PREVIEW_TITLE}
+                      รูปภาพประจำตัวที่ใช้
                     </span>
                     <span className="text-[10px] text-zinc-500 leading-relaxed mt-0.5">
                       {crewPhotoName
-                        ? LOCALIZATION.CREW_FORM.PREVIEW_CROPPED
-                        : LOCALIZATION.CREW_FORM.PREVIEW_ORIGINAL}
+                        ? "รูปภาพหลังแก้ไข"
+                        : "รูปภาพปัจจุบัน"}
                     </span>
                     {crewPhotoName && rawCrewFile && (
                       <button
@@ -228,7 +228,7 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
                         }}
                         className="text-[10px] text-brand hover:underline font-semibold w-fit text-left mt-1 cursor-pointer border-0 bg-transparent p-0 h-auto hover:bg-transparent"
                       >
-                        {LOCALIZATION.CREW_FORM.RECROP}
+                        แก้ไขรูปภาพอีกครั้ง
                       </button>
                     )}
                   </div>
@@ -243,15 +243,15 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
                 onClick={() => router.push("/admin/crew")}
                 className="flex-1 py-3 text-sm font-semibold rounded-xl"
               >
-                {LOCALIZATION.CREW_FORM.CANCEL}
+                ยกเลิก
               </Button>
               <Button
                 type="submit"
                 className="flex-1 py-3 text-sm font-semibold rounded-xl"
               >
                 {editingCrew
-                  ? LOCALIZATION.CREW_FORM.SAVE
-                  : LOCALIZATION.CREW_FORM.ADD}
+                  ? "บันทึกการแก้ไข"
+                  : "เพิ่มรายชื่อ"}
               </Button>
             </div>
           </form>

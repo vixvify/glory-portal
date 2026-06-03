@@ -30,6 +30,7 @@ import {
   useUpdateMovieMutation,
 } from "@/hooks/use-movies";
 import { CreateMovie, UpdateMovie } from "@/core/domain/movie";
+import { getYouTubeId } from "@/utils/youtube";
 
 interface MovieFormProps {
   editingMovie?: Movie | null;
@@ -47,6 +48,7 @@ type MovieFormInputs = {
   category: string;
   thumbnail?: File | null;
   youtubeUrl: string;
+  trailerUrl?: string;
   year: number;
   matchRate: number;
   ageRating: string;
@@ -120,8 +122,12 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     setValue,
     reset,
     control,
+    watch,
     formState: { errors },
   } = useForm<MovieFormInputs>();
+
+  const watchedYoutubeUrl = watch("youtubeUrl");
+  const watchedTrailerUrl = watch("trailerUrl");
 
   useEffect(() => {
     if (editingMovie) {
@@ -212,6 +218,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         category: editingMovie.category,
         thumbnail: null,
         youtubeUrl: editingMovie.youtubeUrl,
+        trailerUrl: editingMovie.trailerUrl || "",
         year: editingMovie.year,
         matchRate: editingMovie.matchRate,
         ageRating: editingMovie.ageRating,
@@ -249,6 +256,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         category: "Action",
         thumbnail: null,
         youtubeUrl: "",
+        trailerUrl: "",
         year: new Date().getFullYear(),
         matchRate: 98,
         ageRating: "PG",
@@ -321,6 +329,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               ? validated.thumbnail
               : editingMovie.thumbnail,
           youtubeUrl: validated.youtubeUrl,
+          trailerUrl: validated.trailerUrl || null,
           year: validated.year,
           matchRate: validated.matchRate,
           ageRating: validated.ageRating,
@@ -353,6 +362,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           category: validated.category,
           thumbnail: validated.thumbnail as File,
           youtubeUrl: validated.youtubeUrl,
+          trailerUrl: validated.trailerUrl || undefined,
           year: validated.year,
           matchRate: validated.matchRate,
           ageRating: validated.ageRating,
@@ -405,20 +415,20 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         <div className="bg-card border border-zinc-800/35 rounded-3xl p-6 md:p-8 shadow-xl backdrop-blur-md">
           <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6">
             <Input
-              label={LOCALIZATION.MOVIE_FORM.TITLE_LABEL}
-              placeholder={LOCALIZATION.MOVIE_FORM.TITLE_PLACEHOLDER}
+              label="ชื่อเรื่อง"
+              placeholder="เช่น Interstellar"
               error={errors.title?.message}
               {...register("title", {
-                required: LOCALIZATION.MOVIE_FORM.TITLE_REQUIRED,
+                required: "กรุณากรอกชื่อเรื่อง",
               })}
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <Select
-                label={LOCALIZATION.MOVIE_FORM.CATEGORY_LABEL}
+                label="หมวดหมู่"
                 error={errors.category?.message}
                 {...register("category", {
-                  required: LOCALIZATION.MOVIE_FORM.CATEGORY_REQUIRED,
+                  required: "กรุณาเลือกหมวดหมู่",
                 })}
                 options={categories.map((cat) => ({
                   value: cat.name,
@@ -427,10 +437,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               />
 
               <Select
-                label={LOCALIZATION.MOVIE_FORM.AGE_LABEL}
+                label="เรตอายุที่แนะนำ"
                 error={errors.ageRating?.message}
                 {...register("ageRating", {
-                  required: LOCALIZATION.MOVIE_FORM.AGE_REQUIRED,
+                  required: "กรุณาเลือกเรตอายุ",
                 })}
                 options={ageRatings.map((rating) => ({
                   value: rating.name,
@@ -441,13 +451,13 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <Select
-                label={LOCALIZATION.MOVIE_FORM.LANGUAGE_LABEL}
+                label="ภาษาของภาพยนตร์"
                 error={errors.language?.message}
                 {...register("language")}
                 options={[
                   {
                     value: "",
-                    label: LOCALIZATION.MOVIE_FORM.LANGUAGE_SELECT_PLACEHOLDER,
+                    label: "เลือกภาษาของภาพยนตร์...",
                   },
                   ...languages.map((lang) => ({
                     value: lang.name,
@@ -457,14 +467,13 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               />
 
               <Select
-                label={LOCALIZATION.MOVIE_FORM.TARGET_GROUP_LABEL}
+                label="กลุ่มเป้าหมายผู้ชม"
                 error={errors.targetGroup?.message}
                 {...register("targetGroup")}
                 options={[
                   {
                     value: "",
-                    label:
-                      LOCALIZATION.MOVIE_FORM.TARGET_GROUP_SELECT_PLACEHOLDER,
+                    label: "เลือกกลุ่มเป้าหมาย...",
                   },
                   ...targetGroups.map((tg) => ({
                     value: tg.name,
@@ -474,7 +483,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               />
 
               <Select
-                label={LOCALIZATION.MOVIE_FORM.COLOR_LABEL}
+                label="โทนสีภาพยนตร์ (Color Type)"
                 error={errors.colorType?.message}
                 {...register("colorType", {
                   required: "กรุณาเลือกโทนสีภาพยนตร์",
@@ -482,15 +491,15 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 options={[
                   {
                     value: "COLOR",
-                    label: LOCALIZATION.MOVIE_FORM.COLOR_COLOR,
+                    label: "ภาพสี (Color)",
                   },
                   {
                     value: "BLACK_AND_WHITE",
-                    label: LOCALIZATION.MOVIE_FORM.COLOR_BW,
+                    label: "ขาวดำ (Black & White)",
                   },
                   {
                     value: "COLOR_AND_BW",
-                    label: LOCALIZATION.MOVIE_FORM.COLOR_MIXED,
+                    label: "สีและขาวดำ (Color & Black & White)",
                   },
                 ]}
               />
@@ -498,51 +507,51 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <Input
-                label={LOCALIZATION.MOVIE_FORM.YEAR_LABEL}
+                label="ปีที่ฉาย"
                 type="number"
-                placeholder={LOCALIZATION.MOVIE_FORM.YEAR_PLACEHOLDER}
+                placeholder="เช่น 2014"
                 error={errors.year?.message}
                 {...register("year", {
-                  required: LOCALIZATION.MOVIE_FORM.YEAR_REQUIRED,
+                  required: "กรุณากรอกปีที่ฉาย",
                   min: {
                     value: 1900,
-                    message: LOCALIZATION.MOVIE_FORM.YEAR_MIN,
+                    message: "ปีที่ฉายต้องไม่เก่ากว่า 1900",
                   },
                   max: {
                     value: 2100,
-                    message: LOCALIZATION.MOVIE_FORM.YEAR_MAX,
+                    message: "ปีที่ฉายต้องไม่เกิน 2100",
                   },
                 })}
               />
 
               <Input
-                label={LOCALIZATION.MOVIE_FORM.MATCH_LABEL}
+                label="ความเหมาะสม (%)"
                 type="number"
-                placeholder={LOCALIZATION.MOVIE_FORM.MATCH_PLACEHOLDER}
+                placeholder="เช่น 98"
                 error={errors.matchRate?.message}
                 {...register("matchRate", {
-                  required: LOCALIZATION.MOVIE_FORM.MATCH_REQUIRED,
-                  min: { value: 0, message: LOCALIZATION.MOVIE_FORM.MATCH_MIN },
+                  required: "กรุณากรอกเปอร์เซ็นต์ความเหมาะสม",
+                  min: { value: 0, message: "ขั้นต่ำ 0%" },
                   max: {
                     value: 100,
-                    message: LOCALIZATION.MOVIE_FORM.MATCH_MAX,
+                    message: "ไม่เกิน 100%",
                   },
                 })}
               />
 
               <Input
-                label={LOCALIZATION.MOVIE_FORM.DURATION_LABEL}
-                placeholder={LOCALIZATION.MOVIE_FORM.DURATION_PLACEHOLDER}
+                label="ความยาวภาพยนตร์ (นาที)"
+                placeholder="เช่น 120"
                 error={errors.duration?.message}
                 {...register("duration", {
-                  required: LOCALIZATION.MOVIE_FORM.DURATION_REQUIRED,
+                  required: "กรุณากรอกความยาวภาพยนตร์",
                 })}
               />
             </div>
 
             <div className="space-y-2">
               <label className="text-xs font-semibold text-zinc-300">
-                {LOCALIZATION.MOVIE_FORM.COVER_LABEL}
+                ภาพปกภาพยนตร์ (Thumbnail)
               </label>
               <div className="relative group/file">
                 <Controller
@@ -583,10 +592,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     }
                   >
                     {selectedFileName ||
-                      LOCALIZATION.MOVIE_FORM.COVER_PLACEHOLDER}
+                      "อัปโหลดภาพปกภาพยนตร์..."}
                   </span>
                   <span className="px-3 py-1 bg-zinc-800 text-zinc-300 rounded-lg text-xs font-semibold group-hover/file:bg-brand group-hover/file:text-white transition-colors">
-                    {LOCALIZATION.MOVIE_FORM.COVER_BROWSE}
+                    เลือกไฟล์
                   </span>
                 </div>
               </div>
@@ -633,26 +642,77 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               )}
             </div>
 
-            <Input
-              label={LOCALIZATION.MOVIE_FORM.YOUTUBE_LABEL}
-              placeholder={LOCALIZATION.MOVIE_FORM.YOUTUBE_PLACEHOLDER}
-              error={errors.youtubeUrl?.message}
-              {...register("youtubeUrl", {
-                required: LOCALIZATION.MOVIE_FORM.YOUTUBE_REQUIRED,
-              })}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Input
+                  label="ลิงก์ภาพยนตร์ (YouTube Movie URL)"
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  error={errors.youtubeUrl?.message}
+                  {...register("youtubeUrl", {
+                    required: "กรุณากรอกลิงก์ภาพยนตร์",
+                  })}
+                />
+                {watchedYoutubeUrl && (
+                  (() => {
+                    const ytid = getYouTubeId(watchedYoutubeUrl);
+                    return ytid ? (
+                      <div className="mt-2 relative rounded-2xl overflow-hidden border border-zinc-800 bg-black/50 aspect-[16/9] w-full shadow-lg shadow-black/50 transition-all hover:border-brand/30">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${ytid}`}
+                          title="YouTube Movie Preview"
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          className="absolute inset-0 w-full h-full"
+                        />
+                      </div>
+                    ) : watchedYoutubeUrl.trim() ? (
+                      <p className="text-[10px] text-zinc-550 pl-1">ลิงก์ YouTube ไม่ถูกต้อง</p>
+                    ) : null;
+                  })()
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Input
+                  label="ลิงก์ตัวอย่างภาพยนตร์ (YouTube Trailer URL)"
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  error={errors.trailerUrl?.message}
+                  {...register("trailerUrl")}
+                />
+                {watchedTrailerUrl && (
+                  (() => {
+                    const ytid = getYouTubeId(watchedTrailerUrl);
+                    return ytid ? (
+                      <div className="mt-2 relative rounded-2xl overflow-hidden border border-zinc-800 bg-black/50 aspect-[16/9] w-full shadow-lg shadow-black/50 transition-all hover:border-brand/30">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${ytid}`}
+                          title="YouTube Trailer Preview"
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          className="absolute inset-0 w-full h-full"
+                        />
+                      </div>
+                    ) : watchedTrailerUrl.trim() ? (
+                      <p className="text-[10px] text-zinc-550 pl-1">ลิงก์ YouTube ไม่ถูกต้อง</p>
+                    ) : null;
+                  })()
+                )}
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <Input
-                label={LOCALIZATION.MOVIE_FORM.STUDIO_LABEL}
-                placeholder={LOCALIZATION.MOVIE_FORM.STUDIO_PLACEHOLDER}
+                label="สังกัด (Studio / Production / Affiliation)"
+                placeholder="พิมพ์ชื่อสังกัดหรือสตูดิโอ..."
                 error={errors.studio?.message}
                 {...register("studio")}
               />
 
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-300">
-                  {LOCALIZATION.MOVIE_FORM.WARNINGS_LABEL}
+                  คำเตือนเนื้อหา (Warnings)
                 </label>
                 <div className="flex items-center gap-6 bg-black/40 border border-zinc-800 rounded-xl px-4 py-3 h-[46px]">
                   <label className="flex items-center gap-2 text-sm text-zinc-300 cursor-pointer select-none">
@@ -661,7 +721,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       {...register("hasProfanity")}
                       className="w-4 h-4 rounded border-zinc-850 text-brand focus:ring-brand bg-zinc-950"
                     />
-                    {LOCALIZATION.MOVIE_FORM.WARNING_PROFANITY}
+                    มีคำหยาบคาย
                   </label>
                   <label className="flex items-center gap-2 text-sm text-zinc-300 cursor-pointer select-none">
                     <input
@@ -669,7 +729,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       {...register("hasDrugs")}
                       className="w-4 h-4 rounded border-zinc-850 text-brand focus:ring-brand bg-zinc-950"
                     />
-                    {LOCALIZATION.MOVIE_FORM.WARNING_DRUGS}
+                    มียาเสพติด/สิ่งมึนเมา
                   </label>
                 </div>
               </div>
@@ -677,16 +737,16 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
             <div className="border-t border-zinc-800/60 pt-6 mt-4 space-y-6">
               <h4 className="text-sm font-bold text-brand uppercase tracking-wider">
-                {LOCALIZATION.MOVIE_FORM.CREW_SECTION_TITLE}
+                ข้อมูลเบื้องหลัง & ทีมงานผู้สร้าง
               </h4>
 
               <Select
-                label={LOCALIZATION.MOVIE_FORM.UNI_LABEL}
+                label="สถาบัน / มหาวิทยาลัย"
                 error={errors.university?.message}
                 {...register("university")}
               >
                 <option value="" className="bg-zinc-900 text-zinc-405">
-                  {LOCALIZATION.MOVIE_FORM.UNI_SELECT_PLACEHOLDER}
+                  ไม่ระบุ / เลือกสถาบันการศึกษา...
                 </option>
                 {universities.map((uni) => (
                   <option
@@ -701,7 +761,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-300">
-                  {LOCALIZATION.MOVIE_FORM.DIRECTOR_LABEL}
+                  ผู้กำกับ (Director)
                 </label>
                 <div className="space-y-3">
                   {directors.map((director, idx) => (
@@ -709,9 +769,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       <CreatableSearchSelect
                         value={director}
                         options={crewOptions}
-                        placeholder={
-                          LOCALIZATION.MOVIE_FORM.DIRECTOR_PLACEHOLDER
-                        }
+                        placeholder="พิมพ์ชื่อ หรือเลือกผู้กำกับจากคลังรายชื่อ..."
                         onChange={(val) => {
                           const newDirectors = [...directors];
                           newDirectors[idx] = val;
@@ -741,14 +799,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
                   >
                     <AddIcon className="text-sm" />{" "}
-                    {LOCALIZATION.MOVIE_FORM.DIRECTOR_ADD}
+                    เพิ่มรายชื่อผู้กำกับ
                   </Button>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-300">
-                  {LOCALIZATION.MOVIE_FORM.PRODUCER_LABEL}
+                  ผู้อำนวยการสร้าง (Producer)
                 </label>
                 <div className="space-y-3">
                   {producers.map((producer, idx) => (
@@ -756,9 +814,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       <CreatableSearchSelect
                         value={producer}
                         options={crewOptions}
-                        placeholder={
-                          LOCALIZATION.MOVIE_FORM.PRODUCER_PLACEHOLDER
-                        }
+                        placeholder="พิมพ์ชื่อ หรือเลือกผู้อำนวยการสร้าง..."
                         onChange={(val) => {
                           const newProducers = [...producers];
                           newProducers[idx] = val;
@@ -788,14 +844,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
                   >
                     <AddIcon className="text-sm" />{" "}
-                    {LOCALIZATION.MOVIE_FORM.PRODUCER_ADD}
+                    เพิ่มรายชื่อผู้อำนวยการสร้าง
                   </Button>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-300">
-                  {LOCALIZATION.MOVIE_FORM.WRITER_LABEL}
+                  ผู้เขียนบท (Writer)
                 </label>
                 <div className="space-y-3">
                   {writers.map((writer, idx) => (
@@ -803,7 +859,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       <CreatableSearchSelect
                         value={writer}
                         options={crewOptions}
-                        placeholder={LOCALIZATION.MOVIE_FORM.WRITER_PLACEHOLDER}
+                        placeholder="พิมพ์ชื่อ หรือเลือกผู้เขียนบท..."
                         onChange={(val) => {
                           const newWriters = [...writers];
                           newWriters[idx] = val;
@@ -833,14 +889,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
                   >
                     <AddIcon className="text-sm" />{" "}
-                    {LOCALIZATION.MOVIE_FORM.WRITER_ADD}
+                    เพิ่มรายชื่อผู้เขียนบท
                   </Button>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-300">
-                  {LOCALIZATION.MOVIE_FORM.CAST_LABEL}
+                  นักแสดงนำ (Cast)
                 </label>
                 <div className="space-y-3">
                   {castMembers.map((actor, idx) => (
@@ -848,7 +904,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       <CreatableSearchSelect
                         value={actor}
                         options={crewOptions}
-                        placeholder={LOCALIZATION.MOVIE_FORM.CAST_PLACEHOLDER}
+                        placeholder="พิมพ์ชื่อ หรือเลือกนักแสดง..."
                         onChange={(val) => {
                           const newCast = [...castMembers];
                           newCast[idx] = val;
@@ -880,14 +936,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
                   >
                     <AddIcon className="text-sm" />{" "}
-                    {LOCALIZATION.MOVIE_FORM.CAST_ADD}
+                    เพิ่มรายชื่อนักแสดง
                   </Button>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-300">
-                  {LOCALIZATION.MOVIE_FORM.DOP_LABEL}
+                  ผู้กำกับภาพ (DOP)
                 </label>
                 <div className="space-y-3">
                   {dops.map((dop, idx) => (
@@ -895,7 +951,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       <CreatableSearchSelect
                         value={dop}
                         options={crewOptions}
-                        placeholder={LOCALIZATION.MOVIE_FORM.DOP_PLACEHOLDER}
+                        placeholder="พิมพ์ชื่อ หรือเลือกผู้กำกับภาพ..."
                         onChange={(val) => {
                           const newDops = [...dops];
                           newDops[idx] = val;
@@ -923,14 +979,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
                   >
                     <AddIcon className="text-sm" />{" "}
-                    {LOCALIZATION.MOVIE_FORM.DOP_ADD}
+                    เพิ่มรายชื่อผู้กำกับภาพ
                   </Button>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-300">
-                  {LOCALIZATION.MOVIE_FORM.EDITOR_LABEL}
+                  ผู้ลำดับภาพ (Editor)
                 </label>
                 <div className="space-y-3">
                   {editors.map((editor, idx) => (
@@ -938,7 +994,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       <CreatableSearchSelect
                         value={editor}
                         options={crewOptions}
-                        placeholder={LOCALIZATION.MOVIE_FORM.EDITOR_PLACEHOLDER}
+                        placeholder="พิมพ์ชื่อ หรือเลือกผู้ลำดับภาพ..."
                         onChange={(val) => {
                           const newEditors = [...editors];
                           newEditors[idx] = val;
@@ -968,42 +1024,61 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
                   >
                     <AddIcon className="text-sm" />{" "}
-                    {LOCALIZATION.MOVIE_FORM.EDITOR_ADD}
+                    เพิ่มรายชื่อผู้ลำดับภาพ
                   </Button>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-300">
-                  {LOCALIZATION.MOVIE_FORM.BTS_VIDEO_LABEL}
+                  ลิงก์วิดีโอเบื้องหลัง (YouTube BTS Video)
                 </label>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {btsVideos.map((videoUrl, idx) => (
-                    <div key={idx} className="flex gap-2 items-center">
-                      <Input
-                        type="text"
-                        placeholder={
-                          LOCALIZATION.MOVIE_FORM.BTS_VIDEO_PLACEHOLDER
-                        }
-                        value={videoUrl}
-                        onChange={(e) => {
-                          const newVideos = [...btsVideos];
-                          newVideos[idx] = e.target.value;
-                          setBtsVideos(newVideos);
-                        }}
-                        className="flex-1 bg-black/40 border-zinc-800 focus:border-brand rounded-xl px-4 py-2.5"
-                      />
-                      {btsVideos.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() =>
-                            setBtsVideos(btsVideos.filter((_, i) => i !== idx))
-                          }
-                          className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all h-auto"
-                        >
-                          <CloseIcon className="text-sm" />
-                        </Button>
+                    <div key={idx} className="space-y-2 p-4 bg-zinc-900/30 border border-zinc-800/40 rounded-2xl">
+                      <div className="flex gap-2 items-center">
+                        <Input
+                          type="text"
+                          placeholder="https://www.youtube.com/watch?v=..."
+                          value={videoUrl}
+                          onChange={(e) => {
+                            const newVideos = [...btsVideos];
+                            newVideos[idx] = e.target.value;
+                            setBtsVideos(newVideos);
+                          }}
+                          className="flex-1 bg-black/40 border-zinc-800 focus:border-brand rounded-xl px-4 py-2.5"
+                        />
+                        {btsVideos.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() =>
+                              setBtsVideos(btsVideos.filter((_, i) => i !== idx))
+                            }
+                            className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all h-auto"
+                          >
+                            <CloseIcon className="text-sm" />
+                          </Button>
+                        )}
+                      </div>
+                      {videoUrl && (
+                        (() => {
+                          const ytid = getYouTubeId(videoUrl);
+                          return ytid ? (
+                            <div className="mt-2 relative rounded-2xl overflow-hidden border border-zinc-800 bg-black/50 aspect-[16/9] w-full max-w-md shadow-lg shadow-black/50 transition-all hover:border-brand/30">
+                              <iframe
+                                src={`https://www.youtube.com/embed/${ytid}`}
+                                title={`YouTube BTS Video Preview ${idx + 1}`}
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowFullScreen
+                                className="absolute inset-0 w-full h-full"
+                              />
+                            </div>
+                          ) : videoUrl.trim() ? (
+                            <p className="text-[10px] text-zinc-500 pl-1 font-light">ลิงก์ YouTube ไม่ถูกต้อง</p>
+                          ) : null;
+                        })()
                       )}
                     </div>
                   ))}
@@ -1011,10 +1086,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     type="button"
                     variant="secondary"
                     onClick={() => setBtsVideos([...btsVideos, ""])}
-                    className="py-2 px-4 text-xs w-fit flex items-center gap-1.5 rounded-xl bg-zinc-900 border border-zinc-800"
+                    className="py-2 px-4 text-xs w-fit flex items-center gap-1.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 transition-colors"
                   >
                     <AddIcon className="text-sm" />{" "}
-                    {LOCALIZATION.MOVIE_FORM.BTS_VIDEO_ADD}
+                    เพิ่มลิงก์วิดีโอเบื้องหลังอื่น
                   </Button>
                 </div>
               </div>
@@ -1022,13 +1097,13 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
             <div className="space-y-2 pt-4 border-t border-zinc-800/60">
               <label className="text-xs font-semibold text-zinc-300">
-                {LOCALIZATION.MOVIE_FORM.DESC_LABEL}
+                เรื่องย่อ (Description)
               </label>
               <textarea
                 rows={5}
-                placeholder={LOCALIZATION.MOVIE_FORM.DESC_PLACEHOLDER}
+                placeholder="กรอกรายละเอียดเรื่องย่อภาพยนตร์เพื่อดึงดูดผู้ชม..."
                 {...register("description", {
-                  required: LOCALIZATION.MOVIE_FORM.DESC_REQUIRED,
+                  required: "กรุณากรอกเรื่องย่อภาพยนตร์",
                 })}
                 className={`w-full bg-black/40 border ${errors.description ? "border-red-500" : "border-zinc-800 focus:border-brand"} rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors resize-none`}
               />
@@ -1046,15 +1121,15 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 onClick={() => router.push("/admin/movies")}
                 className="flex-1 py-3 text-sm font-semibold rounded-xl"
               >
-                {LOCALIZATION.MOVIE_FORM.CANCEL}
+                ยกเลิก
               </Button>
               <Button
                 type="submit"
                 className="flex-1 py-3 text-sm font-semibold rounded-xl"
               >
                 {editingMovie
-                  ? LOCALIZATION.MOVIE_FORM.SAVE
-                  : LOCALIZATION.MOVIE_FORM.ADD}
+                  ? "บันทึกข้อมูลภาพยนตร์"
+                  : "เพิ่มภาพยนตร์ใหม่"}
               </Button>
             </div>
           </form>

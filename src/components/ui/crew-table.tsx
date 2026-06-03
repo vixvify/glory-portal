@@ -25,10 +25,10 @@ export const CrewTable: React.FC<CrewTableProps> = ({
       <table className="w-full text-left border-collapse">
         <thead>
           <tr className="border-b border-zinc-800/40 text-xs font-bold text-zinc-400 uppercase bg-zinc-950/20">
-            <th className="py-4 px-6">{LOCALIZATION.ADMIN.TABLE_CREW_NAME}</th>
-            <th className="py-4 px-6">{LOCALIZATION.ADMIN.TABLE_CREW_STATUS}</th>
-            <th className="py-4 px-6">{LOCALIZATION.ADMIN.TABLE_CREW_DATE}</th>
-            <th className="py-4 px-6 text-right">{LOCALIZATION.ADMIN.TABLE_ACTIONS}</th>
+            <th className="py-4 px-6">ชื่อ-นามสกุล</th>
+            <th className="py-4 px-6">สถานะผลงาน</th>
+            <th className="py-4 px-6">วันที่บันทึก</th>
+            <th className="py-4 px-6 text-right">จัดการ</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-zinc-800/30 text-sm">
@@ -38,7 +38,7 @@ export const CrewTable: React.FC<CrewTableProps> = ({
                 colSpan={4}
                 className="py-16 text-center text-zinc-500 font-light"
               >
-                {LOCALIZATION.ADMIN.NO_CREW}
+                ไม่พบรายชื่อทีมงานที่ระบุ
               </td>
             </tr>
           ) : (

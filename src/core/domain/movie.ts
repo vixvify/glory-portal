@@ -72,6 +72,7 @@ export interface Movie {
   category: string;
   thumbnail: string;
   youtubeUrl: string;
+  trailerUrl?: string | null;
   views: number;
   ratings: Rating[];
   year: number;
@@ -97,6 +98,7 @@ export interface CreateMovie {
   category: string;
   thumbnail: File | null;
   youtubeUrl: string;
+  trailerUrl?: string;
   year: number;
   matchRate: number;
   ageRating: string;
@@ -123,6 +125,7 @@ export interface UpdateMovie {
   category: string;
   thumbnail: File | string;
   youtubeUrl: string;
+  trailerUrl?: string | null;
   year: number;
   matchRate: number;
   ageRating: string;

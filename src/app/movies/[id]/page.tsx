@@ -45,6 +45,7 @@ export default function MovieDetails() {
   );
 
   const [selectedStars, setSelectedStars] = useState(0);
+  const [isPlayingTrailer, setIsPlayingTrailer] = useState(false);
   const { isPlayingMovie, playingMovie, playMovie, stopMovie } =
     useMoviePlayer();
 
@@ -152,6 +153,17 @@ export default function MovieDetails() {
                     <PlayArrowIcon className="text-xl mr-1.5" />
                     เล่น
                   </Button>
+
+                  {movie?.trailerUrl && (
+                    <Button
+                      variant="secondary"
+                      size="md"
+                      onClick={() => setIsPlayingTrailer(true)}
+                    >
+                      <PlayArrowIcon className="text-xl mr-1.5 text-brand" />
+                      ตัวอย่างภาพยนตร์
+                    </Button>
+                  )}
 
                   <button className="flex items-center justify-center w-11 h-11 rounded-full border border-zinc-700 bg-zinc-900/60 hover:bg-zinc-800 text-emerald-400 cursor-pointer transition-colors">
                     <CheckIcon className="text-xl" />
@@ -512,6 +524,14 @@ export default function MovieDetails() {
           onClose={stopMovie}
           youtubeUrl={playingMovie.youtubeUrl}
           movieTitle={playingMovie.title}
+        />
+      )}
+      {isPlayingTrailer && movie && movie.trailerUrl && (
+        <PlayerModal
+          isOpen={isPlayingTrailer}
+          onClose={() => setIsPlayingTrailer(false)}
+          youtubeUrl={movie.trailerUrl}
+          movieTitle={`${movie.title} (ตัวอย่างภาพยนตร์)`}
         />
       )}
     </div>

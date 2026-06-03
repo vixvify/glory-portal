@@ -87,7 +87,7 @@ export default function AdminCrewPage() {
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-wide bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent flex items-center gap-2">
               <PeopleIcon className="text-brand" />{" "}
-              {LOCALIZATION.ADMIN.TAB_CREW(availableCrew.length)}
+              ทีมงาน & นักแสดง ({availableCrew.length})
             </h1>
           </div>
 
@@ -96,7 +96,7 @@ export default function AdminCrewPage() {
             className="flex items-center justify-center gap-2"
           >
             <AddIcon className="text-lg" />
-            {LOCALIZATION.ADMIN.ADD_CREW}
+            เพิ่มรายชื่อทีมงาน
           </Button>
         </div>
 
@@ -105,10 +105,9 @@ export default function AdminCrewPage() {
             <SearchInput
               value={crewSearchQuery}
               onChange={setCrewSearchQuery}
-              placeholder={LOCALIZATION.ADMIN.SEARCH_CREW_PLACEHOLDER}
+              placeholder="ค้นหาชื่อทีมงาน / นักแสดง..."
             />
           </div>
-
           {isSearchingCrew ? (
             <div className="flex items-center justify-center py-20">
               <div className="w-10 h-10 border-4 border-zinc-700 border-t-white rounded-full animate-spin" />

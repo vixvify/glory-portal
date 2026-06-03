@@ -6,7 +6,6 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Movie } from "@/core/domain/movie";
-import { LOCALIZATION } from "@/core/constants/localization";
 
 import { Button } from "./button";
 
@@ -26,12 +25,12 @@ export const MovieTable: React.FC<MovieTableProps> = ({
       <table className="w-full text-left border-collapse">
         <thead>
           <tr className="border-b border-zinc-800/40 text-xs font-bold text-zinc-400 uppercase bg-zinc-950/20">
-            <th className="py-4 px-6">{LOCALIZATION.ADMIN.TABLE_MOVIE}</th>
-            <th className="py-4 px-6">{LOCALIZATION.ADMIN.TABLE_GENRE}</th>
-            <th className="py-4 px-6">{LOCALIZATION.ADMIN.TABLE_RELEASE}</th>
-            <th className="py-4 px-6">{LOCALIZATION.ADMIN.TABLE_DURATION}</th>
-            <th className="py-4 px-6">{LOCALIZATION.ADMIN.TABLE_STATS}</th>
-            <th className="py-4 px-6 text-right">{LOCALIZATION.ADMIN.TABLE_ACTIONS}</th>
+            <th className="py-4 px-6">ภาพยนตร์</th>
+            <th className="py-4 px-6">หมวดหมู่</th>
+            <th className="py-4 px-6">ปีที่ฉาย / เรตติ้ง</th>
+            <th className="py-4 px-6">ความยาว</th>
+            <th className="py-4 px-6">สถิติการเข้าชม</th>
+            <th className="py-4 px-6 text-right">จัดการ</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-zinc-800/30 text-sm">
@@ -41,7 +40,7 @@ export const MovieTable: React.FC<MovieTableProps> = ({
                 colSpan={6}
                 className="py-16 text-center text-zinc-500 font-light"
               >
-                {LOCALIZATION.ADMIN.NO_MOVIES}
+                ไม่พบภาพยนตร์ที่ตรงตามตัวกรอง
               </td>
             </tr>
           ) : (
@@ -84,7 +83,7 @@ export const MovieTable: React.FC<MovieTableProps> = ({
                       {movie.ageRating}
                     </span>
                     <span className="text-[10px] text-emerald-400 font-bold">
-                      {LOCALIZATION.ADMIN.MATCH_RATE(movie.matchRate)}
+                      {movie.matchRate}% ตรงกัน
                     </span>
                   </div>
                 </td>
@@ -99,11 +98,11 @@ export const MovieTable: React.FC<MovieTableProps> = ({
                 <td className="py-4 px-6 space-y-1">
                   <div className="text-xs text-zinc-300 flex items-center gap-1">
                     <VisibilityIcon className="text-xs text-zinc-500" />
-                    {LOCALIZATION.ADMIN.VIEWS_COUNT(movie.views || 0)}
+                    {(movie.views || 0).toLocaleString()} ครั้ง
                   </div>
                   <div className="text-[10px] text-zinc-400 flex items-center gap-1">
                     <StarIcon className="text-[10px] text-zinc-500" />
-                    {LOCALIZATION.ADMIN.REVIEWS_COUNT(movie.ratings?.length || 0)}
+                    {movie.ratings?.length || 0} รีวิว
                   </div>
                 </td>
 

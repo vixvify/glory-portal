@@ -33,6 +33,12 @@ export const movieSchema = z.object({
   category: categorySchema,
   thumbnail: z.unknown(),
   youtubeUrl: z.string().url("Must be a valid URL"),
+  trailerUrl: z
+    .string()
+    .url("Must be a valid URL")
+    .optional()
+    .or(z.literal(""))
+    .nullable(),
   views: z.number().nonnegative().optional(),
   ratings: z.any().optional(),
   year: z.number().int().min(1900).max(2100),
