@@ -12,6 +12,17 @@ export const registerUserSchema = userSchema.pick({
   name: true,
   email: true,
   password: true,
+}).extend({
+  photo: z.instanceof(File).optional(),
+  motto: z.string().optional(),
+  bio: z.string().optional(),
+  ig: z.string().optional(),
+  facebook: z.string().optional(),
+  youtube: z.string().optional(),
+  tiktok: z.string().optional(),
+  positions: z.array(z.string()).optional(),
+  birthday: z.string().optional(),
+  awards: z.array(z.string()).optional(),
 });
 
 export const loginUserSchema = userSchema.pick({

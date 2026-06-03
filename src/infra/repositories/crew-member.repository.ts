@@ -4,7 +4,9 @@ import { CrewMember, CrewFilterParams } from "@/core/domain/movie";
 import httpClient from "@/lib/http";
 
 export class CrewMemberRepositoryImpl implements CrewMemberRepository {
-  async getCrewMembers(params?: CrewFilterParams): Promise<ApiResponse<CrewMember[]>> {
+  async getCrewMembers(
+    params?: CrewFilterParams,
+  ): Promise<ApiResponse<CrewMember[]>> {
     return await httpClient.get<CrewMember[]>("/crew-members", { params });
   }
 

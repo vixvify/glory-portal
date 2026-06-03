@@ -1,11 +1,10 @@
 "use client";
 
 import { useMemo, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import PlayerModal from "@/components/modal/player-modal";
-import AuthModal from "@/components/modal/auth-modal";
 import { useMoviePlayer } from "@/hooks/use-movie-player";
 import { Movie } from "@/core/domain/movie";
-import { User } from "@/core/domain/user";
 import { useAppStore } from "@/store/use-store";
 import Loading from "../loading";
 import { Toast } from "@/components/ui/toast";
@@ -44,14 +43,13 @@ export default function HomePage(props: Props) {
     initialAllMovies,
     favorites,
   } = props;
+  const router = useRouter();
   const {
     currentUser,
     setCurrentUser,
     showToast,
     searchQuery,
     setSearchQuery,
-    isAuthOpen,
-    setIsAuthOpen,
   } = useAppStore();
 
   const {
@@ -77,17 +75,10 @@ export default function HomePage(props: Props) {
 
   const moviesData = movieParams ? fetchedMovies : initialAllMovies;
 
-  const handleLoginSuccess = useCallback(
-    (user: User) => {
-      setCurrentUser(user);
-    },
-    [setCurrentUser],
-  );
-
   const handleToggleFavorite = useCallback(
     (movieId: string) => {
       if (!currentUser) {
-        setIsAuthOpen(true);
+        router.push("/auth/login");
         return;
       }
       const isCurrentlyFavorite = favorites.some((m) => m.id === movieId);
@@ -108,7 +99,14 @@ export default function HomePage(props: Props) {
         },
       );
     },
-    [currentUser, favorites, moviesData, toggleFavoriteMutation, showToast],
+    [
+      currentUser,
+      favorites,
+      moviesData,
+      toggleFavoriteMutation,
+      showToast,
+      router,
+    ],
   );
 
   const isSearching =
@@ -157,11 +155,6 @@ export default function HomePage(props: Props) {
         />
       )}
 
-      <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-        onLoginSuccess={handleLoginSuccess}
-      />
       <Toast />
     </div>
   );

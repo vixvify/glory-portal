@@ -1,12 +1,15 @@
 import { Rating, RatingCheckInput, RatingInput } from "../domain/rating";
 import { RatingRepository } from "../ports/rating.repository";
+import { parseSchema } from "@/lib/validation";
+import { ratingInputSchema, ratingCheckInputSchema } from "../schema/rating";
 
 export class RatingService {
   constructor(private readonly ratingRepository: RatingRepository) {}
 
   async addRating(data: RatingInput): Promise<void> {
     try {
-      const response = await this.ratingRepository.addRating(data);
+      const validated = parseSchema(ratingInputSchema, data);
+      const response = await this.ratingRepository.addRating(validated);
       if (response.error) {
         throw new Error(response.error);
       }
@@ -18,7 +21,8 @@ export class RatingService {
 
   async checkRating(data: RatingCheckInput): Promise<boolean> {
     try {
-      const response = await this.ratingRepository.checkRating(data);
+      const validated = parseSchema(ratingCheckInputSchema, data);
+      const response = await this.ratingRepository.checkRating(validated);
       if (response.error) {
         throw new Error(response.error);
       }
@@ -31,7 +35,8 @@ export class RatingService {
 
   async deleteRating(data: RatingCheckInput): Promise<void> {
     try {
-      const response = await this.ratingRepository.deleteRating(data);
+      const validated = parseSchema(ratingCheckInputSchema, data);
+      const response = await this.ratingRepository.deleteRating(validated);
       if (response.error) {
         throw new Error(response.error);
       }
@@ -43,7 +48,8 @@ export class RatingService {
 
   async updateRating(data: RatingInput): Promise<void> {
     try {
-      const response = await this.ratingRepository.updateRating(data);
+      const validated = parseSchema(ratingInputSchema, data);
+      const response = await this.ratingRepository.updateRating(validated);
       if (response.error) {
         throw new Error(response.error);
       }
@@ -55,8 +61,9 @@ export class RatingService {
 
   async getRatingByMovieAndUser(data: RatingCheckInput): Promise<Rating> {
     try {
+      const validated = parseSchema(ratingCheckInputSchema, data);
       const response =
-        await this.ratingRepository.getRatingByMovieAndUser(data);
+        await this.ratingRepository.getRatingByMovieAndUser(validated);
       if (response.error) {
         throw new Error(response.error);
       }

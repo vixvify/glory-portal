@@ -5,12 +5,22 @@ import {
   CrewFilterParams,
 } from "../domain/movie";
 import { CrewMemberRepository } from "../ports/crew-member.repository";
+import { parseSchema } from "@/lib/validation";
+import {
+  crewFilterParamsSchema,
+  createCrewMemberSchema,
+  updateCrewMemberSchema,
+} from "../schema/crew";
+import { toFormData } from "@/utils/form-data";
 
 export class CrewMemberService {
   constructor(private readonly crewMemberRepository: CrewMemberRepository) {}
 
   async getCrewMembers(params?: CrewFilterParams): Promise<CrewMember[]> {
     try {
+      if (params) {
+        parseSchema(crewFilterParamsSchema, params);
+      }
       const response = await this.crewMemberRepository.getCrewMembers(params);
       if (response.error) {
         throw new Error(response.error);
@@ -36,14 +46,8 @@ export class CrewMemberService {
   }
   async createCrewMember(crewMember: CreateCrewMember): Promise<CrewMember> {
     try {
-      const formData = new FormData();
-      formData.append("name", crewMember.name);
-      if (crewMember.email) {
-        formData.append("email", crewMember.email);
-      }
-      if (crewMember.photo) {
-        formData.append("photo", crewMember.photo);
-      }
+      const validated = parseSchema(createCrewMemberSchema, crewMember);
+      const formData = toFormData(validated);
       const response =
         await this.crewMemberRepository.createCrewMember(formData);
       if (response.error) {
@@ -61,16 +65,8 @@ export class CrewMemberService {
     crewMember: UpdateCrewMember,
   ): Promise<CrewMember> {
     try {
-      const formData = new FormData();
-      formData.append("name", crewMember.name);
-      if (crewMember.email !== undefined && crewMember.email !== null) {
-        formData.append("email", crewMember.email);
-      }
-      if (crewMember.photo instanceof File) {
-        formData.append("photo", crewMember.photo);
-      } else if (typeof crewMember.photo === "string") {
-        formData.append("photo", crewMember.photo);
-      }
+      const validated = parseSchema(updateCrewMemberSchema, crewMember);
+      const formData = toFormData(validated);
       const response = await this.crewMemberRepository.updateCrewMember(
         id,
         formData,

@@ -1,19 +1,19 @@
 import { ApiResponse } from "../interface/response";
 import httpClient from "@/lib/http";
 import { AuthRepository } from "@/core/ports/auth.repository";
-import { User, RegisterUser, LoginUser } from "@/core/domain/user";
-import { parseSchema } from "@/lib/validation";
-import { registerUserSchema, loginUserSchema } from "@/core/schema/auth";
+import { User, LoginUser } from "@/core/domain/user";
 
 export class AuthRepositoryImpl implements AuthRepository {
-  async register(user: RegisterUser): Promise<ApiResponse<User>> {
-    const validated = parseSchema(registerUserSchema, user);
-    const response = await httpClient.post<User>("/auth/register", validated);
+  async register(user: FormData): Promise<ApiResponse<User>> {
+    const response = await httpClient.post<User>("/auth/register", user, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return response;
   }
   async login(user: LoginUser): Promise<ApiResponse<User>> {
-    const validated = parseSchema(loginUserSchema, user);
-    const response = await httpClient.post<User>("/auth/login", validated);
+    const response = await httpClient.post<User>("/auth/login", user);
     return response;
   }
   async logout(): Promise<ApiResponse<void>> {

@@ -13,7 +13,7 @@ import { useLogoutMutation } from "@/hooks/use-auth";
 
 export default function Navbar() {
   const router = useRouter();
-  const { searchQuery, setSearchQuery, setIsAuthOpen, currentUser } =
+  const { searchQuery, setSearchQuery, currentUser } =
     useAppStore();
 
   const { data: categories = [] } = useCategoriesQuery();
@@ -24,7 +24,7 @@ export default function Navbar() {
   };
 
   const onSignInClick = () => {
-    setIsAuthOpen(true);
+    router.push("/auth/login");
   };
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);

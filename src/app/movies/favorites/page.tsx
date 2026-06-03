@@ -25,7 +25,7 @@ export default function FavoritesPage() {
     stopMovie,
   } = useMoviePlayer();
 
-  const { currentUser, showToast, setIsAuthOpen } = useAppStore();
+  const { currentUser, showToast } = useAppStore();
 
   const { data: favorites = [], isLoading } = useFavoritesQuery(!!currentUser);
   const toggleFavoriteMutation = useToggleFavoriteMutation();
@@ -98,7 +98,7 @@ export default function FavoritesPage() {
             </div>
             <Button
               variant="brand"
-              onClick={() => setIsAuthOpen(true)}
+              onClick={() => router.push("/auth/login")}
               className="w-full py-3"
             >
               เข้าสู่ระบบเลย

@@ -1,11 +1,17 @@
 import { User, RegisterUser, LoginUser } from "../domain/user";
 import { AuthRepository } from "../ports/auth.repository";
+import { parseSchema } from "@/lib/validation";
+import { registerUserSchema, loginUserSchema } from "../schema/auth";
+import { toFormData } from "@/utils/form-data";
 
 export class AuthService {
   constructor(private readonly authRepository: AuthRepository) {}
   async register(user: RegisterUser): Promise<User> {
     try {
-      const response = await this.authRepository.register(user);
+      const validated = parseSchema(registerUserSchema, user);
+      const formData = toFormData(validated);
+
+      const response = await this.authRepository.register(formData);
       if (response.error) {
         throw new Error(response.error);
       }
@@ -17,7 +23,8 @@ export class AuthService {
   }
   async login(user: LoginUser): Promise<User> {
     try {
-      const response = await this.authRepository.login(user);
+      const validated = parseSchema(loginUserSchema, user);
+      const response = await this.authRepository.login(validated);
       if (response.error) {
         throw new Error(response.error);
       }

@@ -5,7 +5,25 @@ export const ratingSchema = z.object({
   score: z.number().min(1).max(5),
 });
 
-export const categorySchema = z.enum(["Action", "Sci-Fi", "Horror", "Comedy", "Thriller", "Drama", "Romance", "Adventure", "Fantasy", "Animation", "Biography", "Documentary", "Family", "Music", "Mystery", "Sport", "Western"]);
+export const categorySchema = z.enum([
+  "Action",
+  "Sci-Fi",
+  "Horror",
+  "Comedy",
+  "Thriller",
+  "Drama",
+  "Romance",
+  "Adventure",
+  "Fantasy",
+  "Animation",
+  "Biography",
+  "Documentary",
+  "Family",
+  "Music",
+  "Mystery",
+  "Sport",
+  "Western",
+]);
 export const ageRatingSchema = z.enum(["G", "PG", "PG-13", "NC-17", "R"]);
 
 export const movieSchema = z.object({
@@ -27,10 +45,22 @@ export const movieSchema = z.object({
   email: z.string().optional().nullable(),
   language: z.string().optional().nullable(),
   targetGroup: z.string().optional().nullable(),
-  director: z.union([z.string(), z.array(z.string())]).optional().nullable(),
-  producer: z.union([z.string(), z.array(z.string())]).optional().nullable(),
-  writer: z.union([z.string(), z.array(z.string())]).optional().nullable(),
-  cast: z.union([z.string(), z.array(z.string())]).optional().nullable(),
+  director: z
+    .union([z.string(), z.array(z.string())])
+    .optional()
+    .nullable(),
+  producer: z
+    .union([z.string(), z.array(z.string())])
+    .optional()
+    .nullable(),
+  writer: z
+    .union([z.string(), z.array(z.string())])
+    .optional()
+    .nullable(),
+  cast: z
+    .union([z.string(), z.array(z.string())])
+    .optional()
+    .nullable(),
   btsVideo: z.string().optional().nullable(),
   btsPhotos: z.unknown().optional().nullable(),
 });
@@ -46,3 +76,15 @@ export const createMovieSchema = movieSchema.omit({
   views: true,
   ratings: true,
 });
+
+export const movieIdSchema = z.string().min(1, "Movie ID is required");
+
+export const movieFilterParamsSchema = z.object({
+  search: z.string().optional(),
+  searchby: z.string().optional(),
+  page: z.union([z.number(), z.string()]).optional(),
+  pagenumber: z.union([z.number(), z.string()]).optional(),
+  sort: z.string().optional(),
+  sortby: z.string().optional(),
+}).optional();
+
