@@ -128,7 +128,7 @@ export default function Navbar() {
             )}
           </div>
 
-          <Link href="movies/favorites">
+          <Link href="/movies/favorites">
             <button
               className={`cursor-pointer transition-colors duration-300 hover:text-white text-zinc-300 hover:bg-zinc-800/40 hover:text-white `}
             >

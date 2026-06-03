@@ -215,9 +215,7 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
                       รูปภาพประจำตัวที่ใช้
                     </span>
                     <span className="text-[10px] text-zinc-500 leading-relaxed mt-0.5">
-                      {crewPhotoName
-                        ? "รูปภาพหลังแก้ไข"
-                        : "รูปภาพปัจจุบัน"}
+                      {crewPhotoName ? "รูปภาพหลังแก้ไข" : "รูปภาพปัจจุบัน"}
                     </span>
                     {crewPhotoName && rawCrewFile && (
                       <button
@@ -240,7 +238,7 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() => router.push("/admin/crew")}
+                onClick={() => router.push("/")}
                 className="flex-1 py-3 text-sm font-semibold rounded-xl"
               >
                 ยกเลิก
@@ -249,9 +247,7 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
                 type="submit"
                 className="flex-1 py-3 text-sm font-semibold rounded-xl"
               >
-                {editingCrew
-                  ? "บันทึกการแก้ไข"
-                  : "เพิ่มรายชื่อ"}
+                {editingCrew ? "บันทึกการแก้ไข" : "เพิ่มรายชื่อ"}
               </Button>
             </div>
           </form>

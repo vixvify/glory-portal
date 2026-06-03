@@ -591,8 +591,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                         : "text-zinc-400"
                     }
                   >
-                    {selectedFileName ||
-                      "อัปโหลดภาพปกภาพยนตร์..."}
+                    {selectedFileName || "อัปโหลดภาพปกภาพยนตร์..."}
                   </span>
                   <span className="px-3 py-1 bg-zinc-800 text-zinc-300 rounded-lg text-xs font-semibold group-hover/file:bg-brand group-hover/file:text-white transition-colors">
                     เลือกไฟล์
@@ -652,7 +651,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     required: "กรุณากรอกลิงก์ภาพยนตร์",
                   })}
                 />
-                {watchedYoutubeUrl && (
+                {watchedYoutubeUrl &&
                   (() => {
                     const ytid = getYouTubeId(watchedYoutubeUrl);
                     return ytid ? (
@@ -667,10 +666,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                         />
                       </div>
                     ) : watchedYoutubeUrl.trim() ? (
-                      <p className="text-[10px] text-zinc-550 pl-1">ลิงก์ YouTube ไม่ถูกต้อง</p>
+                      <p className="text-[10px] text-zinc-550 pl-1">
+                        ลิงก์ YouTube ไม่ถูกต้อง
+                      </p>
                     ) : null;
-                  })()
-                )}
+                  })()}
               </div>
 
               <div className="space-y-2">
@@ -680,7 +680,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   error={errors.trailerUrl?.message}
                   {...register("trailerUrl")}
                 />
-                {watchedTrailerUrl && (
+                {watchedTrailerUrl &&
                   (() => {
                     const ytid = getYouTubeId(watchedTrailerUrl);
                     return ytid ? (
@@ -695,10 +695,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                         />
                       </div>
                     ) : watchedTrailerUrl.trim() ? (
-                      <p className="text-[10px] text-zinc-550 pl-1">ลิงก์ YouTube ไม่ถูกต้อง</p>
+                      <p className="text-[10px] text-zinc-550 pl-1">
+                        ลิงก์ YouTube ไม่ถูกต้อง
+                      </p>
                     ) : null;
-                  })()
-                )}
+                  })()}
               </div>
             </div>
 
@@ -798,8 +799,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     }
                     className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
                   >
-                    <AddIcon className="text-sm" />{" "}
-                    เพิ่มรายชื่อผู้กำกับ
+                    <AddIcon className="text-sm" /> เพิ่มรายชื่อผู้กำกับ
                   </Button>
                 </div>
               </div>
@@ -843,8 +843,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     }
                     className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
                   >
-                    <AddIcon className="text-sm" />{" "}
-                    เพิ่มรายชื่อผู้อำนวยการสร้าง
+                    <AddIcon className="text-sm" /> เพิ่มรายชื่อผู้อำนวยการสร้าง
                   </Button>
                 </div>
               </div>
@@ -888,8 +887,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     }
                     className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
                   >
-                    <AddIcon className="text-sm" />{" "}
-                    เพิ่มรายชื่อผู้เขียนบท
+                    <AddIcon className="text-sm" /> เพิ่มรายชื่อผู้เขียนบท
                   </Button>
                 </div>
               </div>
@@ -935,8 +933,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     }
                     className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
                   >
-                    <AddIcon className="text-sm" />{" "}
-                    เพิ่มรายชื่อนักแสดง
+                    <AddIcon className="text-sm" /> เพิ่มรายชื่อนักแสดง
                   </Button>
                 </div>
               </div>
@@ -978,8 +975,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     onClick={() => setDops([...dops, { id: "", name: "" }])}
                     className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
                   >
-                    <AddIcon className="text-sm" />{" "}
-                    เพิ่มรายชื่อผู้กำกับภาพ
+                    <AddIcon className="text-sm" /> เพิ่มรายชื่อผู้กำกับภาพ
                   </Button>
                 </div>
               </div>
@@ -1023,8 +1019,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     }
                     className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
                   >
-                    <AddIcon className="text-sm" />{" "}
-                    เพิ่มรายชื่อผู้ลำดับภาพ
+                    <AddIcon className="text-sm" /> เพิ่มรายชื่อผู้ลำดับภาพ
                   </Button>
                 </div>
               </div>
@@ -1035,7 +1030,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 </label>
                 <div className="space-y-4">
                   {btsVideos.map((videoUrl, idx) => (
-                    <div key={idx} className="space-y-2 p-4 bg-zinc-900/30 border border-zinc-800/40 rounded-2xl">
+                    <div
+                      key={idx}
+                      className="space-y-2 p-4 bg-zinc-900/30 border border-zinc-800/40 rounded-2xl"
+                    >
                       <div className="flex gap-2 items-center">
                         <Input
                           type="text"
@@ -1053,7 +1051,9 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                             type="button"
                             variant="secondary"
                             onClick={() =>
-                              setBtsVideos(btsVideos.filter((_, i) => i !== idx))
+                              setBtsVideos(
+                                btsVideos.filter((_, i) => i !== idx),
+                              )
                             }
                             className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all h-auto"
                           >
@@ -1061,7 +1061,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                           </Button>
                         )}
                       </div>
-                      {videoUrl && (
+                      {videoUrl &&
                         (() => {
                           const ytid = getYouTubeId(videoUrl);
                           return ytid ? (
@@ -1076,10 +1076,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                               />
                             </div>
                           ) : videoUrl.trim() ? (
-                            <p className="text-[10px] text-zinc-500 pl-1 font-light">ลิงก์ YouTube ไม่ถูกต้อง</p>
+                            <p className="text-[10px] text-zinc-500 pl-1 font-light">
+                              ลิงก์ YouTube ไม่ถูกต้อง
+                            </p>
                           ) : null;
-                        })()
-                      )}
+                        })()}
                     </div>
                   ))}
                   <Button
@@ -1118,7 +1119,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() => router.push("/admin/movies")}
+                onClick={() => router.push("/")}
                 className="flex-1 py-3 text-sm font-semibold rounded-xl"
               >
                 ยกเลิก
@@ -1127,9 +1128,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 type="submit"
                 className="flex-1 py-3 text-sm font-semibold rounded-xl"
               >
-                {editingMovie
-                  ? "บันทึกข้อมูลภาพยนตร์"
-                  : "เพิ่มภาพยนตร์ใหม่"}
+                {editingMovie ? "บันทึกข้อมูลภาพยนตร์" : "เพิ่มภาพยนตร์ใหม่"}
               </Button>
             </div>
           </form>
