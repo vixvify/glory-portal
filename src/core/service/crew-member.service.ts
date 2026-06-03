@@ -11,7 +11,6 @@ import {
   createCrewMemberSchema,
   updateCrewMemberSchema,
 } from "../schema/crew";
-import { toFormData } from "@/utils/form-data";
 
 export class CrewMemberService {
   constructor(private readonly crewMemberRepository: CrewMemberRepository) {}
@@ -47,9 +46,8 @@ export class CrewMemberService {
   async createCrewMember(crewMember: CreateCrewMember): Promise<CrewMember> {
     try {
       const validated = parseSchema(createCrewMemberSchema, crewMember);
-      const formData = toFormData(validated);
       const response =
-        await this.crewMemberRepository.createCrewMember(formData);
+        await this.crewMemberRepository.createCrewMember(validated);
       if (response.error) {
         throw new Error(response.error);
       }
@@ -66,10 +64,9 @@ export class CrewMemberService {
   ): Promise<CrewMember> {
     try {
       const validated = parseSchema(updateCrewMemberSchema, crewMember);
-      const formData = toFormData(validated);
       const response = await this.crewMemberRepository.updateCrewMember(
         id,
-        formData,
+        validated,
       );
       if (response.error) {
         throw new Error(response.error);

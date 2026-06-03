@@ -14,11 +14,9 @@ export const crewFilterParamsSchema = z.object({
 export const createCrewMemberSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address").optional().or(z.literal("")),
-  photo: z.union([z.any(), z.null()]).optional(),
 });
 
 export const updateCrewMemberSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address").optional().nullable().or(z.literal("")),
-  photo: z.union([z.any(), z.string(), z.null()]).optional(),
 });

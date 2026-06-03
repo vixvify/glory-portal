@@ -1,14 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import CloseIcon from "@mui/icons-material/Close";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PeopleIcon from "@mui/icons-material/People";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ImageCropper } from "@/components/modal/image-cropper";
 import { CrewMember } from "@/core/domain/movie";
 import { LOCALIZATION } from "@/core/constants/localization";
 import { useAppStore } from "@/store/use-store";
@@ -24,20 +22,11 @@ interface CrewFormProps {
 type CrewFormInputs = {
   name: string;
   email?: string;
-  photo?: File | null;
 };
 
 export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
   const router = useRouter();
   const { showToast } = useAppStore();
-
-  const [crewPhotoName, setCrewPhotoName] = useState<string | null>(null);
-  const [crewPhotoPreview, setCrewPhotoPreview] = useState<string | null>(null);
-  const [crewPhotoInput, setCrewPhotoInput] = useState<File | null>(null);
-  const [rawCrewFile, setRawCrewFile] = useState<File | null>(null);
-
-  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
-  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [isSavingLocal, setIsSavingLocal] = useState(false);
 
   const createCrewMutation = useCreateCrewMemberMutation();
@@ -47,32 +36,19 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
     register,
     handleSubmit,
     reset,
-    control,
     formState: { errors },
   } = useForm<CrewFormInputs>();
 
   useEffect(() => {
     if (editingCrew) {
-      setCrewPhotoPreview(editingCrew.photoUrl || null);
-      setCrewPhotoInput(null);
-      setCrewPhotoName(null);
-      setRawCrewFile(null);
-
       reset({
         name: editingCrew.name,
         email: editingCrew.email || "",
-        photo: null,
       });
     } else {
-      setCrewPhotoPreview(null);
-      setCrewPhotoInput(null);
-      setCrewPhotoName(null);
-      setRawCrewFile(null);
-
       reset({
         name: "",
         email: "",
-        photo: null,
       });
     }
   }, [editingCrew, reset]);
@@ -87,7 +63,6 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
           crewMember: {
             name: data.name.trim(),
             email: data.email?.trim() || null,
-            photo: crewPhotoInput || editingCrew.photoUrl || null,
           },
         });
         showToast(LOCALIZATION.TOAST.EDIT_CREW_SUCCESS, "success");
@@ -95,7 +70,6 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
         await createCrewMutation.mutateAsync({
           name: data.name.trim(),
           email: data.email?.trim() || undefined,
-          photo: crewPhotoInput,
         });
         showToast(LOCALIZATION.TOAST.ADD_CREW_SUCCESS, "success");
       }
@@ -120,8 +94,7 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
             {editingCrew ? "แก้ไขข้อมูลทีมงาน" : "สร้างข้อมูลทีมงานใหม่"}
           </h1>
           <p className="text-xs text-zinc-400 font-light">
-            ระบุชื่อตัวตน
-            อัปโหลดรูปภาพใบหน้าประจำตัวสำหรับใช้แสดงผลในทำเนียบทีมงานภาพยนตร์สั้น
+            ระบุชื่อตัวตน และอีเมลผู้ใช้ระบบ (ถ้ามี) เพื่อเชื่อมโยงกับบัญชีผู้ใช้
           </p>
         </div>
 
@@ -144,101 +117,31 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
               {...register("email")}
             />
 
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-zinc-300">
-                รูปภาพประจำตัว
-              </label>
-
-              <div className="relative group/file">
-                <Controller
-                  name="photo"
-                  control={control}
-                  defaultValue={null}
-                  render={({ field }) => (
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] ?? null;
-                        if (file) {
-                          setRawCrewFile(file);
-                          setCropImageSrc(URL.createObjectURL(file));
-                          setIsCropModalOpen(true);
-                          e.target.value = "";
-                        }
-                      }}
-                    />
-                  )}
-                />
-
-                <div className="w-full bg-black/40 border border-zinc-800 group-hover/file:border-brand rounded-xl px-4 py-3 text-sm text-zinc-450 flex items-center justify-between transition-colors">
-                  <span
-                    className={
-                      crewPhotoName
-                        ? "text-white font-medium truncate max-w-[70%]"
-                        : "text-zinc-400"
-                    }
-                  >
-                    {crewPhotoName || "เลือกรูปภาพประจำตัว..."}
+            {editingCrew?.photoUrl && (
+              <div className="flex items-center gap-4 mt-4 pl-1">
+                <div className="relative w-20 h-20 rounded-full overflow-hidden border border-zinc-850 bg-black/40 shadow-inner flex-shrink-0 animate-fade-in">
+                  <img
+                    src={editingCrew.photoUrl}
+                    alt="Crew Preview"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs text-zinc-300 font-semibold">
+                    รูปภาพประจำตัว
                   </span>
-                  <span className="px-3 py-1 bg-zinc-800 text-zinc-300 rounded-lg text-xs font-semibold group-hover/file:bg-brand group-hover/file:text-white transition-colors">
-                    เลือกไฟล์
+                  <span className="text-[10px] text-zinc-500 leading-relaxed mt-0.5">
+                    ดึงข้อมูลจากบัญชีผู้ใช้
                   </span>
                 </div>
               </div>
-
-              {crewPhotoPreview && (
-                <div className="flex items-center gap-4 mt-4 pl-1">
-                  <div className="relative w-20 h-20 rounded-full overflow-hidden border border-zinc-850 bg-black/40 shadow-inner group/crewpreview flex-shrink-0">
-                    <img
-                      src={crewPhotoPreview}
-                      alt="Crew Preview"
-                      className="w-full h-full object-cover"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setCrewPhotoInput(null);
-                        setCrewPhotoName(null);
-                        setCrewPhotoPreview(
-                          editingCrew ? editingCrew.photoUrl || null : null,
-                        );
-                      }}
-                      className="absolute inset-0 bg-black/60 opacity-0 group-hover/crewpreview:opacity-100 transition-opacity flex items-center justify-center text-red-500 cursor-pointer border-0 rounded-none p-0 h-auto"
-                    >
-                      <CloseIcon className="text-sm text-white" />
-                    </button>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-xs text-zinc-300 font-semibold">
-                      รูปภาพประจำตัวที่ใช้
-                    </span>
-                    <span className="text-[10px] text-zinc-500 leading-relaxed mt-0.5">
-                      {crewPhotoName ? "รูปภาพหลังแก้ไข" : "รูปภาพปัจจุบัน"}
-                    </span>
-                    {crewPhotoName && rawCrewFile && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setCropImageSrc(URL.createObjectURL(rawCrewFile));
-                          setIsCropModalOpen(true);
-                        }}
-                        className="text-[10px] text-brand hover:underline font-semibold w-fit text-left mt-1 cursor-pointer border-0 bg-transparent p-0 h-auto hover:bg-transparent"
-                      >
-                        แก้ไขรูปภาพอีกครั้ง
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
 
             <div className="pt-6 border-t border-zinc-800/40 flex items-center gap-4">
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() => router.push("/")}
+                onClick={() => router.push("/admin/crew")}
                 className="flex-1 py-3 text-sm font-semibold rounded-xl"
               >
                 ยกเลิก
@@ -253,23 +156,6 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
           </form>
         </div>
       </main>
-
-      <ImageCropper
-        isOpen={isCropModalOpen}
-        imageSrc={cropImageSrc}
-        fileName={rawCrewFile?.name}
-        onClose={() => {
-          setIsCropModalOpen(false);
-          setRawCrewFile(null);
-          setCropImageSrc(null);
-        }}
-        onConfirm={(croppedFile, previewUrl) => {
-          setCrewPhotoInput(croppedFile);
-          setCrewPhotoName(croppedFile.name);
-          setCrewPhotoPreview(previewUrl);
-          setIsCropModalOpen(false);
-        }}
-      />
 
       {isSavingLocal && (
         <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/70 backdrop-blur-md animate-fade-in">

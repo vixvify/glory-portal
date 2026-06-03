@@ -148,13 +148,11 @@ export interface UpdateMovie {
 export interface CreateCrewMember {
   name: string;
   email?: string;
-  photo?: File | null;
 }
 
 export interface UpdateCrewMember {
   name: string;
   email?: string | null;
-  photo?: File | string | null;
 }
 export interface MovieFilterParams {
   search?: string;

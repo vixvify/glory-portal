@@ -1,13 +1,13 @@
 import { ApiResponse } from "@/infra/interface/response";
-import { CrewMember, CrewFilterParams } from "../domain/movie";
+import { CrewMember, CrewFilterParams, CreateCrewMember, UpdateCrewMember } from "../domain/movie";
 
 export interface CrewMemberRepository {
   getCrewMembers(params?: CrewFilterParams): Promise<ApiResponse<CrewMember[]>>;
   getCrewMemberById(id: string): Promise<ApiResponse<CrewMember>>;
-  createCrewMember(formData: FormData): Promise<ApiResponse<CrewMember>>;
+  createCrewMember(crewMember: CreateCrewMember): Promise<ApiResponse<CrewMember>>;
   updateCrewMember(
     id: string,
-    formData: FormData,
+    crewMember: UpdateCrewMember,
   ): Promise<ApiResponse<CrewMember>>;
   deleteCrewMember(id: string): Promise<ApiResponse<void>>;
 }

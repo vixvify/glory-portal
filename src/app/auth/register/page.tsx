@@ -130,7 +130,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-black to-black flex items-center justify-center p-4 py-12">
+    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-black to-black flex items-start justify-center p-4 pt-24 md:pt-28 pb-16">
       <div
         className={`w-full ${showOptional ? "max-w-5xl" : "max-w-xl"} bg-zinc-950/40 backdrop-blur-xl rounded-[2rem] border border-zinc-800 shadow-2xl p-10 space-y-8 transition-all duration-500 ease-in-out`}
       >

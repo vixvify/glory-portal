@@ -1,6 +1,6 @@
 import { ApiResponse } from "../interface/response";
 import { CrewMemberRepository } from "@/core/ports/crew-member.repository";
-import { CrewMember, CrewFilterParams } from "@/core/domain/movie";
+import { CrewMember, CrewFilterParams, CreateCrewMember, UpdateCrewMember } from "@/core/domain/movie";
 import httpClient from "@/lib/http";
 
 export class CrewMemberRepositoryImpl implements CrewMemberRepository {
@@ -14,23 +14,15 @@ export class CrewMemberRepositoryImpl implements CrewMemberRepository {
     return await httpClient.get<CrewMember>(`/crew-members/${id}`);
   }
 
-  async createCrewMember(formData: FormData): Promise<ApiResponse<CrewMember>> {
-    return await httpClient.post<CrewMember>("/crew-members", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+  async createCrewMember(crewMember: CreateCrewMember): Promise<ApiResponse<CrewMember>> {
+    return await httpClient.post<CrewMember>("/crew-members", crewMember);
   }
 
   async updateCrewMember(
     id: string,
-    formData: FormData,
+    crewMember: UpdateCrewMember,
   ): Promise<ApiResponse<CrewMember>> {
-    return await httpClient.put<CrewMember>(`/crew-members/${id}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    return await httpClient.put<CrewMember>(`/crew-members/${id}`, crewMember);
   }
 
   async deleteCrewMember(id: string): Promise<ApiResponse<void>> {
