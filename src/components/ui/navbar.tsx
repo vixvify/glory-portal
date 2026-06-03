@@ -212,6 +212,13 @@ export default function Navbar() {
                     {currentUser.email}
                   </p>
                 </div>
+                <Link
+                  href="/profile"
+                  onClick={() => setShowProfileMenu(false)}
+                  className="w-full block text-left px-3 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800/60 rounded-lg cursor-pointer transition-colors mb-1"
+                >
+                  โปรไฟล์ของฉัน
+                </Link>
                 <button
                   onClick={() => {
                     onSignOut();

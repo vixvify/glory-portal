@@ -262,7 +262,7 @@ export default function RegisterPage() {
                     <textarea
                       placeholder="ระบุประวัติโดยย่อของคุณ..."
                       rows={3}
-                      className="w-full bg-zinc-900/60 border border-zinc-800 rounded-lg py-2.5 px-4 text-sm text-white focus:outline-none transition-colors focus:border-brand placeholder-zinc-650 font-light"
+                      className="w-full bg-zinc-900/60 border border-zinc-800 rounded-lg py-2.5 px-4 text-sm text-white focus:outline-none transition-colors focus:border-brand placeholder-zinc-500 font-light"
                       {...register("bio")}
                     />
                   </div>
@@ -419,13 +419,15 @@ export default function RegisterPage() {
             </button>
           </div>
 
-          <Button
-            type="submit"
-            isLoading={registerMutation.isPending}
-            className="w-full mt-2 py-3 bg-brand text-white hover:bg-brand-hover shadow-lg shadow-brand/10 text-sm font-bold uppercase tracking-wider rounded-xl transition-all active:scale-[0.98]"
-          >
-            สมัครสมาชิก
-          </Button>
+          <div className="flex justify-center w-full mt-2">
+            <Button
+              type="submit"
+              isLoading={registerMutation.isPending}
+              className="w-full max-w-md py-3 bg-brand text-white hover:bg-brand-hover shadow-lg shadow-brand/10 text-sm font-bold uppercase tracking-wider rounded-xl transition-all active:scale-[0.98]"
+            >
+              สมัครสมาชิก
+            </Button>
+          </div>
         </form>
 
         <div className="relative flex py-4 items-center">

@@ -79,7 +79,7 @@ export default function CrewRow({ title, crew }: CrewRowProps) {
                     className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-300"
                   />
                 ) : (
-                  <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-zinc-555 group-hover/item:text-brand transition-colors">
+                  <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-zinc-500 group-hover/item:text-brand transition-colors">
                     <PersonIcon className="text-4xl sm:text-5xl" />
                   </div>
                 )}

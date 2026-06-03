@@ -82,7 +82,7 @@ export default function CrewProfilePage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-brand selection:text-black pb-24">
       <main className="max-w-7xl mx-auto w-full px-6 md:px-16 pt-28 space-y-12 animate-fade-in">
-        <div className="flex items-center gap-2 text-xs text-zinc-555">
+        <div className="flex items-center gap-2 text-xs text-zinc-500">
           <Link
             href="/"
             className="hover:text-brand transition-colors flex items-center gap-1"
@@ -106,7 +106,7 @@ export default function CrewProfilePage() {
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             ) : (
-              <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-zinc-650">
+              <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-zinc-600">
                 <PersonIcon className="text-6xl md:text-7xl" />
               </div>
             )}

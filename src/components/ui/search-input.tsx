@@ -27,7 +27,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         onChange={(e) => onChange(e.target.value)}
         maxLength={maxLength}
         className="bg-black/40 border-zinc-800 focus:border-brand rounded-xl py-2"
-        icon={<SearchIcon className="text-lg text-zinc-505" />}
+        icon={<SearchIcon className="text-lg text-zinc-500" />}
         suffix={
           value ? (
             <button
