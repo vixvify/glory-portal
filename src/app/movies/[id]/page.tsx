@@ -6,9 +6,6 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CheckIcon from "@mui/icons-material/Check";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import EmailIcon from "@mui/icons-material/Email";
 import { User } from "@/core/domain/user";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,7 +45,8 @@ export default function MovieDetails() {
   );
 
   const [selectedStars, setSelectedStars] = useState(0);
-  const { isPlayingMovie, playingMovie, playMovie, stopMovie } = useMoviePlayer();
+  const { isPlayingMovie, playingMovie, playMovie, stopMovie } =
+    useMoviePlayer();
 
   useEffect(() => {
     if (userRating) {
@@ -158,42 +156,6 @@ export default function MovieDetails() {
                   <button className="flex items-center justify-center w-11 h-11 rounded-full border border-zinc-700 bg-zinc-900/60 hover:bg-zinc-800 text-emerald-400 cursor-pointer transition-colors">
                     <CheckIcon className="text-xl" />
                   </button>
-
-                  {(movie?.facebook || movie?.instagram || movie?.email) && (
-                    <div className="flex items-center gap-3.5 ml-2 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full border border-zinc-800/40">
-                      {movie.facebook && (
-                        <a
-                          href={movie.facebook}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-zinc-400 hover:text-[#1877F2] transition-colors hover:scale-110 duration-200"
-                          title="Facebook"
-                        >
-                          <FacebookIcon className="text-xl" />
-                        </a>
-                      )}
-                      {movie.instagram && (
-                        <a
-                          href={movie.instagram}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-zinc-400 hover:text-[#E1306C] transition-colors hover:scale-110 duration-200"
-                          title="Instagram"
-                        >
-                          <InstagramIcon className="text-xl" />
-                        </a>
-                      )}
-                      {movie.email && (
-                        <a
-                          href={`mailto:${movie.email}`}
-                          className="text-zinc-400 hover:text-brand transition-colors hover:scale-110 duration-200"
-                          title="Email"
-                        >
-                          <EmailIcon className="text-xl" />
-                        </a>
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -202,35 +164,102 @@ export default function MovieDetails() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-2 md:px-4">
           <div className="lg:col-span-2 space-y-8">
-            <div className="flex flex-wrap items-center gap-3 text-sm bg-zinc-900/30 border border-zinc-900/60 p-4 rounded-2xl w-full">
-              <span className="text-emerald-400 font-bold tracking-tight">
-                {movie?.matchRate}% ตรงกับคุณ
-              </span>
-              <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
-              <span className="text-zinc-400">{movie?.year}</span>
-              <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
-              <span className="px-2 py-0.5 text-xs font-semibold border border-zinc-700 text-zinc-300 rounded bg-zinc-950/40">
-                {movie?.ageRating}
-              </span>
-              <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
-              <span className="text-zinc-400">{movie?.duration} นาที</span>
-              <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
-              <span className="px-2.5 py-0.5 text-xs font-semibold bg-brand/10 border border-brand/20 text-brand rounded-full">
-                {movie?.category}
-              </span>
-              {movie?.language && (
-                <>
+            <div className="flex flex-col gap-y-3.5 text-sm bg-zinc-900/30 border border-zinc-900/60 p-4 rounded-2xl w-full">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-zinc-400">
+                <span className="text-emerald-400 font-bold tracking-tight whitespace-nowrap">
+                  {movie?.matchRate}% ตรงกับคุณ
+                </span>
+
+                <div className="flex items-center gap-3 whitespace-nowrap">
                   <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
-                  <span className="text-zinc-400">ภาษา: {movie.language}</span>
-                </>
-              )}
-              {movie?.targetGroup && (
-                <>
+                  <span>{movie?.year}</span>
+                </div>
+
+                <div className="flex items-center gap-3 whitespace-nowrap">
                   <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
-                  <span className="px-2.5 py-0.5 text-xs font-semibold bg-zinc-900/80 border border-zinc-800 text-zinc-300 rounded-full">
-                    กลุ่มเป้าหมาย: {movie.targetGroup}
+                  <span className="px-2 py-0.5 text-xs font-semibold border border-zinc-700 text-zinc-300 rounded bg-zinc-950/40">
+                    {movie?.ageRating}
                   </span>
-                </>
+                </div>
+
+                <div className="flex items-center gap-3 whitespace-nowrap">
+                  <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
+                  <span>{movie?.duration} นาที</span>
+                </div>
+
+                <div className="flex items-center gap-3 whitespace-nowrap">
+                  <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
+                  <span className="px-2.5 py-0.5 text-xs font-semibold bg-brand/10 border border-brand/20 text-brand rounded-full">
+                    {movie?.category}
+                  </span>
+                </div>
+
+                {movie?.language && (
+                  <div className="flex items-center gap-3 whitespace-nowrap">
+                    <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
+                    <span>ภาษา: {movie.language}</span>
+                  </div>
+                )}
+              </div>
+
+              {(movie?.targetGroup ||
+                movie?.colorType ||
+                movie?.studio ||
+                movie?.hasProfanity ||
+                movie?.hasDrugs) && (
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-2.5 pt-3 border-t border-zinc-800/40">
+                  {movie?.targetGroup && (
+                    <span className="px-2.5 py-0.5 text-xs font-semibold bg-zinc-900/80 border border-zinc-800 text-zinc-300 rounded-full whitespace-nowrap">
+                      กลุ่มเป้าหมาย: {movie.targetGroup}
+                    </span>
+                  )}
+
+                  {movie?.colorType && (
+                    <div className="flex items-center gap-3 whitespace-nowrap">
+                      {movie?.targetGroup && (
+                        <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
+                      )}
+                      <span className="px-2.5 py-0.5 text-xs font-semibold bg-zinc-900/80 border border-zinc-800 text-zinc-300 rounded-full">
+                        โทนสี:{" "}
+                        {movie.colorType === "COLOR"
+                          ? "ภาพสี"
+                          : movie.colorType === "BLACK_AND_WHITE"
+                            ? "ขาวดำ"
+                            : "สีและขาวดำ"}
+                      </span>
+                    </div>
+                  )}
+
+                  {movie?.studio && (
+                    <div className="flex items-center gap-3 whitespace-nowrap">
+                      {(movie?.targetGroup || movie?.colorType) && (
+                        <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
+                      )}
+                      <span className="text-zinc-400">
+                        สังกัด: {movie.studio}
+                      </span>
+                    </div>
+                  )}
+
+                  {(movie?.hasProfanity || movie?.hasDrugs) && (
+                    <div className="flex items-center gap-3 whitespace-nowrap">
+                      {(movie?.targetGroup ||
+                        movie?.colorType ||
+                        movie?.studio) && (
+                        <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
+                      )}
+                      <span className="px-2.5 py-0.5 text-xs font-semibold bg-red-500/10 border border-red-500/20 text-red-400 rounded-full">
+                        คำเตือน:{" "}
+                        {[
+                          movie.hasProfanity && "มีคำหยาบคาย",
+                          movie.hasDrugs && "มียาเสพติด/สิ่งมึนเมา",
+                        ]
+                          .filter(Boolean)
+                          .join(", ")}
+                      </span>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
@@ -289,36 +318,36 @@ export default function MovieDetails() {
               </div>
             </div>
 
-            <div className="space-y-5 pt-6 border-t border-zinc-800/60">
-              <h4 className="text-base font-bold text-white tracking-wide uppercase">
-                เบื้องหลังการถ่ายทำ
-              </h4>
+            {movie?.bts?.btsVideo &&
+              movie.bts.btsVideo.filter(Boolean).length > 0 && (
+                <div className="space-y-5 pt-6 border-t border-zinc-800/60">
+                  <h4 className="text-base font-bold text-white tracking-wide uppercase">
+                    วิดีโอเบื้องหลังการถ่ายทำ
+                  </h4>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {movie?.bts && movie.bts.btsPhotos?.length > 0 ? (
-                  movie.bts.btsPhotos.map((photo, idx) => (
-                    <div
-                      key={idx}
-                      className="rounded-2xl overflow-hidden border border-zinc-800/80 aspect-video relative group cursor-pointer shadow-lg hover:border-brand/40 transition-all duration-300"
-                    >
-                      <img
-                        src={photo}
-                        alt="Behind the scenes"
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </div>
-                  ))
-                ) : (
-                  <div className="rounded-2xl overflow-hidden border border-zinc-800/80 aspect-video relative group shadow-lg col-span-2 sm:col-span-3">
-                    <img
-                      src="https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c"
-                      alt=""
-                      className="w-full h-52 object-cover"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {movie.bts.btsVideo.filter(Boolean).map((videoUrl, idx) => (
+                      <a
+                        href={videoUrl}
+                        key={idx}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 bg-zinc-900/30 border border-zinc-800/40 p-4 rounded-2xl hover:bg-zinc-900/60 hover:border-zinc-700/40 transition-all group cursor-pointer"
+                      >
+                        <PlayArrowIcon className="text-brand text-2xl group-hover:scale-110 transition-transform" />
+                        <div>
+                          <p className="font-bold text-sm text-zinc-200 group-hover:text-brand transition-colors">
+                            วิดีโอเบื้องหลัง #{idx + 1}
+                          </p>
+                          <p className="text-[10px] text-zinc-550 truncate max-w-[250px]">
+                            {videoUrl}
+                          </p>
+                        </div>
+                      </a>
+                    ))}
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
+              )}
 
             <div className="space-y-4 pt-6 border-t border-zinc-800/60">
               <h4 className="text-lg font-bold text-white tracking-wide">

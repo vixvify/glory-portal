@@ -111,24 +111,10 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
     }
   };
 
-
-
   return (
     <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-brand selection:text-black pb-20">
       <main className="max-w-xl mx-auto w-full px-6 md:px-8 pt-28 space-y-8 animate-fade-in">
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-xs text-zinc-500">
-            <button
-              onClick={() => router.push("/admin/crew")}
-              className="hover:text-brand transition-colors flex items-center gap-1 bg-transparent border-0 p-0 text-zinc-500 cursor-pointer"
-            >
-              <ArrowBackIcon className="text-sm" /> ระบบจัดการข้อมูลทีมงาน
-            </button>
-            <span>/</span>
-            <span className="text-zinc-300">
-              {editingCrew ? "แก้ไขข้อมูลทีมงาน" : "สร้างข้อมูลทีมงานใหม่"}
-            </span>
-          </div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-wide bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent flex items-center gap-2">
             <PeopleIcon className="text-brand" />{" "}
             {editingCrew ? "แก้ไขข้อมูลทีมงาน" : "สร้างข้อมูลทีมงานใหม่"}
@@ -157,7 +143,6 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
               type="email"
               {...register("email")}
             />
-
 
             <div className="space-y-2">
               <label className="text-xs font-semibold text-zinc-300">

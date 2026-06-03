@@ -40,11 +40,12 @@ export const movieSchema = z.object({
   ageRating: ageRatingSchema,
   duration: z.number().min(1, "Duration is required"),
   university: z.string().optional().nullable(),
-  facebook: z.string().optional().nullable(),
-  instagram: z.string().optional().nullable(),
-  email: z.string().optional().nullable(),
   language: z.string().optional().nullable(),
   targetGroup: z.string().optional().nullable(),
+  hasProfanity: z.boolean().optional(),
+  hasDrugs: z.boolean().optional(),
+  colorType: z.string().min(1, "Color type is required"),
+  studio: z.string().optional().nullable(),
   director: z
     .union([z.string(), z.array(z.string())])
     .optional()
@@ -61,8 +62,15 @@ export const movieSchema = z.object({
     .union([z.string(), z.array(z.string())])
     .optional()
     .nullable(),
+  dop: z
+    .union([z.string(), z.array(z.string())])
+    .optional()
+    .nullable(),
+  editor: z
+    .union([z.string(), z.array(z.string())])
+    .optional()
+    .nullable(),
   btsVideo: z.string().optional().nullable(),
-  btsPhotos: z.unknown().optional().nullable(),
 });
 
 export const updateMovieSchema = movieSchema.omit({
@@ -83,7 +91,7 @@ export const movieFilterParamsSchema = z.object({
   search: z.string().optional(),
   searchby: z.string().optional(),
   page: z.union([z.number(), z.string()]).optional(),
-  pagenumber: z.union([z.number(), z.string()]).optional(),
+  pagesize: z.union([z.number(), z.string()]).optional(),
   sort: z.string().optional(),
   sortby: z.string().optional(),
 }).optional();

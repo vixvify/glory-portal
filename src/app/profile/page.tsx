@@ -13,7 +13,6 @@ import WorkIcon from "@mui/icons-material/Work";
 import CakeIcon from "@mui/icons-material/Cake";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import LockIcon from "@mui/icons-material/Lock";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function ProfilePage() {
@@ -54,7 +53,7 @@ export default function ProfilePage() {
               กรุณาเข้าสู่ระบบ
             </h2>
             <p className="text-xs text-zinc-400 font-light leading-relaxed">
-              กรุณาเข้าสู่ระบบด้วยบัญชีคนทำหนังของคุณ
+              กรุณาเข้าสู่ระบบ
               เพื่อเข้าถึงข้อมูลโปรไฟล์และรายการประเมินภาพยนตร์ทั้งหมด
             </p>
           </div>

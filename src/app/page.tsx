@@ -20,14 +20,14 @@ export default function Page() {
     sort: "desc",
     sortby: "matchRate",
     page: 1,
-    pagenumber: 5,
+    pagesize: 5,
   });
 
   const { data: popularMovies = [], isLoading: isPopLoading } = useMoviesQuery({
     sort: "desc",
     sortby: "views",
     page: 1,
-    pagenumber: 10,
+    pagesize: 10,
   });
 
   const { data: categories = [], isLoading: isCatLoading } = useCategoriesQuery();
@@ -49,14 +49,14 @@ export default function Page() {
     queries: universities.map((uni) => ({
       queryKey: [
         "movies",
-        { search: uni.name, searchby: "university", page: 1, pagenumber: 10 },
+        { search: uni.name, searchby: "university", page: 1, pagesize: 10 },
       ],
       queryFn: () =>
         movieService.getMovies({
           search: uni.name,
           searchby: "university",
           page: 1,
-          pagenumber: 10,
+          pagesize: 10,
         }),
     })),
   });
@@ -69,7 +69,7 @@ export default function Page() {
           search: category.name,
           searchby: "category",
           page: 1,
-          pagenumber: 10,
+          pagesize: 10,
         },
       ],
       queryFn: () =>
@@ -77,7 +77,7 @@ export default function Page() {
           search: category.name,
           searchby: "category",
           page: 1,
-          pagenumber: 10,
+          pagesize: 10,
         }),
     })),
   });

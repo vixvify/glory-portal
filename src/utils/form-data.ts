@@ -6,7 +6,7 @@ export const toFormData = (data: Record<string, any>): FormData => {
   Object.entries(data).forEach(([key, value]) => {
     if (value === undefined || value === null) return;
 
-    const listFields = ["director", "producer", "writer", "cast", "btsVideo"];
+    const listFields = ["director", "producer", "writer", "cast", "btsVideo", "dop", "editor"];
     if (listFields.includes(key)) {
       const arr = parseStringOrArray(value);
       arr.forEach((item) => formData.append(key, item));

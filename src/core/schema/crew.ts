@@ -6,7 +6,7 @@ export const crewFilterParamsSchema = z.object({
   search: z.string().optional(),
   searchby: z.string().optional(),
   page: z.union([z.number(), z.string()]).optional(),
-  pagenumber: z.union([z.number(), z.string()]).optional(),
+  pagesize: z.union([z.number(), z.string()]).optional(),
   sort: z.string().optional(),
   sortby: z.string().optional(),
 }).optional();

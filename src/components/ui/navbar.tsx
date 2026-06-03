@@ -13,8 +13,7 @@ import { useLogoutMutation } from "@/hooks/use-auth";
 
 export default function Navbar() {
   const router = useRouter();
-  const { searchQuery, setSearchQuery, currentUser } =
-    useAppStore();
+  const { searchQuery, setSearchQuery, currentUser } = useAppStore();
 
   const { data: categories = [] } = useCategoriesQuery();
   const logoutMutation = useLogoutMutation();
@@ -129,19 +128,27 @@ export default function Navbar() {
             )}
           </div>
 
-          <Link href="/movies/favorites">
+          <Link href="movies/favorites">
             <button
               className={`cursor-pointer transition-colors duration-300 hover:text-white text-zinc-300 hover:bg-zinc-800/40 hover:text-white `}
             >
               รายการของฉัน
             </button>
           </Link>
-          {currentUser && currentUser?.role === "admin" && (
+          {currentUser && (
             <Link
-              href="/admin"
+              href="/admin/movies/create"
               className={`cursor-pointer transition-colors duration-300 hover:text-white text-zinc-300 hover:bg-zinc-800/40 hover:text-white `}
             >
-              ผู้ดูแล
+              เพิ่มภาพยนตร์
+            </Link>
+          )}
+          {currentUser && (
+            <Link
+              href="/admin/crew/create"
+              className={`cursor-pointer transition-colors duration-300 hover:text-white text-zinc-300 hover:bg-zinc-800/40 hover:text-white `}
+            >
+              เพิ่มทีมงาน
             </Link>
           )}
         </div>

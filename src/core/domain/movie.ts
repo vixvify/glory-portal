@@ -61,7 +61,6 @@ export interface MovieBts {
   id: string;
   movieId: string;
   btsVideo: string[];
-  btsPhotos: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -80,11 +79,12 @@ export interface Movie {
   ageRating: string;
   duration: number;
   university?: string | null;
-  facebook?: string | null;
-  instagram?: string | null;
-  email?: string | null;
   language?: string | null;
   targetGroup?: string | null;
+  hasProfanity: boolean;
+  hasDrugs: boolean;
+  colorType: string;
+  studio?: string | null;
   crew: MovieCrew[];
   bts?: MovieBts | null;
   createdAt: Date;
@@ -102,17 +102,19 @@ export interface CreateMovie {
   ageRating: string;
   duration: number;
   university?: string;
-  facebook?: string;
-  instagram?: string;
-  email?: string;
   language?: string;
   targetGroup?: string;
   director?: string | string[];
   producer?: string | string[];
   writer?: string | string[];
   cast?: string | string[];
+  dop?: string | string[];
+  editor?: string | string[];
   btsVideo?: string | string[];
-  btsPhotos?: FileList | File[] | string | string[] | null;
+  hasProfanity?: boolean;
+  hasDrugs?: boolean;
+  colorType: string;
+  studio?: string;
 }
 
 export interface UpdateMovie {
@@ -126,17 +128,19 @@ export interface UpdateMovie {
   ageRating: string;
   duration: number;
   university?: string | null;
-  facebook?: string | null;
-  instagram?: string | null;
-  email?: string | null;
   language?: string | null;
   targetGroup?: string | null;
   director?: string | string[] | null;
   producer?: string | string[] | null;
   writer?: string | string[] | null;
   cast?: string | string[] | null;
+  dop?: string | string[] | null;
+  editor?: string | string[] | null;
   btsVideo?: string | string[] | null;
-  btsPhotos?: FileList | File[] | string | string[] | null;
+  hasProfanity?: boolean;
+  hasDrugs?: boolean;
+  colorType: string;
+  studio?: string | null;
 }
 export interface CreateCrewMember {
   name: string;
@@ -153,7 +157,7 @@ export interface MovieFilterParams {
   search?: string;
   searchby?: string;
   page?: number | string;
-  pagenumber?: number | string;
+  pagesize?: number | string;
   sort?: string;
   sortby?: string;
 }
@@ -162,7 +166,7 @@ export interface CrewFilterParams {
   search?: string;
   searchby?: string;
   page?: number | string;
-  pagenumber?: number | string;
+  pagesize?: number | string;
   sort?: string;
   sortby?: string;
 }
