@@ -60,13 +60,13 @@ type MovieFormInputs = {
   hasDrugs: boolean;
   colorType: string;
   studio?: string;
-  director?: string;
-  producer?: string;
-  writer?: string;
-  cast?: string;
-  dop?: string;
-  editor?: string;
-  btsVideo?: string | string[];
+  director?: string[];
+  producer?: string[];
+  writer?: string[];
+  cast?: string[];
+  dop?: string[];
+  editor?: string[];
+  btsVideo?: string[];
 };
 
 export const MovieForm: React.FC<MovieFormProps> = ({
@@ -230,12 +230,12 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         hasDrugs: editingMovie.hasDrugs ?? false,
         colorType: editingMovie.colorType || "COLOR",
         studio: editingMovie.studio || "",
-        director: "",
-        producer: "",
-        writer: "",
-        cast: "",
-        dop: "",
-        editor: "",
+        director: [],
+        producer: [],
+        writer: [],
+        cast: [],
+        dop: [],
+        editor: [],
         btsVideo: editingMovie.bts?.btsVideo || [],
       });
     } else {
@@ -266,12 +266,12 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         hasDrugs: false,
         colorType: "COLOR",
         studio: "",
-        director: "",
-        producer: "",
-        writer: "",
-        cast: "",
-        dop: "",
-        editor: "",
+        director: [],
+        producer: [],
+        writer: [],
+        cast: [],
+        dop: [],
+        editor: [],
         btsVideo: [],
       });
     }
