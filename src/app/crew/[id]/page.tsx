@@ -52,6 +52,8 @@ export default function CrewProfilePage() {
     return <Loading />;
   }
 
+  console.log(crewMember);
+
   if (error || !crewMember) {
     return (
       <div className="min-h-screen bg-zinc-950 text-white flex flex-col items-center justify-center p-6">
