@@ -62,34 +62,13 @@ export const movieSchema = z.object({
   hasDrugs: z.boolean().optional(),
   colorType: z.string().min(1, "Color type is required"),
   studio: z.string().optional().nullable(),
-  director: z
-    .union([z.string(), z.array(z.string())])
-    .optional()
-    .nullable(),
-  producer: z
-    .union([z.string(), z.array(z.string())])
-    .optional()
-    .nullable(),
-  writer: z
-    .union([z.string(), z.array(z.string())])
-    .optional()
-    .nullable(),
-  cast: z
-    .union([z.string(), z.array(z.string())])
-    .optional()
-    .nullable(),
-  dop: z
-    .union([z.string(), z.array(z.string())])
-    .optional()
-    .nullable(),
-  editor: z
-    .union([z.string(), z.array(z.string())])
-    .optional()
-    .nullable(),
-  btsVideo: z
-    .union([z.string(), z.array(z.string())])
-    .optional()
-    .nullable(),
+  director: z.array(z.string()).optional().nullable(),
+  producer: z.array(z.string()).optional().nullable(),
+  writer: z.array(z.string()).optional().nullable(),
+  cast: z.array(z.string()).optional().nullable(),
+  dop: z.array(z.string()).optional().nullable(),
+  editor: z.array(z.string()).optional().nullable(),
+  btsVideo: z.array(z.string()).optional().nullable(),
 });
 
 export const updateMovieSchema = movieSchema.omit({
