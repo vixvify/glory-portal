@@ -25,6 +25,17 @@ export default function Navbar() {
   const onSignInClick = () => {
     router.push("/auth/login");
   };
+
+  const handleNavClick = (category: string | null) => {
+    if (category === null) {
+      router.push("/");
+    } else {
+      router.push(`/movies/category/${category}`);
+    }
+    setShowMoviesMenu(false);
+    setSearchQuery("");
+  };
+
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
@@ -56,12 +67,6 @@ export default function Navbar() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const handleNavClick = (category: string | null) => {
-    router.push(`/movies/category/${category}`);
-    setShowMoviesMenu(false);
-    setSearchQuery("");
-  };
-
   if (pathname.startsWith("/watch")) {
     return null;
   }
@@ -87,7 +92,7 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-6 text-sm text-zinc-300">
           <Link
             href="/"
-            className={`cursor-pointer transition-colors duration-300 hover:text-white }`}
+            className="cursor-pointer transition-colors duration-300 hover:text-white"
           >
             หน้าแรก
           </Link>
@@ -95,7 +100,7 @@ export default function Navbar() {
           <div className="relative">
             <button
               onClick={() => setShowMoviesMenu(!showMoviesMenu)}
-              className={`flex items-center gap-1 cursor-pointer transition-colors duration-305 hover:text-white focus:outline-none ${"text-white font-semibold"}`}
+              className="flex items-center gap-1 cursor-pointer transition-colors duration-305 hover:text-white focus:outline-none text-white font-semibold"
             >
               ภาพยนตร์
               <div
@@ -112,7 +117,8 @@ export default function Navbar() {
                 </div>
                 <div className="max-h-60 overflow-y-auto pr-1 no-scrollbar space-y-0.5">
                   <button
-                    className={`w-full text-left px-3 py-2 text-xs rounded-lg cursor-pointer transition-colors text-zinc-300 hover:bg-zinc-800/40 hover:text-white `}
+                    onClick={() => handleNavClick(null)}
+                    className="w-full text-left px-3 py-2 text-xs rounded-lg cursor-pointer transition-colors text-zinc-300 hover:bg-zinc-800/40 hover:text-white"
                   >
                     หนังทั้งหมด
                   </button>
@@ -122,7 +128,7 @@ export default function Navbar() {
                       onClick={() => {
                         handleNavClick(cat.name);
                       }}
-                      className={`w-full text-left px-3 py-2 text-xs rounded-lg cursor-pointer transition-colors text-zinc-300 hover:bg-zinc-800/40 hover:text-white `}
+                      className="w-full text-left px-3 py-2 text-xs rounded-lg cursor-pointer transition-colors text-zinc-300 hover:bg-zinc-800/40 hover:text-white"
                     >
                       {CATEGORY_TITLE_MAPPING[cat.name] || cat.name}
                     </button>
@@ -132,17 +138,13 @@ export default function Navbar() {
             )}
           </div>
 
-          <Link href="/movies/favorites">
-            <button
-              className={`cursor-pointer transition-colors duration-300 hover:text-white text-zinc-300 hover:bg-zinc-800/40 hover:text-white `}
-            >
-              รายการของฉัน
-            </button>
+          <Link href="/movies/favorites" className="cursor-pointer transition-colors duration-300 text-zinc-300 hover:text-white">
+            รายการของฉัน
           </Link>
           {currentUser && (
             <Link
               href="/admin/movies/create"
-              className={`cursor-pointer transition-colors duration-300 hover:text-white text-zinc-300 hover:bg-zinc-800/40 hover:text-white `}
+              className="cursor-pointer transition-colors duration-300 text-zinc-300 hover:text-white"
             >
               เพิ่มภาพยนตร์
             </Link>
@@ -150,7 +152,7 @@ export default function Navbar() {
           {currentUser && (
             <Link
               href="/admin/crew/create"
-              className={`cursor-pointer transition-colors duration-300 hover:text-white text-zinc-300 hover:bg-zinc-800/40 hover:text-white `}
+              className="cursor-pointer transition-colors duration-300 text-zinc-300 hover:text-white"
             >
               เพิ่มทีมงาน
             </Link>

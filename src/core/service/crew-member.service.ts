@@ -66,7 +66,7 @@ export class CrewMemberService {
       const validated = parseSchema(updateCrewMemberSchema, crewMember);
       const response = await this.crewMemberRepository.updateCrewMember(
         id,
-        validated,
+        { ...validated, id },
       );
       if (response.error) {
         throw new Error(response.error);

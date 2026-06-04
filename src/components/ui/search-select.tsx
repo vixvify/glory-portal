@@ -36,7 +36,10 @@ export function CreatableSearchSelect({
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
@@ -48,15 +51,15 @@ export function CreatableSearchSelect({
 
   const filteredOptions = searchTerm.trim()
     ? options.filter((opt) =>
-      opt.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+        opt.name.toLowerCase().includes(searchTerm.toLowerCase()),
+      )
     : options;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setSearchTerm(val);
     const exactMatch = options.find(
-      (opt) => opt.name.toLowerCase() === val.trim().toLowerCase()
+      (opt) => opt.name.toLowerCase() === val.trim().toLowerCase(),
     );
     if (exactMatch) {
       onChange({ id: exactMatch.id, name: exactMatch.name });
@@ -142,7 +145,7 @@ export function CreatableSearchSelect({
                   className="text-xs text-brand hover:underline font-semibold flex items-center justify-center gap-1 mx-auto cursor-pointer"
                 >
                   <AddIcon className="text-xs" />
-                  เพิ่มทีมงานและนักแสดง: "{searchTerm}"
+                  เพิ่มทีมงานและนักแสดง: &quot;{searchTerm}&quot;
                 </button>
               )}
             </div>

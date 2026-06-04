@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useScrollRow } from "@/hooks/use-scroll-row";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Movie } from "@/core/domain/movie";
@@ -22,35 +22,8 @@ export default function MovieRow({
   favorites,
   onToggleFavorite,
 }: MovieRowProps) {
-  const rowRef = useRef<HTMLDivElement>(null);
-  const [showLeftArrow, setShowLeftArrow] = useState(false);
-  const [showRightArrow, setShowRightArrow] = useState(true);
-
-  const checkScrollArrows = () => {
-    if (rowRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = rowRef.current;
-      setShowLeftArrow(scrollLeft > 5);
-      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 5);
-    }
-  };
-
-  useEffect(() => {
-    const el = rowRef.current;
-    if (el) {
-      el.addEventListener("scroll", checkScrollArrows);
-      setTimeout(checkScrollArrows, 200);
-    }
-    return () => el?.removeEventListener("scroll", checkScrollArrows);
-  }, [movies]);
-
-  const handleScroll = (direction: "left" | "right") => {
-    if (rowRef.current) {
-      const { clientWidth } = rowRef.current;
-      const scrollAmount =
-        direction === "left" ? -clientWidth * 0.75 : clientWidth * 0.75;
-      rowRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-    }
-  };
+  const { rowRef, showLeftArrow, showRightArrow, handleScroll } =
+    useScrollRow(movies);
 
   if (movies.length === 0) return null;
 

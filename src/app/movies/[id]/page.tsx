@@ -24,6 +24,7 @@ import { calculateRatingStats } from "@/utils/rating";
 import Loading from "@/app/loading";
 import PlayerModal from "@/components/modal/player-modal";
 import { useMoviePlayer } from "@/hooks/use-movie-player";
+import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 
 export default function MovieDetails() {
   const params = useParams<{ id: string }>();
@@ -201,7 +202,9 @@ export default function MovieDetails() {
                 <div className="flex items-center gap-3 whitespace-nowrap">
                   <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
                   <span className="px-2.5 py-0.5 text-xs font-semibold bg-brand/10 border border-brand/20 text-brand rounded-full">
-                    {movie?.category}
+                    {movie?.category &&
+                      (CATEGORY_TITLE_MAPPING[movie.category] ||
+                        movie.category)}
                   </span>
                 </div>
 

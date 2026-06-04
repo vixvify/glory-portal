@@ -36,6 +36,7 @@ export default function CategoryPage() {
   const handleToggleFavorite = useCallback(
     (movieId: string) => {
       if (!currentUser) {
+        router.push("/auth/login");
         return;
       }
       const isCurrentlyFavorite = favorites.some((m) => m.id === movieId);

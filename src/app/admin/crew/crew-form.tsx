@@ -60,10 +60,8 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
       if (editingCrew) {
         await updateCrewMutation.mutateAsync({
           id: editingCrew.id,
-          crewMember: {
-            name: data.name.trim(),
-            email: data.email?.trim() || null,
-          },
+          name: data.name.trim(),
+          email: data.email?.trim() || null,
         });
         showToast(LOCALIZATION.TOAST.EDIT_CREW_SUCCESS, "success");
       } else {

@@ -9,7 +9,7 @@ import {
   useTargetGroupsQuery,
 } from "@/hooks/use-master-data";
 import { useCrewMembersQuery } from "@/hooks/use-crew-members";
-import { MovieForm } from "../movieform";
+import { MovieForm } from "../movie-form";
 
 export default function CreateMoviePage() {
   const { data: categories = [], isLoading: isCategoriesLoading } =

@@ -6,6 +6,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Movie } from "@/core/domain/movie";
+import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 
 import { Button } from "./button";
 
@@ -69,7 +70,7 @@ export const MovieTable: React.FC<MovieTableProps> = ({
 
                 <td className="py-4 px-6">
                   <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-brand/10 text-brand border border-brand/20">
-                    {movie.category}
+                    {CATEGORY_TITLE_MAPPING[movie.category] || movie.category}
                   </span>
                 </td>
 

@@ -16,7 +16,6 @@ export function Toast() {
     if (toast?.isVisible) {
       setShouldRender(true);
     } else {
-      // Allow fade-out animation to complete before unmounting
       const timer = setTimeout(() => {
         setShouldRender(false);
       }, 300);
@@ -57,22 +56,18 @@ export function Toast() {
           : "opacity-0 -translate-y-4 scale-95 pointer-events-none"
       }`}
     >
-      {/* Dynamic Background Glow Accent */}
-      <div className={`absolute inset-0 rounded-xl opacity-30 blur-[2px] pointer-events-none ${glows[toast.type]}`} />
+      <div
+        className={`absolute inset-0 rounded-xl opacity-30 blur-[2px] pointer-events-none ${glows[toast.type]}`}
+      />
 
-      {/* Icon */}
-      <div className="relative z-10 flex-shrink-0">
-        {icons[toast.type]}
-      </div>
+      <div className="relative z-10 flex-shrink-0">{icons[toast.type]}</div>
 
-      {/* Message */}
       <div className="relative z-10 flex-grow pr-2">
         <p className="text-sm font-semibold text-white/95 tracking-wide">
           {toast.message}
         </p>
       </div>
 
-      {/* Close button */}
       <button
         onClick={hideToast}
         className="relative z-10 flex-shrink-0 p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer"

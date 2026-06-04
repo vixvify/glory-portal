@@ -10,7 +10,7 @@ import {
 } from "@/hooks/use-master-data";
 import { useCrewMembersQuery } from "@/hooks/use-crew-members";
 import { useAppStore } from "@/store/use-store";
-import HomePage from "./home/Home";
+import HomePage from "./home/home";
 import Loading from "./loading";
 
 export default function Page() {

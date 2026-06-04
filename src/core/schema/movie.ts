@@ -1,9 +1,19 @@
 import { z } from "zod";
 
 export const ratingSchema = z.object({
-  user: z.string(),
-  score: z.number().min(1).max(5),
-});
+  id: z.string(),
+  movieId: z.string(),
+  userId: z.string(),
+  stars: z.number().min(1).max(5),
+  comment: z.string().optional().nullable(),
+  createdAt: z.union([z.string(), z.date()]).optional(),
+  updatedAt: z.union([z.string(), z.date()]).optional(),
+  user: z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string(),
+  }).partial().optional(),
+}).partial();
 
 export const categorySchema = z.enum([
   "Action",
@@ -40,7 +50,7 @@ export const movieSchema = z.object({
     .or(z.literal(""))
     .nullable(),
   views: z.number().nonnegative().optional(),
-  ratings: z.any().optional(),
+  ratings: z.array(ratingSchema).optional(),
   year: z.number().int().min(1900).max(2100),
   matchRate: z.number().min(0).max(100),
   ageRating: ageRatingSchema,
@@ -76,7 +86,10 @@ export const movieSchema = z.object({
     .union([z.string(), z.array(z.string())])
     .optional()
     .nullable(),
-  btsVideo: z.string().optional().nullable(),
+  btsVideo: z
+    .union([z.string(), z.array(z.string())])
+    .optional()
+    .nullable(),
 });
 
 export const updateMovieSchema = movieSchema.omit({

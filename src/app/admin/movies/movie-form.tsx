@@ -66,7 +66,7 @@ type MovieFormInputs = {
   cast?: string;
   dop?: string;
   editor?: string;
-  btsVideo?: string;
+  btsVideo?: string | string[];
 };
 
 export const MovieForm: React.FC<MovieFormProps> = ({
@@ -236,9 +236,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         cast: "",
         dop: "",
         editor: "",
-        btsVideo: editingMovie.bts?.btsVideo
-          ? editingMovie.bts.btsVideo.join(", ")
-          : "",
+        btsVideo: editingMovie.bts?.btsVideo || [],
       });
     } else {
       setSelectedFileName(null);
@@ -274,7 +272,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         cast: "",
         dop: "",
         editor: "",
-        btsVideo: "",
+        btsVideo: [],
       });
     }
   }, [editingMovie, reset]);
@@ -297,7 +295,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         hasDrugs: data.hasDrugs,
         colorType: data.colorType || "COLOR",
         studio: data.studio || null,
-        btsVideo: activeVideos.join(","),
+        btsVideo: activeVideos,
         director: directors
           .filter((d) => d.name.trim() !== "")
           .map((d) => d.id || d.name.trim()),
@@ -320,6 +318,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
       if (editingMovie) {
         const updatedPayload: UpdateMovie = {
+          id: editingMovie.id,
           title: validated.title,
           description: validated.description,
           category: validated.category,
@@ -350,10 +349,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           btsVideo: validated.btsVideo || null,
         };
 
-        await updateMovieMutation.mutateAsync({
-          id: editingMovie.id,
-          movie: updatedPayload,
-        });
+        await updateMovieMutation.mutateAsync(updatedPayload);
         showToast(LOCALIZATION.TOAST.EDIT_MOVIE_SUCCESS, "success");
       } else {
         const createPayload: CreateMovie = {
