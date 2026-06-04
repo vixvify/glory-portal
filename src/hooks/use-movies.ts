@@ -3,8 +3,8 @@ import { movieService } from "@/infra/container";
 import {
   Movie,
   CreateMovie,
-  UpdateMovie,
   MovieFilterParams,
+  UpdateMovie,
 } from "@/core/domain/movie";
 
 export function useMoviesQuery(params?: MovieFilterParams) {
@@ -35,8 +35,8 @@ export function useCreateMovieMutation() {
 
 export function useUpdateMovieMutation() {
   const queryClient = useQueryClient();
-  return useMutation<Movie, Error, { id: string; movie: UpdateMovie }>({
-    mutationFn: ({ id, movie }) => movieService.updateMovie(id, movie),
+  return useMutation<Movie, Error, UpdateMovie>({
+    mutationFn: (movie) => movieService.updateMovie(movie.id, movie),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["movies"] });
     },

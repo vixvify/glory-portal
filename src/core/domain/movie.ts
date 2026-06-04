@@ -120,6 +120,7 @@ export interface CreateMovie {
 }
 
 export interface UpdateMovie {
+  id: string;
   title: string;
   description: string;
   category: string;
@@ -151,6 +152,7 @@ export interface CreateCrewMember {
 }
 
 export interface UpdateCrewMember {
+  id: string;
   name: string;
   email?: string | null;
 }

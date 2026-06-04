@@ -62,6 +62,10 @@ export default function Navbar() {
     setSearchQuery("");
   };
 
+  if (pathname.startsWith("/watch")) {
+    return null;
+  }
+
   return (
     <nav
       className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 md:px-16 py-4 transition-all duration-500 ease-out ${

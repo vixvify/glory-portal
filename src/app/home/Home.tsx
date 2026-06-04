@@ -2,7 +2,6 @@
 
 import { useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import PlayerModal from "@/components/modal/player-modal";
 import { useMoviePlayer } from "@/hooks/use-movie-player";
 import { Movie } from "@/core/domain/movie";
 import { useAppStore } from "@/store/use-store";
@@ -52,12 +51,7 @@ export default function HomePage(props: Props) {
     setSearchQuery,
   } = useAppStore();
 
-  const {
-    isPlayingMovie,
-    playingMovie,
-    playMovie: handlePlayMovie,
-    stopMovie,
-  } = useMoviePlayer();
+  const { playMovie: handlePlayMovie } = useMoviePlayer();
 
   const activeSearchQuery = useDebounce(searchQuery, 200);
 
@@ -146,14 +140,7 @@ export default function HomePage(props: Props) {
         />
       )}
 
-      {playingMovie && (
-        <PlayerModal
-          isOpen={isPlayingMovie}
-          onClose={stopMovie}
-          youtubeUrl={playingMovie.youtubeUrl}
-          movieTitle={playingMovie.title}
-        />
-      )}
+
 
       <Toast />
     </div>

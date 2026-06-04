@@ -9,21 +9,15 @@ import {
 import { useAppStore } from "@/store/use-store";
 import MovieGrid from "@/components/movie/movie-grid";
 import Loading from "@/app/loading";
-import PlayerModal from "@/components/modal/player-modal";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useMoviePlayer } from "@/hooks/use-movie-player";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import LockIcon from "@mui/icons-material/Lock";
 import { Button } from "@/components/ui/button";
 
 export default function FavoritesPage() {
   const router = useRouter();
-  const {
-    isPlayingMovie,
-    playingMovie,
-    playMovie: handlePlayMovie,
-    stopMovie,
-  } = useMoviePlayer();
+  const { playMovie: handlePlayMovie } = useMoviePlayer();
 
   const { currentUser, showToast } = useAppStore();
 
@@ -138,14 +132,7 @@ export default function FavoritesPage() {
         )}
       </main>
 
-      {playingMovie && (
-        <PlayerModal
-          isOpen={isPlayingMovie}
-          onClose={stopMovie}
-          youtubeUrl={playingMovie.youtubeUrl}
-          movieTitle={playingMovie.title}
-        />
-      )}
+
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { favoriteService } from "@/infra/container";
 import { Movie } from "@/core/domain/movie";
+import { ToggleFavoriteMutationInput } from "@/core/domain/favorite";
 
 export function useFavoritesQuery(enabled = true) {
   return useQuery<Movie[], Error>({
@@ -12,7 +13,7 @@ export function useFavoritesQuery(enabled = true) {
 
 export function useToggleFavoriteMutation() {
   const queryClient = useQueryClient();
-  return useMutation<void, Error, { movieId: string; isFavorite: boolean }>({
+  return useMutation<void, Error, ToggleFavoriteMutationInput>({
     mutationFn: ({ movieId, isFavorite }) =>
       isFavorite
         ? favoriteService.removeFavorite(movieId)

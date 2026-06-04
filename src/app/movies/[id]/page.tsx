@@ -46,8 +46,7 @@ export default function MovieDetails() {
 
   const [selectedStars, setSelectedStars] = useState(0);
   const [isPlayingTrailer, setIsPlayingTrailer] = useState(false);
-  const { isPlayingMovie, playingMovie, playMovie, stopMovie } =
-    useMoviePlayer();
+  const { playMovie } = useMoviePlayer();
 
   useEffect(() => {
     if (userRating) {
@@ -518,14 +517,7 @@ export default function MovieDetails() {
           </div>
         </div>
       </div>
-      {isPlayingMovie && playingMovie && (
-        <PlayerModal
-          isOpen={isPlayingMovie}
-          onClose={stopMovie}
-          youtubeUrl={playingMovie.youtubeUrl}
-          movieTitle={playingMovie.title}
-        />
-      )}
+
       {isPlayingTrailer && movie && movie.trailerUrl && (
         <PlayerModal
           isOpen={isPlayingTrailer}

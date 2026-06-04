@@ -10,7 +10,6 @@ import {
 import { useAppStore } from "@/store/use-store";
 import MovieGrid from "@/components/movie/movie-grid";
 import Loading from "@/app/loading";
-import PlayerModal from "@/components/modal/player-modal";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useMoviePlayer } from "@/hooks/use-movie-player";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
@@ -22,12 +21,7 @@ export default function CategoryPage() {
     ? decodeURIComponent(params.category)
     : "";
 
-  const {
-    isPlayingMovie,
-    playingMovie,
-    playMovie: handlePlayMovie,
-    stopMovie,
-  } = useMoviePlayer();
+  const { playMovie: handlePlayMovie } = useMoviePlayer();
 
   const { currentUser, showToast } = useAppStore();
 
@@ -110,14 +104,7 @@ export default function CategoryPage() {
         )}
       </main>
 
-      {playingMovie && (
-        <PlayerModal
-          isOpen={isPlayingMovie}
-          onClose={stopMovie}
-          youtubeUrl={playingMovie.youtubeUrl}
-          movieTitle={playingMovie.title}
-        />
-      )}
+
     </div>
   );
 }

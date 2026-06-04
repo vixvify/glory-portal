@@ -3,8 +3,8 @@ import { crewMemberService } from "@/infra/container";
 import {
   CrewMember,
   CreateCrewMember,
-  UpdateCrewMember,
   CrewFilterParams,
+  UpdateCrewMember,
 } from "@/core/domain/movie";
 
 export function useCrewMembersQuery(params?: CrewFilterParams) {
@@ -34,13 +34,9 @@ export function useCreateCrewMemberMutation() {
 
 export function useUpdateCrewMemberMutation() {
   const queryClient = useQueryClient();
-  return useMutation<
-    CrewMember,
-    Error,
-    { id: string; crewMember: UpdateCrewMember }
-  >({
-    mutationFn: ({ id, crewMember }) =>
-      crewMemberService.updateCrewMember(id, crewMember),
+  return useMutation<CrewMember, Error, UpdateCrewMember>({
+    mutationFn: (crewMember) =>
+      crewMemberService.updateCrewMember(crewMember.id, crewMember),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["crewMembers"] });
       queryClient.invalidateQueries({ queryKey: ["movies"] });

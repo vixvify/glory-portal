@@ -1,23 +1,18 @@
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Movie } from "@/core/domain/movie";
 
 export function useMoviePlayer() {
-  const [isPlayingMovie, setIsPlayingMovie] = useState(false);
-  const [playingMovie, setPlayingMovie] = useState<Movie | null>(null);
+  const router = useRouter();
 
   const playMovie = useCallback((movie: Movie) => {
-    setPlayingMovie(movie);
-    setIsPlayingMovie(true);
-  }, []);
-
-  const stopMovie = useCallback(() => {
-    setIsPlayingMovie(false);
-  }, []);
+    router.push(`/watch/${movie.id}`);
+  }, [router]);
 
   return {
-    isPlayingMovie,
-    playingMovie,
+    isPlayingMovie: false,
+    playingMovie: null as Movie | null,
     playMovie,
-    stopMovie,
+    stopMovie: () => {},
   };
 }
