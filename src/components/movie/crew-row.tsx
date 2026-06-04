@@ -45,9 +45,9 @@ export default function CrewRow({ title, crew }: CrewRowProps) {
               className="flex-none w-32 sm:w-40 flex flex-col items-center select-none group/item cursor-pointer snap-start"
             >
               <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-2 border-zinc-800/60 group-hover/item:border-brand/80 transition-all duration-300 shadow-md relative aspect-square">
-                {member.photoUrl ? (
+                {member.user?.photoUrl ? (
                   <img
-                    src={member.photoUrl}
+                    src={member.user.photoUrl}
                     alt={member.name}
                     className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-300"
                   />

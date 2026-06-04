@@ -115,11 +115,11 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
               {...register("email")}
             />
 
-            {editingCrew?.photoUrl && (
+            {editingCrew?.user?.photoUrl && (
               <div className="flex items-center gap-4 mt-4 pl-1">
                 <div className="relative w-20 h-20 rounded-full overflow-hidden border border-zinc-850 bg-black/40 shadow-inner flex-shrink-0 animate-fade-in">
                   <img
-                    src={editingCrew.photoUrl}
+                    src={editingCrew.user.photoUrl}
                     alt="Crew Preview"
                     className="w-full h-full object-cover"
                   />

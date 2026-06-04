@@ -10,7 +10,6 @@ import EmailIcon from "@mui/icons-material/Email";
 import Loading from "@/app/loading";
 import { useCrewMemberQueryById } from "@/hooks/use-crew-members";
 
-// Role localization mapping
 const ROLE_MAPPING: Record<string, string> = {
   director: "ผู้กำกับ (Director)",
   producer: "ผู้อำนวยการสร้าง (Producer)",
@@ -28,7 +27,6 @@ export default function CrewProfilePage() {
     error,
   } = useCrewMemberQueryById(params.id);
 
-  // Group filmography by role
   const groupedMovieCrews = useMemo(() => {
     if (!crewMember?.movieCrews) return {};
     const groups: Record<string, typeof crewMember.movieCrews> = {};
@@ -46,7 +44,6 @@ export default function CrewProfilePage() {
     return groups;
   }, [crewMember]);
 
-  // Derive unique roles for tags
   const crewRoles = useMemo(() => {
     return Object.keys(groupedMovieCrews);
   }, [groupedMovieCrews]);
@@ -99,9 +96,9 @@ export default function CrewProfilePage() {
           <div className="absolute -top-32 -left-32 w-96 h-96 bg-brand/5 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-3 border-brand/50 shadow-2xl shrink-0 group aspect-square">
-            {crewMember.photoUrl ? (
+            {crewMember.user?.photoUrl ? (
               <img
-                src={crewMember.photoUrl}
+                src={crewMember.user.photoUrl}
                 alt={crewMember.name}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />

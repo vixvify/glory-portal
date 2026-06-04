@@ -20,6 +20,7 @@ export const CrewTable: React.FC<CrewTableProps> = ({
   onEdit,
   onDelete,
 }) => {
+  console.log(crew);
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left border-collapse">
@@ -53,9 +54,9 @@ export const CrewTable: React.FC<CrewTableProps> = ({
                   className="group/row hover:bg-zinc-900/10 transition-colors"
                 >
                   <td className="py-4 px-6 flex items-center gap-4">
-                    {member.photoUrl ? (
+                    {member?.user?.photoUrl ? (
                       <img
-                        src={member.photoUrl}
+                        src={member.user.photoUrl}
                         alt={member.name}
                         className="w-10 h-10 rounded-full object-cover border border-zinc-800 flex-shrink-0"
                       />
@@ -100,14 +101,11 @@ export const CrewTable: React.FC<CrewTableProps> = ({
                   </td>
 
                   <td className="py-4 px-6 text-zinc-400 font-light">
-                    {new Date(member.createdAt).toLocaleDateString(
-                      "th-TH",
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      },
-                    )}
+                    {new Date(member.createdAt).toLocaleDateString("th-TH", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
                   </td>
 
                   <td className="py-4 px-6 text-right">

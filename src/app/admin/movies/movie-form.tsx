@@ -113,7 +113,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
   const crewOptions = availableCrew.map((c) => ({
     id: c.id,
     name: c.name,
-    photoUrl: c.photoUrl,
+    photoUrl: c.user?.photoUrl,
   }));
 
   const {

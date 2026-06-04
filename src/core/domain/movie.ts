@@ -1,4 +1,5 @@
 import { Rating } from "./rating";
+import { User } from "./user";
 
 export interface Category {
   id: string;
@@ -33,10 +34,10 @@ export interface CrewMember {
   id: string;
   name: string;
   email?: string | null;
-  photoUrl?: string | null;
   userId?: string | null;
   createdAt: Date;
   updatedAt: Date;
+  user?: User | null;
   movieCrews?: {
     id: string;
     movieId: string;
@@ -90,6 +91,7 @@ export interface Movie {
   bts?: MovieBts | null;
   createdAt: Date;
   updatedAt: Date;
+  user: User;
 }
 
 export interface CreateMovie {

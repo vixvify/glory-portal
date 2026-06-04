@@ -6,6 +6,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CheckIcon from "@mui/icons-material/Check";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
+import PersonIcon from "@mui/icons-material/Person";
 import { User } from "@/core/domain/user";
 import { Button } from "@/components/ui/button";
 import {
@@ -299,15 +300,17 @@ export default function MovieDetails() {
                       key={member.id}
                       className="flex items-center gap-3.5 bg-zinc-900/30 border border-zinc-800/40 p-3 rounded-2xl transition-all hover:bg-zinc-900/60 hover:border-zinc-700/40 group block cursor-pointer"
                     >
-                      <img
-                        src={
-                          member.crewMember?.photoUrl ||
-                          "https://placehold.co/100?text=" +
-                            (member.crewMember?.name.charAt(0) || "C")
-                        }
-                        alt={member.crewMember?.name || "Crew Member"}
-                        className="w-12 h-12 rounded-full object-cover bg-zinc-800 border border-zinc-700/50 group-hover:border-brand/40 transition-colors"
-                      />
+                      {member.crewMember?.user?.photoUrl ? (
+                        <img
+                          src={member.crewMember.user.photoUrl}
+                          alt={member.crewMember.name}
+                          className="w-12 h-12 rounded-full object-cover bg-zinc-800 border border-zinc-700/50 group-hover:border-brand/40 transition-colors flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-brand/10 border border-brand/20 flex items-center justify-center text-brand flex-shrink-0">
+                          <PersonIcon className="text-xl" />
+                        </div>
+                      )}
                       <div>
                         <p className="font-bold text-zinc-200 group-hover:text-brand transition-colors flex items-center gap-1.5">
                           {member.crewMember?.name}
