@@ -7,10 +7,14 @@ import {
   UpdateCrewMember,
 } from "@/core/domain/movie";
 
-export function useCrewMembersQuery(params?: CrewFilterParams) {
+export function useCrewMembersQuery(
+  params?: CrewFilterParams,
+  options?: { enabled?: boolean },
+) {
   return useQuery<CrewMember[], Error>({
     queryKey: params ? ["crewMembers", params] : ["crewMembers"],
     queryFn: () => crewMemberService.getCrewMembers(params),
+    ...options,
   });
 }
 

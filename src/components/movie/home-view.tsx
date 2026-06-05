@@ -14,7 +14,6 @@ interface HomeViewProps {
   actorsList: CrewMember[];
   universityMoviesMap: Record<string, Movie[]>;
   categoryMoviesMap: Record<string, Movie[]>;
-  initialAllMovies: Movie[];
   favorites: Movie[];
   handlePlayMovie: (movie: Movie) => void;
   handleToggleFavorite: (movieId: string) => void;

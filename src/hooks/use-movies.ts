@@ -7,10 +7,14 @@ import {
   UpdateMovie,
 } from "@/core/domain/movie";
 
-export function useMoviesQuery(params?: MovieFilterParams) {
+export function useMoviesQuery(
+  params?: MovieFilterParams,
+  options?: { enabled?: boolean },
+) {
   return useQuery<Movie[], Error>({
     queryKey: params ? ["movies", params] : ["movies"],
     queryFn: () => movieService.getMovies(params),
+    ...options,
   });
 }
 

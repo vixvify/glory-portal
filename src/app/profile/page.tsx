@@ -36,13 +36,13 @@ export default function ProfilePage() {
 
   const { data: myMovies = [], isLoading: isMoviesLoading } = useMoviesQuery(
     currentUser ? { createdBy: currentUser.id } : undefined,
+    { enabled: !!currentUser },
   );
 
   const { data: myCrew = [], isLoading: isCrewLoading } = useCrewMembersQuery(
     currentUser ? { createdBy: currentUser.id } : undefined,
+    { enabled: !!currentUser },
   );
-
-  const { data: allMovies = [] } = useMoviesQuery();
 
   const deleteMovieMutation = useDeleteMovieMutation();
   const deleteCrewMemberMutation = useDeleteCrewMemberMutation();
@@ -409,7 +409,6 @@ export default function ProfilePage() {
             ) : (
               <CrewTable
                 crew={myCrew}
-                movies={allMovies}
                 onEdit={(member) => router.push(`/crew/${member.id}/edit`)}
                 onDelete={setDeleteCrewId}
               />

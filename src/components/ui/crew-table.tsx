@@ -9,14 +9,12 @@ import { Button } from "./button";
 
 interface CrewTableProps {
   crew: CrewMember[];
-  movies: Movie[];
   onEdit: (member: CrewMember) => void;
   onDelete: (id: string) => void;
 }
 
 export const CrewTable: React.FC<CrewTableProps> = ({
   crew,
-  movies,
   onEdit,
   onDelete,
 }) => {
@@ -44,9 +42,7 @@ export const CrewTable: React.FC<CrewTableProps> = ({
             </tr>
           ) : (
             crew.map((member) => {
-              const movieCount = movies.filter((m) =>
-                m.crew?.some((c) => c.crewMember?.id === member.id),
-              ).length;
+              const movieCount = member.movieCrews?.length || 0;
 
               return (
                 <tr

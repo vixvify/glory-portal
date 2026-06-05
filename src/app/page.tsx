@@ -82,8 +82,6 @@ export default function Page() {
     })),
   });
 
-  const { data: allMovies = [], isLoading: isAllLoading } = useMoviesQuery();
-
   const isAnyLoading =
     isRecLoading ||
     isPopLoading ||
@@ -91,7 +89,6 @@ export default function Page() {
     isUniLoading ||
     isDirsLoading ||
     isActorsLoading ||
-    isAllLoading ||
     (!!currentUser && isFavsLoading) ||
     universityMovieQueries.some((q) => q.isLoading) ||
     categoryMovieQueries.some((q) => q.isLoading);
@@ -124,7 +121,6 @@ export default function Page() {
       actorsList={actorsList}
       universityMoviesMap={universityMoviesMap}
       categoryMoviesMap={categoryMoviesMap}
-      initialAllMovies={allMovies}
       favorites={serverFavorites}
     />
   );

@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/ui/search-input";
 import { CrewTable } from "@/components/ui/crew-table";
 import { ConfirmModal } from "@/components/modal/confirm-modal";
-import { useMoviesQuery } from "@/hooks/use-movies";
 import {
   useCrewMembersQuery,
   useDeleteCrewMemberMutation,
@@ -40,7 +39,6 @@ export default function AdminCrewPage() {
   const { data: availableCrew = [], isLoading: isCrewLoading } =
     useCrewMembersQuery(crewParams);
   console.log(availableCrew);
-  const { data: movies = [], isLoading: isMoviesLoading } = useMoviesQuery();
 
   const deleteCrewMutation = useDeleteCrewMemberMutation();
 
@@ -66,7 +64,7 @@ export default function AdminCrewPage() {
     }
   };
 
-  if (isInitialLoading || isMoviesLoading) {
+  if (isInitialLoading) {
     return <Loading />;
   }
 
@@ -115,7 +113,6 @@ export default function AdminCrewPage() {
           ) : (
             <CrewTable
               crew={availableCrew}
-              movies={movies}
               onEdit={(member) => router.push(`/crew/${member.id}/edit`)}
               onDelete={setDeleteCrewId}
             />

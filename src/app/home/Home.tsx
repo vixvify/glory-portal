@@ -25,7 +25,6 @@ interface Props {
   actorsList: CrewMember[];
   universityMoviesMap: Record<string, Movie[]>;
   categoryMoviesMap: Record<string, Movie[]>;
-  initialAllMovies: Movie[];
   favorites: Movie[];
 }
 
@@ -39,17 +38,10 @@ export default function HomePage(props: Props) {
     actorsList,
     universityMoviesMap,
     categoryMoviesMap,
-    initialAllMovies,
     favorites,
   } = props;
   const router = useRouter();
-  const {
-    currentUser,
-    setCurrentUser,
-    showToast,
-    searchQuery,
-    setSearchQuery,
-  } = useAppStore();
+  const { currentUser, showToast, searchQuery, setSearchQuery } = useAppStore();
 
   const { playMovie: handlePlayMovie } = useMoviePlayer();
 
@@ -63,11 +55,11 @@ export default function HomePage(props: Props) {
   }, [activeSearchQuery]);
 
   const { data: fetchedMovies = [], isLoading: isMoviesLoading } =
-    useMoviesQuery(movieParams);
+    useMoviesQuery(movieParams, { enabled: !!activeSearchQuery.trim() });
 
   const toggleFavoriteMutation = useToggleFavoriteMutation();
 
-  const moviesData = movieParams ? fetchedMovies : initialAllMovies;
+  const moviesData = fetchedMovies;
 
   const handleToggleFavorite = useCallback(
     (movieId: string) => {
@@ -106,10 +98,6 @@ export default function HomePage(props: Props) {
   const isSearching =
     searchQuery.trim() !== activeSearchQuery.trim() || isMoviesLoading;
 
-  if (isMoviesLoading) {
-    return <Loading />;
-  }
-
   return (
     <div className="min-h-screen bg-background text-white flex flex-col font-sans select-none pb-16 transition-colors duration-450">
       {!searchQuery ? (
@@ -122,7 +110,6 @@ export default function HomePage(props: Props) {
           actorsList={actorsList}
           universityMoviesMap={universityMoviesMap}
           categoryMoviesMap={categoryMoviesMap}
-          initialAllMovies={initialAllMovies}
           favorites={favorites}
           handlePlayMovie={handlePlayMovie}
           handleToggleFavorite={handleToggleFavorite}
@@ -139,8 +126,6 @@ export default function HomePage(props: Props) {
           setSearchQuery={setSearchQuery}
         />
       )}
-
-
 
       <Toast />
     </div>
