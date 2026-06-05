@@ -172,7 +172,6 @@ export interface MovieFilterParams {
   pagesize?: number | string;
   sort?: string;
   sortby?: string;
-  createdBy?: string;
 }
 
 export interface CrewFilterParams {
@@ -182,5 +181,4 @@ export interface CrewFilterParams {
   pagesize?: number | string;
   sort?: string;
   sortby?: string;
-  createdBy?: string;
 }
