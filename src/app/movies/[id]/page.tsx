@@ -459,40 +459,67 @@ export default function MovieDetails() {
               </div>
             </div>
 
-            {/* Movie Info Sidebar */}
             <div className="p-6 rounded-2xl bg-zinc-900/30 border border-zinc-800/40 space-y-4 shadow-xl text-xs">
               <h5 className="text-xs font-bold text-white uppercase tracking-widest text-left border-b border-zinc-800/60 pb-3 flex items-center justify-between">
                 <span>ข้อมูลภาพยนตร์</span>
                 <span className="w-1.5 h-1.5 bg-brand rounded-full" />
               </h5>
               <div className="space-y-3.5">
-                {movie?.studio && (
+                {movie?.university && (
                   <div className="flex justify-between items-start gap-4">
-                    <span className="text-zinc-550 font-light whitespace-nowrap">ค่าย / สังกัด</span>
-                    <span className="text-zinc-200 font-medium text-right">{movie.studio}</span>
+                    <span className="text-zinc-550 font-light whitespace-nowrap">
+                      มหาวิทยาลัย / สถาบัน
+                    </span>
+                    <span className="text-zinc-200 font-medium text-right max-w-40">
+                      {movie.university}
+                    </span>
+                  </div>
+                )}
+                {movie?.studio && (
+                  <div className="flex justify-between items-start gap-4 pt-3 border-t border-zinc-900/40">
+                    <span className="text-zinc-550 font-light whitespace-nowrap">
+                      ค่าย / สังกัด
+                    </span>
+                    <span className="text-zinc-200 font-medium text-right">
+                      {movie.studio}
+                    </span>
                   </div>
                 )}
                 {movie?.targetGroup && (
                   <div className="flex justify-between items-start gap-4 pt-3 border-t border-zinc-900/40">
-                    <span className="text-zinc-550 font-light whitespace-nowrap">กลุ่มเป้าหมาย</span>
-                    <span className="text-zinc-200 font-medium text-right">{movie.targetGroup}</span>
+                    <span className="text-zinc-550 font-light whitespace-nowrap">
+                      กลุ่มเป้าหมาย
+                    </span>
+                    <span className="text-zinc-200 font-medium text-right">
+                      {movie.targetGroup}
+                    </span>
                   </div>
                 )}
                 {movie?.language && (
                   <div className="flex justify-between items-start gap-4 pt-3 border-t border-zinc-900/40">
-                    <span className="text-zinc-550 font-light whitespace-nowrap">ภาษา</span>
-                    <span className="text-zinc-200 font-medium text-right">{movie.language}</span>
+                    <span className="text-zinc-550 font-light whitespace-nowrap">
+                      ภาษา
+                    </span>
+                    <span className="text-zinc-200 font-medium text-right">
+                      {movie.language}
+                    </span>
                   </div>
                 )}
                 {movie?.aspectRatio && (
                   <div className="flex justify-between items-start gap-4 pt-3 border-t border-zinc-900/40">
-                    <span className="text-zinc-550 font-light whitespace-nowrap">อัตราส่วนภาพ</span>
-                    <span className="text-zinc-200 font-medium text-right">{movie.aspectRatio}</span>
+                    <span className="text-zinc-550 font-light whitespace-nowrap">
+                      อัตราส่วนภาพ
+                    </span>
+                    <span className="text-zinc-200 font-medium text-right">
+                      {movie.aspectRatio}
+                    </span>
                   </div>
                 )}
                 {movie?.colorType && (
                   <div className="flex justify-between items-start gap-4 pt-3 border-t border-zinc-900/40">
-                    <span className="text-zinc-550 font-light whitespace-nowrap">โทนสี</span>
+                    <span className="text-zinc-550 font-light whitespace-nowrap">
+                      โทนสี
+                    </span>
                     <span className="text-zinc-200 font-medium text-right">
                       {movie.colorType === "COLOR"
                         ? "ภาพสี (Color)"

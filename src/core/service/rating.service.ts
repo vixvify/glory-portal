@@ -59,7 +59,7 @@ export class RatingService {
     }
   }
 
-  async getRatingByMovieAndUser(data: RatingCheckInput): Promise<Rating> {
+  async getRatingByMovieAndUser(data: RatingCheckInput): Promise<Rating | null> {
     try {
       const validated = parseSchema(ratingCheckInputSchema, data);
       const response =
