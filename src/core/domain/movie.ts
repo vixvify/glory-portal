@@ -80,6 +80,7 @@ export interface Movie {
   ratings: Rating[];
   year: number;
   matchRate: number;
+  aspectRatio: string;
   ageRating: string;
   duration: number;
   university?: string | null;
@@ -93,7 +94,8 @@ export interface Movie {
   bts?: MovieBts | null;
   createdAt: Date;
   updatedAt: Date;
-  user: User;
+  userId: string;
+  user?: User | null;
 }
 
 export interface CreateMovie {
@@ -104,7 +106,8 @@ export interface CreateMovie {
   youtubeUrl: string;
   trailerUrl?: string;
   year: number;
-  matchRate: number;
+  matchRate?: number;
+  aspectRatio: string;
   ageRating: string;
   duration: number;
   university?: string;
@@ -132,7 +135,8 @@ export interface UpdateMovie {
   youtubeUrl: string;
   trailerUrl?: string | null;
   year: number;
-  matchRate: number;
+  matchRate?: number;
+  aspectRatio: string;
   ageRating: string;
   duration: number;
   university?: string | null;
@@ -167,6 +171,7 @@ export interface MovieFilterParams {
   pagesize?: number | string;
   sort?: string;
   sortby?: string;
+  userId?: string;
 }
 
 export interface CrewFilterParams {

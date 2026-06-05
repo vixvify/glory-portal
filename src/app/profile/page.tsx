@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-store";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -14,10 +15,40 @@ import CakeIcon from "@mui/icons-material/Cake";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import LockIcon from "@mui/icons-material/Lock";
 import { Button } from "@/components/ui/button";
+import { useMoviesQuery, useDeleteMovieMutation } from "@/hooks/use-movies";
+import { MovieTable } from "@/components/ui/movie-table";
+import { ConfirmModal } from "@/components/modal/confirm-modal";
+import { LOCALIZATION } from "@/core/constants/localization";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { currentUser } = useAppStore();
+  const { currentUser, showToast } = useAppStore();
+
+  const [deleteMovieId, setDeleteMovieId] = useState<string | null>(null);
+  const [isDeletingLocal, setIsDeletingLocal] = useState(false);
+
+  const { data: myMovies = [], isLoading: isMoviesLoading } = useMoviesQuery(
+    currentUser ? { userId: currentUser.id } : undefined,
+  );
+
+  const deleteMovieMutation = useDeleteMovieMutation();
+
+  const handleDeleteConfirm = async () => {
+    if (deleteMovieId) {
+      try {
+        setIsDeletingLocal(true);
+        await deleteMovieMutation.mutateAsync(deleteMovieId);
+        showToast(LOCALIZATION.TOAST.DELETE_MOVIE_SUCCESS, "success");
+      } catch (err: unknown) {
+        const errorMessage =
+          err instanceof Error ? err.message : LOCALIZATION.ERRORS.DELETE;
+        showToast(errorMessage, "error");
+      } finally {
+        setIsDeletingLocal(false);
+        setDeleteMovieId(null);
+      }
+    }
+  };
 
   const formatBirthday = (dateStr?: string | null) => {
     if (!dateStr) return null;
@@ -303,7 +334,56 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+
+        <div className="bg-zinc-950/40 backdrop-blur-xl rounded-[2rem] border border-zinc-800 shadow-2xl p-8 space-y-6">
+          <div className="flex items-center justify-between border-b border-zinc-900/50 pb-4">
+            <h3 className="text-xl font-bold text-white tracking-wide">
+              ภาพยนตร์ที่ฉันเพิ่ม ({myMovies.length})
+            </h3>
+          </div>
+          {isMoviesLoading ? (
+            <div className="flex justify-center py-10">
+              <div className="w-8 h-8 border-4 border-zinc-700 border-t-white rounded-full animate-spin" />
+            </div>
+          ) : (
+            <MovieTable
+              movies={myMovies}
+              onEdit={(movie) => router.push(`/movies/${movie.id}/edit`)}
+              onDelete={setDeleteMovieId}
+            />
+          )}
+        </div>
       </main>
+
+      <ConfirmModal
+        isOpen={deleteMovieId !== null}
+        title={LOCALIZATION.CONFIRM.DELETE_MOVIE_TITLE}
+        message={LOCALIZATION.CONFIRM.DELETE_MOVIE_MSG}
+        variant="danger"
+        confirmText={LOCALIZATION.CONFIRM.DELETE_MOVIE_BTN}
+        cancelText={LOCALIZATION.CONFIRM.CANCEL}
+        onClose={() => setDeleteMovieId(null)}
+        onConfirm={handleDeleteConfirm}
+      />
+
+      {isDeletingLocal && (
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/70 backdrop-blur-md animate-fade-in">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="relative w-20 h-20">
+              <div className="absolute inset-0 rounded-full border-4 border-zinc-800/60" />
+              <div className="absolute inset-0 rounded-full border-4 border-brand border-t-transparent animate-spin" />
+            </div>
+            <div className="space-y-1.5 text-center">
+              <h3 className="text-xl font-bold tracking-wide text-white">
+                {LOCALIZATION.LOADING.DELETE_MOVIE}
+              </h3>
+              <p className="text-xs text-zinc-400 font-light">
+                {LOCALIZATION.LOADING.SUB_DELETE_MOVIE}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

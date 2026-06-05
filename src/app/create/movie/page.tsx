@@ -1,7 +1,5 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import { useMovieQueryById } from "@/hooks/use-movies";
 import Loading from "@/app/loading";
 import {
   useCategoriesQuery,
@@ -11,13 +9,9 @@ import {
   useTargetGroupsQuery,
 } from "@/hooks/use-master-data";
 import { useCrewMembersQuery } from "@/hooks/use-crew-members";
-import { MovieForm } from "../../movie-form";
+import { MovieForm } from "./movie-form";
 
-export default function EditMoviePage() {
-  const params = useParams<{ id: string }>();
-  const { data: movie, isLoading: isMovieLoading } = useMovieQueryById(
-    params.id,
-  );
+export default function CreateMoviePage() {
   const { data: categories = [], isLoading: isCategoriesLoading } =
     useCategoriesQuery();
   const { data: ageRatings = [], isLoading: isAgeRatingsLoading } =
@@ -32,7 +26,6 @@ export default function EditMoviePage() {
     useCrewMembersQuery();
 
   const isMasterLoading =
-    isMovieLoading ||
     isCategoriesLoading ||
     isAgeRatingsLoading ||
     isUniversitiesLoading ||
@@ -44,19 +37,8 @@ export default function EditMoviePage() {
     return <Loading />;
   }
 
-  if (!movie) {
-    return (
-      <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center">
-        <p className="text-zinc-400 font-light">
-          ไม่พบข้อมูลภาพยนตร์สั้นที่ต้องการแก้ไข
-        </p>
-      </div>
-    );
-  }
-
   return (
     <MovieForm
-      editingMovie={movie}
       categories={categories}
       ageRatings={ageRatings}
       universities={universities}
@@ -66,4 +48,3 @@ export default function EditMoviePage() {
     />
   );
 }
-

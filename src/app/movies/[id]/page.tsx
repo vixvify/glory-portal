@@ -176,116 +176,54 @@ export default function MovieDetails() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-2 md:px-4">
-          <div className="lg:col-span-2 space-y-8">
-            <div className="flex flex-col gap-y-3.5 text-sm bg-zinc-900/30 border border-zinc-900/60 p-4 rounded-2xl w-full">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-zinc-400">
-                <span className="text-emerald-400 font-bold tracking-tight whitespace-nowrap">
-                  {movie?.matchRate}% ตรงกับคุณ
-                </span>
+          <div className="lg:col-span-2 space-y-6">
+            <div className="flex flex-wrap items-center gap-x-3.5 gap-y-2 text-sm text-zinc-400">
+              <span className="text-emerald-400 font-bold">
+                {movie?.matchRate}% ตรงกับคุณ
+              </span>
 
-                <div className="flex items-center gap-3 whitespace-nowrap">
-                  <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
-                  <span>{movie?.year}</span>
-                </div>
+              <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
+              <span className="text-zinc-200">{movie?.year}</span>
 
-                <div className="flex items-center gap-3 whitespace-nowrap">
-                  <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
-                  <span className="px-2 py-0.5 text-xs font-semibold border border-zinc-700 text-zinc-300 rounded bg-zinc-950/40">
-                    {movie?.ageRating}
-                  </span>
-                </div>
+              <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
+              <span className="px-1.5 py-0.5 text-xs font-bold border border-zinc-800 text-zinc-300 rounded bg-zinc-900/50">
+                {movie?.ageRating}
+              </span>
 
-                <div className="flex items-center gap-3 whitespace-nowrap">
-                  <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
-                  <span>{movie?.duration} นาที</span>
-                </div>
+              <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
+              <span className="text-zinc-200">{movie?.duration} นาที</span>
 
-                <div className="flex items-center gap-3 whitespace-nowrap">
-                  <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
-                  <span className="px-2.5 py-0.5 text-xs font-semibold bg-brand/10 border border-brand/20 text-brand rounded-full">
-                    {movie?.category &&
-                      (CATEGORY_TITLE_MAPPING[movie.category] ||
-                        movie.category)}
-                  </span>
-                </div>
-
-                {movie?.language && (
-                  <div className="flex items-center gap-3 whitespace-nowrap">
-                    <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
-                    <span>ภาษา: {movie.language}</span>
-                  </div>
-                )}
-              </div>
-
-              {(movie?.targetGroup ||
-                movie?.colorType ||
-                movie?.studio ||
-                movie?.hasProfanity ||
-                movie?.hasDrugs) && (
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-2.5 pt-3 border-t border-zinc-800/40">
-                  {movie?.targetGroup && (
-                    <span className="px-2.5 py-0.5 text-xs font-semibold bg-zinc-900/80 border border-zinc-800 text-zinc-300 rounded-full whitespace-nowrap">
-                      กลุ่มเป้าหมาย: {movie.targetGroup}
-                    </span>
-                  )}
-
-                  {movie?.colorType && (
-                    <div className="flex items-center gap-3 whitespace-nowrap">
-                      {movie?.targetGroup && (
-                        <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
-                      )}
-                      <span className="px-2.5 py-0.5 text-xs font-semibold bg-zinc-900/80 border border-zinc-800 text-zinc-300 rounded-full">
-                        โทนสี:{" "}
-                        {movie.colorType === "COLOR"
-                          ? "ภาพสี"
-                          : movie.colorType === "BLACK_AND_WHITE"
-                            ? "ขาวดำ"
-                            : "สีและขาวดำ"}
-                      </span>
-                    </div>
-                  )}
-
-                  {movie?.studio && (
-                    <div className="flex items-center gap-3 whitespace-nowrap">
-                      {(movie?.targetGroup || movie?.colorType) && (
-                        <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
-                      )}
-                      <span className="text-zinc-400">
-                        สังกัด: {movie.studio}
-                      </span>
-                    </div>
-                  )}
-
-                  {(movie?.hasProfanity || movie?.hasDrugs) && (
-                    <div className="flex items-center gap-3 whitespace-nowrap">
-                      {(movie?.targetGroup ||
-                        movie?.colorType ||
-                        movie?.studio) && (
-                        <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
-                      )}
-                      <span className="px-2.5 py-0.5 text-xs font-semibold bg-red-500/10 border border-red-500/20 text-red-400 rounded-full">
-                        คำเตือน:{" "}
-                        {[
-                          movie.hasProfanity && "มีคำหยาบคาย",
-                          movie.hasDrugs && "มียาเสพติด/สิ่งมึนเมา",
-                        ]
-                          .filter(Boolean)
-                          .join(", ")}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
+              <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
+              <span className="px-2.5 py-0.5 text-xs font-bold bg-brand/10 border border-brand/20 text-brand rounded-full">
+                {movie?.category &&
+                  (CATEGORY_TITLE_MAPPING[movie.category] || movie.category)}
+              </span>
             </div>
 
-            <div className="space-y-3">
-              <h3 className="text-lg font-bold text-white tracking-wide">
+            <div className="space-y-2">
+              <h3 className="text-base font-bold text-zinc-400 tracking-wide uppercase">
                 เรื่องย่อ
               </h3>
-              <p className="text-zinc-300 text-sm leading-relaxed font-light">
+              <p className="text-zinc-200 text-sm leading-relaxed font-light">
                 {movie?.description}
               </p>
             </div>
+            {(movie?.hasProfanity || movie?.hasDrugs) && (
+              <div className="flex items-center gap-2 text-xs text-red-400/90 pt-1">
+                <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse flex-shrink-0" />
+                <span className="font-semibold flex-shrink-0">
+                  คำเตือนเนื้อหา:
+                </span>
+                <span className="text-zinc-400 font-normal">
+                  {[
+                    movie.hasProfanity && "มีคำหยาบคาย",
+                    movie.hasDrugs && "มียาเสพติด/สิ่งมึนเมา",
+                  ]
+                    .filter(Boolean)
+                    .join(", ")}
+                </span>
+              </div>
+            )}
 
             <div className="space-y-5 pt-6 border-t border-zinc-800/60">
               <h4 className="text-base font-bold text-white tracking-wide uppercase">
@@ -517,6 +455,52 @@ export default function MovieDetails() {
                   >
                     ลบ
                   </button>
+                )}
+              </div>
+            </div>
+
+            {/* Movie Info Sidebar */}
+            <div className="p-6 rounded-2xl bg-zinc-900/30 border border-zinc-800/40 space-y-4 shadow-xl text-xs">
+              <h5 className="text-xs font-bold text-white uppercase tracking-widest text-left border-b border-zinc-800/60 pb-3 flex items-center justify-between">
+                <span>ข้อมูลภาพยนตร์</span>
+                <span className="w-1.5 h-1.5 bg-brand rounded-full" />
+              </h5>
+              <div className="space-y-3.5">
+                {movie?.studio && (
+                  <div className="flex justify-between items-start gap-4">
+                    <span className="text-zinc-550 font-light whitespace-nowrap">ค่าย / สังกัด</span>
+                    <span className="text-zinc-200 font-medium text-right">{movie.studio}</span>
+                  </div>
+                )}
+                {movie?.targetGroup && (
+                  <div className="flex justify-between items-start gap-4 pt-3 border-t border-zinc-900/40">
+                    <span className="text-zinc-550 font-light whitespace-nowrap">กลุ่มเป้าหมาย</span>
+                    <span className="text-zinc-200 font-medium text-right">{movie.targetGroup}</span>
+                  </div>
+                )}
+                {movie?.language && (
+                  <div className="flex justify-between items-start gap-4 pt-3 border-t border-zinc-900/40">
+                    <span className="text-zinc-550 font-light whitespace-nowrap">ภาษา</span>
+                    <span className="text-zinc-200 font-medium text-right">{movie.language}</span>
+                  </div>
+                )}
+                {movie?.aspectRatio && (
+                  <div className="flex justify-between items-start gap-4 pt-3 border-t border-zinc-900/40">
+                    <span className="text-zinc-550 font-light whitespace-nowrap">อัตราส่วนภาพ</span>
+                    <span className="text-zinc-200 font-medium text-right">{movie.aspectRatio}</span>
+                  </div>
+                )}
+                {movie?.colorType && (
+                  <div className="flex justify-between items-start gap-4 pt-3 border-t border-zinc-900/40">
+                    <span className="text-zinc-550 font-light whitespace-nowrap">โทนสี</span>
+                    <span className="text-zinc-200 font-medium text-right">
+                      {movie.colorType === "COLOR"
+                        ? "ภาพสี (Color)"
+                        : movie.colorType === "BLACK_AND_WHITE"
+                          ? "ขาวดำ"
+                          : "สีและขาวดำ"}
+                    </span>
+                  </div>
                 )}
               </div>
             </div>

@@ -141,22 +141,6 @@ export default function Navbar() {
           <Link href="/movies/favorites" className="cursor-pointer transition-colors duration-300 text-zinc-300 hover:text-white">
             รายการของฉัน
           </Link>
-          {currentUser && (
-            <Link
-              href="/admin/movies/create"
-              className="cursor-pointer transition-colors duration-300 text-zinc-300 hover:text-white"
-            >
-              เพิ่มภาพยนตร์
-            </Link>
-          )}
-          {currentUser && (
-            <Link
-              href="/admin/crew/create"
-              className="cursor-pointer transition-colors duration-300 text-zinc-300 hover:text-white"
-            >
-              เพิ่มทีมงาน
-            </Link>
-          )}
         </div>
       </div>
 
@@ -231,6 +215,20 @@ export default function Navbar() {
                   className="w-full block text-left px-3 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800/60 rounded-lg cursor-pointer transition-colors mb-1"
                 >
                   โปรไฟล์ของฉัน
+                </Link>
+                <Link
+                  href="/create/movie"
+                  onClick={() => setShowProfileMenu(false)}
+                  className="w-full block text-left px-3 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800/60 rounded-lg cursor-pointer transition-colors mb-1"
+                >
+                  เพิ่มภาพยนตร์
+                </Link>
+                <Link
+                  href="/create/crew"
+                  onClick={() => setShowProfileMenu(false)}
+                  className="w-full block text-left px-3 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800/60 rounded-lg cursor-pointer transition-colors mb-1"
+                >
+                  เพิ่มทีมงาน
                 </Link>
                 <button
                   onClick={() => {

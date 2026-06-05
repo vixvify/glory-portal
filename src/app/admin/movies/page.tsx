@@ -106,7 +106,7 @@ export default function AdminMoviesPage() {
           </div>
 
           <Button
-            onClick={() => router.push("/admin/movies/create")}
+            onClick={() => router.push("/create/movie")}
             className="flex items-center justify-center gap-2"
           >
             <AddIcon className="text-lg" />
@@ -156,7 +156,7 @@ export default function AdminMoviesPage() {
           ) : (
             <MovieTable
               movies={movies}
-              onEdit={(movie) => router.push(`/admin/movies/${movie.id}/edit`)}
+              onEdit={(movie) => router.push(`/movies/${movie.id}/edit`)}
               onDelete={setDeleteMovieId}
             />
           )}

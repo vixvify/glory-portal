@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import Loading from "@/app/loading";
-import { CrewForm } from "../../crew-form";
+import { CrewForm } from "@/app/create/crew/crew-form";
 import { useCrewMemberQueryById } from "@/hooks/use-crew-members";
 
 export default function EditCrewPage() {

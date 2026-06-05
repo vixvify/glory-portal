@@ -98,7 +98,7 @@ export default function AdminPage() {
                     ดูภาพยนตร์ทั้งหมด
                   </button>
                 </Link>
-                <Link href="/admin/movies/create" className="flex-shrink-0">
+                <Link href="/create/movie" className="flex-shrink-0">
                   <button
                     className="p-3 bg-brand/10 hover:bg-brand/20 border border-brand/20 text-brand rounded-xl transition-all cursor-pointer"
                     title="เพิ่มภาพยนตร์ใหม่"
@@ -130,7 +130,7 @@ export default function AdminPage() {
                     ดูรายชื่อทีมงานทั้งหมด
                   </button>
                 </Link>
-                <Link href="/admin/crew/create" className="flex-shrink-0">
+                <Link href="/create/crew" className="flex-shrink-0">
                   <button
                     className="p-3 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 text-violet-400 rounded-xl transition-all cursor-pointer"
                     title="เพิ่มทีมงานใหม่"

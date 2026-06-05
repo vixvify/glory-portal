@@ -52,7 +52,8 @@ export const movieSchema = z.object({
   views: z.number().nonnegative().optional(),
   ratings: z.array(ratingSchema).optional(),
   year: z.number().int().min(1900).max(2100),
-  matchRate: z.number().min(0).max(100),
+  matchRate: z.number().min(0).max(100).optional(),
+  aspectRatio: z.string().min(1, "Aspect ratio is required").regex(/^\d+:\d+$/, "Aspect ratio must be in format W:H (e.g. 16:9)"),
   ageRating: ageRatingSchema,
   duration: z.number().min(1, "Duration is required"),
   university: z.string().optional().nullable(),
@@ -69,18 +70,23 @@ export const movieSchema = z.object({
   dop: z.array(z.string()).optional().nullable(),
   editor: z.array(z.string()).optional().nullable(),
   btsVideo: z.array(z.string()).optional().nullable(),
+  userId: z.string().optional(),
 });
 
 export const updateMovieSchema = movieSchema.omit({
   id: true,
   views: true,
   ratings: true,
+  matchRate: true,
+  userId: true,
 });
 
 export const createMovieSchema = movieSchema.omit({
   id: true,
   views: true,
   ratings: true,
+  matchRate: true,
+  userId: true,
 });
 
 export const movieIdSchema = z.string().min(1, "Movie ID is required");
@@ -92,5 +98,6 @@ export const movieFilterParamsSchema = z.object({
   pagesize: z.union([z.number(), z.string()]).optional(),
   sort: z.string().optional(),
   sortby: z.string().optional(),
+  userId: z.string().optional(),
 }).optional();
 

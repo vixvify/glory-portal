@@ -72,7 +72,7 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
         showToast(LOCALIZATION.TOAST.ADD_CREW_SUCCESS, "success");
       }
 
-      router.push("/admin/crew");
+      router.push("/");
     } catch (err: unknown) {
       const errMsg =
         err instanceof Error ? err.message : LOCALIZATION.ERRORS.SAVE;
@@ -117,7 +117,7 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
 
             {editingCrew?.user?.photoUrl && (
               <div className="flex items-center gap-4 mt-4 pl-1">
-                <div className="relative w-20 h-20 rounded-full overflow-hidden border border-zinc-850 bg-black/40 shadow-inner flex-shrink-0 animate-fade-in">
+                <div className="relative w-20 h-20 rounded-full overflow-hidden border border-zinc-855 bg-black/40 shadow-inner flex-shrink-0 animate-fade-in">
                   <img
                     src={editingCrew.user.photoUrl}
                     alt="Crew Preview"
@@ -128,7 +128,7 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
                   <span className="text-xs text-zinc-300 font-semibold">
                     รูปภาพประจำตัว
                   </span>
-                  <span className="text-[10px] text-zinc-500 leading-relaxed mt-0.5">
+                  <span className="text-[10px] text-zinc-555 leading-relaxed mt-0.5">
                     ดึงข้อมูลจากบัญชีผู้ใช้
                   </span>
                 </div>
@@ -139,7 +139,7 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() => router.push("/admin/crew")}
+                onClick={() => router.push("/")}
                 className="flex-1 py-3 text-sm font-semibold rounded-xl"
               >
                 ยกเลิก

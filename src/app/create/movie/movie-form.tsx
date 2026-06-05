@@ -50,7 +50,7 @@ type MovieFormInputs = {
   youtubeUrl: string;
   trailerUrl?: string;
   year: number;
-  matchRate: number;
+  aspectRatio: string;
   ageRating: string;
   duration: number;
   university?: string;
@@ -220,7 +220,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         youtubeUrl: editingMovie.youtubeUrl,
         trailerUrl: editingMovie.trailerUrl || "",
         year: editingMovie.year,
-        matchRate: editingMovie.matchRate,
+        aspectRatio: editingMovie.aspectRatio || "16:9",
         ageRating: editingMovie.ageRating,
         duration: editingMovie.duration,
         university: editingMovie.university || "",
@@ -256,7 +256,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         youtubeUrl: "",
         trailerUrl: "",
         year: new Date().getFullYear(),
-        matchRate: 98,
+        aspectRatio: "16:9",
         ageRating: "PG",
         duration: 120,
         university: "",
@@ -287,7 +287,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         ...data,
         thumbnail: thumbnailFile || editingMovie?.thumbnail,
         year: Number(data.year),
-        matchRate: Number(data.matchRate),
         duration: Number(data.duration),
         language: data.language || null,
         targetGroup: data.targetGroup || null,
@@ -330,7 +329,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           youtubeUrl: validated.youtubeUrl,
           trailerUrl: validated.trailerUrl || null,
           year: validated.year,
-          matchRate: validated.matchRate,
+          aspectRatio: validated.aspectRatio,
           ageRating: validated.ageRating,
           duration: validated.duration,
           university: validated.university || null,
@@ -360,7 +359,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           youtubeUrl: validated.youtubeUrl,
           trailerUrl: validated.trailerUrl || undefined,
           year: validated.year,
-          matchRate: validated.matchRate,
+          aspectRatio: validated.aspectRatio,
           ageRating: validated.ageRating,
           duration: validated.duration,
           university: validated.university || undefined,
@@ -383,7 +382,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         showToast(LOCALIZATION.TOAST.ADD_MOVIE_SUCCESS, "success");
       }
 
-      router.push("/admin/movies");
+      router.push("/");
     } catch (err: unknown) {
       const errMsg =
         err instanceof Error ? err.message : LOCALIZATION.ERRORS.SAVE_MOVIE;
@@ -520,19 +519,19 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 })}
               />
 
-              <Input
-                label="ความเหมาะสม (%)"
-                type="number"
-                placeholder="เช่น 98"
-                error={errors.matchRate?.message}
-                {...register("matchRate", {
-                  required: "กรุณากรอกเปอร์เซ็นต์ความเหมาะสม",
-                  min: { value: 0, message: "ขั้นต่ำ 0%" },
-                  max: {
-                    value: 100,
-                    message: "ไม่เกิน 100%",
-                  },
+              <Select
+                label="อัตราส่วนภาพ"
+                error={errors.aspectRatio?.message}
+                {...register("aspectRatio", {
+                  required: "กรุณาเลือกอัตราส่วนภาพ",
                 })}
+                options={[
+                  { value: "16:9", label: "16:9 (แนวนอนมาตรฐาน)" },
+                  { value: "9:16", label: "9:16 (แนวตั้ง/TikTok)" },
+                  { value: "4:3", label: "4:3 (มาตรฐานคลาสสิก)" },
+                  { value: "1:1", label: "1:1 (สี่เหลี่ยมจัตุรัส)" },
+                  { value: "21:9", label: "21:9 (จอกว้างพิเศษ)" },
+                ]}
               />
 
               <Input
@@ -564,7 +563,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                         field.onChange(file);
                         setSelectedFileName(file?.name ?? null);
                         if (file) {
-                          setMovieCoverPreview(URL.createObjectURL(file));
+                           setMovieCoverPreview(URL.createObjectURL(file));
                         } else {
                           setMovieCoverPreview(
                             editingMovie &&
@@ -1120,7 +1119,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     type="button"
                     variant="secondary"
                     onClick={() => setBtsVideos([...btsVideos, ""])}
-                    className="py-2 px-4 text-xs w-fit flex items-center gap-1.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 transition-colors"
+                    className="py-2 px-4 text-xs w-fit flex items-center gap-1.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 transition-colors"
                   >
                     <AddIcon className="text-sm" />{" "}
                     เพิ่มลิงก์วิดีโอเบื้องหลังอื่น

@@ -92,7 +92,7 @@ export default function AdminCrewPage() {
           </div>
 
           <Button
-            onClick={() => router.push("/admin/crew/create")}
+            onClick={() => router.push("/create/crew")}
             className="flex items-center justify-center gap-2"
           >
             <AddIcon className="text-lg" />
@@ -116,7 +116,7 @@ export default function AdminCrewPage() {
             <CrewTable
               crew={availableCrew}
               movies={movies}
-              onEdit={(member) => router.push(`/admin/crew/${member.id}/edit`)}
+              onEdit={(member) => router.push(`/crew/${member.id}/edit`)}
               onDelete={setDeleteCrewId}
             />
           )}
