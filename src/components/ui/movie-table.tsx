@@ -12,8 +12,8 @@ import { Button } from "./button";
 
 interface MovieTableProps {
   movies: Movie[];
-  onEdit: (movie: Movie) => void;
-  onDelete: (id: string) => void;
+  onEdit?: (movie: Movie) => void;
+  onDelete?: (id: string) => void;
 }
 
 export const MovieTable: React.FC<MovieTableProps> = ({
@@ -109,22 +109,26 @@ export const MovieTable: React.FC<MovieTableProps> = ({
 
                 <td className="py-4 px-6 text-right">
                   <div className="flex items-center justify-end gap-2">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => onEdit(movie)}
-                      className="p-2 hover:bg-brand/20 text-zinc-400 hover:text-brand border-zinc-800 hover:border-brand/30 h-auto rounded-lg"
-                    >
-                      <EditIcon className="text-sm" />
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => onDelete(movie.id)}
-                      className="p-2 hover:bg-red-500/20 text-zinc-400 hover:text-red-400 border-zinc-800 hover:border-red-500/30 h-auto rounded-lg"
-                    >
-                      <DeleteIcon className="text-sm" />
-                    </Button>
+                    {onEdit && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => onEdit(movie)}
+                        className="p-2 hover:bg-brand/20 text-zinc-400 hover:text-brand border-zinc-800 hover:border-brand/30 h-auto rounded-lg"
+                      >
+                        <EditIcon className="text-sm" />
+                      </Button>
+                    )}
+                    {onDelete && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => onDelete(movie.id)}
+                        className="p-2 hover:bg-red-500/20 text-zinc-400 hover:text-red-400 border-zinc-800 hover:border-red-500/30 h-auto rounded-lg"
+                      >
+                        <DeleteIcon className="text-sm" />
+                      </Button>
+                    )}
                   </div>
                 </td>
               </tr>

@@ -26,6 +26,14 @@ export function useMyMoviesQuery(options?: { enabled?: boolean }) {
   });
 }
 
+export function useMyContributedMoviesQuery(options?: { enabled?: boolean }) {
+  return useQuery<Movie[], Error>({
+    queryKey: ["movies", "my-contributions"],
+    queryFn: () => movieService.getMyContributedMovies(),
+    ...options,
+  });
+}
+
 export function useMovieQueryById(id?: string) {
   return useQuery<Movie, Error>({
     queryKey: ["movie", id],

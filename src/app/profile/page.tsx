@@ -15,7 +15,7 @@ import CakeIcon from "@mui/icons-material/Cake";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import LockIcon from "@mui/icons-material/Lock";
 import { Button } from "@/components/ui/button";
-import { useMyMoviesQuery, useDeleteMovieMutation } from "@/hooks/use-movies";
+import { useMyMoviesQuery, useDeleteMovieMutation, useMyContributedMoviesQuery } from "@/hooks/use-movies";
 import {
   useMyCrewMembersQuery,
   useDeleteCrewMemberMutation,
@@ -32,11 +32,17 @@ export default function ProfilePage() {
   const [deleteMovieId, setDeleteMovieId] = useState<string | null>(null);
   const [deleteCrewId, setDeleteCrewId] = useState<string | null>(null);
   const [isDeletingLocal, setIsDeletingLocal] = useState(false);
-  const [activeTab, setActiveTab] = useState<"movies" | "crew">("movies");
-
-  const { data: myMovies = [], isLoading: isMoviesLoading } = useMyMoviesQuery(
-    { enabled: !!currentUser },
+  const [activeTab, setActiveTab] = useState<"movies" | "contributed" | "crew">(
+    "movies",
   );
+
+  const { data: myMovies = [], isLoading: isMoviesLoading } = useMyMoviesQuery({
+    enabled: !!currentUser,
+  });
+
+  const { data: contributedMovies = [], isLoading: isContributedLoading } = useMyContributedMoviesQuery({
+    enabled: !!currentUser,
+  });
 
   const { data: myCrew = [], isLoading: isCrewLoading } = useMyCrewMembersQuery(
     { enabled: !!currentUser },
@@ -70,7 +76,9 @@ export default function ProfilePage() {
         showToast("ลบข้อมูลทีมงานเรียบร้อยแล้ว", "success");
       } catch (err: unknown) {
         const errorMessage =
-          err instanceof Error ? err.message : "เกิดข้อผิดพลาดในการลบข้อมูลทีมงาน";
+          err instanceof Error
+            ? err.message
+            : "เกิดข้อผิดพลาดในการลบข้อมูลทีมงาน";
         showToast(errorMessage, "error");
       } finally {
         setIsDeletingLocal(false);
@@ -365,10 +373,10 @@ export default function ProfilePage() {
         </div>
 
         <div className="bg-zinc-950/40 backdrop-blur-xl rounded-[2rem] border border-zinc-800 shadow-2xl p-8 space-y-6">
-          <div className="flex items-center gap-6 border-b border-zinc-900/50 pb-4">
+          <div className="flex items-center gap-6 border-b border-zinc-900/50 pb-4 overflow-x-auto scrollbar-none">
             <button
               onClick={() => setActiveTab("movies")}
-              className={`text-lg font-bold tracking-wide pb-2 px-1 border-b-2 transition-all cursor-pointer ${
+              className={`text-lg font-bold tracking-wide pb-2 px-1 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === "movies"
                   ? "text-brand border-brand"
                   : "text-zinc-400 border-transparent hover:text-white"
@@ -377,8 +385,18 @@ export default function ProfilePage() {
               ภาพยนตร์ที่ฉันเพิ่ม ({myMovies.length})
             </button>
             <button
+              onClick={() => setActiveTab("contributed")}
+              className={`text-lg font-bold tracking-wide pb-2 px-1 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+                activeTab === "contributed"
+                  ? "text-brand border-brand"
+                  : "text-zinc-400 border-transparent hover:text-white"
+              }`}
+            >
+              ภาพยนตร์ที่มีส่วนร่วม ({contributedMovies.length})
+            </button>
+            <button
               onClick={() => setActiveTab("crew")}
-              className={`text-lg font-bold tracking-wide pb-2 px-1 border-b-2 transition-all cursor-pointer ${
+              className={`text-lg font-bold tracking-wide pb-2 px-1 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === "crew"
                   ? "text-brand border-brand"
                   : "text-zinc-400 border-transparent hover:text-white"
@@ -399,18 +417,24 @@ export default function ProfilePage() {
                 onDelete={setDeleteMovieId}
               />
             )
-          ) : (
-            isCrewLoading ? (
+          ) : activeTab === "contributed" ? (
+            isContributedLoading ? (
               <div className="flex justify-center py-10">
                 <div className="w-8 h-8 border-4 border-zinc-700 border-t-white rounded-full animate-spin" />
               </div>
             ) : (
-              <CrewTable
-                crew={myCrew}
-                onEdit={(member) => router.push(`/crew/${member.id}/edit`)}
-                onDelete={setDeleteCrewId}
-              />
+              <MovieTable movies={contributedMovies} />
             )
+          ) : isCrewLoading ? (
+            <div className="flex justify-center py-10">
+              <div className="w-8 h-8 border-4 border-zinc-700 border-t-white rounded-full animate-spin" />
+            </div>
+          ) : (
+            <CrewTable
+              crew={myCrew}
+              onEdit={(member) => router.push(`/crew/${member.id}/edit`)}
+              onDelete={setDeleteCrewId}
+            />
           )}
         </div>
       </main>

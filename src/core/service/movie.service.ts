@@ -42,6 +42,18 @@ export class MovieService {
       throw error;
     }
   }
+  async getMyContributedMovies(): Promise<Movie[]> {
+    try {
+      const response = await this.movieRepository.getMyContributedMovies();
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      return response.data;
+    } catch (error) {
+      console.error("Error in getMyContributedMovies:", error);
+      throw error;
+    }
+  }
   async getMovieById(id: string): Promise<Movie> {
     try {
       const response = await this.movieRepository.getMovieById(id);
