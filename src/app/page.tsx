@@ -16,12 +16,13 @@ import Loading from "./loading";
 export default function Page() {
   const { currentUser } = useAppStore();
 
-  const { data: recommendedMovies = [], isLoading: isRecLoading } = useMoviesQuery({
-    sort: "desc",
-    sortby: "matchRate",
-    page: 1,
-    pagesize: 5,
-  });
+  const { data: recommendedMovies = [], isLoading: isRecLoading } =
+    useMoviesQuery({
+      sort: "desc",
+      sortby: "matchRate",
+      page: 1,
+      pagesize: 5,
+    });
 
   const { data: popularMovies = [], isLoading: isPopLoading } = useMoviesQuery({
     sort: "desc",
@@ -30,20 +31,25 @@ export default function Page() {
     pagesize: 10,
   });
 
-  const { data: categories = [], isLoading: isCatLoading } = useCategoriesQuery();
-  const { data: universities = [], isLoading: isUniLoading } = useUniversitiesQuery();
+  const { data: categories = [], isLoading: isCatLoading } =
+    useCategoriesQuery();
+  const { data: universities = [], isLoading: isUniLoading } =
+    useUniversitiesQuery();
 
-  const { data: directorsList = [], isLoading: isDirsLoading } = useCrewMembersQuery({
-    search: "director",
-    searchby: "role",
-  });
+  const { data: directorsList = [], isLoading: isDirsLoading } =
+    useCrewMembersQuery({
+      search: "director",
+      searchby: "role",
+    });
 
-  const { data: actorsList = [], isLoading: isActorsLoading } = useCrewMembersQuery({
-    search: "cast",
-    searchby: "role",
-  });
+  const { data: actorsList = [], isLoading: isActorsLoading } =
+    useCrewMembersQuery({
+      search: "cast",
+      searchby: "role",
+    });
 
-  const { data: serverFavorites = [], isLoading: isFavsLoading } = useFavoritesQuery(!!currentUser);
+  const { data: serverFavorites = [], isLoading: isFavsLoading } =
+    useFavoritesQuery(!!currentUser);
 
   const universityMovieQueries = useQueries({
     queries: universities.map((uni) => ({
@@ -125,4 +131,3 @@ export default function Page() {
     />
   );
 }
-
