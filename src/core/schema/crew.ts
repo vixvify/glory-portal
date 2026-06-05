@@ -9,6 +9,7 @@ export const crewFilterParamsSchema = z.object({
   pagesize: z.union([z.number(), z.string()]).optional(),
   sort: z.string().optional(),
   sortby: z.string().optional(),
+  createdBy: z.string().optional(),
 }).optional();
 
 export const createCrewMemberSchema = z.object({

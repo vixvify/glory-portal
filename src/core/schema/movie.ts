@@ -70,7 +70,7 @@ export const movieSchema = z.object({
   dop: z.array(z.string()).optional().nullable(),
   editor: z.array(z.string()).optional().nullable(),
   btsVideo: z.array(z.string()).optional().nullable(),
-  userId: z.string().optional(),
+  createdBy: z.string().optional(),
 });
 
 export const updateMovieSchema = movieSchema.omit({
@@ -78,7 +78,7 @@ export const updateMovieSchema = movieSchema.omit({
   views: true,
   ratings: true,
   matchRate: true,
-  userId: true,
+  createdBy: true,
 });
 
 export const createMovieSchema = movieSchema.omit({
@@ -86,7 +86,7 @@ export const createMovieSchema = movieSchema.omit({
   views: true,
   ratings: true,
   matchRate: true,
-  userId: true,
+  createdBy: true,
 });
 
 export const movieIdSchema = z.string().min(1, "Movie ID is required");
@@ -98,6 +98,6 @@ export const movieFilterParamsSchema = z.object({
   pagesize: z.union([z.number(), z.string()]).optional(),
   sort: z.string().optional(),
   sortby: z.string().optional(),
-  userId: z.string().optional(),
+  createdBy: z.string().optional(),
 }).optional();
 

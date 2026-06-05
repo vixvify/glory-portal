@@ -35,6 +35,7 @@ export interface CrewMember {
   name: string;
   email?: string | null;
   userId?: string | null;
+  createdBy: string;
   createdAt: Date;
   updatedAt: Date;
   user?: User | null;
@@ -94,7 +95,7 @@ export interface Movie {
   bts?: MovieBts | null;
   createdAt: Date;
   updatedAt: Date;
-  userId: string;
+  createdBy: string;
   user?: User | null;
 }
 
@@ -171,7 +172,7 @@ export interface MovieFilterParams {
   pagesize?: number | string;
   sort?: string;
   sortby?: string;
-  userId?: string;
+  createdBy?: string;
 }
 
 export interface CrewFilterParams {
@@ -181,4 +182,5 @@ export interface CrewFilterParams {
   pagesize?: number | string;
   sort?: string;
   sortby?: string;
+  createdBy?: string;
 }

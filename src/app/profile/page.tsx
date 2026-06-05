@@ -16,7 +16,12 @@ import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import LockIcon from "@mui/icons-material/Lock";
 import { Button } from "@/components/ui/button";
 import { useMoviesQuery, useDeleteMovieMutation } from "@/hooks/use-movies";
+import {
+  useCrewMembersQuery,
+  useDeleteCrewMemberMutation,
+} from "@/hooks/use-crew-members";
 import { MovieTable } from "@/components/ui/movie-table";
+import { CrewTable } from "@/components/ui/crew-table";
 import { ConfirmModal } from "@/components/modal/confirm-modal";
 import { LOCALIZATION } from "@/core/constants/localization";
 
@@ -25,13 +30,22 @@ export default function ProfilePage() {
   const { currentUser, showToast } = useAppStore();
 
   const [deleteMovieId, setDeleteMovieId] = useState<string | null>(null);
+  const [deleteCrewId, setDeleteCrewId] = useState<string | null>(null);
   const [isDeletingLocal, setIsDeletingLocal] = useState(false);
+  const [activeTab, setActiveTab] = useState<"movies" | "crew">("movies");
 
   const { data: myMovies = [], isLoading: isMoviesLoading } = useMoviesQuery(
-    currentUser ? { userId: currentUser.id } : undefined,
+    currentUser ? { createdBy: currentUser.id } : undefined,
   );
 
+  const { data: myCrew = [], isLoading: isCrewLoading } = useCrewMembersQuery(
+    currentUser ? { createdBy: currentUser.id } : undefined,
+  );
+
+  const { data: allMovies = [] } = useMoviesQuery();
+
   const deleteMovieMutation = useDeleteMovieMutation();
+  const deleteCrewMemberMutation = useDeleteCrewMemberMutation();
 
   const handleDeleteConfirm = async () => {
     if (deleteMovieId) {
@@ -46,6 +60,23 @@ export default function ProfilePage() {
       } finally {
         setIsDeletingLocal(false);
         setDeleteMovieId(null);
+      }
+    }
+  };
+
+  const handleDeleteCrewConfirm = async () => {
+    if (deleteCrewId) {
+      try {
+        setIsDeletingLocal(true);
+        await deleteCrewMemberMutation.mutateAsync(deleteCrewId);
+        showToast("ลบข้อมูลทีมงานเรียบร้อยแล้ว", "success");
+      } catch (err: unknown) {
+        const errorMessage =
+          err instanceof Error ? err.message : "เกิดข้อผิดพลาดในการลบข้อมูลทีมงาน";
+        showToast(errorMessage, "error");
+      } finally {
+        setIsDeletingLocal(false);
+        setDeleteCrewId(null);
       }
     }
   };
@@ -336,21 +367,53 @@ export default function ProfilePage() {
         </div>
 
         <div className="bg-zinc-950/40 backdrop-blur-xl rounded-[2rem] border border-zinc-800 shadow-2xl p-8 space-y-6">
-          <div className="flex items-center justify-between border-b border-zinc-900/50 pb-4">
-            <h3 className="text-xl font-bold text-white tracking-wide">
+          <div className="flex items-center gap-6 border-b border-zinc-900/50 pb-4">
+            <button
+              onClick={() => setActiveTab("movies")}
+              className={`text-lg font-bold tracking-wide pb-2 px-1 border-b-2 transition-all cursor-pointer ${
+                activeTab === "movies"
+                  ? "text-brand border-brand"
+                  : "text-zinc-400 border-transparent hover:text-white"
+              }`}
+            >
               ภาพยนตร์ที่ฉันเพิ่ม ({myMovies.length})
-            </h3>
+            </button>
+            <button
+              onClick={() => setActiveTab("crew")}
+              className={`text-lg font-bold tracking-wide pb-2 px-1 border-b-2 transition-all cursor-pointer ${
+                activeTab === "crew"
+                  ? "text-brand border-brand"
+                  : "text-zinc-400 border-transparent hover:text-white"
+              }`}
+            >
+              ทีมงานที่ฉันเพิ่ม ({myCrew.length})
+            </button>
           </div>
-          {isMoviesLoading ? (
-            <div className="flex justify-center py-10">
-              <div className="w-8 h-8 border-4 border-zinc-700 border-t-white rounded-full animate-spin" />
-            </div>
+          {activeTab === "movies" ? (
+            isMoviesLoading ? (
+              <div className="flex justify-center py-10">
+                <div className="w-8 h-8 border-4 border-zinc-700 border-t-white rounded-full animate-spin" />
+              </div>
+            ) : (
+              <MovieTable
+                movies={myMovies}
+                onEdit={(movie) => router.push(`/movies/${movie.id}/edit`)}
+                onDelete={setDeleteMovieId}
+              />
+            )
           ) : (
-            <MovieTable
-              movies={myMovies}
-              onEdit={(movie) => router.push(`/movies/${movie.id}/edit`)}
-              onDelete={setDeleteMovieId}
-            />
+            isCrewLoading ? (
+              <div className="flex justify-center py-10">
+                <div className="w-8 h-8 border-4 border-zinc-700 border-t-white rounded-full animate-spin" />
+              </div>
+            ) : (
+              <CrewTable
+                crew={myCrew}
+                movies={allMovies}
+                onEdit={(member) => router.push(`/crew/${member.id}/edit`)}
+                onDelete={setDeleteCrewId}
+              />
+            )
           )}
         </div>
       </main>
@@ -364,6 +427,17 @@ export default function ProfilePage() {
         cancelText={LOCALIZATION.CONFIRM.CANCEL}
         onClose={() => setDeleteMovieId(null)}
         onConfirm={handleDeleteConfirm}
+      />
+
+      <ConfirmModal
+        isOpen={deleteCrewId !== null}
+        title="ยืนยันการลบรายชื่อทีมงาน"
+        message="คุณแน่ใจหรือไม่ว่าต้องการลบรายชื่อทีมงานคนนี้ออกจากระบบ? การกระทำนี้ไม่สามารถย้อนกลับได้"
+        variant="danger"
+        confirmText="ลบรายชื่อทีมงาน"
+        cancelText={LOCALIZATION.CONFIRM.CANCEL}
+        onClose={() => setDeleteCrewId(null)}
+        onConfirm={handleDeleteCrewConfirm}
       />
 
       {isDeletingLocal && (
