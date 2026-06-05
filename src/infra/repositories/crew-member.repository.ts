@@ -10,6 +10,10 @@ export class CrewMemberRepositoryImpl implements CrewMemberRepository {
     return await httpClient.get<CrewMember[]>("/crew-members", { params });
   }
 
+  async getMyCrewMembers(): Promise<ApiResponse<CrewMember[]>> {
+    return await httpClient.get<CrewMember[]>("/crew-members/my-crew");
+  }
+
   async getCrewMemberById(id: string): Promise<ApiResponse<CrewMember>> {
     return await httpClient.get<CrewMember>(`/crew-members/${id}`);
   }

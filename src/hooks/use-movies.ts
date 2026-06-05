@@ -18,6 +18,14 @@ export function useMoviesQuery(
   });
 }
 
+export function useMyMoviesQuery(options?: { enabled?: boolean }) {
+  return useQuery<Movie[], Error>({
+    queryKey: ["movies", "my-movies"],
+    queryFn: () => movieService.getMyMovies(),
+    ...options,
+  });
+}
+
 export function useMovieQueryById(id?: string) {
   return useQuery<Movie, Error>({
     queryKey: ["movie", id],

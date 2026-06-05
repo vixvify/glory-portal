@@ -43,7 +43,7 @@ export default function MovieDetails() {
   const { data: movie, isLoading } = useMovieQueryById(params.id);
   const { data: userRating } = useMovieUserRatingQuery(
     movie?.id ?? "",
-    currentUser?.id ?? "",
+    !!currentUser,
   );
 
   const [selectedStars, setSelectedStars] = useState(0);
@@ -59,9 +59,9 @@ export default function MovieDetails() {
   const { averageRating, ratingCount } = calculateRatingStats(movie?.ratings);
 
   const handleAddRating = useCallback(
-    (movieId: string, user: User, stars: number) => {
+    (movieId: string, stars: number) => {
       addRatingMutation.mutate(
-        { userId: user.id, movieId, stars },
+        { movieId, stars },
         {
           onSuccess: () => {
             showToast("เพิ่มคะแนนแล้ว", "success");
@@ -76,9 +76,9 @@ export default function MovieDetails() {
   );
 
   const handleUpdateRating = useCallback(
-    (movieId: string, user: User, stars: number) => {
+    (movieId: string, stars: number) => {
       updateRatingMutation.mutate(
-        { userId: user.id, movieId, stars },
+        { movieId, stars },
         {
           onSuccess: () => {
             showToast("แก้ไขคะแนนแล้ว", "success");
@@ -93,9 +93,9 @@ export default function MovieDetails() {
   );
 
   const handleDeleteRating = useCallback(
-    (movieId: string, user: User) => {
+    (movieId: string) => {
       deleteRatingMutation.mutate(
-        { userId: user.id, movieId },
+        { movieId },
         {
           onSuccess: () => {
             showToast("ลบคะแนนแล้ว", "success");
@@ -427,9 +427,9 @@ export default function MovieDetails() {
                       return;
                     }
                     if (userRating) {
-                      handleUpdateRating(movie.id, currentUser, selectedStars);
+                      handleUpdateRating(movie.id, selectedStars);
                     } else {
-                      handleAddRating(movie.id, currentUser, selectedStars);
+                      handleAddRating(movie.id, selectedStars);
                     }
                   }}
                   variant="brand"
@@ -445,7 +445,7 @@ export default function MovieDetails() {
                   <button
                     onClick={() => {
                       if (currentUser && movie) {
-                        handleDeleteRating(movie.id, currentUser);
+                        handleDeleteRating(movie.id);
                         setSelectedStars(5);
                       }
                     }}

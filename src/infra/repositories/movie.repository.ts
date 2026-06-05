@@ -9,6 +9,11 @@ export class MovieRepositoryImpl implements MovieRepository {
     return response;
   }
 
+  async getMyMovies(): Promise<ApiResponse<Movie[]>> {
+    const response = await httpClient.get<Movie[]>("/movie/my-movies");
+    return response;
+  }
+
   async getMovieById(id: string): Promise<ApiResponse<Movie>> {
     const response = await httpClient.get<Movie>(`/movie/${id}`);
     return response;

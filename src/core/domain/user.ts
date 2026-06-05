@@ -1,8 +1,6 @@
 export interface User {
-  id: string;
   name: string;
   email: string;
-  role: "admin" | "user";
   photoUrl?: string | null;
   motto?: string | null;
   bio?: string | null;

@@ -3,6 +3,7 @@ import { CrewMember, CrewFilterParams, CreateCrewMember, UpdateCrewMember } from
 
 export interface CrewMemberRepository {
   getCrewMembers(params?: CrewFilterParams): Promise<ApiResponse<CrewMember[]>>;
+  getMyCrewMembers(): Promise<ApiResponse<CrewMember[]>>;
   getCrewMemberById(id: string): Promise<ApiResponse<CrewMember>>;
   createCrewMember(crewMember: CreateCrewMember): Promise<ApiResponse<CrewMember>>;
   updateCrewMember(

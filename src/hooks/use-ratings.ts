@@ -4,13 +4,12 @@ import { RatingInput, RatingCheckInput, Rating } from "@/core/domain/rating";
 
 export function useMovieUserRatingQuery(
   movieId: string,
-  userId: string,
   enabled = true,
 ) {
   return useQuery<Rating | null, Error>({
-    queryKey: ["movie-rating", movieId, userId],
-    queryFn: () => ratingService.getRatingByMovieAndUser({ movieId, userId }),
-    enabled: enabled && !!movieId && !!userId,
+    queryKey: ["movie-rating", movieId],
+    queryFn: () => ratingService.getRatingByMovieAndUser({ movieId }),
+    enabled: enabled && !!movieId,
   });
 }
 
@@ -22,7 +21,7 @@ export function useAddRatingMutation() {
       queryClient.invalidateQueries({ queryKey: ["movies"] });
       queryClient.invalidateQueries({ queryKey: ["movie", variables.movieId] });
       queryClient.invalidateQueries({
-        queryKey: ["movie-rating", variables.movieId, variables.userId],
+        queryKey: ["movie-rating", variables.movieId],
       });
     },
   });
@@ -36,7 +35,7 @@ export function useUpdateRatingMutation() {
       queryClient.invalidateQueries({ queryKey: ["movies"] });
       queryClient.invalidateQueries({ queryKey: ["movie", variables.movieId] });
       queryClient.invalidateQueries({
-        queryKey: ["movie-rating", variables.movieId, variables.userId],
+        queryKey: ["movie-rating", variables.movieId],
       });
     },
   });
@@ -50,7 +49,7 @@ export function useDeleteRatingMutation() {
       queryClient.invalidateQueries({ queryKey: ["movies"] });
       queryClient.invalidateQueries({ queryKey: ["movie", variables.movieId] });
       queryClient.invalidateQueries({
-        queryKey: ["movie-rating", variables.movieId, variables.userId],
+        queryKey: ["movie-rating", variables.movieId],
       });
     },
   });

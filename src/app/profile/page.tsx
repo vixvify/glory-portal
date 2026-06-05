@@ -15,9 +15,9 @@ import CakeIcon from "@mui/icons-material/Cake";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import LockIcon from "@mui/icons-material/Lock";
 import { Button } from "@/components/ui/button";
-import { useMoviesQuery, useDeleteMovieMutation } from "@/hooks/use-movies";
+import { useMyMoviesQuery, useDeleteMovieMutation } from "@/hooks/use-movies";
 import {
-  useCrewMembersQuery,
+  useMyCrewMembersQuery,
   useDeleteCrewMemberMutation,
 } from "@/hooks/use-crew-members";
 import { MovieTable } from "@/components/ui/movie-table";
@@ -34,13 +34,11 @@ export default function ProfilePage() {
   const [isDeletingLocal, setIsDeletingLocal] = useState(false);
   const [activeTab, setActiveTab] = useState<"movies" | "crew">("movies");
 
-  const { data: myMovies = [], isLoading: isMoviesLoading } = useMoviesQuery(
-    currentUser ? { createdBy: currentUser.id } : undefined,
+  const { data: myMovies = [], isLoading: isMoviesLoading } = useMyMoviesQuery(
     { enabled: !!currentUser },
   );
 
-  const { data: myCrew = [], isLoading: isCrewLoading } = useCrewMembersQuery(
-    currentUser ? { createdBy: currentUser.id } : undefined,
+  const { data: myCrew = [], isLoading: isCrewLoading } = useMyCrewMembersQuery(
     { enabled: !!currentUser },
   );
 
@@ -176,7 +174,7 @@ export default function ProfilePage() {
                   {currentUser.name}
                 </h2>
                 <span className="px-3 py-1 bg-brand/10 border border-brand/20 text-brand text-[10px] font-bold uppercase tracking-wider rounded-full shadow-sm">
-                  {currentUser.role === "admin" ? "ผู้ดูแลระบบ" : "สมาชิกเว็บ"}
+                  สมาชิกเว็บไซต์
                 </span>
               </div>
 

@@ -18,6 +18,14 @@ export function useCrewMembersQuery(
   });
 }
 
+export function useMyCrewMembersQuery(options?: { enabled?: boolean }) {
+  return useQuery<CrewMember[], Error>({
+    queryKey: ["crewMembers", "my-crew"],
+    queryFn: () => crewMemberService.getMyCrewMembers(),
+    ...options,
+  });
+}
+
 export function useCrewMemberQueryById(id?: string) {
   return useQuery<CrewMember, Error>({
     queryKey: ["crewMember", id],
