@@ -130,11 +130,11 @@ export default function MovieHero({ movies, onPlayClick }: Props) {
           </span>
           <span className="text-zinc-300">{currentMovie.year}</span>
           <span className="px-1.5 py-0.5 text-[10px] md:text-xs font-bold border border-zinc-500 text-zinc-300 rounded leading-none">
-            {currentMovie.ageRating}
+            {currentMovie.ageRating?.name}
           </span>
           <span className="text-zinc-300">{currentMovie.duration}</span>
           <span className="text-zinc-300 font-semibold bg-zinc-800/80 px-2 py-0.5 rounded-full text-xs">
-            {CATEGORY_TITLE_MAPPING[currentMovie.category]}
+            {currentMovie.category ? (CATEGORY_TITLE_MAPPING[currentMovie.category.name] || currentMovie.category.name) : ""}
           </span>
         </div>
 

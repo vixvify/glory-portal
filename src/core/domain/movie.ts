@@ -30,6 +30,13 @@ export interface TargetGroup {
   name: string;
   createdAt: Date;
 }
+
+export interface CrewRole {
+  id: string;
+  name: string;
+  createdAt: Date;
+}
+
 export interface CrewMember {
   id: string;
   name: string;
@@ -39,32 +46,18 @@ export interface CrewMember {
   createdAt: Date;
   updatedAt: Date;
   user?: User | null;
-  movieCrews?: {
-    id: string;
-    movieId: string;
-    crewMemberId: string;
-    role: string;
-    movie?: Movie;
-    createdAt?: Date;
-    updatedAt?: Date;
-  }[];
+  movies?: MovieCrew[];
 }
+
 export interface MovieCrew {
   id: string;
   movieId: string;
   crewMemberId: string;
+  roleId: string;
   role: string;
+  crewRole?: CrewRole;
   crewMember?: CrewMember;
   movie?: Movie;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-
-export interface MovieBts {
-  id: string;
-  movieId: string;
-  btsVideo: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -73,7 +66,7 @@ export interface Movie {
   id: string;
   title: string;
   description: string;
-  category: string;
+  category: Category;
   thumbnail: string;
   youtubeUrl: string;
   trailerUrl?: string | null;
@@ -82,38 +75,38 @@ export interface Movie {
   year: number;
   matchRate: number;
   aspectRatio: string;
-  ageRating: string;
+  ageRating: AgeRating;
   duration: number;
-  university?: string | null;
-  language?: string | null;
-  targetGroup?: string | null;
+  university?: University | null;
+  language?: Language | null;
+  targetGroup?: TargetGroup | null;
   hasProfanity: boolean;
   hasDrugs: boolean;
   colorType: string;
   studio?: string | null;
   crew: MovieCrew[];
-  bts?: MovieBts | null;
+  btsVideos: string[];
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;
-  user?: User | null;
+  creator?: User | null;
 }
 
 export interface CreateMovie {
   title: string;
   description: string;
-  category: string;
+  categoryId: string;
   thumbnail: File | null;
   youtubeUrl: string;
   trailerUrl?: string;
   year: number;
   matchRate?: number;
   aspectRatio: string;
-  ageRating: string;
+  ageRatingId: string;
   duration: number;
-  university?: string;
-  language?: string;
-  targetGroup?: string;
+  universityId?: string;
+  languageId?: string;
+  targetGroupId?: string;
   director?: string[];
   producer?: string[];
   writer?: string[];
@@ -131,18 +124,18 @@ export interface UpdateMovie {
   id: string;
   title: string;
   description: string;
-  category: string;
+  categoryId: string;
   thumbnail: File | string;
   youtubeUrl: string;
   trailerUrl?: string | null;
   year: number;
   matchRate?: number;
   aspectRatio: string;
-  ageRating: string;
+  ageRatingId: string;
   duration: number;
-  university?: string | null;
-  language?: string | null;
-  targetGroup?: string | null;
+  universityId?: string | null;
+  languageId?: string | null;
+  targetGroupId?: string | null;
   director?: string[] | null;
   producer?: string[] | null;
   writer?: string[] | null;
@@ -155,6 +148,7 @@ export interface UpdateMovie {
   colorType: string;
   studio?: string | null;
 }
+
 export interface CreateCrewMember {
   name: string;
   email?: string;
@@ -165,6 +159,7 @@ export interface UpdateCrewMember {
   name: string;
   email?: string | null;
 }
+
 export interface MovieFilterParams {
   search?: string;
   searchby?: string;

@@ -5,7 +5,6 @@ import { useForm, Controller } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import MovieIcon from "@mui/icons-material/Movie";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,17 +44,17 @@ interface MovieFormProps {
 type MovieFormInputs = {
   title: string;
   description: string;
-  category: string;
+  categoryId: string;
   thumbnail?: File | null;
   youtubeUrl: string;
   trailerUrl?: string;
   year: number;
   aspectRatio: string;
-  ageRating: string;
+  ageRatingId: string;
   duration: number;
-  university?: string;
-  language?: string;
-  targetGroup?: string;
+  universityId?: string;
+  languageId?: string;
+  targetGroupId?: string;
   hasProfanity: boolean;
   hasDrugs: boolean;
   colorType: string;
@@ -138,8 +137,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           : null,
       );
       setBtsVideos(
-        editingMovie.bts?.btsVideo && editingMovie.bts.btsVideo.length > 0
-          ? editingMovie.bts.btsVideo
+        editingMovie.btsVideos && editingMovie.btsVideos.length > 0
+          ? editingMovie.btsVideos
           : [""],
       );
 
@@ -215,20 +214,20 @@ export const MovieForm: React.FC<MovieFormProps> = ({
       reset({
         title: editingMovie.title,
         description: editingMovie.description,
-        category: editingMovie.category,
+        categoryId: editingMovie.category.id,
         thumbnail: null,
         youtubeUrl: editingMovie.youtubeUrl,
         trailerUrl: editingMovie.trailerUrl || "",
         year: editingMovie.year,
         aspectRatio: editingMovie.aspectRatio || "16:9",
-        ageRating: editingMovie.ageRating,
+        ageRatingId: editingMovie.ageRating.id,
         duration: editingMovie.duration,
-        university: editingMovie.university || "",
-        language: editingMovie.language || "",
-        targetGroup: editingMovie.targetGroup || "",
+        universityId: editingMovie.university?.id || "",
+        languageId: editingMovie.language?.id || "",
+        targetGroupId: editingMovie.targetGroup?.id || "",
         hasProfanity: editingMovie.hasProfanity ?? false,
         hasDrugs: editingMovie.hasDrugs ?? false,
-        colorType: editingMovie.colorType || "COLOR",
+        colorType: editingMovie.colorType || "color",
         studio: editingMovie.studio || "",
         director: [],
         producer: [],
@@ -236,7 +235,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         cast: [],
         dop: [],
         editor: [],
-        btsVideo: editingMovie.bts?.btsVideo || [],
+        btsVideo: editingMovie.btsVideos || [],
       });
     } else {
       setSelectedFileName(null);
@@ -251,20 +250,20 @@ export const MovieForm: React.FC<MovieFormProps> = ({
       reset({
         title: "",
         description: "",
-        category: "Action",
+        categoryId: categories[0]?.id || "",
         thumbnail: null,
         youtubeUrl: "",
         trailerUrl: "",
         year: new Date().getFullYear(),
         aspectRatio: "16:9",
-        ageRating: "PG",
+        ageRatingId: ageRatings[0]?.id || "",
         duration: 120,
-        university: "",
-        language: "",
-        targetGroup: "",
+        universityId: "",
+        languageId: "",
+        targetGroupId: "",
         hasProfanity: false,
         hasDrugs: false,
-        colorType: "COLOR",
+        colorType: "color",
         studio: "",
         director: [],
         producer: [],
@@ -275,7 +274,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         btsVideo: [],
       });
     }
-  }, [editingMovie, reset]);
+  }, [editingMovie, reset, categories, ageRatings]);
 
   const onSubmitForm = async (data: MovieFormInputs) => {
     try {
@@ -288,11 +287,12 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         thumbnail: thumbnailFile || editingMovie?.thumbnail,
         year: Number(data.year),
         duration: Number(data.duration),
-        language: data.language || null,
-        targetGroup: data.targetGroup || null,
+        universityId: data.universityId || null,
+        languageId: data.languageId || null,
+        targetGroupId: data.targetGroupId || null,
         hasProfanity: data.hasProfanity,
         hasDrugs: data.hasDrugs,
-        colorType: data.colorType || "COLOR",
+        colorType: data.colorType || "color",
         studio: data.studio || null,
         btsVideo: activeVideos,
         director: directors
@@ -320,7 +320,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           id: editingMovie.id,
           title: validated.title,
           description: validated.description,
-          category: validated.category,
+          categoryId: validated.categoryId,
           thumbnail:
             validated.thumbnail instanceof File ||
             typeof validated.thumbnail === "string"
@@ -330,11 +330,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           trailerUrl: validated.trailerUrl || null,
           year: validated.year,
           aspectRatio: validated.aspectRatio,
-          ageRating: validated.ageRating,
+          ageRatingId: validated.ageRatingId,
           duration: validated.duration,
-          university: validated.university || null,
-          language: validated.language || null,
-          targetGroup: validated.targetGroup || null,
+          universityId: validated.universityId || null,
+          languageId: validated.languageId || null,
+          targetGroupId: validated.targetGroupId || null,
           hasProfanity: validated.hasProfanity,
           hasDrugs: validated.hasDrugs,
           colorType: validated.colorType,
@@ -354,17 +354,17 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         const createPayload: CreateMovie = {
           title: validated.title,
           description: validated.description,
-          category: validated.category,
+          categoryId: validated.categoryId,
           thumbnail: validated.thumbnail as File,
           youtubeUrl: validated.youtubeUrl,
           trailerUrl: validated.trailerUrl || undefined,
           year: validated.year,
           aspectRatio: validated.aspectRatio,
-          ageRating: validated.ageRating,
+          ageRatingId: validated.ageRatingId,
           duration: validated.duration,
-          university: validated.university || undefined,
-          language: validated.language || undefined,
-          targetGroup: validated.targetGroup || undefined,
+          universityId: validated.universityId || undefined,
+          languageId: validated.languageId || undefined,
+          targetGroupId: validated.targetGroupId || undefined,
           hasProfanity: validated.hasProfanity,
           hasDrugs: validated.hasDrugs,
           colorType: validated.colorType,
@@ -421,24 +421,24 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <Select
                 label="หมวดหมู่"
-                error={errors.category?.message}
-                {...register("category", {
+                error={errors.categoryId?.message}
+                {...register("categoryId", {
                   required: "กรุณาเลือกหมวดหมู่",
                 })}
                 options={categories.map((cat) => ({
-                  value: cat.name,
+                  value: cat.id,
                   label: CATEGORY_TITLE_MAPPING[cat.name] || cat.name,
                 }))}
               />
 
               <Select
                 label="เรตอายุที่แนะนำ"
-                error={errors.ageRating?.message}
-                {...register("ageRating", {
+                error={errors.ageRatingId?.message}
+                {...register("ageRatingId", {
                   required: "กรุณาเลือกเรตอายุ",
                 })}
                 options={ageRatings.map((rating) => ({
-                  value: rating.name,
+                  value: rating.id,
                   label: rating.name,
                 }))}
               />
@@ -447,15 +447,15 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <Select
                 label="ภาษาของภาพยนตร์"
-                error={errors.language?.message}
-                {...register("language")}
+                error={errors.languageId?.message}
+                {...register("languageId")}
                 options={[
                   {
                     value: "",
                     label: "เลือกภาษาของภาพยนตร์...",
                   },
                   ...languages.map((lang) => ({
-                    value: lang.name,
+                    value: lang.id,
                     label: lang.name,
                   })),
                 ]}
@@ -463,15 +463,15 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
               <Select
                 label="กลุ่มเป้าหมายผู้ชม"
-                error={errors.targetGroup?.message}
-                {...register("targetGroup")}
+                error={errors.targetGroupId?.message}
+                {...register("targetGroupId")}
                 options={[
                   {
                     value: "",
                     label: "เลือกกลุ่มเป้าหมาย...",
                   },
                   ...targetGroups.map((tg) => ({
-                    value: tg.name,
+                    value: tg.id,
                     label: tg.name,
                   })),
                 ]}
@@ -485,16 +485,12 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 })}
                 options={[
                   {
-                    value: "COLOR",
+                    value: "color",
                     label: "ภาพสี (Color)",
                   },
                   {
-                    value: "BLACK_AND_WHITE",
+                    value: "black_and_white",
                     label: "ขาวดำ (Black & White)",
-                  },
-                  {
-                    value: "COLOR_AND_BW",
-                    label: "สีและขาวดำ (Color & Black & White)",
                   },
                 ]}
               />
@@ -563,7 +559,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                         field.onChange(file);
                         setSelectedFileName(file?.name ?? null);
                         if (file) {
-                           setMovieCoverPreview(URL.createObjectURL(file));
+                          setMovieCoverPreview(URL.createObjectURL(file));
                         } else {
                           setMovieCoverPreview(
                             editingMovie &&
@@ -577,7 +573,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   )}
                 />
                 <div
-                  className={`w-full bg-black/40 border ${errors.thumbnail ? "border-red-500" : "border-zinc-800 group-hover/file:border-brand"} rounded-xl px-4 py-3 text-sm text-zinc-405 flex items-center justify-between transition-colors`}
+                  className={`w-full bg-black/40 border ${errors.thumbnail ? "border-red-500" : "border-zinc-800 group-hover/file:border-brand"} rounded-xl px-4 py-3 text-sm text-zinc-400 flex items-center justify-between transition-colors`}
                 >
                   <span
                     className={
@@ -613,7 +609,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                           : null,
                       );
                     }}
-                    className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500 hover:text-white text-zinc-405 rounded-full transition-colors cursor-pointer border-0 shadow-md opacity-0 group-hover/preview:opacity-100"
+                    className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500 hover:text-white text-zinc-400 rounded-full transition-colors cursor-pointer border-0 shadow-md opacity-0 group-hover/preview:opacity-100"
                   >
                     <CloseIcon className="text-[10px]" />
                   </button>
@@ -626,7 +622,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 </span>
               )}
               {editingMovie && typeof editingMovie.thumbnail === "string" && (
-                <p className="text-[10px] text-zinc-500 pl-1 leading-relaxed">
+                <p className="text-[10px] text-zinc-550 pl-1 leading-relaxed">
                   รูปปัจจุบัน:{" "}
                   <span className="text-brand font-medium truncate max-w-[200px] inline-block align-bottom">
                     {editingMovie.thumbnail.split("/").pop()}
@@ -661,7 +657,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                         />
                       </div>
                     ) : watchedYoutubeUrl.trim() ? (
-                      <p className="text-[10px] text-zinc-550 pl-1">
+                      <p className="text-[10px] text-zinc-500 pl-1">
                         ลิงก์ YouTube ไม่ถูกต้อง
                       </p>
                     ) : null;
@@ -775,22 +771,19 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
               <Select
                 label="สถาบัน / มหาวิทยาลัย"
-                error={errors.university?.message}
-                {...register("university")}
-              >
-                <option value="" className="bg-zinc-900 text-zinc-405">
-                  ไม่ระบุ / เลือกสถาบันการศึกษา...
-                </option>
-                {universities.map((uni) => (
-                  <option
-                    key={uni.id}
-                    value={uni.name}
-                    className="bg-zinc-900 text-white"
-                  >
-                    {uni.name}
-                  </option>
-                ))}
-              </Select>
+                error={errors.universityId?.message}
+                {...register("universityId")}
+                options={[
+                  {
+                    value: "",
+                    label: "ไม่ระบุ / เลือกสถาบันการศึกษา...",
+                  },
+                  ...universities.map((uni) => ({
+                    value: uni.id,
+                    label: uni.name,
+                  })),
+                ]}
+              />
 
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-300">

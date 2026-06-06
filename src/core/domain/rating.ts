@@ -2,11 +2,11 @@ import { User } from "./user";
 import { Movie } from "./movie";
 
 export interface Rating {
-  id: string;
+  id?: string;
   movieId: string;
   userId?: string;
   stars: number;
-  comment?: string;
+  comment?: string | null;
   createdAt: Date;
   updatedAt: Date;
   movie: Movie;
@@ -16,6 +16,7 @@ export interface Rating {
 export interface RatingInput {
   movieId: string;
   stars: number;
+  comment?: string | null;
 }
 
 export interface RatingCheckInput {

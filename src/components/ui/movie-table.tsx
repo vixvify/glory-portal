@@ -70,7 +70,7 @@ export const MovieTable: React.FC<MovieTableProps> = ({
 
                 <td className="py-4 px-6">
                   <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-brand/10 text-brand border border-brand/20">
-                    {CATEGORY_TITLE_MAPPING[movie.category] || movie.category}
+                    {movie.category ? (CATEGORY_TITLE_MAPPING[movie.category.name] || movie.category.name) : ""}
                   </span>
                 </td>
 
@@ -81,7 +81,7 @@ export const MovieTable: React.FC<MovieTableProps> = ({
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="px-1 py-0.5 text-[9px] font-bold border border-zinc-700 text-zinc-400 rounded leading-none">
-                      {movie.ageRating}
+                      {movie.ageRating?.name}
                     </span>
                     <span className="text-[10px] text-emerald-400 font-bold">
                       {movie.matchRate}% ตรงกัน

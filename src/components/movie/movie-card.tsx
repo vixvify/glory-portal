@@ -56,7 +56,7 @@ function MovieCard({
         </div>
 
         <span className="absolute top-2 left-2 px-2 py-0.5 text-[9px] font-bold tracking-wider bg-black/60 backdrop-blur-md text-zinc-300 border border-zinc-700/50 rounded uppercase">
-          {CATEGORY_TITLE_MAPPING[movie.category]}
+          {movie.category ? (CATEGORY_TITLE_MAPPING[movie.category.name] || movie.category.name) : ""}
         </span>
       </div>
 
@@ -82,7 +82,7 @@ function MovieCard({
               {movie.matchRate}%
             </span>
             <span className="px-1 py-0.2 border border-zinc-600 text-[9px] text-zinc-300 rounded leading-none scale-90">
-              {movie.ageRating}
+              {movie.ageRating?.name}
             </span>
             <div className="flex items-center gap-0.5 text-amber-500 shrink-0">
               <StarIcon className="text-xs md:text-[14px]" />

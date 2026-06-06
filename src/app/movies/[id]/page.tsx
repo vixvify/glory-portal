@@ -47,21 +47,23 @@ export default function MovieDetails() {
   );
 
   const [selectedStars, setSelectedStars] = useState(0);
+  const [commentText, setCommentText] = useState("");
   const [isPlayingTrailer, setIsPlayingTrailer] = useState(false);
   const { playMovie } = useMoviePlayer();
 
   useEffect(() => {
     if (userRating) {
       setSelectedStars(userRating.stars);
+      setCommentText(userRating.comment || "");
     }
   }, [userRating]);
 
   const { averageRating, ratingCount } = calculateRatingStats(movie?.ratings);
 
   const handleAddRating = useCallback(
-    (movieId: string, stars: number) => {
+    (movieId: string, stars: number, comment: string) => {
       addRatingMutation.mutate(
-        { movieId, stars },
+        { movieId, stars, comment: comment.trim() || null },
         {
           onSuccess: () => {
             showToast("เพิ่มคะแนนแล้ว", "success");
@@ -76,9 +78,9 @@ export default function MovieDetails() {
   );
 
   const handleUpdateRating = useCallback(
-    (movieId: string, stars: number) => {
+    (movieId: string, stars: number, comment: string) => {
       updateRatingMutation.mutate(
-        { movieId, stars },
+        { movieId, stars, comment: comment.trim() || null },
         {
           onSuccess: () => {
             showToast("แก้ไขคะแนนแล้ว", "success");
@@ -187,7 +189,7 @@ export default function MovieDetails() {
 
               <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
               <span className="px-1.5 py-0.5 text-xs font-bold border border-zinc-800 text-zinc-300 rounded bg-zinc-900/50">
-                {movie?.ageRating}
+                {movie?.ageRating?.name}
               </span>
 
               <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
@@ -196,7 +198,7 @@ export default function MovieDetails() {
               <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
               <span className="px-2.5 py-0.5 text-xs font-bold bg-brand/10 border border-brand/20 text-brand rounded-full">
                 {movie?.category &&
-                  (CATEGORY_TITLE_MAPPING[movie.category] || movie.category)}
+                  (CATEGORY_TITLE_MAPPING[movie.category.name] || movie.category.name)}
               </span>
             </div>
 
@@ -273,15 +275,15 @@ export default function MovieDetails() {
               </div>
             </div>
 
-            {movie?.bts?.btsVideo &&
-              movie.bts.btsVideo.filter(Boolean).length > 0 && (
+            {movie?.btsVideos &&
+              movie.btsVideos.filter(Boolean).length > 0 && (
                 <div className="space-y-5 pt-6 border-t border-zinc-800/60">
                   <h4 className="text-base font-bold text-white tracking-wide uppercase">
                     วิดีโอเบื้องหลังการถ่ายทำ
                   </h4>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {movie.bts.btsVideo.filter(Boolean).map((videoUrl, idx) => (
+                    {movie.btsVideos.filter(Boolean).map((videoUrl, idx) => (
                       <a
                         href={videoUrl}
                         key={idx}
@@ -313,7 +315,7 @@ export default function MovieDetails() {
                 {movie?.ratings && movie.ratings.length > 0 ? (
                   movie.ratings.slice(0, 5).map((rating) => (
                     <div
-                      key={rating.id}
+                      key={`${rating.userId}-${rating.movieId}`}
                       className="p-4 rounded-2xl bg-zinc-900/20 border border-zinc-850 flex items-start gap-4"
                     >
                       <div className="w-10 h-10 rounded-full bg-brand/10 border border-brand/20 flex items-center justify-center text-brand font-bold text-sm">
@@ -402,7 +404,7 @@ export default function MovieDetails() {
                   const starValue = idx + 1;
 
                   return (
-                    <button
+                     <button
                       key={idx}
                       onClick={() => setSelectedStars(starValue)}
                       disabled={isRatingPending}
@@ -419,6 +421,15 @@ export default function MovieDetails() {
                 })}
               </div>
 
+              <textarea
+                rows={3}
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                disabled={isRatingPending}
+                placeholder="เขียนความคิดเห็นของคุณเกี่ยวกับหนังเรื่องนี้... (ไม่บังคับ)"
+                className="w-full bg-black/40 border border-zinc-800 focus:border-brand rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-colors resize-none"
+              />
+
               <div className="flex gap-2">
                 <Button
                   onClick={() => {
@@ -427,9 +438,9 @@ export default function MovieDetails() {
                       return;
                     }
                     if (userRating) {
-                      handleUpdateRating(movie.id, selectedStars);
+                      handleUpdateRating(movie.id, selectedStars, commentText);
                     } else {
-                      handleAddRating(movie.id, selectedStars);
+                      handleAddRating(movie.id, selectedStars, commentText);
                     }
                   }}
                   variant="brand"
@@ -447,6 +458,7 @@ export default function MovieDetails() {
                       if (currentUser && movie) {
                         handleDeleteRating(movie.id);
                         setSelectedStars(5);
+                        setCommentText("");
                       }
                     }}
                     disabled={isRatingPending}
@@ -471,7 +483,7 @@ export default function MovieDetails() {
                       มหาวิทยาลัย / สถาบัน
                     </span>
                     <span className="text-zinc-200 font-medium text-right max-w-40">
-                      {movie.university}
+                      {movie.university.name}
                     </span>
                   </div>
                 )}
@@ -491,7 +503,7 @@ export default function MovieDetails() {
                       กลุ่มเป้าหมาย
                     </span>
                     <span className="text-zinc-200 font-medium text-right">
-                      {movie.targetGroup}
+                      {movie.targetGroup.name}
                     </span>
                   </div>
                 )}
@@ -501,7 +513,7 @@ export default function MovieDetails() {
                       ภาษา
                     </span>
                     <span className="text-zinc-200 font-medium text-right">
-                      {movie.language}
+                      {movie.language.name}
                     </span>
                   </div>
                 )}
@@ -521,11 +533,9 @@ export default function MovieDetails() {
                       โทนสี
                     </span>
                     <span className="text-zinc-200 font-medium text-right">
-                      {movie.colorType === "COLOR"
+                      {movie.colorType === "color"
                         ? "ภาพสี (Color)"
-                        : movie.colorType === "BLACK_AND_WHITE"
-                          ? "ขาวดำ"
-                          : "สีและขาวดำ"}
+                        : "ขาวดำ"}
                     </span>
                   </div>
                 )}

@@ -42,7 +42,7 @@ export const CrewTable: React.FC<CrewTableProps> = ({
             </tr>
           ) : (
             crew.map((member) => {
-              const movieCount = member.movieCrews?.length || 0;
+              const movieCount = member.movies?.length || 0;
 
               return (
                 <tr

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PersonIcon from "@mui/icons-material/Person";
-import MovieIcon from "@mui/icons-material/Movie";
 import EmailIcon from "@mui/icons-material/Email";
 import Loading from "@/app/loading";
 import { useCrewMemberQueryById } from "@/hooks/use-crew-members";
@@ -27,11 +26,11 @@ export default function CrewProfilePage() {
     error,
   } = useCrewMemberQueryById(params.id);
 
-  const groupedMovieCrews = useMemo(() => {
-    if (!crewMember?.movieCrews) return {};
-    const groups: Record<string, typeof crewMember.movieCrews> = {};
+  const groupedMovies = useMemo(() => {
+    if (!crewMember?.movies) return {};
+    const groups: Record<string, typeof crewMember.movies> = {};
 
-    crewMember.movieCrews.forEach((mc) => {
+    crewMember.movies.forEach((mc) => {
       const roleLower = mc.role.toLowerCase();
       const roleTitle = ROLE_MAPPING[roleLower] || mc.role;
 
@@ -45,14 +44,12 @@ export default function CrewProfilePage() {
   }, [crewMember]);
 
   const crewRoles = useMemo(() => {
-    return Object.keys(groupedMovieCrews);
-  }, [groupedMovieCrews]);
+    return Object.keys(groupedMovies);
+  }, [groupedMovies]);
 
   if (isLoading) {
     return <Loading />;
   }
-
-  console.log(crewMember);
 
   if (error || !crewMember) {
     return (
@@ -145,7 +142,7 @@ export default function CrewProfilePage() {
 
         <div className="space-y-12">
           {crewRoles.length > 0 ? (
-            Object.entries(groupedMovieCrews).map(([roleTitle, items]) => (
+            Object.entries(groupedMovies).map(([roleTitle, items]) => (
               <div key={roleTitle} className="space-y-6 animate-fade-in">
                 <div className="border-b border-zinc-800/80 pb-2.5 flex items-center justify-between">
                   <h2 className="text-lg md:text-xl font-bold text-white uppercase tracking-wider flex items-center gap-2.5">
@@ -191,8 +188,8 @@ export default function CrewProfilePage() {
                               <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 font-semibold">
                                 <span>{movie.year}</span>
                                 <span>•</span>
-                                <span className="text-zinc-400">
-                                  {movie.category}
+                                <span className="text-zinc-450">
+                                  {movie.category.name}
                                 </span>
                               </div>
                             </div>
