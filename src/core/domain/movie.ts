@@ -1,5 +1,6 @@
 import { Rating } from "./rating";
 import { User } from "./user";
+import { CrewRole, CrewMember } from "./crew";
 
 export interface Category {
   id: string;
@@ -31,23 +32,7 @@ export interface TargetGroup {
   createdAt: Date;
 }
 
-export interface CrewRole {
-  id: string;
-  name: string;
-  createdAt: Date;
-}
 
-export interface CrewMember {
-  id: string;
-  name: string;
-  email?: string | null;
-  userId?: string | null;
-  createdBy: string;
-  createdAt: Date;
-  updatedAt: Date;
-  user?: User | null;
-  movies?: MovieCrew[];
-}
 
 export interface MovieCrew {
   id: string;
@@ -92,6 +77,14 @@ export interface Movie {
   creator?: User | null;
 }
 
+export interface MovieCrewInputItem {
+  crewMemberId?: string | null;
+  name?: string | null;
+  email?: string | null;
+}
+
+
+
 export interface CreateMovie {
   title: string;
   description: string;
@@ -107,12 +100,12 @@ export interface CreateMovie {
   universityId?: string;
   languageId?: string;
   targetGroupId?: string;
-  director?: string[];
-  producer?: string[];
-  writer?: string[];
-  cast?: string[];
-  dop?: string[];
-  editor?: string[];
+  director?: MovieCrewInputItem[];
+  producer?: MovieCrewInputItem[];
+  writer?: MovieCrewInputItem[];
+  cast?: MovieCrewInputItem[];
+  dop?: MovieCrewInputItem[];
+  editor?: MovieCrewInputItem[];
   btsVideo?: string[];
   hasProfanity?: boolean;
   hasDrugs?: boolean;
@@ -136,12 +129,12 @@ export interface UpdateMovie {
   universityId?: string | null;
   languageId?: string | null;
   targetGroupId?: string | null;
-  director?: string[] | null;
-  producer?: string[] | null;
-  writer?: string[] | null;
-  cast?: string[] | null;
-  dop?: string[] | null;
-  editor?: string[] | null;
+  director?: MovieCrewInputItem[] | null;
+  producer?: MovieCrewInputItem[] | null;
+  writer?: MovieCrewInputItem[] | null;
+  cast?: MovieCrewInputItem[] | null;
+  dop?: MovieCrewInputItem[] | null;
+  editor?: MovieCrewInputItem[] | null;
   btsVideo?: string[] | null;
   hasProfanity?: boolean;
   hasDrugs?: boolean;
@@ -149,27 +142,7 @@ export interface UpdateMovie {
   studio?: string | null;
 }
 
-export interface CreateCrewMember {
-  name: string;
-  email?: string;
-}
-
-export interface UpdateCrewMember {
-  id: string;
-  name: string;
-  email?: string | null;
-}
-
 export interface MovieFilterParams {
-  search?: string;
-  searchby?: string;
-  page?: number | string;
-  pagesize?: number | string;
-  sort?: string;
-  sortby?: string;
-}
-
-export interface CrewFilterParams {
   search?: string;
   searchby?: string;
   page?: number | string;

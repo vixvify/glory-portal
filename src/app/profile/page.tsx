@@ -20,8 +20,8 @@ import {
   useMyCrewMembersQuery,
   useDeleteCrewMemberMutation,
 } from "@/hooks/use-crew-members";
-import { MovieTable } from "@/components/ui/movie-table";
-import { CrewTable } from "@/components/ui/crew-table";
+import { MovieTable } from "@/components/movie/movie-table";
+import { CrewTable } from "@/components/crew/crew-table";
 import { ConfirmModal } from "@/components/modal/confirm-modal";
 import { LOCALIZATION } from "@/core/constants/localization";
 

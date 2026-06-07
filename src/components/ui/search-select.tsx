@@ -9,6 +9,7 @@ interface SelectOption {
   id: string;
   name: string;
   photoUrl?: string | null;
+  email?: string | null;
 }
 
 interface CreatableSearchSelectProps {
@@ -62,9 +63,9 @@ export function CreatableSearchSelect({
       (opt) => opt.name.toLowerCase() === val.trim().toLowerCase(),
     );
     if (exactMatch) {
-      onChange({ id: exactMatch.id, name: exactMatch.name });
+      onChange(exactMatch);
     } else {
-      onChange({ id: "", name: val });
+      onChange({ id: "", name: val, email: "" });
     }
     setIsOpen(true);
   };

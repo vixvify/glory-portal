@@ -2,10 +2,11 @@ import React from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonIcon from "@mui/icons-material/Person";
-import { CrewMember, Movie } from "@/core/domain/movie";
+import { Movie } from "@/core/domain/movie";
+import { CrewMember } from "@/core/domain/crew";
 import { LOCALIZATION } from "@/core/constants/localization";
 
-import { Button } from "./button";
+import { Button } from "@/components/ui/button";
 
 interface CrewTableProps {
   crew: CrewMember[];

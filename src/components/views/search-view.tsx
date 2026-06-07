@@ -1,6 +1,6 @@
 import { Movie } from "@/core/domain/movie";
-import MovieGrid from "./movie-grid";
-import { Button } from "../ui/button";
+import MovieGrid from "@/components/movie/movie-grid";
+import { Button } from "@/components/ui/button";
 
 interface SearchViewProps {
   searchQuery: string;

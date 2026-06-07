@@ -1,5 +1,5 @@
 import { ApiResponse } from "@/infra/interface/response";
-import { CrewMember, CrewFilterParams, CreateCrewMember, UpdateCrewMember } from "../domain/movie";
+import { CrewMember, CrewFilterParams, CreateCrewMember, UpdateCrewMember } from "../domain/crew";
 
 export interface CrewMemberRepository {
   getCrewMembers(params?: CrewFilterParams): Promise<ApiResponse<CrewMember[]>>;

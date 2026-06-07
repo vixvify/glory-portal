@@ -15,10 +15,10 @@ import {
   Category,
   AgeRating,
   University,
-  CrewMember,
   Language,
   TargetGroup,
 } from "@/core/domain/movie";
+import { CrewMember } from "@/core/domain/crew";
 import { parseSchema } from "@/lib/validation";
 import { createMovieSchema } from "@/core/schema/movie";
 import { LOCALIZATION } from "@/core/constants/localization";
@@ -29,7 +29,103 @@ import {
   useUpdateMovieMutation,
 } from "@/hooks/use-movies";
 import { CreateMovie, UpdateMovie } from "@/core/domain/movie";
+import { CrewStateItem } from "@/core/domain/crew";
 import { getYouTubeId } from "@/utils/youtube";
+import { mapCrewToState, mapStateToCrewInput } from "@/utils/crew";
+
+interface CrewSectionProps {
+  label: string;
+  list: CrewStateItem[];
+  setList: React.Dispatch<React.SetStateAction<CrewStateItem[]>>;
+  placeholder: string;
+  addButtonLabel: string;
+  crewOptions: Array<{
+    id: string;
+    name: string;
+    photoUrl?: string | null;
+    email: string;
+  }>;
+}
+
+const CrewSection: React.FC<CrewSectionProps> = ({
+  label,
+  list,
+  setList,
+  placeholder,
+  addButtonLabel,
+  crewOptions,
+}) => {
+  return (
+    <div className="space-y-2">
+      <label className="text-xs font-semibold text-zinc-300">{label}</label>
+      <div className="space-y-4">
+        {list.map((item, idx) => (
+          <div
+            key={idx}
+            className="space-y-2 p-3 bg-zinc-900/10 border border-zinc-900 rounded-2xl"
+          >
+            <div className="flex gap-2 items-center">
+              <CreatableSearchSelect
+                value={{ id: item.id, name: item.name, email: item.email }}
+                options={crewOptions}
+                placeholder={placeholder}
+                onChange={(val) => {
+                  const newList = [...list];
+                  newList[idx] = {
+                    id: val.id,
+                    name: val.name,
+                    email: val.email || "",
+                  };
+                  setList(newList);
+                }}
+                className="flex-1"
+              />
+              {list.length > 1 && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setList(list.filter((_, i) => i !== idx))}
+                  className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto"
+                >
+                  <CloseIcon className="text-sm" />
+                </Button>
+              )}
+            </div>
+
+            <div className="pl-1 flex items-center gap-2">
+              <span className="text-[11px] text-zinc-555 flex-shrink-0">
+                อีเมล:
+              </span>
+              <Input
+                type="email"
+                placeholder="เช่น example@email.com "
+                value={item.email}
+                readOnly={!!item.id}
+                onChange={(e) => {
+                  const newList = [...list];
+                  newList[idx] = {
+                    ...newList[idx],
+                    email: e.target.value,
+                  };
+                  setList(newList);
+                }}
+                className="bg-black/25 border-zinc-900/80 focus:border-brand/45 rounded-lg py-1.5 text-xs text-zinc-300 read-only:opacity-60 read-only:cursor-not-allowed h-8"
+              />
+            </div>
+          </div>
+        ))}
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => setList([...list, { id: "", name: "", email: "" }])}
+          className="py-2 px-4 text-xs flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
+        >
+          <AddIcon className="text-sm" /> {addButtonLabel}
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 interface MovieFormProps {
   editingMovie?: Movie | null;
@@ -86,24 +182,27 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     null,
   );
   const [isSavingLocal, setIsSavingLocal] = useState(false);
+  const [activeCrewTab, setActiveCrewTab] = useState<
+    "director" | "producer" | "writer" | "cast" | "dop" | "editor"
+  >("director");
 
-  const [directors, setDirectors] = useState<
-    Array<{ id: string; name: string }>
-  >([{ id: "", name: "" }]);
-  const [producers, setProducers] = useState<
-    Array<{ id: string; name: string }>
-  >([{ id: "", name: "" }]);
-  const [writers, setWriters] = useState<Array<{ id: string; name: string }>>([
-    { id: "", name: "" },
+  const [directors, setDirectors] = useState<CrewStateItem[]>([
+    { id: "", name: "", email: "" },
   ]);
-  const [castMembers, setCastMembers] = useState<
-    Array<{ id: string; name: string }>
-  >([{ id: "", name: "" }]);
-  const [dops, setDops] = useState<Array<{ id: string; name: string }>>([
-    { id: "", name: "" },
+  const [producers, setProducers] = useState<CrewStateItem[]>([
+    { id: "", name: "", email: "" },
   ]);
-  const [editors, setEditors] = useState<Array<{ id: string; name: string }>>([
-    { id: "", name: "" },
+  const [writers, setWriters] = useState<CrewStateItem[]>([
+    { id: "", name: "", email: "" },
+  ]);
+  const [castMembers, setCastMembers] = useState<CrewStateItem[]>([
+    { id: "", name: "", email: "" },
+  ]);
+  const [dops, setDops] = useState<CrewStateItem[]>([
+    { id: "", name: "", email: "" },
+  ]);
+  const [editors, setEditors] = useState<CrewStateItem[]>([
+    { id: "", name: "", email: "" },
   ]);
 
   const createMovieMutation = useCreateMovieMutation();
@@ -113,6 +212,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     id: c.id,
     name: c.name,
     photoUrl: c.user?.photoUrl,
+    email: c.email || "",
   }));
 
   const {
@@ -142,74 +242,12 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           : [""],
       );
 
-      const movieDirectors =
-        editingMovie.crew
-          ?.filter((c) => c.role.toLowerCase() === "director")
-          .map((c) => ({
-            id: c.crewMember?.id || "",
-            name: c.crewMember?.name || "",
-          }))
-          .filter((x): x is { id: string; name: string } => !!x.name) || [];
-
-      const movieProducers =
-        editingMovie.crew
-          ?.filter((c) => c.role.toLowerCase() === "producer")
-          .map((c) => ({
-            id: c.crewMember?.id || "",
-            name: c.crewMember?.name || "",
-          }))
-          .filter((x): x is { id: string; name: string } => !!x.name) || [];
-
-      const movieWriters =
-        editingMovie.crew
-          ?.filter((c) => c.role.toLowerCase() === "writer")
-          .map((c) => ({
-            id: c.crewMember?.id || "",
-            name: c.crewMember?.name || "",
-          }))
-          .filter((x): x is { id: string; name: string } => !!x.name) || [];
-
-      const movieCast =
-        editingMovie.crew
-          ?.filter((c) => c.role.toLowerCase() === "cast")
-          .map((c) => ({
-            id: c.crewMember?.id || "",
-            name: c.crewMember?.name || "",
-          }))
-          .filter((x): x is { id: string; name: string } => !!x.name) || [];
-
-      const movieDops =
-        editingMovie.crew
-          ?.filter((c) => c.role.toLowerCase() === "dop")
-          .map((c) => ({
-            id: c.crewMember?.id || "",
-            name: c.crewMember?.name || "",
-          }))
-          .filter((x): x is { id: string; name: string } => !!x.name) || [];
-
-      const movieEditors =
-        editingMovie.crew
-          ?.filter((c) => c.role.toLowerCase() === "editor")
-          .map((c) => ({
-            id: c.crewMember?.id || "",
-            name: c.crewMember?.name || "",
-          }))
-          .filter((x): x is { id: string; name: string } => !!x.name) || [];
-
-      setDirectors(
-        movieDirectors.length > 0 ? movieDirectors : [{ id: "", name: "" }],
-      );
-      setProducers(
-        movieProducers.length > 0 ? movieProducers : [{ id: "", name: "" }],
-      );
-      setWriters(
-        movieWriters.length > 0 ? movieWriters : [{ id: "", name: "" }],
-      );
-      setCastMembers(movieCast.length > 0 ? movieCast : [{ id: "", name: "" }]);
-      setDops(movieDops.length > 0 ? movieDops : [{ id: "", name: "" }]);
-      setEditors(
-        movieEditors.length > 0 ? movieEditors : [{ id: "", name: "" }],
-      );
+      setDirectors(mapCrewToState(editingMovie.crew, "director"));
+      setProducers(mapCrewToState(editingMovie.crew, "producer"));
+      setWriters(mapCrewToState(editingMovie.crew, "writer"));
+      setCastMembers(mapCrewToState(editingMovie.crew, "cast"));
+      setDops(mapCrewToState(editingMovie.crew, "dop"));
+      setEditors(mapCrewToState(editingMovie.crew, "editor"));
 
       reset({
         title: editingMovie.title,
@@ -241,12 +279,12 @@ export const MovieForm: React.FC<MovieFormProps> = ({
       setSelectedFileName(null);
       setMovieCoverPreview(null);
       setBtsVideos([""]);
-      setDirectors([{ id: "", name: "" }]);
-      setProducers([{ id: "", name: "" }]);
-      setWriters([{ id: "", name: "" }]);
-      setCastMembers([{ id: "", name: "" }]);
-      setDops([{ id: "", name: "" }]);
-      setEditors([{ id: "", name: "" }]);
+      setDirectors([{ id: "", name: "", email: "" }]);
+      setProducers([{ id: "", name: "", email: "" }]);
+      setWriters([{ id: "", name: "", email: "" }]);
+      setCastMembers([{ id: "", name: "", email: "" }]);
+      setDops([{ id: "", name: "", email: "" }]);
+      setEditors([{ id: "", name: "", email: "" }]);
       reset({
         title: "",
         description: "",
@@ -295,24 +333,12 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         colorType: data.colorType || "color",
         studio: data.studio || null,
         btsVideo: activeVideos,
-        director: directors
-          .filter((d) => d.name.trim() !== "")
-          .map((d) => d.id || d.name.trim()),
-        producer: producers
-          .filter((p) => p.name.trim() !== "")
-          .map((p) => p.id || p.name.trim()),
-        writer: writers
-          .filter((w) => w.name.trim() !== "")
-          .map((w) => w.id || w.name.trim()),
-        cast: castMembers
-          .filter((c) => c.name.trim() !== "")
-          .map((c) => c.id || c.name.trim()),
-        dop: dops
-          .filter((d) => d.name.trim() !== "")
-          .map((d) => d.id || d.name.trim()),
-        editor: editors
-          .filter((e) => e.name.trim() !== "")
-          .map((e) => e.id || e.name.trim()),
+        director: mapStateToCrewInput(directors),
+        producer: mapStateToCrewInput(producers),
+        writer: mapStateToCrewInput(writers),
+        cast: mapStateToCrewInput(castMembers),
+        dop: mapStateToCrewInput(dops),
+        editor: mapStateToCrewInput(editors),
       });
 
       if (editingMovie) {
@@ -407,8 +433,13 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           </p>
         </div>
 
-        <div className="bg-card border border-zinc-800/35 rounded-3xl p-6 md:p-8 shadow-xl backdrop-blur-md">
-          <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-8">
+          <div className="bg-card border border-zinc-800/35 rounded-3xl p-6 md:p-8 shadow-xl backdrop-blur-md space-y-6">
+            <div className="flex items-center gap-2 border-b border-zinc-800/40 pb-4">
+              <span className="w-1.5 h-6 bg-brand rounded-full" />
+              <h2 className="text-lg font-bold text-white">ข้อมูลทั่วไปของภาพยนตร์ (General Information)</h2>
+            </div>
+
             <Input
               label="ชื่อเรื่อง"
               placeholder="เช่น Interstellar"
@@ -417,6 +448,25 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 required: "กรุณากรอกชื่อเรื่อง",
               })}
             />
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-zinc-300">
+                เรื่องย่อ (Description)
+              </label>
+              <textarea
+                rows={5}
+                placeholder="กรอกรายละเอียดเรื่องย่อภาพยนตร์เพื่อดึงดูดผู้ชม..."
+                {...register("description", {
+                  required: "กรุณากรอกเรื่องย่อภาพยนตร์",
+                })}
+                className={`w-full bg-black/40 border ${errors.description ? "border-red-500" : "border-zinc-800 focus:border-brand"} rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors resize-none`}
+              />
+              {errors.description && (
+                <span className="text-[10px] text-red-500 block pl-1 font-semibold">
+                  {errors.description.message}
+                </span>
+              )}
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <Select
@@ -538,6 +588,99 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   required: "กรุณากรอกความยาวภาพยนตร์",
                 })}
               />
+            </div>
+
+            <Select
+              label="สถาบัน / มหาวิทยาลัย"
+              error={errors.universityId?.message}
+              {...register("universityId")}
+              options={[
+                {
+                  value: "",
+                  label: "ไม่ระบุ / เลือกสถาบันการศึกษา...",
+                },
+                ...universities.map((uni) => ({
+                  value: uni.id,
+                  label: uni.name,
+                })),
+              ]}
+            />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <Input
+                label="สังกัด (Studio / Production / Affiliation)"
+                placeholder="พิมพ์ชื่อสังกัดหรือสตูดิโอ..."
+                error={errors.studio?.message}
+                {...register("studio")}
+              />
+
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-zinc-300">
+                  คำเตือนเนื้อหา (Warnings)
+                </label>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <label className="flex-1 flex items-center gap-3 bg-zinc-900/40 hover:bg-zinc-900/70 border border-zinc-800/80 hover:border-brand/40 px-4 py-3 rounded-xl cursor-pointer select-none group transition-all duration-300 shadow-md">
+                    <div className="relative flex items-center justify-center">
+                      <input
+                        type="checkbox"
+                        {...register("hasProfanity")}
+                        className="sr-only peer"
+                      />
+                      <div className="w-5 h-5 rounded-md border border-zinc-700 bg-zinc-950 transition-all duration-200 flex items-center justify-center peer-checked:border-brand peer-checked:bg-brand/20 peer-focus-visible:ring-2 peer-focus-visible:ring-brand/40 group-hover:border-zinc-500 peer-checked:group-hover:border-brand peer-checked:[&_svg]:scale-100">
+                        <svg
+                          className="w-3 h-3 text-brand scale-0 transition-transform duration-200 stroke-[3]"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold text-zinc-200 group-hover:text-white transition-colors">
+                      มีคำหยาบคาย
+                    </span>
+                  </label>
+
+                  <label className="flex-1 flex items-center gap-3 bg-zinc-900/40 hover:bg-zinc-900/70 border border-zinc-800/80 hover:border-brand/40 px-4 py-3 rounded-xl cursor-pointer select-none group transition-all duration-300 shadow-md">
+                    <div className="relative flex items-center justify-center">
+                      <input
+                        type="checkbox"
+                        {...register("hasDrugs")}
+                        className="sr-only peer"
+                      />
+                      <div className="w-5 h-5 rounded-md border border-zinc-700 bg-zinc-950 transition-all duration-200 flex items-center justify-center peer-checked:border-brand peer-checked:bg-brand/20 peer-focus-visible:ring-2 peer-focus-visible:ring-brand/40 group-hover:border-zinc-500 peer-checked:group-hover:border-brand peer-checked:[&_svg]:scale-100">
+                        <svg
+                          className="w-3 h-3 text-brand scale-0 transition-transform duration-200 stroke-[3]"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold text-zinc-200 group-hover:text-white transition-colors">
+                      มียาเสพติด/สิ่งมึนเมา
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-card border border-zinc-800/35 rounded-3xl p-6 md:p-8 shadow-xl backdrop-blur-md space-y-6">
+            <div className="flex items-center gap-2 border-b border-zinc-800/40 pb-4">
+              <span className="w-1.5 h-6 bg-brand rounded-full" />
+              <h2 className="text-lg font-bold text-white">วิดีโอและไฟล์สื่อประกอบ (Media & Video Links)</h2>
             </div>
 
             <div className="space-y-2">
@@ -686,370 +829,110 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                         />
                       </div>
                     ) : watchedTrailerUrl.trim() ? (
-                      <p className="text-[10px] text-zinc-550 pl-1">
+                      <p className="text-[10px] text-zinc-555 pl-1">
                         ลิงก์ YouTube ไม่ถูกต้อง
                       </p>
                     ) : null;
                   })()}
               </div>
             </div>
+          </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <Input
-                label="สังกัด (Studio / Production / Affiliation)"
-                placeholder="พิมพ์ชื่อสังกัดหรือสตูดิโอ..."
-                error={errors.studio?.message}
-                {...register("studio")}
-              />
-
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-zinc-300">
-                  คำเตือนเนื้อหา (Warnings)
-                </label>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <label className="flex-1 flex items-center gap-3 bg-zinc-900/40 hover:bg-zinc-900/70 border border-zinc-800/80 hover:border-brand/40 px-4 py-3 rounded-xl cursor-pointer select-none group transition-all duration-300 shadow-md">
-                    <div className="relative flex items-center justify-center">
-                      <input
-                        type="checkbox"
-                        {...register("hasProfanity")}
-                        className="sr-only peer"
-                      />
-                      <div className="w-5 h-5 rounded-md border border-zinc-700 bg-zinc-950 transition-all duration-200 flex items-center justify-center peer-checked:border-brand peer-checked:bg-brand/20 peer-focus-visible:ring-2 peer-focus-visible:ring-brand/40 group-hover:border-zinc-500 peer-checked:group-hover:border-brand peer-checked:[&_svg]:scale-100">
-                        <svg
-                          className="w-3 h-3 text-brand scale-0 transition-transform duration-200 stroke-[3]"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    <span className="text-xs font-bold text-zinc-200 group-hover:text-white transition-colors">
-                      มีคำหยาบคาย
-                    </span>
-                  </label>
-
-                  <label className="flex-1 flex items-center gap-3 bg-zinc-900/40 hover:bg-zinc-900/70 border border-zinc-800/80 hover:border-brand/40 px-4 py-3 rounded-xl cursor-pointer select-none group transition-all duration-300 shadow-md">
-                    <div className="relative flex items-center justify-center">
-                      <input
-                        type="checkbox"
-                        {...register("hasDrugs")}
-                        className="sr-only peer"
-                      />
-                      <div className="w-5 h-5 rounded-md border border-zinc-700 bg-zinc-950 transition-all duration-200 flex items-center justify-center peer-checked:border-brand peer-checked:bg-brand/20 peer-focus-visible:ring-2 peer-focus-visible:ring-brand/40 group-hover:border-zinc-500 peer-checked:group-hover:border-brand peer-checked:[&_svg]:scale-100">
-                        <svg
-                          className="w-3 h-3 text-brand scale-0 transition-transform duration-200 stroke-[3]"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    <span className="text-xs font-bold text-zinc-200 group-hover:text-white transition-colors">
-                      มียาเสพติด/สิ่งมึนเมา
-                    </span>
-                  </label>
-                </div>
-              </div>
+          <div className="bg-card border border-zinc-800/35 rounded-3xl p-6 md:p-8 shadow-xl backdrop-blur-md space-y-6">
+            <div className="flex items-center gap-2 border-b border-zinc-800/40 pb-4">
+              <span className="w-1.5 h-6 bg-brand rounded-full" />
+              <h2 className="text-lg font-bold text-white">ข้อมูลทีมงานและเบื้องหลัง (Production & Crew)</h2>
             </div>
 
-            <div className="border-t border-zinc-800/60 pt-6 mt-4 space-y-6">
-              <h4 className="text-sm font-bold text-brand uppercase tracking-wider">
-                ข้อมูลเบื้องหลัง & ทีมงานผู้สร้าง
-              </h4>
-
-              <Select
-                label="สถาบัน / มหาวิทยาลัย"
-                error={errors.universityId?.message}
-                {...register("universityId")}
-                options={[
-                  {
-                    value: "",
-                    label: "ไม่ระบุ / เลือกสถาบันการศึกษา...",
-                  },
-                  ...universities.map((uni) => ({
-                    value: uni.id,
-                    label: uni.name,
-                  })),
-                ]}
-              />
-
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-zinc-300">
-                  ผู้กำกับ (Director)
-                </label>
-                <div className="space-y-3">
-                  {directors.map((director, idx) => (
-                    <div key={idx} className="flex gap-2 items-center">
-                      <CreatableSearchSelect
-                        value={director}
-                        options={crewOptions}
-                        placeholder="พิมพ์ชื่อ หรือเลือกผู้กำกับจากคลังรายชื่อ..."
-                        onChange={(val) => {
-                          const newDirectors = [...directors];
-                          newDirectors[idx] = val;
-                          setDirectors(newDirectors);
-                        }}
-                      />
-                      {directors.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() =>
-                            setDirectors(directors.filter((_, i) => i !== idx))
-                          }
-                          className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto"
-                        >
-                          <CloseIcon className="text-sm" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                  <Button
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2 border-b border-zinc-800/40 pb-4">
+                {[
+                  { id: "director", label: "ผู้กำกับ (Director)" },
+                  { id: "producer", label: "ผู้อำนวยการสร้าง (Producer)" },
+                  { id: "writer", label: "ผู้เขียนบท (Writer)" },
+                  { id: "cast", label: "นักแสดงนำ (Cast)" },
+                  { id: "dop", label: "ผู้กำกับภาพ (DOP)" },
+                  { id: "editor", label: "ผู้ลำดับภาพ (Editor)" },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
                     type="button"
-                    variant="secondary"
-                    onClick={() =>
-                      setDirectors([...directors, { id: "", name: "" }])
-                    }
-                    className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
+                    onClick={() => setActiveCrewTab(tab.id as any)}
+                    className={`px-4 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
+                      activeCrewTab === tab.id
+                        ? "bg-brand/10 border-brand text-brand font-bold"
+                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-850"
+                    }`}
                   >
-                    <AddIcon className="text-sm" /> เพิ่มรายชื่อผู้กำกับ
-                  </Button>
-                </div>
+                    {tab.label}
+                  </button>
+                ))}
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-zinc-300">
-                  ผู้อำนวยการสร้าง (Producer)
-                </label>
-                <div className="space-y-3">
-                  {producers.map((producer, idx) => (
-                    <div key={idx} className="flex gap-2 items-center">
-                      <CreatableSearchSelect
-                        value={producer}
-                        options={crewOptions}
-                        placeholder="พิมพ์ชื่อ หรือเลือกผู้อำนวยการสร้าง..."
-                        onChange={(val) => {
-                          const newProducers = [...producers];
-                          newProducers[idx] = val;
-                          setProducers(newProducers);
-                        }}
-                      />
-                      {producers.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() =>
-                            setProducers(producers.filter((_, i) => i !== idx))
-                          }
-                          className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto"
-                        >
-                          <CloseIcon className="text-sm" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() =>
-                      setProducers([...producers, { id: "", name: "" }])
-                    }
-                    className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
-                  >
-                    <AddIcon className="text-sm" /> เพิ่มรายชื่อผู้อำนวยการสร้าง
-                  </Button>
-                </div>
+              <div className="bg-zinc-900/10 border border-zinc-800/30 rounded-3xl p-5 md:p-6 min-h-[200px]">
+                {activeCrewTab === "director" && (
+                  <CrewSection
+                    label="ผู้กำกับ (Director)"
+                    list={directors}
+                    setList={setDirectors}
+                    placeholder="พิมพ์ชื่อ หรือเลือกผู้กำกับจากคลังรายชื่อ..."
+                    addButtonLabel="เพิ่มรายชื่อผู้กำกับ"
+                    crewOptions={crewOptions}
+                  />
+                )}
+                {activeCrewTab === "producer" && (
+                  <CrewSection
+                    label="ผู้อำนวยการสร้าง (Producer)"
+                    list={producers}
+                    setList={setProducers}
+                    placeholder="พิมพ์ชื่อ หรือเลือกผู้อำนวยการสร้าง..."
+                    addButtonLabel="เพิ่มรายชื่อผู้อำนวยการสร้าง"
+                    crewOptions={crewOptions}
+                  />
+                )}
+                {activeCrewTab === "writer" && (
+                  <CrewSection
+                    label="ผู้เขียนบท (Writer)"
+                    list={writers}
+                    setList={setWriters}
+                    placeholder="พิมพ์ชื่อ หรือเลือกผู้เขียนบท..."
+                    addButtonLabel="เพิ่มรายชื่อผู้เขียนบท"
+                    crewOptions={crewOptions}
+                  />
+                )}
+                {activeCrewTab === "cast" && (
+                  <CrewSection
+                    label="นักแสดงนำ (Cast)"
+                    list={castMembers}
+                    setList={setCastMembers}
+                    placeholder="พิมพ์ชื่อ หรือเลือกนักแสดง..."
+                    addButtonLabel="เพิ่มรายชื่อนักแสดง"
+                    crewOptions={crewOptions}
+                  />
+                )}
+                {activeCrewTab === "dop" && (
+                  <CrewSection
+                    label="ผู้กำกับภาพ (DOP)"
+                    list={dops}
+                    setList={setDops}
+                    placeholder="พิมพ์ชื่อ หรือเลือกผู้กำกับภาพ..."
+                    addButtonLabel="เพิ่มรายชื่อผู้กำกับภาพ"
+                    crewOptions={crewOptions}
+                  />
+                )}
+                {activeCrewTab === "editor" && (
+                  <CrewSection
+                    label="ผู้ลำดับภาพ (Editor)"
+                    list={editors}
+                    setList={setEditors}
+                    placeholder="พิมพ์ชื่อ หรือเลือกผู้ลำดับภาพ..."
+                    addButtonLabel="เพิ่มรายชื่อผู้ลำดับภาพ"
+                    crewOptions={crewOptions}
+                  />
+                )}
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-zinc-300">
-                  ผู้เขียนบท (Writer)
-                </label>
-                <div className="space-y-3">
-                  {writers.map((writer, idx) => (
-                    <div key={idx} className="flex gap-2 items-center">
-                      <CreatableSearchSelect
-                        value={writer}
-                        options={crewOptions}
-                        placeholder="พิมพ์ชื่อ หรือเลือกผู้เขียนบท..."
-                        onChange={(val) => {
-                          const newWriters = [...writers];
-                          newWriters[idx] = val;
-                          setWriters(newWriters);
-                        }}
-                      />
-                      {writers.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() =>
-                            setWriters(writers.filter((_, i) => i !== idx))
-                          }
-                          className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto"
-                        >
-                          <CloseIcon className="text-sm" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() =>
-                      setWriters([...writers, { id: "", name: "" }])
-                    }
-                    className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
-                  >
-                    <AddIcon className="text-sm" /> เพิ่มรายชื่อผู้เขียนบท
-                  </Button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-zinc-300">
-                  นักแสดงนำ (Cast)
-                </label>
-                <div className="space-y-3">
-                  {castMembers.map((actor, idx) => (
-                    <div key={idx} className="flex gap-2 items-center">
-                      <CreatableSearchSelect
-                        value={actor}
-                        options={crewOptions}
-                        placeholder="พิมพ์ชื่อ หรือเลือกนักแสดง..."
-                        onChange={(val) => {
-                          const newCast = [...castMembers];
-                          newCast[idx] = val;
-                          setCastMembers(newCast);
-                        }}
-                      />
-                      {castMembers.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() =>
-                            setCastMembers(
-                              castMembers.filter((_, i) => i !== idx),
-                            )
-                          }
-                          className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto"
-                        >
-                          <CloseIcon className="text-sm" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() =>
-                      setCastMembers([...castMembers, { id: "", name: "" }])
-                    }
-                    className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
-                  >
-                    <AddIcon className="text-sm" /> เพิ่มรายชื่อนักแสดง
-                  </Button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-zinc-300">
-                  ผู้กำกับภาพ (DOP)
-                </label>
-                <div className="space-y-3">
-                  {dops.map((dop, idx) => (
-                    <div key={idx} className="flex gap-2 items-center">
-                      <CreatableSearchSelect
-                        value={dop}
-                        options={crewOptions}
-                        placeholder="พิมพ์ชื่อ หรือเลือกผู้กำกับภาพ..."
-                        onChange={(val) => {
-                          const newDops = [...dops];
-                          newDops[idx] = val;
-                          setDops(newDops);
-                        }}
-                      />
-                      {dops.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() =>
-                            setDops(dops.filter((_, i) => i !== idx))
-                          }
-                          className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto"
-                        >
-                          <CloseIcon className="text-sm" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => setDops([...dops, { id: "", name: "" }])}
-                    className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
-                  >
-                    <AddIcon className="text-sm" /> เพิ่มรายชื่อผู้กำกับภาพ
-                  </Button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-zinc-300">
-                  ผู้ลำดับภาพ (Editor)
-                </label>
-                <div className="space-y-3">
-                  {editors.map((editor, idx) => (
-                    <div key={idx} className="flex gap-2 items-center">
-                      <CreatableSearchSelect
-                        value={editor}
-                        options={crewOptions}
-                        placeholder="พิมพ์ชื่อ หรือเลือกผู้ลำดับภาพ..."
-                        onChange={(val) => {
-                          const newEditors = [...editors];
-                          newEditors[idx] = val;
-                          setEditors(newEditors);
-                        }}
-                      />
-                      {editors.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() =>
-                            setEditors(editors.filter((_, i) => i !== idx))
-                          }
-                          className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto"
-                        >
-                          <CloseIcon className="text-sm" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() =>
-                      setEditors([...editors, { id: "", name: "" }])
-                    }
-                    className="py-2 px-4 text-xs flex items-center gap-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
-                  >
-                    <AddIcon className="text-sm" /> เพิ่มรายชื่อผู้ลำดับภาพ
-                  </Button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
+              <div className="space-y-2 pt-4 border-t border-zinc-800/40">
                 <label className="text-xs font-semibold text-zinc-300">
                   ลิงก์วิดีโอเบื้องหลัง (YouTube BTS Video)
                 </label>
@@ -1120,44 +1003,25 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="space-y-2 pt-4 border-t border-zinc-800/60">
-              <label className="text-xs font-semibold text-zinc-300">
-                เรื่องย่อ (Description)
-              </label>
-              <textarea
-                rows={5}
-                placeholder="กรอกรายละเอียดเรื่องย่อภาพยนตร์เพื่อดึงดูดผู้ชม..."
-                {...register("description", {
-                  required: "กรุณากรอกเรื่องย่อภาพยนตร์",
-                })}
-                className={`w-full bg-black/40 border ${errors.description ? "border-red-500" : "border-zinc-800 focus:border-brand"} rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors resize-none`}
-              />
-              {errors.description && (
-                <span className="text-[10px] text-red-500 block pl-1 font-semibold">
-                  {errors.description.message}
-                </span>
-              )}
-            </div>
-
-            <div className="pt-6 border-t border-zinc-800/40 flex items-center gap-4">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => router.push("/")}
-                className="flex-1 py-3 text-sm font-semibold rounded-xl"
-              >
-                ยกเลิก
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1 py-3 text-sm font-semibold rounded-xl"
-              >
-                {editingMovie ? "บันทึกข้อมูลภาพยนตร์" : "เพิ่มภาพยนตร์ใหม่"}
-              </Button>
-            </div>
-          </form>
-        </div>
+          <div className="pt-6 border-t border-zinc-800/40 flex items-center gap-4">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => router.push("/")}
+              className="flex-1 py-3 text-sm font-semibold rounded-xl"
+            >
+              ยกเลิก
+            </Button>
+            <Button
+              type="submit"
+              className="flex-1 py-3 text-sm font-semibold rounded-xl"
+            >
+              {editingMovie ? "บันทึกข้อมูลภาพยนตร์" : "เพิ่มภาพยนตร์ใหม่"}
+            </Button>
+          </div>
+        </form>
       </main>
 
       {isSavingLocal && (

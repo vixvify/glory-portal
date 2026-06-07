@@ -5,7 +5,7 @@ import {
   CreateCrewMember,
   CrewFilterParams,
   UpdateCrewMember,
-} from "@/core/domain/movie";
+} from "@/core/domain/crew";
 
 export function useCrewMembersQuery(
   params?: CrewFilterParams,

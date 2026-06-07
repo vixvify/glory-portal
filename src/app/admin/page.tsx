@@ -130,14 +130,6 @@ export default function AdminPage() {
                     ดูรายชื่อทีมงานทั้งหมด
                   </button>
                 </Link>
-                <Link href="/create/crew" className="flex-shrink-0">
-                  <button
-                    className="p-3 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 text-violet-400 rounded-xl transition-all cursor-pointer"
-                    title="เพิ่มทีมงานใหม่"
-                  >
-                    <AddIcon className="text-xl" />
-                  </button>
-                </Link>
               </div>
             </div>
           </div>

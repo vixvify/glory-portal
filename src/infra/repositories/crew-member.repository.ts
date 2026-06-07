@@ -1,6 +1,6 @@
 import { ApiResponse } from "../interface/response";
 import { CrewMemberRepository } from "@/core/ports/crew-member.repository";
-import { CrewMember, CrewFilterParams, CreateCrewMember, UpdateCrewMember } from "@/core/domain/movie";
+import { CrewMember, CrewFilterParams, CreateCrewMember, UpdateCrewMember } from "@/core/domain/crew";
 import httpClient from "@/lib/http";
 
 export class CrewMemberRepositoryImpl implements CrewMemberRepository {

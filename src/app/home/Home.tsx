@@ -11,10 +11,10 @@ import { useMoviesQuery } from "@/hooks/use-movies";
 import { useToggleFavoriteMutation } from "@/hooks/use-favorites";
 import { Category } from "@/core/domain/movie";
 import { University } from "@/core/domain/movie";
-import { CrewMember } from "@/core/domain/movie";
+import { CrewMember } from "@/core/domain/crew";
 import { useDebounce } from "@/hooks/use-debounce";
-import HomeView from "@/components/movie/home-view";
-import SearchView from "@/components/movie/search-view";
+import HomeView from "@/components/views/home-view";
+import SearchView from "@/components/views/search-view";
 
 interface Props {
   recommendedMovies: Movie[];

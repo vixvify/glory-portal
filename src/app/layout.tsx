@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Kanit } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
-import Navbar from "@/components/ui/navbar";
+import Navbar from "@/components/layout/navbar";
 
 const kanit = Kanit({
   subsets: ["latin"],

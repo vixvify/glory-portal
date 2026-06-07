@@ -1,9 +1,10 @@
-import { Movie, Category, University, CrewMember } from "@/core/domain/movie";
+import { Movie, Category, University } from "@/core/domain/movie";
+import { CrewMember } from "@/core/domain/crew";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
-import MovieRow from "./movie-row";
-import MovieRankRow from "./movie-rank-row";
-import CrewRow from "./crew-row";
-import MovieHero from "./movie-hero";
+import MovieRow from "@/components/movie/movie-row";
+import MovieRankRow from "@/components/movie/movie-rank-row";
+import CrewRow from "@/components/crew/crew-row";
+import MovieHero from "@/components/movie/movie-hero";
 
 interface HomeViewProps {
   recommendedMovies: Movie[];

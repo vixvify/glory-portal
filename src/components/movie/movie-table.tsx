@@ -8,7 +8,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { Movie } from "@/core/domain/movie";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 
-import { Button } from "./button";
+import { Button } from "@/components/ui/button";
 
 interface MovieTableProps {
   movies: Movie[];

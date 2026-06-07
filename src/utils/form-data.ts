@@ -39,7 +39,13 @@ export const toFormData = (data: Record<string, unknown>): FormData => {
     if (Array.isArray(value)) {
       value.forEach((item) => {
         if (item !== undefined && item !== null) {
-          formData.append(key, item instanceof File ? item : String(item));
+          if (item instanceof File) {
+            formData.append(key, item);
+          } else if (typeof item === "object") {
+            formData.append(key, JSON.stringify(item));
+          } else {
+            formData.append(key, String(item));
+          }
         }
       });
       return;

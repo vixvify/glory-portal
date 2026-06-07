@@ -3,14 +3,12 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PeopleIcon from "@mui/icons-material/People";
 import { useAppStore } from "@/store/use-store";
 import Loading from "@/app/loading";
-import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/ui/search-input";
-import { CrewTable } from "@/components/ui/crew-table";
+import { CrewTable } from "@/components/crew/crew-table";
 import { ConfirmModal } from "@/components/modal/confirm-modal";
 import {
   useCrewMembersQuery,
@@ -88,14 +86,6 @@ export default function AdminCrewPage() {
               ทีมงาน & นักแสดง ({availableCrew.length})
             </h1>
           </div>
-
-          <Button
-            onClick={() => router.push("/create/crew")}
-            className="flex items-center justify-center gap-2"
-          >
-            <AddIcon className="text-lg" />
-            เพิ่มรายชื่อทีมงาน
-          </Button>
         </div>
 
         <div className="bg-card border border-zinc-800/35 rounded-2xl shadow-xl overflow-hidden backdrop-blur-md">

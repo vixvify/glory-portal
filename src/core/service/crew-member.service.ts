@@ -3,7 +3,7 @@ import {
   CreateCrewMember,
   UpdateCrewMember,
   CrewFilterParams,
-} from "../domain/movie";
+} from "../domain/crew";
 import { CrewMemberRepository } from "../ports/crew-member.repository";
 import { parseSchema } from "@/lib/validation";
 import {
