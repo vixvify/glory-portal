@@ -1,10 +1,10 @@
 import { ApiResponse } from "@/infra/interface/response";
-import { Rating, RatingCheckInput, RatingInput } from "../domain/rating";
+import { Rating, RatingParams, CreateRating, UpdateRating } from "../domain/rating";
 
 export interface RatingRepository {
-  addRating(data: RatingInput): Promise<ApiResponse<void>>;
-  checkRating(data: RatingCheckInput): Promise<ApiResponse<boolean>>;
-  deleteRating(data: RatingCheckInput): Promise<ApiResponse<void>>;
-  updateRating(data: RatingInput): Promise<ApiResponse<void>>;
-  getRatingByMovieAndUser(data: RatingCheckInput): Promise<ApiResponse<Rating | null>>;
+  addRating(data: CreateRating): Promise<ApiResponse<void>>;
+  checkRating(data: RatingParams): Promise<ApiResponse<boolean>>;
+  deleteRating(data: RatingParams): Promise<ApiResponse<void>>;
+  updateRating(data: UpdateRating): Promise<ApiResponse<void>>;
+  getRatingByMovieAndUser(data: RatingParams): Promise<ApiResponse<Rating | null>>;
 }

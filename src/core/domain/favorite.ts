@@ -1,4 +1,4 @@
-export interface ToggleFavoriteMutationInput {
+export interface ToggleFavorite {
   movieId: string;
   isFavorite: boolean;
 }

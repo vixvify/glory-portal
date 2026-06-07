@@ -13,12 +13,18 @@ export interface Rating {
   user: User;
 }
 
-export interface RatingInput {
+export interface CreateRating {
   movieId: string;
   stars: number;
   comment?: string | null;
 }
 
-export interface RatingCheckInput {
+export interface UpdateRating {
+  movieId: string;
+  stars: number;
+  comment?: string | null;
+}
+
+export interface RatingParams {
   movieId: string;
 }
