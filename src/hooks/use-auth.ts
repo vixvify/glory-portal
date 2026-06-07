@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { authService } from "@/infra/container";
 import { RegisterUser, LoginUser, User } from "@/core/domain/user";
 import { useAppStore } from "@/store/use-store";
+import { useRouter } from "next/navigation";
 
 export function useRegisterMutation() {
   const { showToast } = useAppStore();
@@ -34,13 +35,16 @@ export function useLoginMutation() {
 export function useLogoutMutation() {
   const { setCurrentUser, showToast } = useAppStore();
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   return useMutation<void, Error, void>({
     mutationFn: () => authService.logout(),
     onSuccess: () => {
       setCurrentUser(null);
       showToast("ออกจากระบบสำเร็จ", "info");
-      queryClient.invalidateQueries({ queryKey: ["favorites"] });
+      queryClient.clear();
+      router.push("/auth/login");
     },
   });
 }
+
