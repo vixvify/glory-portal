@@ -384,61 +384,6 @@ export default function MovieDetails() {
                 </div>
               </div>
             )}
-
-            <div className="space-y-4 pt-6 border-t border-zinc-800/60">
-              <h4 className="text-lg font-bold text-white tracking-wide">
-                รีวิวจากผู้ชม ({movie?.ratings?.length || 0})
-              </h4>
-
-              <div className="space-y-3.5 max-w-2xl">
-                {movie?.ratings && movie.ratings.length > 0 ? (
-                  movie.ratings.slice(0, 5).map((rating) => (
-                    <div
-                      key={`${rating.userId}-${rating.movieId}`}
-                      className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-md flex items-start gap-4"
-                    >
-                      <div className="w-10 h-10 rounded-full bg-brand/10 border border-brand/20 flex items-center justify-center text-brand font-bold text-sm">
-                        {(rating.user?.name || rating.user?.email || "U")
-                          .charAt(0)
-                          .toUpperCase()}
-                      </div>
-
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-semibold text-zinc-200">
-                            {rating.user?.name ||
-                              rating.user?.email ||
-                              "ผู้ใช้งาน"}
-                          </span>
-
-                          <div className="flex items-center gap-0.5 text-amber-500">
-                            {Array.from({ length: 5 }).map((_, idx) =>
-                              idx < rating.stars ? (
-                                <StarIcon key={idx} className="text-sm" />
-                              ) : (
-                                <StarBorderIcon
-                                  key={idx}
-                                  className="text-sm text-zinc-700"
-                                />
-                              ),
-                            )}
-                          </div>
-                        </div>
-
-                        <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
-                          {rating.comment ||
-                            `ให้คะแนนเรื่องนี้ ${rating.stars} ดาว`}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-xs text-zinc-550 italic font-light">
-                    ยังไม่มีการเขียนรีวิวสำหรับภาพยนตร์เรื่องนี้
-                  </p>
-                )}
-              </div>
-            </div>
           </div>
 
           <div className="space-y-6">
@@ -500,16 +445,6 @@ export default function MovieDetails() {
                     );
                   })}
                 </div>
-
-                <textarea
-                  rows={3}
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  disabled={isRatingPending}
-                  placeholder="เขียนความคิดเห็นของคุณเกี่ยวกับหนังเรื่องนี้... (ไม่บังคับ)"
-                  className="w-full glass-input rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-colors resize-none"
-                />
-
                 <div className="flex gap-2">
                   <Button
                     onClick={() => {

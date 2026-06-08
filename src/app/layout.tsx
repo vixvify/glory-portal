@@ -3,6 +3,7 @@ import { Kanit } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import Navbar from "@/components/layout/navbar";
+import Footer from "@/components/layout/footer";
 
 const kanit = Kanit({
   subsets: ["latin"],
@@ -29,7 +30,10 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Providers>
           <Navbar />
-          {children}
+          <div className="flex-1 flex flex-col">
+            {children}
+          </div>
+          <Footer />
         </Providers>
       </body>
     </html>

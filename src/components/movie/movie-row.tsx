@@ -13,6 +13,7 @@ interface MovieRowProps {
   onPlayClick: (movie: Movie) => void;
   favorites: Movie[];
   onToggleFavorite: (movieId: string) => void;
+  isPortrait?: boolean;
 }
 
 export default function MovieRow({
@@ -21,11 +22,14 @@ export default function MovieRow({
   onPlayClick,
   favorites,
   onToggleFavorite,
+  isPortrait,
 }: MovieRowProps) {
   const { rowRef, showLeftArrow, showRightArrow, handleScroll } =
     useScrollRow(movies);
 
   if (movies.length === 0) return null;
+
+  const isPortraitMode = isPortrait;
 
   return (
     <div className="space-y-2 group/row relative">
@@ -49,12 +53,19 @@ export default function MovieRow({
         >
           {movies.map((movie) => (
             <Link href={`/movies/${movie.id}`} key={movie.id}>
-              <div className="flex-none w-[200px] sm:w-[240px] md:w-[280px] snap-start">
+              <div
+                className={`flex-none snap-start transition-all duration-300 ${
+                  isPortraitMode
+                    ? "w-[130px] sm:w-[160px] md:w-[190px]"
+                    : "w-[200px] sm:w-[240px] md:w-[280px]"
+                }`}
+              >
                 <MovieCard
                   movie={movie}
                   onPlayClick={onPlayClick}
                   isFavorite={favorites.some((fav) => fav.id === movie.id)}
                   onToggleFavorite={onToggleFavorite}
+                  isPortrait={isPortraitMode}
                 />
               </div>
             </Link>

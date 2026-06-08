@@ -25,6 +25,7 @@ interface Props {
   universityMovies: Movie[];
   categoryMoviesMap: Record<string, Movie[]>;
   favorites: Movie[];
+  portaitMovie: Movie[];
 }
 
 export default function HomePage(props: Props) {
@@ -37,6 +38,7 @@ export default function HomePage(props: Props) {
     universityMovies,
     categoryMoviesMap,
     favorites,
+    portaitMovie,
   } = props;
   const router = useRouter();
   const { currentUser, showToast, searchQuery, setSearchQuery } = useAppStore();
@@ -111,6 +113,7 @@ export default function HomePage(props: Props) {
           handlePlayMovie={handlePlayMovie}
           handleToggleFavorite={handleToggleFavorite}
           setSearchQuery={setSearchQuery}
+          portaitMovie={portaitMovie}
         />
       ) : (
         <SearchView

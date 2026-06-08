@@ -27,6 +27,12 @@ import { LOCALIZATION } from "@/core/constants/localization";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 import { useAppStore } from "@/store/use-store";
 import {
+  COLOR_OPTIONS,
+  ASPECT_RATIO_OPTIONS,
+  CONTENT_WARNING_OPTIONS,
+  DROPDOWN_PLACEHOLDERS,
+} from "@/core/constants/movie-form";
+import {
   useCreateMovieMutation,
   useUpdateMovieMutation,
 } from "@/hooks/use-movies";
@@ -261,7 +267,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         youtubeUrl: editingMovie.youtubeUrl,
         trailerUrl: editingMovie.trailerUrl || "",
         year: editingMovie.year,
-        aspectRatio: editingMovie.aspectRatio || "16:9",
+        aspectRatio: editingMovie.aspectRatio || "แนวนอน",
         ageRatingId: editingMovie.ageRating.id,
         duration: editingMovie.duration,
         universityId: editingMovie.university?.id || "",
@@ -297,7 +303,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         youtubeUrl: "",
         trailerUrl: "",
         year: new Date().getFullYear(),
-        aspectRatio: "16:9",
+        aspectRatio: "แนวนอน",
         ageRatingId: ageRatings[0]?.id || "",
         duration: 120,
         universityId: "",
@@ -537,10 +543,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 error={errors.languageId?.message}
                 {...register("languageId")}
                 options={[
-                  {
-                    value: "",
-                    label: "เลือกภาษาของภาพยนตร์...",
-                  },
+                  DROPDOWN_PLACEHOLDERS.LANGUAGE,
                   ...languages.map((lang) => ({
                     value: lang.id,
                     label: lang.name,
@@ -553,10 +556,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 error={errors.targetGroupId?.message}
                 {...register("targetGroupId")}
                 options={[
-                  {
-                    value: "",
-                    label: "เลือกกลุ่มเป้าหมาย...",
-                  },
+                  DROPDOWN_PLACEHOLDERS.TARGET_GROUP,
                   ...targetGroups.map((tg) => ({
                     value: tg.id,
                     label: tg.name,
@@ -570,16 +570,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 {...register("colorType", {
                   required: "กรุณาเลือกโทนสีภาพยนตร์",
                 })}
-                options={[
-                  {
-                    value: "color",
-                    label: "ภาพสี",
-                  },
-                  {
-                    value: "black_and_white",
-                    label: "ขาวดำ",
-                  },
-                ]}
+                options={COLOR_OPTIONS}
               />
             </div>
 
@@ -608,13 +599,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 {...register("aspectRatio", {
                   required: "กรุณาเลือกอัตราส่วนภาพ",
                 })}
-                options={[
-                  { value: "16:9", label: "16:9 (แนวนอนมาตรฐาน)" },
-                  { value: "9:16", label: "9:16 (แนวตั้ง/TikTok)" },
-                  { value: "4:3", label: "4:3 (มาตรฐานคลาสสิก)" },
-                  { value: "1:1", label: "1:1 (สี่เหลี่ยมจัตุรัส)" },
-                  { value: "21:9", label: "21:9 (จอกว้างพิเศษ)" },
-                ]}
+                options={ASPECT_RATIO_OPTIONS}
               />
 
               <Input
@@ -632,10 +617,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               error={errors.universityId?.message}
               {...register("universityId")}
               options={[
-                {
-                  value: "",
-                  label: "ไม่ระบุ / เลือกสถาบันการศึกษา...",
-                },
+                DROPDOWN_PLACEHOLDERS.UNIVERSITY,
                 ...universities.map((uni) => ({
                   value: uni.id,
                   label: uni.name,
@@ -653,14 +635,15 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
               <MultiSelect
                 label="คำเตือนเนื้อหา"
-                options={[
-                  { value: "profanity", label: "มีคำหยาบคาย" },
-                  { value: "drugs", label: "มียาเสพติด/สิ่งมึนเมา" },
-                ]}
+                options={CONTENT_WARNING_OPTIONS}
                 selectedValues={selectedWarnings}
                 onChange={(values) => {
-                  setValue("hasProfanity", values.includes("profanity"), { shouldDirty: true });
-                  setValue("hasDrugs", values.includes("drugs"), { shouldDirty: true });
+                  setValue("hasProfanity", values.includes("profanity"), {
+                    shouldDirty: true,
+                  });
+                  setValue("hasDrugs", values.includes("drugs"), {
+                    shouldDirty: true,
+                  });
                 }}
                 placeholder="ไม่มีคำเตือนเนื้อหา / เลือกคำเตือน..."
               />
