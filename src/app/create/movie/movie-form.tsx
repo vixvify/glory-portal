@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { CreatableSearchSelect } from "@/components/ui/search-select";
+import { MultiSelect } from "@/components/ui/multi-select";
 import {
   Movie,
   Category,
@@ -223,6 +224,13 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
   const watchedYoutubeUrl = watch("youtubeUrl");
   const watchedTrailerUrl = watch("trailerUrl");
+  const watchedProfanity = watch("hasProfanity") ?? false;
+  const watchedDrugs = watch("hasDrugs") ?? false;
+
+  const selectedWarnings = [
+    ...(watchedProfanity ? ["profanity"] : []),
+    ...(watchedDrugs ? ["drugs"] : []),
+  ];
 
   useEffect(() => {
     if (editingMovie) {
@@ -438,6 +446,37 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               </h2>
             </div>
 
+            <div className="space-y-2">
+              <Input
+                label="ลิงก์ภาพยนตร์"
+                placeholder="https://www.youtube.com/watch?v=..."
+                error={errors.youtubeUrl?.message}
+                {...register("youtubeUrl", {
+                  required: "กรุณากรอกลิงก์ภาพยนตร์",
+                })}
+              />
+              {watchedYoutubeUrl &&
+                (() => {
+                  const ytid = getYouTubeId(watchedYoutubeUrl);
+                  return ytid ? (
+                    <div className="mt-2 relative rounded-2xl overflow-hidden border border-zinc-800 bg-black/50 aspect-[16/9] w-full max-w-md shadow-lg shadow-black/50 transition-all hover:border-brand/30">
+                      <iframe
+                        src={`https://www.youtube.com/embed/${ytid}`}
+                        title="YouTube Movie Preview"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                        className="absolute inset-0 w-full h-full"
+                      />
+                    </div>
+                  ) : watchedYoutubeUrl.trim() ? (
+                    <p className="text-[10px] text-zinc-555 pl-1">
+                      ลิงก์ YouTube ไม่ถูกต้อง
+                    </p>
+                  ) : null;
+                })()}
+            </div>
+
             <Input
               label="ชื่อเรื่อง"
               placeholder="เช่น Interstellar"
@@ -612,199 +651,112 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 {...register("studio")}
               />
 
+              <MultiSelect
+                label="คำเตือนเนื้อหา"
+                options={[
+                  { value: "profanity", label: "มีคำหยาบคาย" },
+                  { value: "drugs", label: "มียาเสพติด/สิ่งมึนเมา" },
+                ]}
+                selectedValues={selectedWarnings}
+                onChange={(values) => {
+                  setValue("hasProfanity", values.includes("profanity"), { shouldDirty: true });
+                  setValue("hasDrugs", values.includes("drugs"), { shouldDirty: true });
+                }}
+                placeholder="ไม่มีคำเตือนเนื้อหา / เลือกคำเตือน..."
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-zinc-800/20">
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-300">
-                  คำเตือนเนื้อหา
+                  ภาพปกภาพยนตร์
                 </label>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <label className="flex-1 flex items-center gap-3 bg-zinc-900/40 hover:bg-zinc-900/70 border border-zinc-800/80 hover:border-brand/40 px-4 py-3 rounded-xl cursor-pointer select-none group transition-all duration-300 shadow-md">
-                    <div className="relative flex items-center justify-center">
+                <div className="relative group/file">
+                  <Controller
+                    name="thumbnail"
+                    control={control}
+                    defaultValue={null}
+                    render={({ field }) => (
                       <input
-                        type="checkbox"
-                        {...register("hasProfanity")}
-                        className="sr-only peer"
+                        type="file"
+                        accept="image/*"
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] ?? null;
+                          field.onChange(file);
+                          setSelectedFileName(file?.name ?? null);
+                          if (file) {
+                            setMovieCoverPreview(URL.createObjectURL(file));
+                          } else {
+                            setMovieCoverPreview(
+                              editingMovie &&
+                                typeof editingMovie.thumbnail === "string"
+                                ? editingMovie.thumbnail
+                                : null,
+                            );
+                          }
+                        }}
                       />
-                      <div className="w-5 h-5 rounded-md border border-zinc-700 bg-zinc-950 transition-all duration-200 flex items-center justify-center peer-checked:border-brand peer-checked:bg-brand/20 peer-focus-visible:ring-2 peer-focus-visible:ring-brand/40 group-hover:border-zinc-500 peer-checked:group-hover:border-brand peer-checked:[&_svg]:scale-100">
-                        <svg
-                          className="w-3 h-3 text-brand scale-0 transition-transform duration-200 stroke-[3]"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    <span className="text-xs font-bold text-zinc-200 group-hover:text-white transition-colors">
-                      มีคำหยาบคาย
-                    </span>
-                  </label>
-
-                  <label className="flex-1 flex items-center gap-3 bg-zinc-900/40 hover:bg-zinc-900/70 border border-zinc-800/80 hover:border-brand/40 px-4 py-3 rounded-xl cursor-pointer select-none group transition-all duration-300 shadow-md">
-                    <div className="relative flex items-center justify-center">
-                      <input
-                        type="checkbox"
-                        {...register("hasDrugs")}
-                        className="sr-only peer"
-                      />
-                      <div className="w-5 h-5 rounded-md border border-zinc-700 bg-zinc-950 transition-all duration-200 flex items-center justify-center peer-checked:border-brand peer-checked:bg-brand/20 peer-focus-visible:ring-2 peer-focus-visible:ring-brand/40 group-hover:border-zinc-500 peer-checked:group-hover:border-brand peer-checked:[&_svg]:scale-100">
-                        <svg
-                          className="w-3 h-3 text-brand scale-0 transition-transform duration-200 stroke-[3]"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    <span className="text-xs font-bold text-zinc-200 group-hover:text-white transition-colors">
-                      มียาเสพติด/สิ่งมึนเมา
-                    </span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-card border border-zinc-800/35 rounded-3xl p-6 md:p-8 shadow-xl backdrop-blur-md space-y-6">
-            <div className="flex items-center gap-2 border-b border-zinc-800/40 pb-4">
-              <span className="w-1.5 h-6 bg-brand rounded-full" />
-              <h2 className="text-lg font-bold text-white">
-                วิดีโอและไฟล์สื่อประกอบ
-              </h2>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-zinc-300">
-                ภาพปกภาพยนตร์
-              </label>
-              <div className="relative group/file">
-                <Controller
-                  name="thumbnail"
-                  control={control}
-                  defaultValue={null}
-                  render={({ field }) => (
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] ?? null;
-                        field.onChange(file);
-                        setSelectedFileName(file?.name ?? null);
-                        if (file) {
-                          setMovieCoverPreview(URL.createObjectURL(file));
-                        } else {
-                          setMovieCoverPreview(
-                            editingMovie &&
-                              typeof editingMovie.thumbnail === "string"
-                              ? editingMovie.thumbnail
-                              : null,
-                          );
-                        }
-                      }}
-                    />
-                  )}
-                />
-                <div
-                  className={`w-full bg-black/40 border ${errors.thumbnail ? "border-red-500" : "border-zinc-800 group-hover/file:border-brand"} rounded-xl px-4 py-3 text-sm text-zinc-400 flex items-center justify-between transition-colors`}
-                >
-                  <span
-                    className={
-                      selectedFileName
-                        ? "text-white font-medium truncate max-w-[70%]"
-                        : "text-zinc-400"
-                    }
-                  >
-                    {selectedFileName || "อัปโหลดภาพปกภาพยนตร์..."}
-                  </span>
-                  <span className="px-3 py-1 bg-zinc-800 text-zinc-300 rounded-lg text-xs font-semibold group-hover/file:bg-brand group-hover/file:text-white transition-colors">
-                    เลือกไฟล์
-                  </span>
-                </div>
-              </div>
-
-              {movieCoverPreview && (
-                <div className="mt-3 relative rounded-xl overflow-hidden border border-zinc-800 bg-black/40 aspect-[16/9] w-full max-w-[280px] group/preview">
-                  <img
-                    src={movieCoverPreview}
-                    alt="Cover Preview"
-                    className="w-full h-full object-cover"
+                    )}
                   />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setValue("thumbnail", null);
-                      setSelectedFileName(null);
-                      setMovieCoverPreview(
-                        editingMovie &&
-                          typeof editingMovie.thumbnail === "string"
-                          ? editingMovie.thumbnail
-                          : null,
-                      );
-                    }}
-                    className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500 hover:text-white text-zinc-400 rounded-full transition-colors cursor-pointer border-0 shadow-md opacity-0 group-hover/preview:opacity-100"
+                  <div
+                    className={`w-full bg-black/40 border ${errors.thumbnail ? "border-red-500" : "border-zinc-800 group-hover/file:border-brand"} rounded-xl px-4 py-3 text-sm text-zinc-400 flex items-center justify-between transition-colors`}
                   >
-                    <CloseIcon className="text-[10px]" />
-                  </button>
+                    <span
+                      className={
+                        selectedFileName
+                          ? "text-white font-medium truncate max-w-[70%]"
+                          : "text-zinc-400"
+                      }
+                    >
+                      {selectedFileName || "อัปโหลดภาพปกภาพยนตร์..."}
+                    </span>
+                    <span className="px-3 py-1 bg-zinc-800 text-zinc-300 rounded-lg text-xs font-semibold group-hover/file:bg-brand group-hover/file:text-white transition-colors">
+                      เลือกไฟล์
+                    </span>
+                  </div>
                 </div>
-              )}
 
-              {errors.thumbnail && (
-                <span className="text-[10px] text-red-500 block pl-1 font-semibold">
-                  {errors.thumbnail.message}
-                </span>
-              )}
-              {editingMovie && typeof editingMovie.thumbnail === "string" && (
-                <p className="text-[10px] text-zinc-550 pl-1 leading-relaxed">
-                  รูปปัจจุบัน:{" "}
-                  <span className="text-brand font-medium truncate max-w-[200px] inline-block align-bottom">
-                    {editingMovie.thumbnail.split("/").pop()}
-                  </span>{" "}
-                  (เว้นว่างไว้หากต้องการใช้รูปเดิม)
-                </p>
-              )}
-            </div>
+                {movieCoverPreview && (
+                  <div className="mt-3 relative rounded-xl overflow-hidden border border-zinc-800 bg-black/40 aspect-[16/9] w-full max-w-[280px] group/preview">
+                    <img
+                      src={movieCoverPreview}
+                      alt="Cover Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setValue("thumbnail", null);
+                        setSelectedFileName(null);
+                        setMovieCoverPreview(
+                          editingMovie &&
+                            typeof editingMovie.thumbnail === "string"
+                            ? editingMovie.thumbnail
+                            : null,
+                        );
+                      }}
+                      className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500 hover:text-white text-zinc-400 rounded-full transition-colors cursor-pointer border-0 shadow-md opacity-0 group-hover/preview:opacity-100"
+                    >
+                      <CloseIcon className="text-[10px]" />
+                    </button>
+                  </div>
+                )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Input
-                  label="ลิงก์ภาพยนตร์"
-                  placeholder="https://www.youtube.com/watch?v=..."
-                  error={errors.youtubeUrl?.message}
-                  {...register("youtubeUrl", {
-                    required: "กรุณากรอกลิงก์ภาพยนตร์",
-                  })}
-                />
-                {watchedYoutubeUrl &&
-                  (() => {
-                    const ytid = getYouTubeId(watchedYoutubeUrl);
-                    return ytid ? (
-                      <div className="mt-2 relative rounded-2xl overflow-hidden border border-zinc-800 bg-black/50 aspect-[16/9] w-full shadow-lg shadow-black/50 transition-all hover:border-brand/30">
-                        <iframe
-                          src={`https://www.youtube.com/embed/${ytid}`}
-                          title="YouTube Movie Preview"
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                          allowFullScreen
-                          className="absolute inset-0 w-full h-full"
-                        />
-                      </div>
-                    ) : watchedYoutubeUrl.trim() ? (
-                      <p className="text-[10px] text-zinc-500 pl-1">
-                        ลิงก์ YouTube ไม่ถูกต้อง
-                      </p>
-                    ) : null;
-                  })()}
+                {errors.thumbnail && (
+                  <span className="text-[10px] text-red-500 block pl-1 font-semibold">
+                    {errors.thumbnail.message}
+                  </span>
+                )}
+                {editingMovie && typeof editingMovie.thumbnail === "string" && (
+                  <p className="text-[10px] text-zinc-550 pl-1 leading-relaxed">
+                    รูปปัจจุบัน:{" "}
+                    <span className="text-brand font-medium truncate max-w-[200px] inline-block align-bottom">
+                      {editingMovie.thumbnail.split("/").pop()}
+                    </span>{" "}
+                    (เว้นว่างไว้หากต้องการใช้รูปเดิม)
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">

@@ -13,6 +13,7 @@ export const registerUserSchema = userSchema.pick({
   email: true,
   password: true,
 }).extend({
+  confirmPassword: z.string().min(1, "กรุณายืนยันรหัสผ่าน"),
   photo: z.instanceof(File).optional(),
   motto: z.string().optional(),
   bio: z.string().optional(),
@@ -23,6 +24,9 @@ export const registerUserSchema = userSchema.pick({
   positions: z.array(z.string()).optional(),
   birthday: z.string().optional(),
   awards: z.array(z.string()).optional(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "รหัสผ่านไม่ตรงกัน",
+  path: ["confirmPassword"],
 });
 
 export const loginUserSchema = userSchema.pick({

@@ -26,6 +26,7 @@ type RegisterFormValues = {
   name: string;
   email: string;
   password: string;
+  confirmPassword: string;
   photo?: File;
   motto?: string;
   bio?: string;
@@ -66,6 +67,7 @@ export default function RegisterPage() {
       name: "",
       email: "",
       password: "",
+      confirmPassword: "",
       motto: "",
       bio: "",
       ig: "",
@@ -215,7 +217,6 @@ export default function RegisterPage() {
                   error={errors.email?.message}
                   {...register("email")}
                 />
-
                 <Input
                   label="รหัสผ่าน"
                   placeholder="••••••••"
@@ -237,9 +238,29 @@ export default function RegisterPage() {
                   error={errors.password?.message}
                   {...register("password")}
                 />
-              </div>
 
-              {showOptional && (
+                <Input
+                  label="ยืนยันรหัสผ่าน"
+                  placeholder="••••••••"
+                  type={showPassword ? "text" : "password"}
+                  icon={<LockIcon className="text-zinc-500 text-lg" />}
+                  suffix={
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="text-zinc-500 hover:text-white cursor-pointer flex items-center justify-center border-0 bg-transparent animate-fade-in"
+                    >
+                      {showPassword ? (
+                        <VisibilityOffIcon className="text-lg" />
+                      ) : (
+                        <VisibilityIcon className="text-lg" />
+                      )}
+                    </button>
+                  }
+                  error={errors.confirmPassword?.message}
+                  {...register("confirmPassword")}
+                />
+              </div>              {showOptional && (
                 <div className="space-y-4 pt-3 border-t border-zinc-800/50 animate-fade-in">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Input
