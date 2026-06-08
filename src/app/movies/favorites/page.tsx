@@ -14,6 +14,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import LockIcon from "@mui/icons-material/Lock";
 import { Button } from "@/components/ui/button";
+import { getAspectRatio } from "@/utils/aspect-ratio";
 
 export default function FavoritesPage() {
   const router = useRouter();
@@ -23,6 +24,8 @@ export default function FavoritesPage() {
 
   const { data: favorites = [], isLoading } = useFavoritesQuery(!!currentUser);
   const toggleFavoriteMutation = useToggleFavoriteMutation();
+
+  const { landscapeMovies, portraitMovies } = getAspectRatio(favorites);
 
   const handleToggleFavorite = useCallback(
     (movieId: string) => {
@@ -131,8 +134,6 @@ export default function FavoritesPage() {
           </div>
         )}
       </main>
-
-
     </div>
   );
 }

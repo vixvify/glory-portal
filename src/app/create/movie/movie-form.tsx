@@ -31,6 +31,7 @@ import {
   ASPECT_RATIO_OPTIONS,
   CONTENT_WARNING_OPTIONS,
   DROPDOWN_PLACEHOLDERS,
+  CREW_TAB_OPTIONS,
 } from "@/core/constants/movie-form";
 import {
   useCreateMovieMutation,
@@ -783,14 +784,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2 border-b border-zinc-800/40 pb-4">
-                {[
-                  { id: "director", label: "ผู้กำกับ" },
-                  { id: "producer", label: "ผู้อำนวยการสร้าง" },
-                  { id: "writer", label: "ผู้เขียนบท" },
-                  { id: "cast", label: "นักแสดงนำ" },
-                  { id: "dop", label: "ผู้กำกับภาพ" },
-                  { id: "editor", label: "ผู้ลำดับภาพ" },
-                ].map((tab) => (
+                {CREW_TAB_OPTIONS.map((tab) => (
                   <button
                     key={tab.id}
                     type="button"

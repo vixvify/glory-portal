@@ -18,3 +18,12 @@ export const DROPDOWN_PLACEHOLDERS = {
   TARGET_GROUP: { value: "", label: "เลือกกลุ่มเป้าหมาย..." },
   UNIVERSITY: { value: "", label: "ไม่ระบุ / เลือกสถาบันการศึกษา..." },
 };
+
+export const CREW_TAB_OPTIONS = [
+  { id: "director", label: "ผู้กำกับ" },
+  { id: "producer", label: "ผู้อำนวยการสร้าง" },
+  { id: "writer", label: "ผู้เขียนบท" },
+  { id: "cast", label: "นักแสดงนำ" },
+  { id: "dop", label: "ผู้กำกับภาพ" },
+  { id: "editor", label: "ผู้ลำดับภาพ" },
+];
