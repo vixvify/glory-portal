@@ -52,9 +52,9 @@ export const LOCALIZATION = {
     TITLE: "ตัดแต่งรูปภาพประจำตัว",
     SUBTITLE:
       "ลากเพื่อขยับรูปภาพ และปรับขนาดการซูมเพื่อให้จัดวางใบหน้าลงในวงกลมได้อย่างสวยงาม",
-    ZOOM: "ระดับการซูม (Zoom)",
+    ZOOM: "ระดับการซูม",
     CANCEL: "ยกเลิก",
-    CONFIRM: "เสร็จสิ้น (Crop)",
+    CONFIRM: "เสร็จสิ้น",
   },
   COMMON: {
     MOVIES_COUNT: (count: number) => `ภาพยนตร์ (${count})`,

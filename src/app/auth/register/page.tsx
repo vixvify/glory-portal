@@ -130,9 +130,9 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-black to-black flex items-start justify-center p-4 pt-24 md:pt-28 pb-16">
+    <div className="min-h-screen bg-transparent flex items-start justify-center p-4 pt-24 md:pt-28 pb-16">
       <div
-        className={`w-full ${showOptional ? "max-w-5xl" : "max-w-xl"} bg-zinc-950/40 backdrop-blur-xl rounded-[2rem] border border-zinc-800 shadow-2xl p-10 space-y-8 transition-all duration-500 ease-in-out`}
+        className={`w-full ${showOptional ? "max-w-5xl" : "max-w-xl"} glass-panel-gold rounded-[2rem] shadow-2xl p-10 space-y-8 transition-all duration-500 ease-in-out`}
       >
         <div className="text-center space-y-2">
           <h2 className="text-3xl font-extrabold tracking-wide bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent">
@@ -193,7 +193,7 @@ export default function RegisterPage() {
                 : "space-y-6"
             }
           >
-            <div className="bg-zinc-900/25 border border-zinc-800/40 rounded-3xl p-6 space-y-5 shadow-xl backdrop-blur-md">
+            <div className="glass-panel rounded-3xl p-6 space-y-5 shadow-xl">
               <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest font-mono border-b border-zinc-800/50 pb-2">
                 ข้อมูลหลักของบัญชี
               </p>
@@ -243,13 +243,13 @@ export default function RegisterPage() {
                 <div className="space-y-4 pt-3 border-t border-zinc-800/50 animate-fade-in">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Input
-                      label="คติพจน์ (Motto)"
+                      label="คติพจน์"
                       placeholder="เช่น ความสำเร็จเกิดจากความพยายาม"
                       {...register("motto")}
                     />
 
                     <Input
-                      label="วันเกิด (Birthday)"
+                      label="วันเกิด"
                       type="date"
                       {...register("birthday")}
                     />
@@ -257,12 +257,12 @@ export default function RegisterPage() {
 
                   <div className="space-y-1 w-full text-left">
                     <label className="text-xs text-zinc-400 font-medium block">
-                      ประวัติโดยย่อ (Brief Bio)
+                      ประวัติโดยย่อ
                     </label>
                     <textarea
                       placeholder="ระบุประวัติโดยย่อของคุณ..."
                       rows={3}
-                      className="w-full bg-zinc-900/60 border border-zinc-800 rounded-lg py-2.5 px-4 text-sm text-white focus:outline-none transition-colors focus:border-brand placeholder-zinc-500 font-light"
+                      className="w-full glass-input rounded-lg py-2.5 px-4 text-sm text-white focus:outline-none transition-colors placeholder-zinc-500 font-light"
                       {...register("bio")}
                     />
                   </div>
@@ -271,7 +271,7 @@ export default function RegisterPage() {
             </div>
 
             {showOptional && (
-              <div className="bg-zinc-900/25 border border-zinc-800/40 rounded-3xl p-6 space-y-6 shadow-xl backdrop-blur-md animate-fade-in">
+              <div className="glass-panel rounded-3xl p-6 space-y-6 shadow-xl animate-fade-in">
                 <div className="space-y-4">
                   <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest font-mono border-b border-zinc-800/50 pb-2">
                     ลิงก์โซเชียลมีเดีย
@@ -307,7 +307,7 @@ export default function RegisterPage() {
 
                   <div className="space-y-2">
                     <label className="text-xs text-zinc-400 font-medium block">
-                      ตำแหน่งประจำ (Positions)
+                      ตำแหน่งประจำ
                     </label>
                     <div className="space-y-3">
                       {positionsList.map((pos, idx) => (
@@ -350,7 +350,7 @@ export default function RegisterPage() {
 
                   <div className="space-y-2">
                     <label className="text-xs text-zinc-400 font-medium block">
-                      รางวัล (Awards)
+                      รางวัล
                     </label>
                     <div className="space-y-3">
                       {awardsList.map((awd, idx) => (

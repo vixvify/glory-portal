@@ -8,7 +8,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Button } from "@/components/ui/button";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 import { useAppStore } from "@/store/use-store";
-import { useCategoriesQuery } from "@/hooks/use-master-data";
+import { useCategoriesQuery, useUniversitiesQuery } from "@/hooks/use-master-data";
 import { useLogoutMutation } from "@/hooks/use-auth";
 
 export default function Navbar() {
@@ -16,7 +16,10 @@ export default function Navbar() {
   const { searchQuery, setSearchQuery, currentUser } = useAppStore();
 
   const { data: categories = [] } = useCategoriesQuery();
+  const { data: universities = [] } = useUniversitiesQuery();
   const logoutMutation = useLogoutMutation();
+
+  const [activeTab, setActiveTab] = useState<"category" | "university">("category");
 
   const onSignOut = () => {
     logoutMutation.mutate();
@@ -32,6 +35,12 @@ export default function Navbar() {
     } else {
       router.push(`/movies/category/${category}`);
     }
+    setShowMoviesMenu(false);
+    setSearchQuery("");
+  };
+
+  const handleUniversityClick = (uniName: string) => {
+    router.push(`/movies/university/${encodeURIComponent(uniName)}`);
     setShowMoviesMenu(false);
     setSearchQuery("");
   };
@@ -75,8 +84,8 @@ export default function Navbar() {
     <nav
       className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 md:px-16 py-4 transition-all duration-500 ease-out ${
         isScrolled
-          ? "bg-background/95 backdrop-blur-md border-b border-zinc-800/40 shadow-xl shadow-black/20"
-          : "bg-transparent"
+          ? "glass-nav shadow-2xl shadow-black/35 py-3.5"
+          : "bg-transparent border-b border-transparent"
       }`}
       style={{ fontFamily: "var(--font-kanit), Arial, Helvetica, sans-serif" }}
     >
@@ -84,7 +93,7 @@ export default function Navbar() {
         <Link
           href="/"
           className="text-3xl font-extrabold tracking-tighter text-brand cursor-pointer transition-transform duration-300 hover:scale-105 active:scale-95"
-          style={{ textShadow: `0 0 10px rgba(var(--theme-primary-rgb),0.3)` }}
+          style={{ textShadow: `0 0 10px rgba(var(--theme-primary-rgb),0.35)` }}
         >
           GLORY
         </Link>
@@ -100,7 +109,7 @@ export default function Navbar() {
           <div className="relative">
             <button
               onClick={() => setShowMoviesMenu(!showMoviesMenu)}
-              className="flex items-center gap-1 cursor-pointer transition-colors duration-305 hover:text-white focus:outline-none text-white font-semibold"
+              className="flex items-center gap-1 cursor-pointer transition-colors duration-300 hover:text-white focus:outline-none text-white font-semibold"
             >
               ภาพยนตร์
               <div
@@ -109,30 +118,68 @@ export default function Navbar() {
             </button>
 
             {showMoviesMenu && (
-              <div className="absolute left-0 mt-3 w-56 bg-card/95 backdrop-blur-md rounded-xl border border-zinc-850 p-2 shadow-2xl animate-fade-in z-50">
-                <div className="px-3 py-1.5 border-b border-zinc-800/80 mb-1">
-                  <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold">
-                    หมวดหมู่
-                  </p>
-                </div>
-                <div className="max-h-60 overflow-y-auto pr-1 no-scrollbar space-y-0.5">
+              <div className="absolute left-0 mt-3 w-64 glass-panel bg-[#090807]/95 border-zinc-800/80 rounded-xl p-3.5 shadow-2xl animate-fade-in z-50">
+                <div className="flex border-b border-white/5 mb-2.5 pb-1.5 gap-1.5">
                   <button
-                    onClick={() => handleNavClick(null)}
-                    className="w-full text-left px-3 py-2 text-xs rounded-lg cursor-pointer transition-colors text-zinc-300 hover:bg-zinc-800/40 hover:text-white"
+                    onClick={() => setActiveTab("category")}
+                    className={`flex-1 text-center py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                      activeTab === "category"
+                        ? "bg-brand/15 text-brand border border-brand/25"
+                        : "text-zinc-400 hover:text-white border border-transparent"
+                    }`}
                   >
-                    หนังทั้งหมด
+                    หมวดหมู่
                   </button>
-                  {categories.map((cat) => (
-                    <button
-                      key={cat.id}
-                      onClick={() => {
-                        handleNavClick(cat.name);
-                      }}
-                      className="w-full text-left px-3 py-2 text-xs rounded-lg cursor-pointer transition-colors text-zinc-300 hover:bg-zinc-800/40 hover:text-white"
-                    >
-                      {CATEGORY_TITLE_MAPPING[cat.name] || cat.name}
-                    </button>
-                  ))}
+                  <button
+                    onClick={() => setActiveTab("university")}
+                    className={`flex-1 text-center py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                      activeTab === "university"
+                        ? "bg-brand/15 text-brand border border-brand/25"
+                        : "text-zinc-400 hover:text-white border border-transparent"
+                    }`}
+                  >
+                    มหาวิทยาลัย
+                  </button>
+                </div>
+
+                <div className="max-h-60 overflow-y-auto pr-1 no-scrollbar space-y-0.5">
+                  {activeTab === "category" ? (
+                    <>
+                      <button
+                        onClick={() => handleNavClick(null)}
+                        className="w-full text-left px-3 py-2 text-xs rounded-lg cursor-pointer transition-colors text-zinc-350 hover:bg-brand/10 hover:text-brand"
+                      >
+                        หนังทั้งหมด
+                      </button>
+                      {categories.map((cat) => (
+                        <button
+                          key={cat.id}
+                          onClick={() => handleNavClick(cat.name)}
+                          className="w-full text-left px-3 py-2 text-xs rounded-lg cursor-pointer transition-colors text-zinc-350 hover:bg-brand/10 hover:text-brand"
+                        >
+                          {CATEGORY_TITLE_MAPPING[cat.name] || cat.name}
+                        </button>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      {universities.length === 0 ? (
+                        <p className="text-center text-zinc-500 py-3 text-xs font-light">
+                          ไม่มีข้อมูลมหาวิทยาลัย
+                        </p>
+                      ) : (
+                        universities.map((uni) => (
+                          <button
+                            key={uni.id}
+                            onClick={() => handleUniversityClick(uni.name)}
+                            className="w-full text-left px-3 py-2 text-xs rounded-lg cursor-pointer transition-colors text-zinc-350 hover:bg-brand/10 hover:text-brand"
+                          >
+                            {uni.name}
+                          </button>
+                        ))
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -146,9 +193,9 @@ export default function Navbar() {
 
       <div className="flex items-center gap-4 md:gap-6">
         <div
-          className={`flex items-center gap-2 px-2 py-1 rounded border transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
             isSearchExpanded
-              ? "w-40 md:w-64 bg-black/60 border-zinc-600 scale-100 opacity-100"
+              ? "w-40 md:w-64 glass-input border-white/10 scale-100 opacity-100"
               : "w-8 bg-transparent border-transparent"
           }`}
         >
@@ -191,7 +238,7 @@ export default function Navbar() {
               onClick={() => setShowProfileMenu(!showProfileMenu)}
               className="flex items-center gap-1.5 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-white font-bold text-sm shadow-md shadow-brand/20">
+              <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-black font-bold text-sm shadow-md shadow-brand/20 border border-brand/40">
                 {(currentUser.name || currentUser.email || "U")
                   .charAt(0)
                   .toUpperCase()}
@@ -200,26 +247,26 @@ export default function Navbar() {
             </button>
 
             {showProfileMenu && (
-              <div className="absolute right-0 mt-3 w-48 bg-card rounded-xl border border-zinc-800 p-2 shadow-xl animate-fade-in z-50">
-                <div className="px-3 py-2 border-b border-zinc-800/80 mb-1">
+              <div className="absolute right-0 mt-3 w-48 glass-panel bg-[#090807]/95 border-zinc-800/80 rounded-xl p-2 shadow-xl animate-fade-in z-50">
+                <div className="px-3 py-2 border-b border-white/5 mb-1">
                   <p className="text-xs text-white font-semibold truncate">
                     {currentUser.name || currentUser.email}
                   </p>
-                  <p className="text-[10px] text-zinc-500 truncate mt-0.5">
+                  <p className="text-[10px] text-zinc-400 truncate mt-0.5">
                     {currentUser.email}
                   </p>
                 </div>
                 <Link
                   href="/profile"
                   onClick={() => setShowProfileMenu(false)}
-                  className="w-full block text-left px-3 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800/60 rounded-lg cursor-pointer transition-colors mb-1"
+                  className="w-full block text-left px-3 py-2 text-xs text-zinc-355 hover:text-brand hover:bg-brand/10 rounded-lg cursor-pointer transition-colors mb-1"
                 >
                   โปรไฟล์ของฉัน
                 </Link>
                 <Link
                   href="/create/movie"
                   onClick={() => setShowProfileMenu(false)}
-                  className="w-full block text-left px-3 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800/60 rounded-lg cursor-pointer transition-colors mb-1"
+                  className="w-full block text-left px-3 py-2 text-xs text-zinc-355 hover:text-brand hover:bg-brand/10 rounded-lg cursor-pointer transition-colors mb-1"
                 >
                   เพิ่มภาพยนตร์
                 </Link>
@@ -228,7 +275,7 @@ export default function Navbar() {
                     onSignOut();
                     setShowProfileMenu(false);
                   }}
-                  className="w-full text-left px-3 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-zinc-800/60 rounded-lg cursor-pointer transition-colors"
+                  className="w-full text-left px-3 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg cursor-pointer transition-colors"
                 >
                   ออกจากระบบ
                 </button>

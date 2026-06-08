@@ -2,9 +2,10 @@
 
 import { useEffect, useState, useRef } from "react";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import AddIcon from "@mui/icons-material/Add";
+import CheckIcon from "@mui/icons-material/Check";
 import { Movie } from "@/core/domain/movie";
 import { Button } from "@/components/ui/button";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
@@ -13,9 +14,16 @@ import Link from "next/link";
 interface Props {
   movies: Movie[];
   onPlayClick: (movie: Movie) => void;
+  favorites: Movie[];
+  onToggleFavorite: (movieId: string) => void;
 }
 
-export default function MovieHero({ movies, onPlayClick }: Props) {
+export default function MovieHero({
+  movies,
+  onPlayClick,
+  favorites = [],
+  onToggleFavorite,
+}: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -114,27 +122,32 @@ export default function MovieHero({ movies, onPlayClick }: Props) {
           </span>
         </div>
 
-        <h1
-          className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-wide leading-tight select-none drop-shadow-xl font-sans animate-fade-in"
-          key={`title-${currentMovie.id}`}
+        <Link
+          href={`/movies/${currentMovie.id}`}
+          className="inline-block group/title"
         >
-          {currentMovie.title}
-        </h1>
+          <h1
+            className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-wide leading-tight select-none drop-shadow-xl font-sans animate-fade-in group-hover/title:text-brand transition-colors cursor-pointer"
+            key={`title-${currentMovie.id}`}
+          >
+            {currentMovie.title}
+          </h1>
+        </Link>
 
         <div
           className="flex items-center gap-3 text-xs md:text-sm animate-fade-in"
           key={`meta-${currentMovie.id}`}
         >
-          <span className="text-emerald-400 font-bold">
-            {currentMovie.matchRate}% ตรงกับคุณ
-          </span>
           <span className="text-zinc-300">{currentMovie.year}</span>
           <span className="px-1.5 py-0.5 text-[10px] md:text-xs font-bold border border-zinc-500 text-zinc-300 rounded leading-none">
             {currentMovie.ageRating?.name}
           </span>
-          <span className="text-zinc-300">{currentMovie.duration}</span>
+          <span className="text-zinc-300">{currentMovie.duration} นาที</span>
           <span className="text-zinc-300 font-semibold bg-zinc-800/80 px-2 py-0.5 rounded-full text-xs">
-            {currentMovie.category ? (CATEGORY_TITLE_MAPPING[currentMovie.category.name] || currentMovie.category.name) : ""}
+            {currentMovie.category
+              ? CATEGORY_TITLE_MAPPING[currentMovie.category.name] ||
+                currentMovie.category.name
+              : ""}
           </span>
         </div>
 
@@ -155,15 +168,24 @@ export default function MovieHero({ movies, onPlayClick }: Props) {
             เล่น
           </Button>
 
-          <Link href={`/movies/${currentMovie.id}`}>
-            <Button
-              variant="outline"
-              className="bg-zinc-600/20 backdrop-blur-md hover:bg-zinc-600/45 active:scale-95 font-bold px-6 md:px-8 py-2.5 md:py-3.5 flex items-center gap-2 border border-zinc-500/25"
-            >
-              <InfoOutlinedIcon className="text-xl md:text-2xl" />
-              ข้อมูลเพิ่มเติม
-            </Button>
-          </Link>
+          <Button
+            variant="outline"
+            onClick={() => onToggleFavorite(currentMovie.id)}
+            className={`backdrop-blur-md hover:bg-zinc-600/45 active:scale-95 font-bold px-6 md:px-8 py-2.5 md:py-3.5 flex items-center gap-2 border transition-all ${
+              favorites.some((fav) => fav.id === currentMovie.id)
+                ? "bg-brand/25 border-brand/50 text-brand hover:border-brand/70"
+                : "bg-zinc-600/20 border-zinc-500/25 text-white hover:text-white"
+            }`}
+          >
+            {favorites.some((fav) => fav.id === currentMovie.id) ? (
+              <CheckIcon className="text-xl md:text-2xl" />
+            ) : (
+              <AddIcon className="text-xl md:text-2xl" />
+            )}
+            {favorites.some((fav) => fav.id === currentMovie.id)
+              ? "อยู่ในรายการของฉันแล้ว"
+              : "เพิ่มในรายการของฉัน"}
+          </Button>
         </div>
       </div>
 

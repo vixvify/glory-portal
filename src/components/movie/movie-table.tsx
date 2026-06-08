@@ -14,12 +14,16 @@ interface MovieTableProps {
   movies: Movie[];
   onEdit?: (movie: Movie) => void;
   onDelete?: (id: string) => void;
+  canEdit?: (movie: Movie) => boolean;
+  canDelete?: (movie: Movie) => boolean;
 }
 
 export const MovieTable: React.FC<MovieTableProps> = ({
   movies,
   onEdit,
   onDelete,
+  canEdit,
+  canDelete,
 }) => {
   return (
     <div className="overflow-x-auto">
@@ -83,9 +87,6 @@ export const MovieTable: React.FC<MovieTableProps> = ({
                     <span className="px-1 py-0.5 text-[9px] font-bold border border-zinc-700 text-zinc-400 rounded leading-none">
                       {movie.ageRating?.name}
                     </span>
-                    <span className="text-[10px] text-emerald-400 font-bold">
-                      {movie.matchRate}% ตรงกัน
-                    </span>
                   </div>
                 </td>
 
@@ -109,7 +110,7 @@ export const MovieTable: React.FC<MovieTableProps> = ({
 
                 <td className="py-4 px-6 text-right">
                   <div className="flex items-center justify-end gap-2">
-                    {onEdit && (
+                    {onEdit && (!canEdit || canEdit(movie)) && (
                       <Button
                         variant="secondary"
                         size="sm"
@@ -119,7 +120,7 @@ export const MovieTable: React.FC<MovieTableProps> = ({
                         <EditIcon className="text-sm" />
                       </Button>
                     )}
-                    {onDelete && (
+                    {onDelete && (!canDelete || canDelete(movie)) && (
                       <Button
                         variant="secondary"
                         size="sm"

@@ -73,7 +73,6 @@ export default function AdminPage() {
         <div className="space-y-4 pt-6 border-t border-zinc-900">
           <h2 className="text-lg font-bold text-white uppercase tracking-wider flex items-center gap-2">
             <SettingsIcon className="text-brand text-lg" /> ระบบจัดการข้อมูล
-            (Management Hub)
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -84,7 +83,7 @@ export default function AdminPage() {
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-xl font-bold group-hover:text-brand transition-colors">
-                    จัดการข้อมูลภาพยนตร์ (Movie Management)
+                    จัดการข้อมูลภาพยนตร์
                   </h3>
                   <p className="text-sm text-zinc-450 leading-relaxed font-light">
                     ดูรายชื่อ ค้นหาภาพยนตร์สั้น กรองข้อมูลตามหมวดหมู่
@@ -116,7 +115,7 @@ export default function AdminPage() {
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-xl font-bold group-hover:text-violet-400 transition-colors">
-                    จัดการข้อมูลทีมงาน (Crew Management)
+                    จัดการข้อมูลทีมงาน
                   </h3>
                   <p className="text-sm text-zinc-450 leading-relaxed font-light">
                     ดูทำเนียบรายชื่อ ค้นหาข้อมูลผู้กำกับ ทีมงานสร้าง และนักแสดง

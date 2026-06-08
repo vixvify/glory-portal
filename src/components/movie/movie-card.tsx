@@ -40,7 +40,7 @@ function MovieCard({
   };
 
   return (
-    <div className="group relative cursor-pointer bg-zinc-900 rounded-xl overflow-hidden shadow-lg border border-zinc-800/80 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:shadow-2xl hover:shadow-black/50 hover:border-zinc-700/60 z-10 hover:z-20 flex flex-col h-full">
+    <div className="group relative cursor-pointer glass-card rounded-xl overflow-hidden z-10 hover:z-20 flex flex-col h-full">
       <div className="relative aspect-video w-full overflow-hidden bg-zinc-950">
         <Image
           src={movie.thumbnail}
@@ -50,7 +50,7 @@ function MovieCard({
           className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-108"
         />
         <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <div className="w-12 h-12 rounded-full bg-white/90 text-black flex items-center justify-center shadow-lg transform scale-75 group-hover:scale-100 transition-transform duration-300">
+          <div className="w-12 h-12 rounded-full bg-brand text-black flex items-center justify-center shadow-lg transform scale-75 group-hover:scale-100 transition-transform duration-300">
             <PlayArrowIcon className="text-2xl ml-0.5" />
           </div>
         </div>
@@ -60,10 +60,10 @@ function MovieCard({
         </span>
       </div>
 
-      <div className="p-4 flex flex-col flex-1 justify-between gap-3 bg-[#181818]">
+      <div className="p-4 flex flex-col flex-1 justify-between gap-3 bg-transparent">
         <div className="space-y-1">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-bold text-sm md:text-base text-white tracking-wide leading-tight group-hover:text-red-500 transition-colors duration-300 line-clamp-1">
+            <h3 className="font-bold text-sm md:text-base text-white tracking-wide leading-tight group-hover:text-brand transition-colors duration-300 line-clamp-1">
               {movie.title}
             </h3>
             <span className="text-[10px] text-zinc-400 shrink-0 font-medium">
@@ -76,12 +76,9 @@ function MovieCard({
           </p>
         </div>
 
-        <div className="flex items-center justify-between gap-2 border-t border-zinc-800/80 pt-2 text-[11px] md:text-xs">
+        <div className="flex items-center justify-between gap-2 border-t border-white/5 pt-2 text-[11px] md:text-xs">
           <div className="flex items-center gap-1.5 font-bold">
-            <span className="text-emerald-400 font-bold shrink-0">
-              {movie.matchRate}%
-            </span>
-            <span className="px-1 py-0.2 border border-zinc-600 text-[9px] text-zinc-300 rounded leading-none scale-90">
+            <span className="px-1.5 py-0.2 border border-white/10 text-[9px] text-zinc-400 rounded leading-none scale-90">
               {movie.ageRating?.name}
             </span>
             <div className="flex items-center gap-0.5 text-amber-500 shrink-0">
@@ -95,7 +92,7 @@ function MovieCard({
           <div className="flex items-center gap-1.5">
             <button
               onClick={handlePlay}
-              className="p-1 rounded-full bg-zinc-800 text-white hover:bg-white hover:text-black hover:scale-105 active:scale-95 transition-all shadow cursor-pointer border border-zinc-700/50"
+              className="p-1 rounded-full bg-white/10 text-white hover:bg-brand hover:text-black hover:scale-105 active:scale-95 transition-all shadow cursor-pointer border border-white/10"
               title="ตัวอย่างภาพยนตร์"
             >
               <PlayArrowIcon className="text-base" />
@@ -105,8 +102,8 @@ function MovieCard({
                 onClick={handleToggle}
                 className={`p-1 rounded-full border transition-all cursor-pointer ${
                   isFavorite
-                    ? "bg-zinc-800 border-zinc-500 text-green-400 hover:border-white"
-                    : "bg-zinc-900 border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                    ? "bg-brand/20 border-brand/40 text-brand hover:border-brand/70"
+                    : "bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10 hover:text-white"
                 }`}
                 title={isFavorite ? "ลบจากรายการของฉัน" : "เพิ่มในรายการของฉัน"}
               >

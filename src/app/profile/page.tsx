@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-store";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -32,9 +32,7 @@ export default function ProfilePage() {
   const [deleteMovieId, setDeleteMovieId] = useState<string | null>(null);
   const [deleteCrewId, setDeleteCrewId] = useState<string | null>(null);
   const [isDeletingLocal, setIsDeletingLocal] = useState(false);
-  const [activeTab, setActiveTab] = useState<"movies" | "contributed" | "crew">(
-    "movies",
-  );
+  const [activeTab, setActiveTab] = useState<"movies" | "crew">("movies");
 
   const { data: myMovies = [], isLoading: isMoviesLoading } = useMyMoviesQuery({
     enabled: !!currentUser,
@@ -44,9 +42,19 @@ export default function ProfilePage() {
     enabled: !!currentUser,
   });
 
-  const { data: myCrew = [], isLoading: isCrewLoading } = useMyCrewMembersQuery(
-    { enabled: !!currentUser },
-  );
+  const { data: myCrew = [], isLoading: isCrewLoading } = useMyCrewMembersQuery({
+    enabled: !!currentUser,
+  });
+
+  const allMyMovies = useMemo(() => {
+    const merged = [...myMovies];
+    contributedMovies.forEach((cm) => {
+      if (!merged.some((m) => m.id === cm.id)) {
+        merged.push(cm);
+      }
+    });
+    return merged;
+  }, [myMovies, contributedMovies]);
 
   const deleteMovieMutation = useDeleteMovieMutation();
   const deleteCrewMemberMutation = useDeleteCrewMemberMutation();
@@ -200,7 +208,7 @@ export default function ProfilePage() {
             <div className="space-y-6">
               <div className="bg-zinc-900/20 border border-zinc-900/40 rounded-3xl p-6 space-y-4">
                 <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest font-mono border-b border-zinc-900/50 pb-2">
-                  เกี่ยวกับตัวฉัน (Bio)
+                  เกี่ยวกับตัวฉัน
                 </p>
                 <p className="text-xs text-zinc-300 font-light leading-relaxed whitespace-pre-line">
                   {currentUser.bio || "ไม่มีข้อมูลประวัติผู้ใช้งาน"}
@@ -316,7 +324,7 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-2 border-b border-zinc-900/50 pb-2">
                   <WorkIcon className="text-xs text-brand" />
                   <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest font-mono">
-                    ตำแหน่งประจำ (Positions)
+                    ตำแหน่งประจำ
                   </p>
                 </div>
 
@@ -342,7 +350,7 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-2 border-b border-zinc-900/50 pb-2">
                   <EmojiEventsIcon className="text-xs text-brand" />
                   <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest font-mono">
-                    รางวัลเกียรติยศ (Awards)
+                    รางวัลเกียรติยศ
                   </p>
                 </div>
 
@@ -382,17 +390,7 @@ export default function ProfilePage() {
                   : "text-zinc-400 border-transparent hover:text-white"
               }`}
             >
-              ภาพยนตร์ที่ฉันเพิ่ม ({myMovies.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("contributed")}
-              className={`text-lg font-bold tracking-wide pb-2 px-1 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === "contributed"
-                  ? "text-brand border-brand"
-                  : "text-zinc-400 border-transparent hover:text-white"
-              }`}
-            >
-              ภาพยนตร์ที่มีส่วนร่วม ({contributedMovies.length})
+              ภาพยนตร์ของฉัน ({allMyMovies.length})
             </button>
             <button
               onClick={() => setActiveTab("crew")}
@@ -405,25 +403,20 @@ export default function ProfilePage() {
               ทีมงานที่ฉันเพิ่ม ({myCrew.length})
             </button>
           </div>
+
           {activeTab === "movies" ? (
-            isMoviesLoading ? (
+            isMoviesLoading || isContributedLoading ? (
               <div className="flex justify-center py-10">
                 <div className="w-8 h-8 border-4 border-zinc-700 border-t-white rounded-full animate-spin" />
               </div>
             ) : (
               <MovieTable
-                movies={myMovies}
+                movies={allMyMovies}
                 onEdit={(movie) => router.push(`/movies/${movie.id}/edit`)}
                 onDelete={setDeleteMovieId}
+                canEdit={(movie) => myMovies.some((m) => m.id === movie.id)}
+                canDelete={(movie) => myMovies.some((m) => m.id === movie.id)}
               />
-            )
-          ) : activeTab === "contributed" ? (
-            isContributedLoading ? (
-              <div className="flex justify-center py-10">
-                <div className="w-8 h-8 border-4 border-zinc-700 border-t-white rounded-full animate-spin" />
-              </div>
-            ) : (
-              <MovieTable movies={contributedMovies} />
             )
           ) : isCrewLoading ? (
             <div className="flex justify-center py-10">

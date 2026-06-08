@@ -4,11 +4,9 @@ import { useQueries } from "@tanstack/react-query";
 import { movieService } from "@/infra/container";
 import { useMoviesQuery } from "@/hooks/use-movies";
 import { useFavoritesQuery } from "@/hooks/use-favorites";
-import {
-  useCategoriesQuery,
-  useUniversitiesQuery,
-} from "@/hooks/use-master-data";
+import { useCategoriesQuery } from "@/hooks/use-master-data";
 import { useCrewMembersQuery } from "@/hooks/use-crew-members";
+import { useAdminStatsQuery } from "@/hooks/use-admin";
 import { useAppStore } from "@/store/use-store";
 import HomePage from "./home/home";
 import Loading from "./loading";
@@ -33,8 +31,6 @@ export default function Page() {
 
   const { data: categories = [], isLoading: isCatLoading } =
     useCategoriesQuery();
-  const { data: universities = [], isLoading: isUniLoading } =
-    useUniversitiesQuery();
 
   const { data: directorsList = [], isLoading: isDirsLoading } =
     useCrewMembersQuery({
@@ -51,21 +47,15 @@ export default function Page() {
   const { data: serverFavorites = [], isLoading: isFavsLoading } =
     useFavoritesQuery(!!currentUser);
 
-  const universityMovieQueries = useQueries({
-    queries: universities.map((uni) => ({
-      queryKey: [
-        "movies",
-        { search: uni.name, searchby: "university", page: 1, pagesize: 10 },
-      ],
-      queryFn: () =>
-        movieService.getMovies({
-          search: uni.name,
-          searchby: "university",
-          page: 1,
-          pagesize: 10,
-        }),
-    })),
-  });
+  const { data: adminStats, isLoading: isStatsLoading } = useAdminStatsQuery();
+
+  const { data: movieByUniversity = [], isLoading: isMovieUniLoading } =
+    useMoviesQuery({
+      search: adminStats?.mostActiveUniversity,
+      searchby: "university",
+      page: 1,
+      pagesize: 10,
+    });
 
   const categoryMovieQueries = useQueries({
     queries: categories.map((category) => ({
@@ -92,23 +82,16 @@ export default function Page() {
     isRecLoading ||
     isPopLoading ||
     isCatLoading ||
-    isUniLoading ||
+    isMovieUniLoading ||
     isDirsLoading ||
     isActorsLoading ||
+    isStatsLoading ||
     (!!currentUser && isFavsLoading) ||
-    universityMovieQueries.some((q) => q.isLoading) ||
     categoryMovieQueries.some((q) => q.isLoading);
 
   if (isAnyLoading) {
     return <Loading />;
   }
-
-  const universityMoviesMap = Object.fromEntries(
-    universities.map((uni, index) => [
-      uni.id,
-      universityMovieQueries[index]?.data || [],
-    ]),
-  );
 
   const categoryMoviesMap = Object.fromEntries(
     categories.map((category, index) => [
@@ -122,10 +105,9 @@ export default function Page() {
       recommendedMovies={recommendedMovies}
       popularMovies={popularMovies}
       categories={categories}
-      universities={universities}
       directorsList={directorsList}
       actorsList={actorsList}
-      universityMoviesMap={universityMoviesMap}
+      universityMovies={movieByUniversity}
       categoryMoviesMap={categoryMoviesMap}
       favorites={serverFavorites}
     />

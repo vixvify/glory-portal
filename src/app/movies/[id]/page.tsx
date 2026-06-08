@@ -7,7 +7,9 @@ import CheckIcon from "@mui/icons-material/Check";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import PersonIcon from "@mui/icons-material/Person";
-import { User } from "@/core/domain/user";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { useScrollRow } from "@/hooks/use-scroll-row";
 import { Button } from "@/components/ui/button";
 import {
   useAddRatingMutation,
@@ -26,6 +28,8 @@ import Loading from "@/app/loading";
 import PlayerModal from "@/components/modal/player-modal";
 import { useMoviePlayer } from "@/hooks/use-movie-player";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
+import { getYouTubeId } from "@/utils/youtube";
+import { getYouTubeBackgroundEmbedUrl } from "@/core/constants/youtube";
 
 export default function MovieDetails() {
   const params = useParams<{ id: string }>();
@@ -50,6 +54,32 @@ export default function MovieDetails() {
   const [commentText, setCommentText] = useState("");
   const [isPlayingTrailer, setIsPlayingTrailer] = useState(false);
   const { playMovie } = useMoviePlayer();
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const {
+    rowRef: crewRowRef,
+    showLeftArrow: showCrewLeft,
+    showRightArrow: showCrewRight,
+    handleScroll: handleCrewScroll,
+  } = useScrollRow(movie?.crew || []);
+
+  const videoId = useMemo(
+    () => getYouTubeId(movie?.trailerUrl),
+    [movie?.trailerUrl],
+  );
+  const backgroundEmbedUrl = useMemo(() => {
+    if (!videoId) return null;
+    return getYouTubeBackgroundEmbedUrl(videoId);
+  }, [videoId]);
+
+  useEffect(() => {
+    setVideoLoaded(false);
+    if (backgroundEmbedUrl) {
+      const timer = setTimeout(() => {
+        setVideoLoaded(true);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [backgroundEmbedUrl]);
 
   useEffect(() => {
     if (userRating) {
@@ -116,19 +146,47 @@ export default function MovieDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-brand selection:text-black">
+    <div className="min-h-screen bg-transparent text-white font-sans selection:bg-brand selection:text-black">
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-28 pb-16 space-y-10 animate-fade-in">
-        <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-zinc-800/40 bg-zinc-900/30">
-          <div
-            className="relative h-[420px] md:h-[520px] bg-cover bg-center"
-            style={{
-              backgroundImage: `
-                linear-gradient(to top, var(--theme-bg) 0%, rgba(var(--theme-bg-rgb), 0.4) 60%, rgba(var(--theme-bg-rgb), 0.85) 100%),
-                linear-gradient(to right, rgba(var(--theme-bg-rgb), 0.95) 0%, rgba(var(--theme-bg-rgb), 0.3) 40%, transparent 100%),
-                url(${movie?.thumbnail})
-              `,
-            }}
-          >
+        <div className="relative rounded-3xl overflow-hidden shadow-2xl glass-panel">
+          <div className="relative h-[420px] md:h-[520px] w-full bg-black/45 overflow-hidden">
+            <div
+              className="absolute inset-0 bg-cover bg-center transition-all duration-1000 z-0"
+              style={{
+                backgroundImage: `url(${movie?.thumbnail})`,
+                opacity: videoLoaded ? 0 : 0.8,
+                visibility: videoLoaded ? "hidden" : "visible",
+              }}
+            />
+
+            {backgroundEmbedUrl && (
+              <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                <iframe
+                  src={backgroundEmbedUrl}
+                  title="Trailer Background"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  className={`absolute top-1/2 left-1/2 w-[100vw] h-[56.25vw] min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 pointer-events-none scale-[1.35] transition-opacity duration-1000 ${
+                    videoLoaded ? "opacity-45" : "opacity-0"
+                  }`}
+                  style={{ pointerEvents: "none" }}
+                  tabIndex={-1}
+                />
+              </div>
+            )}
+
+            <div className="absolute inset-0 bg-transparent pointer-events-auto z-10" />
+
+            <div
+              className="absolute inset-0 z-[9] pointer-events-none"
+              style={{
+                backgroundImage: `
+                  linear-gradient(to top, var(--theme-bg) 0%, rgba(var(--theme-bg-rgb), 0.3) 65%, rgba(var(--theme-bg-rgb), 0.75) 100%),
+                  linear-gradient(to right, rgba(var(--theme-bg-rgb), 0.9) 0%, rgba(var(--theme-bg-rgb), 0.25) 45%, transparent 100%)
+                `,
+              }}
+            />
+
             <button
               onClick={() => router.back()}
               className="absolute top-6 left-6 w-11 h-11 rounded-full bg-black/50 hover:bg-black/80 border border-zinc-700/60 backdrop-blur-md flex items-center justify-center text-white cursor-pointer shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 z-20"
@@ -137,7 +195,7 @@ export default function MovieDetails() {
               <ArrowBackIcon className="text-xl" />
             </button>
 
-            <div className="absolute bottom-6 left-6 md:left-12 flex flex-wrap items-end gap-4 z-10 w-[90%]">
+            <div className="absolute bottom-6 left-6 md:left-12 flex flex-wrap items-end gap-4 z-20 w-[90%]">
               <div>
                 <div className="text-xs font-semibold tracking-widest text-brand mb-2.5 bg-brand/10 border border-brand/20 px-2.5 py-1 rounded-md inline-block">
                   GLORY ORIGINAL
@@ -180,11 +238,6 @@ export default function MovieDetails() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-2 md:px-4">
           <div className="lg:col-span-2 space-y-6">
             <div className="flex flex-wrap items-center gap-x-3.5 gap-y-2 text-sm text-zinc-400">
-              <span className="text-emerald-400 font-bold">
-                {movie?.matchRate}% ตรงกับคุณ
-              </span>
-
-              <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
               <span className="text-zinc-200">{movie?.year}</span>
 
               <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
@@ -198,7 +251,8 @@ export default function MovieDetails() {
               <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
               <span className="px-2.5 py-0.5 text-xs font-bold bg-brand/10 border border-brand/20 text-brand rounded-full">
                 {movie?.category &&
-                  (CATEGORY_TITLE_MAPPING[movie.category.name] || movie.category.name)}
+                  (CATEGORY_TITLE_MAPPING[movie.category.name] ||
+                    movie.category.name)}
               </span>
             </div>
 
@@ -227,84 +281,109 @@ export default function MovieDetails() {
               </div>
             )}
 
-            <div className="space-y-5 pt-6 border-t border-zinc-800/60">
-              <h4 className="text-base font-bold text-white tracking-wide uppercase">
+            <div className="space-y-5 pt-6 border-t border-zinc-800/60 group/row relative">
+              <h4 className="text-base font-bold text-white tracking-wide uppercase pl-1">
                 ทีมงานและนักแสดง
               </h4>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {movie?.crew && movie.crew.length > 0 ? (
-                  movie.crew.map((member) => (
-                    <Link
-                      href={`/crew/${member.crewMember?.id}`}
-                      key={member.id}
-                      className="flex items-center gap-3.5 bg-zinc-900/30 border border-zinc-800/40 p-3 rounded-2xl transition-all hover:bg-zinc-900/60 hover:border-zinc-700/40 group block cursor-pointer"
-                    >
-                      {member.crewMember?.user?.photoUrl ? (
-                        <img
-                          src={member.crewMember.user.photoUrl}
-                          alt={member.crewMember.name}
-                          className="w-12 h-12 rounded-full object-cover bg-zinc-800 border border-zinc-700/50 group-hover:border-brand/40 transition-colors flex-shrink-0"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-brand/10 border border-brand/20 flex items-center justify-center text-brand flex-shrink-0">
-                          <PersonIcon className="text-xl" />
+              <div className="relative">
+                {showCrewLeft && (
+                  <button
+                    onClick={() => handleCrewScroll("left")}
+                    className="absolute left-0 top-0 bottom-0 w-10 md:w-12 bg-black/60 hover:bg-black/85 text-white z-30 flex items-center justify-center rounded-r-lg transition-all duration-300 opacity-0 group-hover/row:opacity-100 border-r border-zinc-800/20 cursor-pointer shadow-lg"
+                  >
+                    <ChevronLeftIcon className="text-3xl hover:scale-125 transition-transform" />
+                  </button>
+                )}
+
+                <div
+                  ref={crewRowRef}
+                  className="flex gap-4 overflow-x-auto pb-3.5 pt-1 snap-x snap-mandatory no-scrollbar scroll-smooth"
+                >
+                  {movie?.crew && movie.crew.length > 0 ? (
+                    movie.crew.map((member) => (
+                      <Link
+                        href={`/crew/${member.crewMember?.id}`}
+                        key={member.id}
+                        className="flex items-center gap-3.5 glass-card p-3 rounded-2xl group flex-shrink-0 w-60 snap-start cursor-pointer block"
+                      >
+                        {member.crewMember?.user?.photoUrl ? (
+                          <img
+                            src={member.crewMember.user.photoUrl}
+                            alt={member.crewMember.name}
+                            className="w-12 h-12 rounded-full object-cover bg-zinc-800 border border-zinc-700/50 group-hover:border-brand/40 transition-colors flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-brand/10 border border-brand/20 flex items-center justify-center text-brand flex-shrink-0">
+                            <PersonIcon className="text-xl" />
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="font-bold text-zinc-200 group-hover:text-brand transition-colors flex items-center gap-1.5 truncate">
+                            {member.crewMember?.name}
+                            {member.crewMember?.userId && (
+                              <span
+                                className="w-1.5 h-1.5 bg-emerald-500 rounded-full flex-shrink-0"
+                                title="ผู้ใช้งานระบบ"
+                              />
+                            )}
+                          </p>
+                          <p className="text-[10px] text-brand uppercase tracking-widest font-medium mt-0.5 truncate">
+                            {member.role}
+                          </p>
                         </div>
-                      )}
-                      <div>
-                        <p className="font-bold text-zinc-200 group-hover:text-brand transition-colors flex items-center gap-1.5">
-                          {member.crewMember?.name}
-                          {member.crewMember?.userId && (
-                            <span
-                              className="w-1.5 h-1.5 bg-emerald-500 rounded-full"
-                              title="ผู้ใช้งานระบบ"
-                            />
-                          )}
-                        </p>
-                        <p className="text-[10px] text-brand uppercase tracking-widest font-medium mt-0.5">
-                          {member.role}
-                        </p>
-                      </div>
-                    </Link>
-                  ))
-                ) : (
-                  <p className="text-xs text-zinc-550 italic font-light col-span-2">
-                    ไม่มีข้อมูลทีมงานและนักแสดงสำหรับเรื่องนี้
-                  </p>
+                      </Link>
+                    ))
+                  ) : (
+                    <p className="text-xs text-zinc-550 italic font-light">
+                      ไม่มีข้อมูลทีมงานและนักแสดงสำหรับเรื่องนี้
+                    </p>
+                  )}
+                </div>
+
+                {showCrewRight && (
+                  <button
+                    onClick={() => handleCrewScroll("right")}
+                    className="absolute right-0 top-0 bottom-0 w-10 md:w-12 bg-black/60 hover:bg-black/85 text-white z-30 flex items-center justify-center rounded-l-lg transition-all duration-300 opacity-0 group-hover/row:opacity-100 border-l border-zinc-800/20 cursor-pointer shadow-lg"
+                  >
+                    <ChevronRightIcon className="text-3xl hover:scale-125 transition-transform" />
+                  </button>
                 )}
               </div>
             </div>
 
-            {movie?.btsVideos &&
-              movie.btsVideos.filter(Boolean).length > 0 && (
-                <div className="space-y-5 pt-6 border-t border-zinc-800/60">
-                  <h4 className="text-base font-bold text-white tracking-wide uppercase">
-                    วิดีโอเบื้องหลังการถ่ายทำ
-                  </h4>
+            {movie?.btsVideos && movie.btsVideos.filter(Boolean).length > 0 && (
+              <div className="space-y-5 pt-6 border-t border-zinc-800/60">
+                <h4 className="text-base font-bold text-white tracking-wide uppercase">
+                  วิดีโอเบื้องหลังการถ่ายทำ
+                </h4>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {movie.btsVideos.filter(Boolean).map((videoUrl, idx) => (
-                      <a
-                        href={videoUrl}
-                        key={idx}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 bg-zinc-900/30 border border-zinc-800/40 p-4 rounded-2xl hover:bg-zinc-900/60 hover:border-zinc-700/40 transition-all group cursor-pointer"
-                      >
-                        <PlayArrowIcon className="text-brand text-2xl group-hover:scale-110 transition-transform" />
-                        <div>
-                          <p className="font-bold text-sm text-zinc-200 group-hover:text-brand transition-colors">
-                            วิดีโอเบื้องหลัง #{idx + 1}
-                          </p>
-                          <p className="text-[10px] text-zinc-550 truncate max-w-[250px]">
-                            {videoUrl}
-                          </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {movie.btsVideos.filter(Boolean).map((videoUrl, idx) => {
+                    const ytid = getYouTubeId(videoUrl);
+                    if (!ytid) return null;
+
+                    return (
+                      <div key={idx} className="space-y-2.5">
+                        <p className="font-bold text-sm text-zinc-350">
+                          วิดีโอเบื้องหลัง #{idx + 1}
+                        </p>
+                        <div className="relative rounded-2xl overflow-hidden border border-zinc-800 bg-black/50 aspect-[16/9] w-full shadow-lg shadow-black/50 transition-all hover:border-brand/30">
+                          <iframe
+                            src={`https://www.youtube.com/embed/${ytid}`}
+                            title={`YouTube BTS Video Preview ${idx + 1}`}
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowFullScreen
+                            className="absolute inset-0 w-full h-full"
+                          />
                         </div>
-                      </a>
-                    ))}
-                  </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              )}
+              </div>
+            )}
 
             <div className="space-y-4 pt-6 border-t border-zinc-800/60">
               <h4 className="text-lg font-bold text-white tracking-wide">
@@ -316,7 +395,7 @@ export default function MovieDetails() {
                   movie.ratings.slice(0, 5).map((rating) => (
                     <div
                       key={`${rating.userId}-${rating.movieId}`}
-                      className="p-4 rounded-2xl bg-zinc-900/20 border border-zinc-850 flex items-start gap-4"
+                      className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-md flex items-start gap-4"
                     >
                       <div className="w-10 h-10 rounded-full bg-brand/10 border border-brand/20 flex items-center justify-center text-brand font-bold text-sm">
                         {(rating.user?.name || rating.user?.email || "U")
@@ -363,115 +442,121 @@ export default function MovieDetails() {
           </div>
 
           <div className="space-y-6">
-            <div className="p-6 rounded-2xl bg-zinc-900/30 border border-zinc-800/40 text-center space-y-4 shadow-xl">
-              <span className="text-zinc-450 text-xs uppercase tracking-widest font-semibold block">
-                คะแนนเฉลี่ยจากผู้ชม
-              </span>
-
-              <div className="flex items-baseline justify-center gap-1.5">
-                <span className="text-5xl font-extrabold text-white tracking-tighter">
-                  {averageRating > 0 ? averageRating : "0.0"}
+            <div className="p-6 rounded-2xl glass-panel-gold space-y-6 shadow-xl animate-fade-in">
+              <div className="text-center space-y-3">
+                <span className="text-zinc-450 text-[10px] uppercase tracking-widest font-semibold block">
+                  คะแนนเฉลี่ยจากผู้ชม
                 </span>
-                <span className="text-zinc-550 text-base">/ 5.0</span>
+
+                <div className="flex items-baseline justify-center gap-1.5">
+                  <span className="text-5xl font-extrabold text-white tracking-tighter">
+                    {averageRating > 0 ? averageRating : "0.0"}
+                  </span>
+                  <span className="text-zinc-550 text-base">/ 5.0</span>
+                </div>
+
+                <div className="flex justify-center gap-0.5">
+                  {Array.from({ length: 5 }).map((_, idx) => {
+                    const starVal = idx + 1;
+                    return starVal <= Math.round(averageRating) ? (
+                      <StarIcon key={idx} className="text-amber-500 text-2xl" />
+                    ) : (
+                      <StarBorderIcon
+                        key={idx}
+                        className="text-zinc-750 text-2xl"
+                      />
+                    );
+                  })}
+                </div>
+
+                <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
+                  รวมทั้งหมด {ratingCount} โหวต
+                </p>
               </div>
 
-              <div className="flex justify-center gap-0.5">
-                {Array.from({ length: 5 }).map((_, idx) => {
-                  const starVal = idx + 1;
-                  return starVal <= Math.round(averageRating) ? (
-                    <StarIcon key={idx} className="text-amber-500 text-2xl" />
-                  ) : (
-                    <StarBorderIcon
-                      key={idx}
-                      className="text-zinc-750 text-2xl"
-                    />
-                  );
-                })}
-              </div>
+              <div className="border-t border-zinc-800/40 pt-5 space-y-4">
+                <h5 className="text-xs font-bold text-white uppercase tracking-widest text-center">
+                  {userRating ? "คะแนนของคุณ" : "ให้คะแนนหนังนี้"}
+                </h5>
 
-              <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
-                รวมทั้งหมด {ratingCount} โหวต
-              </p>
-            </div>
+                <div className="flex justify-center gap-1.5">
+                  {Array.from({ length: 5 }).map((_, idx) => {
+                    const starValue = idx + 1;
 
-            <div className="p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800/50 space-y-5 shadow-xl">
-              <h5 className="text-xs font-bold text-white uppercase tracking-widest text-center">
-                {userRating ? "คะแนนของคุณ" : "ให้คะแนนหนังนี้"}
-              </h5>
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => setSelectedStars(starValue)}
+                        disabled={isRatingPending}
+                        className="cursor-pointer hover:scale-110 active:scale-95 transition-transform focus:outline-none disabled:opacity-50 disabled:pointer-events-none"
+                        aria-label={`ให้ ${starValue} คะแนน`}
+                      >
+                        {starValue <= selectedStars ? (
+                          <StarIcon className="text-amber-500 text-3xl drop-shadow-[0_0_8px_rgba(245,158,11,0.25)]" />
+                        ) : (
+                          <StarBorderIcon className="text-zinc-700 text-3xl" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
 
-              <div className="flex justify-center gap-1.5">
-                {Array.from({ length: 5 }).map((_, idx) => {
-                  const starValue = idx + 1;
-
-                  return (
-                     <button
-                      key={idx}
-                      onClick={() => setSelectedStars(starValue)}
-                      disabled={isRatingPending}
-                      className="cursor-pointer hover:scale-110 active:scale-95 transition-transform focus:outline-none disabled:opacity-50 disabled:pointer-events-none"
-                      aria-label={`ให้ ${starValue} คะแนน`}
-                    >
-                      {starValue <= selectedStars ? (
-                        <StarIcon className="text-amber-500 text-3xl drop-shadow-[0_0_8px_rgba(245,158,11,0.25)]" />
-                      ) : (
-                        <StarBorderIcon className="text-zinc-700 text-3xl" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <textarea
-                rows={3}
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                disabled={isRatingPending}
-                placeholder="เขียนความคิดเห็นของคุณเกี่ยวกับหนังเรื่องนี้... (ไม่บังคับ)"
-                className="w-full bg-black/40 border border-zinc-800 focus:border-brand rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-colors resize-none"
-              />
-
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => {
-                    if (!currentUser || !movie) {
-                      showToast("กรุณาเข้าสู่ระบบก่อนโหวตคะแนน", "warning");
-                      return;
-                    }
-                    if (userRating) {
-                      handleUpdateRating(movie.id, selectedStars, commentText);
-                    } else {
-                      handleAddRating(movie.id, selectedStars, commentText);
-                    }
-                  }}
-                  variant="brand"
-                  size="md"
-                  className="flex-1"
-                  isLoading={isRatingPending}
+                <textarea
+                  rows={3}
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
                   disabled={isRatingPending}
-                >
-                  {userRating ? "แก้ไขคะแนน" : "ส่งคะแนน"}
-                </Button>
+                  placeholder="เขียนความคิดเห็นของคุณเกี่ยวกับหนังเรื่องนี้... (ไม่บังคับ)"
+                  className="w-full glass-input rounded-xl px-3 py-2 text-xs text-white focus:outline-none transition-colors resize-none"
+                />
 
-                {userRating && (
-                  <button
+                <div className="flex gap-2">
+                  <Button
                     onClick={() => {
-                      if (currentUser && movie) {
-                        handleDeleteRating(movie.id);
-                        setSelectedStars(5);
-                        setCommentText("");
+                      if (!currentUser || !movie) {
+                        showToast("กรุณาเข้าสู่ระบบก่อนโหวตคะแนน", "warning");
+                        return;
+                      }
+                      if (userRating) {
+                        handleUpdateRating(
+                          movie.id,
+                          selectedStars,
+                          commentText,
+                        );
+                      } else {
+                        handleAddRating(movie.id, selectedStars, commentText);
                       }
                     }}
+                    variant="brand"
+                    size="md"
+                    className="flex-1"
+                    isLoading={isRatingPending}
                     disabled={isRatingPending}
-                    className="flex-1 bg-red-950/20 text-red-400 hover:bg-red-900/30 hover:text-red-300 border border-red-900/30 text-sm font-bold rounded-lg cursor-pointer transition-colors active:scale-95 flex items-center justify-center py-2.5 disabled:opacity-50 disabled:pointer-events-none"
-                    title="ลบคะแนน"
                   >
-                    ลบ
-                  </button>
-                )}
+                    {userRating ? "แก้ไขคะแนน" : "ส่งคะแนน"}
+                  </Button>
+
+                  {userRating && (
+                    <button
+                      onClick={() => {
+                        if (currentUser && movie) {
+                          handleDeleteRating(movie.id);
+                          setSelectedStars(5);
+                          setCommentText("");
+                        }
+                      }}
+                      disabled={isRatingPending}
+                      className="flex-1 bg-red-950/20 text-red-400 hover:bg-red-900/30 hover:text-red-300 border border-red-900/30 text-sm font-bold rounded-lg cursor-pointer transition-colors active:scale-95 flex items-center justify-center py-2.5 disabled:opacity-50 disabled:pointer-events-none"
+                      title="ลบคะแนน"
+                    >
+                      ลบ
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-zinc-900/30 border border-zinc-800/40 space-y-4 shadow-xl text-xs">
+            <div className="p-6 rounded-2xl glass-panel space-y-4 shadow-xl text-xs">
               <h5 className="text-xs font-bold text-white uppercase tracking-widest text-left border-b border-zinc-800/60 pb-3 flex items-center justify-between">
                 <span>ข้อมูลภาพยนตร์</span>
                 <span className="w-1.5 h-1.5 bg-brand rounded-full" />
@@ -533,9 +618,7 @@ export default function MovieDetails() {
                       โทนสี
                     </span>
                     <span className="text-zinc-200 font-medium text-right">
-                      {movie.colorType === "color"
-                        ? "ภาพสี (Color)"
-                        : "ขาวดำ"}
+                      {movie.colorType === "color" ? "ภาพสี" : "ขาวดำ"}
                     </span>
                   </div>
                 )}

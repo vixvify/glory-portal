@@ -3,4 +3,5 @@ export interface AdminStats {
   totalCategories: number;
   totalViews: number;
   totalCrew: number;
+  mostActiveUniversity: string;
 }

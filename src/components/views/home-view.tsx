@@ -10,10 +10,9 @@ interface HomeViewProps {
   recommendedMovies: Movie[];
   popularMovies: Movie[];
   categories: Category[];
-  universities: University[];
   directorsList: CrewMember[];
   actorsList: CrewMember[];
-  universityMoviesMap: Record<string, Movie[]>;
+  universityMovies: Movie[];
   categoryMoviesMap: Record<string, Movie[]>;
   favorites: Movie[];
   handlePlayMovie: (movie: Movie) => void;
@@ -25,19 +24,22 @@ export default function HomeView({
   recommendedMovies,
   popularMovies,
   categories,
-  universities,
   directorsList,
   actorsList,
-  universityMoviesMap,
+  universityMovies,
   categoryMoviesMap,
   favorites,
   handlePlayMovie,
   handleToggleFavorite,
-  setSearchQuery,
 }: HomeViewProps) {
   return (
     <main className="flex-1 flex flex-col">
-      <MovieHero movies={recommendedMovies} onPlayClick={handlePlayMovie} />
+      <MovieHero
+        movies={recommendedMovies}
+        onPlayClick={handlePlayMovie}
+        favorites={favorites}
+        onToggleFavorite={handleToggleFavorite}
+      />
 
       <div className="relative z-20 px-6 md:px-16 space-y-12 -mt-6 md:-mt-10">
         <MovieRankRow
@@ -58,16 +60,13 @@ export default function HomeView({
           />
         )}
 
-        {universities.map((uni) => (
-          <MovieRow
-            key={uni.id}
-            title={`ผลงานภาพยนตร์จาก ${uni.name}`}
-            movies={universityMoviesMap[uni.id] || []}
-            onPlayClick={handlePlayMovie}
-            favorites={favorites}
-            onToggleFavorite={handleToggleFavorite}
-          />
-        ))}
+        <MovieRow
+          title={`ผลงานภาพยนตร์จาก ${universityMovies[0].university?.name}`}
+          movies={universityMovies || []}
+          onPlayClick={handlePlayMovie}
+          favorites={favorites}
+          onToggleFavorite={handleToggleFavorite}
+        />
 
         {directorsList.length > 0 && (
           <CrewRow title="ผู้กำกับยอดนิยม" crew={directorsList} />

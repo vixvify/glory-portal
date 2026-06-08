@@ -49,8 +49,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-black to-black flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-zinc-950/40 backdrop-blur-xl rounded-2xl border border-zinc-800 shadow-2xl p-8 space-y-6">
+    <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
+      <div className="w-full max-w-md glass-panel-gold rounded-2xl shadow-2xl p-8 space-y-6">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-white tracking-tight mb-2">
             เข้าสู่ระบบ

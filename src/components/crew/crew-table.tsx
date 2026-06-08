@@ -68,7 +68,7 @@ export const CrewTable: React.FC<CrewTableProps> = ({
                         {member.userId && (
                           <span
                             className="w-1.5 h-1.5 bg-emerald-500 rounded-full"
-                            title="ผู้ใช้ในระบบ (Linked Account)"
+                            title="ผู้ใช้ในระบบ"
                           />
                         )}
                       </h4>

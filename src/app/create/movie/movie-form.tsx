@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import MovieIcon from "@mui/icons-material/Movie";
+import EmailIcon from "@mui/icons-material/Email";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -62,9 +63,9 @@ const CrewSection: React.FC<CrewSectionProps> = ({
         {list.map((item, idx) => (
           <div
             key={idx}
-            className="space-y-2 p-3 bg-zinc-900/10 border border-zinc-900 rounded-2xl"
+            className="flex gap-3 items-center p-3 bg-zinc-900/10 border border-zinc-900 rounded-2xl"
           >
-            <div className="flex gap-2 items-center">
+            <div className="flex-1 space-y-2">
               <CreatableSearchSelect
                 value={{ id: item.id, name: item.name, email: item.email }}
                 options={crewOptions}
@@ -78,27 +79,11 @@ const CrewSection: React.FC<CrewSectionProps> = ({
                   };
                   setList(newList);
                 }}
-                className="flex-1"
+                className="w-full"
               />
-              {list.length > 1 && (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setList(list.filter((_, i) => i !== idx))}
-                  className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto"
-                >
-                  <CloseIcon className="text-sm" />
-                </Button>
-              )}
-            </div>
-
-            <div className="pl-1 flex items-center gap-2">
-              <span className="text-[11px] text-zinc-555 flex-shrink-0">
-                อีเมล:
-              </span>
               <Input
                 type="email"
-                placeholder="เช่น example@email.com "
+                placeholder="เช่น example@email.com"
                 value={item.email}
                 readOnly={!!item.id}
                 onChange={(e) => {
@@ -110,8 +95,19 @@ const CrewSection: React.FC<CrewSectionProps> = ({
                   setList(newList);
                 }}
                 className="bg-black/25 border-zinc-900/80 focus:border-brand/45 rounded-lg py-1.5 text-xs text-zinc-300 read-only:opacity-60 read-only:cursor-not-allowed h-8"
+                icon={<EmailIcon className="text-sm" />}
               />
             </div>
+            {list.length > 1 && (
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setList(list.filter((_, i) => i !== idx))}
+                className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto self-center"
+              >
+                <CloseIcon className="text-sm" />
+              </Button>
+            )}
           </div>
         ))}
         <Button
@@ -437,7 +433,9 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           <div className="bg-card border border-zinc-800/35 rounded-3xl p-6 md:p-8 shadow-xl backdrop-blur-md space-y-6">
             <div className="flex items-center gap-2 border-b border-zinc-800/40 pb-4">
               <span className="w-1.5 h-6 bg-brand rounded-full" />
-              <h2 className="text-lg font-bold text-white">ข้อมูลทั่วไปของภาพยนตร์ (General Information)</h2>
+              <h2 className="text-lg font-bold text-white">
+                ข้อมูลทั่วไปของภาพยนตร์
+              </h2>
             </div>
 
             <Input
@@ -451,7 +449,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
             <div className="space-y-2">
               <label className="text-xs font-semibold text-zinc-300">
-                เรื่องย่อ (Description)
+                เรื่องย่อ
               </label>
               <textarea
                 rows={5}
@@ -528,7 +526,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               />
 
               <Select
-                label="โทนสีภาพยนตร์ (Color Type)"
+                label="โทนสีภาพยนตร์"
                 error={errors.colorType?.message}
                 {...register("colorType", {
                   required: "กรุณาเลือกโทนสีภาพยนตร์",
@@ -536,11 +534,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 options={[
                   {
                     value: "color",
-                    label: "ภาพสี (Color)",
+                    label: "ภาพสี",
                   },
                   {
                     value: "black_and_white",
-                    label: "ขาวดำ (Black & White)",
+                    label: "ขาวดำ",
                   },
                 ]}
               />
@@ -608,7 +606,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <Input
-                label="สังกัด (Studio / Production / Affiliation)"
+                label="สังกัด"
                 placeholder="พิมพ์ชื่อสังกัดหรือสตูดิโอ..."
                 error={errors.studio?.message}
                 {...register("studio")}
@@ -616,7 +614,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-300">
-                  คำเตือนเนื้อหา (Warnings)
+                  คำเตือนเนื้อหา
                 </label>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <label className="flex-1 flex items-center gap-3 bg-zinc-900/40 hover:bg-zinc-900/70 border border-zinc-800/80 hover:border-brand/40 px-4 py-3 rounded-xl cursor-pointer select-none group transition-all duration-300 shadow-md">
@@ -680,12 +678,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           <div className="bg-card border border-zinc-800/35 rounded-3xl p-6 md:p-8 shadow-xl backdrop-blur-md space-y-6">
             <div className="flex items-center gap-2 border-b border-zinc-800/40 pb-4">
               <span className="w-1.5 h-6 bg-brand rounded-full" />
-              <h2 className="text-lg font-bold text-white">วิดีโอและไฟล์สื่อประกอบ (Media & Video Links)</h2>
+              <h2 className="text-lg font-bold text-white">
+                วิดีโอและไฟล์สื่อประกอบ
+              </h2>
             </div>
 
             <div className="space-y-2">
               <label className="text-xs font-semibold text-zinc-300">
-                ภาพปกภาพยนตร์ (Thumbnail)
+                ภาพปกภาพยนตร์
               </label>
               <div className="relative group/file">
                 <Controller
@@ -778,7 +778,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Input
-                  label="ลิงก์ภาพยนตร์ (YouTube Movie URL)"
+                  label="ลิงก์ภาพยนตร์"
                   placeholder="https://www.youtube.com/watch?v=..."
                   error={errors.youtubeUrl?.message}
                   {...register("youtubeUrl", {
@@ -809,7 +809,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
               <div className="space-y-2">
                 <Input
-                  label="ลิงก์ตัวอย่างภาพยนตร์ (YouTube Trailer URL)"
+                  label="ลิงก์ตัวอย่างภาพยนตร์"
                   placeholder="https://www.youtube.com/watch?v=..."
                   error={errors.trailerUrl?.message}
                   {...register("trailerUrl")}
@@ -841,18 +841,20 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           <div className="bg-card border border-zinc-800/35 rounded-3xl p-6 md:p-8 shadow-xl backdrop-blur-md space-y-6">
             <div className="flex items-center gap-2 border-b border-zinc-800/40 pb-4">
               <span className="w-1.5 h-6 bg-brand rounded-full" />
-              <h2 className="text-lg font-bold text-white">ข้อมูลทีมงานและเบื้องหลัง (Production & Crew)</h2>
+              <h2 className="text-lg font-bold text-white">
+                ข้อมูลทีมงานและเบื้องหลัง
+              </h2>
             </div>
 
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2 border-b border-zinc-800/40 pb-4">
                 {[
-                  { id: "director", label: "ผู้กำกับ (Director)" },
-                  { id: "producer", label: "ผู้อำนวยการสร้าง (Producer)" },
-                  { id: "writer", label: "ผู้เขียนบท (Writer)" },
-                  { id: "cast", label: "นักแสดงนำ (Cast)" },
-                  { id: "dop", label: "ผู้กำกับภาพ (DOP)" },
-                  { id: "editor", label: "ผู้ลำดับภาพ (Editor)" },
+                  { id: "director", label: "ผู้กำกับ" },
+                  { id: "producer", label: "ผู้อำนวยการสร้าง" },
+                  { id: "writer", label: "ผู้เขียนบท" },
+                  { id: "cast", label: "นักแสดงนำ" },
+                  { id: "dop", label: "ผู้กำกับภาพ" },
+                  { id: "editor", label: "ผู้ลำดับภาพ" },
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -872,7 +874,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               <div className="bg-zinc-900/10 border border-zinc-800/30 rounded-3xl p-5 md:p-6 min-h-[200px]">
                 {activeCrewTab === "director" && (
                   <CrewSection
-                    label="ผู้กำกับ (Director)"
+                    label="ผู้กำกับ"
                     list={directors}
                     setList={setDirectors}
                     placeholder="พิมพ์ชื่อ หรือเลือกผู้กำกับจากคลังรายชื่อ..."
@@ -882,7 +884,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 )}
                 {activeCrewTab === "producer" && (
                   <CrewSection
-                    label="ผู้อำนวยการสร้าง (Producer)"
+                    label="ผู้อำนวยการสร้าง"
                     list={producers}
                     setList={setProducers}
                     placeholder="พิมพ์ชื่อ หรือเลือกผู้อำนวยการสร้าง..."
@@ -892,7 +894,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 )}
                 {activeCrewTab === "writer" && (
                   <CrewSection
-                    label="ผู้เขียนบท (Writer)"
+                    label="ผู้เขียนบท"
                     list={writers}
                     setList={setWriters}
                     placeholder="พิมพ์ชื่อ หรือเลือกผู้เขียนบท..."
@@ -902,7 +904,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 )}
                 {activeCrewTab === "cast" && (
                   <CrewSection
-                    label="นักแสดงนำ (Cast)"
+                    label="นักแสดงนำ"
                     list={castMembers}
                     setList={setCastMembers}
                     placeholder="พิมพ์ชื่อ หรือเลือกนักแสดง..."
@@ -912,7 +914,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 )}
                 {activeCrewTab === "dop" && (
                   <CrewSection
-                    label="ผู้กำกับภาพ (DOP)"
+                    label="ผู้กำกับภาพ"
                     list={dops}
                     setList={setDops}
                     placeholder="พิมพ์ชื่อ หรือเลือกผู้กำกับภาพ..."
@@ -922,7 +924,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 )}
                 {activeCrewTab === "editor" && (
                   <CrewSection
-                    label="ผู้ลำดับภาพ (Editor)"
+                    label="ผู้ลำดับภาพ"
                     list={editors}
                     setList={setEditors}
                     placeholder="พิมพ์ชื่อ หรือเลือกผู้ลำดับภาพ..."
@@ -934,7 +936,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
               <div className="space-y-2 pt-4 border-t border-zinc-800/40">
                 <label className="text-xs font-semibold text-zinc-300">
-                  ลิงก์วิดีโอเบื้องหลัง (YouTube BTS Video)
+                  ลิงก์วิดีโอเบื้องหลัง
                 </label>
                 <div className="space-y-4">
                   {btsVideos.map((videoUrl, idx) => (

@@ -20,10 +20,9 @@ interface Props {
   recommendedMovies: Movie[];
   popularMovies: Movie[];
   categories: Category[];
-  universities: University[];
   directorsList: CrewMember[];
   actorsList: CrewMember[];
-  universityMoviesMap: Record<string, Movie[]>;
+  universityMovies: Movie[];
   categoryMoviesMap: Record<string, Movie[]>;
   favorites: Movie[];
 }
@@ -33,10 +32,9 @@ export default function HomePage(props: Props) {
     recommendedMovies,
     popularMovies,
     categories,
-    universities,
     directorsList,
     actorsList,
-    universityMoviesMap,
+    universityMovies,
     categoryMoviesMap,
     favorites,
   } = props;
@@ -105,10 +103,9 @@ export default function HomePage(props: Props) {
           recommendedMovies={recommendedMovies}
           popularMovies={popularMovies}
           categories={categories}
-          universities={universities}
           directorsList={directorsList}
           actorsList={actorsList}
-          universityMoviesMap={universityMoviesMap}
+          universityMovies={universityMovies}
           categoryMoviesMap={categoryMoviesMap}
           favorites={favorites}
           handlePlayMovie={handlePlayMovie}

@@ -10,10 +10,10 @@ import Loading from "@/app/loading";
 import { useCrewMemberQueryById } from "@/hooks/use-crew-members";
 
 const ROLE_MAPPING: Record<string, string> = {
-  director: "ผู้กำกับ (Director)",
-  producer: "ผู้อำนวยการสร้าง (Producer)",
-  writer: "ผู้เขียนบท (Writer)",
-  cast: "นักแสดง (Cast)",
+  director: "ผู้กำกับ",
+  producer: "ผู้อำนวยการสร้าง",
+  writer: "ผู้เขียนบท",
+  cast: "นักแสดง",
 };
 
 export default function CrewProfilePage() {

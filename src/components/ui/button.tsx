@@ -1,7 +1,7 @@
 import React from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "brand" | "secondary" | "outline" | "ghost" | "white";
+  variant?: "brand" | "secondary" | "outline" | "ghost" | "white" | "glass";
   size?: "sm" | "md" | "lg";
   isLoading?: boolean;
 }
@@ -13,10 +13,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants = {
       brand: "bg-brand text-white hover:bg-brand-hover shadow-md shadow-brand/10",
-      secondary: "bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700/50",
-      outline: "border border-zinc-800 hover:bg-zinc-800 text-zinc-300 hover:text-white",
+      secondary: "bg-zinc-800/60 backdrop-blur-md hover:bg-zinc-700/80 text-white border border-zinc-700/40",
+      outline: "border border-zinc-700/30 hover:bg-zinc-850 text-zinc-300 hover:text-white backdrop-blur-sm",
       ghost: "text-zinc-400 hover:text-brand bg-transparent hover:bg-zinc-800/30",
       white: "bg-white text-black hover:bg-white/90 shadow-md shadow-white/5",
+      glass: "glass-button",
     };
 
     const sizes = {
