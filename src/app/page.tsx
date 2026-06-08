@@ -44,6 +44,14 @@ export default function Page() {
       searchby: "role",
     });
 
+  const { data: portaitMovie = [], isLoading: isPortaitLoading } =
+    useMoviesQuery({
+      search: "แนวตั้ง",
+      searchby: "aspectRatio",
+      page: 1,
+      pagesize: 10,
+    });
+
   const { data: serverFavorites = [], isLoading: isFavsLoading } =
     useFavoritesQuery(!!currentUser);
 
@@ -86,6 +94,7 @@ export default function Page() {
     isDirsLoading ||
     isActorsLoading ||
     isStatsLoading ||
+    isPortaitLoading ||
     (!!currentUser && isFavsLoading) ||
     categoryMovieQueries.some((q) => q.isLoading);
 
@@ -107,6 +116,7 @@ export default function Page() {
       categories={categories}
       directorsList={directorsList}
       actorsList={actorsList}
+      portaitMovie={portaitMovie}
       universityMovies={movieByUniversity}
       categoryMoviesMap={categoryMoviesMap}
       favorites={serverFavorites}

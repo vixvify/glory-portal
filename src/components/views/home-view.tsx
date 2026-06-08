@@ -15,6 +15,7 @@ interface HomeViewProps {
   universityMovies: Movie[];
   categoryMoviesMap: Record<string, Movie[]>;
   favorites: Movie[];
+  portaitMovie: Movie[];
   handlePlayMovie: (movie: Movie) => void;
   handleToggleFavorite: (movieId: string) => void;
   setSearchQuery: (query: string) => void;
@@ -29,6 +30,7 @@ export default function HomeView({
   universityMovies,
   categoryMoviesMap,
   favorites,
+  portaitMovie,
   handlePlayMovie,
   handleToggleFavorite,
 }: HomeViewProps) {
@@ -75,6 +77,15 @@ export default function HomeView({
         {actorsList.length > 0 && (
           <CrewRow title="นักแสดงและทีมงาน" crew={actorsList} />
         )}
+
+        <MovieRow
+          title={"ภาพยนตร์แนวตั้ง"}
+          movies={portaitMovie || []}
+          onPlayClick={handlePlayMovie}
+          favorites={favorites}
+          onToggleFavorite={handleToggleFavorite}
+          isPortrait={true}
+        />
 
         {categories.map((category) => (
           <MovieRow
