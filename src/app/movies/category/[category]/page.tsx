@@ -13,7 +13,6 @@ import Loading from "@/app/loading";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useMoviePlayer } from "@/hooks/use-movie-player";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
-import { getAspectRatio } from "@/utils/aspect-ratio";
 
 export default function CategoryPage() {
   const params = useParams<{ category: string }>();
@@ -33,8 +32,6 @@ export default function CategoryPage() {
 
   const { data: favorites = [] } = useFavoritesQuery(!!currentUser);
   const toggleFavoriteMutation = useToggleFavoriteMutation();
-
-  const { landscapeMovies, portraitMovies } = getAspectRatio(movies);
 
   const handleToggleFavorite = useCallback(
     (movieId: string) => {
@@ -60,7 +57,7 @@ export default function CategoryPage() {
         },
       );
     },
-    [currentUser, favorites, toggleFavoriteMutation, showToast],
+    [currentUser, favorites, toggleFavoriteMutation, showToast, router],
   );
 
   if (isLoading) {

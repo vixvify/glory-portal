@@ -12,7 +12,6 @@ import MovieGrid from "@/components/movie/movie-grid";
 import Loading from "@/app/loading";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useMoviePlayer } from "@/hooks/use-movie-player";
-import { getAspectRatio } from "@/utils/aspect-ratio";
 
 export default function UniversityPage() {
   const params = useParams<{ university: string }>();
@@ -31,8 +30,6 @@ export default function UniversityPage() {
 
   const { data: favorites = [] } = useFavoritesQuery(!!currentUser);
   const toggleFavoriteMutation = useToggleFavoriteMutation();
-
-  const { landscapeMovies, portraitMovies } = getAspectRatio(movies);
 
   const handleToggleFavorite = useCallback(
     (movieId: string) => {

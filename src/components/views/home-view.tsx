@@ -1,4 +1,4 @@
-import { Movie, Category, University } from "@/core/domain/movie";
+import { Movie, Category } from "@/core/domain/movie";
 import { CrewMember } from "@/core/domain/crew";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 import MovieRow from "@/components/movie/movie-row";

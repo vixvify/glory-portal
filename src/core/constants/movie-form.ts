@@ -26,4 +26,6 @@ export const CREW_TAB_OPTIONS = [
   { id: "cast", label: "นักแสดงนำ" },
   { id: "dop", label: "ผู้กำกับภาพ" },
   { id: "editor", label: "ผู้ลำดับภาพ" },
-];
+] as const;
+
+export type CrewTabId = (typeof CREW_TAB_OPTIONS)[number]["id"];

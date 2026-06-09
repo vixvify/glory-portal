@@ -32,10 +32,6 @@ export function CreatableSearchSelect({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setSearchTerm(value.name);
-  }, [value.name]);
-
-  useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
         containerRef.current &&

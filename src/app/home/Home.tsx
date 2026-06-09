@@ -5,12 +5,10 @@ import { useRouter } from "next/navigation";
 import { useMoviePlayer } from "@/hooks/use-movie-player";
 import { Movie } from "@/core/domain/movie";
 import { useAppStore } from "@/store/use-store";
-import Loading from "../loading";
 import { Toast } from "@/components/ui/toast";
 import { useMoviesQuery } from "@/hooks/use-movies";
 import { useToggleFavoriteMutation } from "@/hooks/use-favorites";
 import { Category } from "@/core/domain/movie";
-import { University } from "@/core/domain/movie";
 import { CrewMember } from "@/core/domain/crew";
 import { useDebounce } from "@/hooks/use-debounce";
 import HomeView from "@/components/views/home-view";
@@ -88,7 +86,6 @@ export default function HomePage(props: Props) {
     [
       currentUser,
       favorites,
-      moviesData,
       toggleFavoriteMutation,
       showToast,
       router,

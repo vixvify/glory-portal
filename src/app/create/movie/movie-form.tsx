@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
@@ -32,6 +32,7 @@ import {
   CONTENT_WARNING_OPTIONS,
   DROPDOWN_PLACEHOLDERS,
   CREW_TAB_OPTIONS,
+  CrewTabId,
 } from "@/core/constants/movie-form";
 import {
   useCreateMovieMutation,
@@ -186,9 +187,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     null,
   );
   const [isSavingLocal, setIsSavingLocal] = useState(false);
-  const [activeCrewTab, setActiveCrewTab] = useState<
-    "director" | "producer" | "writer" | "cast" | "dop" | "editor"
-  >("director");
+  const [activeCrewTab, setActiveCrewTab] = useState<CrewTabId>("director");
 
   const [directors, setDirectors] = useState<CrewStateItem[]>([
     { id: "", name: "", email: "" },
@@ -225,20 +224,21 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     setValue,
     reset,
     control,
-    watch,
     formState: { errors },
   } = useForm<MovieFormInputs>();
 
-  const watchedYoutubeUrl = watch("youtubeUrl");
-  const watchedTrailerUrl = watch("trailerUrl");
-  const watchedProfanity = watch("hasProfanity") ?? false;
-  const watchedDrugs = watch("hasDrugs") ?? false;
+  const watchedYoutubeUrl = useWatch({ control, name: "youtubeUrl" });
+  const watchedTrailerUrl = useWatch({ control, name: "trailerUrl" });
+  const watchedProfanity =
+    useWatch({ control, name: "hasProfanity" }) ?? false;
+  const watchedDrugs = useWatch({ control, name: "hasDrugs" }) ?? false;
 
   const selectedWarnings = [
     ...(watchedProfanity ? ["profanity"] : []),
     ...(watchedDrugs ? ["drugs"] : []),
   ];
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (editingMovie) {
       setSelectedFileName(null);
@@ -324,6 +324,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
       });
     }
   }, [editingMovie, reset, categories, ageRatings]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const onSubmitForm = async (data: MovieFormInputs) => {
     try {
@@ -788,7 +789,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   <button
                     key={tab.id}
                     type="button"
-                    onClick={() => setActiveCrewTab(tab.id as any)}
+                    onClick={() => setActiveCrewTab(tab.id)}
                     className={`px-4 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
                       activeCrewTab === tab.id
                         ? "bg-brand/10 border-brand text-brand font-bold"
