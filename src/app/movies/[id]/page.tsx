@@ -50,11 +50,14 @@ export default function MovieDetails() {
     !!currentUser,
   );
 
-  const [selectedStars, setSelectedStars] = useState(0);
-  const [commentText, setCommentText] = useState("");
+  const [draftStars, setDraftStars] = useState<number | null>(null);
+  const [draftComment, setDraftComment] = useState<string | null>(null);
   const [isPlayingTrailer, setIsPlayingTrailer] = useState(false);
   const { playMovie } = useMoviePlayer();
-  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoState, setVideoState] = useState<{
+    url: string | null;
+    isLoaded: boolean;
+  }>({ url: null, isLoaded: false });
   const {
     rowRef: crewRowRef,
     showLeftArrow: showCrewLeft,
@@ -70,23 +73,22 @@ export default function MovieDetails() {
     if (!videoId) return null;
     return getYouTubeBackgroundEmbedUrl(videoId);
   }, [videoId]);
+  const videoLoaded =
+    !!backgroundEmbedUrl &&
+    videoState.url === backgroundEmbedUrl &&
+    videoState.isLoaded;
 
   useEffect(() => {
-    setVideoLoaded(false);
     if (backgroundEmbedUrl) {
       const timer = setTimeout(() => {
-        setVideoLoaded(true);
+        setVideoState({ url: backgroundEmbedUrl, isLoaded: true });
       }, 1500);
       return () => clearTimeout(timer);
     }
   }, [backgroundEmbedUrl]);
 
-  useEffect(() => {
-    if (userRating) {
-      setSelectedStars(userRating.stars);
-      setCommentText(userRating.comment || "");
-    }
-  }, [userRating]);
+  const selectedStars = draftStars ?? userRating?.stars ?? 0;
+  const commentText = draftComment ?? userRating?.comment ?? "";
 
   const { averageRating, ratingCount } = calculateRatingStats(movie?.ratings);
 
@@ -431,7 +433,7 @@ export default function MovieDetails() {
                     return (
                       <button
                         key={idx}
-                        onClick={() => setSelectedStars(starValue)}
+                        onClick={() => setDraftStars(starValue)}
                         disabled={isRatingPending}
                         className="cursor-pointer hover:scale-110 active:scale-95 transition-transform focus:outline-none disabled:opacity-50 disabled:pointer-events-none"
                         aria-label={`ให้ ${starValue} คะแนน`}
@@ -476,8 +478,8 @@ export default function MovieDetails() {
                       onClick={() => {
                         if (currentUser && movie) {
                           handleDeleteRating(movie.id);
-                          setSelectedStars(5);
-                          setCommentText("");
+                          setDraftStars(5);
+                          setDraftComment("");
                         }
                       }}
                       disabled={isRatingPending}

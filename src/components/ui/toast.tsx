@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
 import { useAppStore } from "@/store/use-store";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -10,20 +9,8 @@ import CloseIcon from "@mui/icons-material/Close";
 
 export function Toast() {
   const { toast, hideToast } = useAppStore();
-  const [shouldRender, setShouldRender] = useState(false);
 
-  useEffect(() => {
-    if (toast?.isVisible) {
-      setShouldRender(true);
-    } else {
-      const timer = setTimeout(() => {
-        setShouldRender(false);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [toast?.isVisible]);
-
-  if (!shouldRender || !toast) return null;
+  if (!toast?.isVisible) return null;
 
   const icons = {
     success: <CheckCircleIcon className="text-emerald-400 text-xl" />,

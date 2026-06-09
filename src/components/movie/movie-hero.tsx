@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -30,18 +30,22 @@ export default function MovieHero({
 
   const heroMovies = movies.slice(0, 4);
 
-  const startTimer = () => {
+  const stopTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+  }, []);
+
+  const startTimer = useCallback(() => {
+    if (heroMovies.length <= 1) {
+      return;
+    }
+
     stopTimer();
     timerRef.current = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % heroMovies.length);
     }, 4000);
-  };
-
-  const stopTimer = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-  };
+  }, [heroMovies.length, stopTimer]);
 
   useEffect(() => {
     if (!isHovered) {
@@ -50,7 +54,7 @@ export default function MovieHero({
       stopTimer();
     }
     return () => stopTimer();
-  }, [isHovered, heroMovies.length]);
+  }, [isHovered, startTimer, stopTimer]);
 
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();

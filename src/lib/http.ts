@@ -10,21 +10,6 @@ const http: AxiosInstance = axios.create({
   timeout: 40000,
 });
 
-http.interceptors.request.use(
-  (config) => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("thaiflix_auth_token");
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
 interface StandardResponse<T> {
   data: T;
   status: number;
@@ -45,15 +30,14 @@ const handleRequest = async <T>(
     };
   } catch (error) {
     const axiosError = error as AxiosError<StandardResponse<T>>;
-    const status = axiosError.response?.status || 500;
     const errorData = axiosError.response?.data;
 
-    return {
-      data: null as unknown as T,
-      error: errorData?.error || errorData?.message || axiosError.message || "An unexpected error occurred",
-      status,
-      statusCode: errorData?.statusCode || "ERROR",
-    };
+    throw new Error(
+      errorData?.error ||
+        errorData?.message ||
+        axiosError.message ||
+        "An unexpected error occurred",
+    );
   }
 };
 

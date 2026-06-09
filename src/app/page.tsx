@@ -16,6 +16,8 @@ export default function Page() {
 
   const { data: recommendedMovies = [], isLoading: isRecLoading } =
     useMoviesQuery({
+      search: "แนวนอน",
+      searchby: "aspectRatio",
       sort: "desc",
       sortby: "matchRate",
       page: 1,
@@ -23,6 +25,8 @@ export default function Page() {
     });
 
   const { data: popularMovies = [], isLoading: isPopLoading } = useMoviesQuery({
+    search: "แนวนอน",
+    searchby: "aspectRatio",
     sort: "desc",
     sortby: "views",
     page: 1,

@@ -36,7 +36,6 @@ export default function AdminCrewPage() {
 
   const { data: availableCrew = [], isLoading: isCrewLoading } =
     useCrewMembersQuery(crewParams);
-  console.log(availableCrew);
 
   const deleteCrewMutation = useDeleteCrewMemberMutation();
 

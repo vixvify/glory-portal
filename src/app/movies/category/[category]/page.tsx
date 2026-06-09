@@ -57,7 +57,7 @@ export default function CategoryPage() {
         },
       );
     },
-    [currentUser, favorites, toggleFavoriteMutation, showToast],
+    [currentUser, favorites, toggleFavoriteMutation, showToast, router],
   );
 
   if (isLoading) {
@@ -104,8 +104,6 @@ export default function CategoryPage() {
           </div>
         )}
       </main>
-
-
     </div>
   );
 }

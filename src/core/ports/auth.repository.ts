@@ -1,5 +1,5 @@
 import { ApiResponse } from "@/infra/interface/response";
-import { RegisterUser, LoginUser, User } from "../domain/user";
+import { LoginUser, User } from "../domain/user";
 
 export interface AuthRepository {
   register(user: FormData): Promise<ApiResponse<User>>;

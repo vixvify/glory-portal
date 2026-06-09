@@ -2,7 +2,6 @@ import React from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonIcon from "@mui/icons-material/Person";
-import { Movie } from "@/core/domain/movie";
 import { CrewMember } from "@/core/domain/crew";
 import { LOCALIZATION } from "@/core/constants/localization";
 
@@ -19,7 +18,6 @@ export const CrewTable: React.FC<CrewTableProps> = ({
   onEdit,
   onDelete,
 }) => {
-  console.log(crew);
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left border-collapse">
