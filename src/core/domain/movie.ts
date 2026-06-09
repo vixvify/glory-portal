@@ -32,8 +32,6 @@ export interface TargetGroup {
   createdAt: Date;
 }
 
-
-
 export interface MovieCrew {
   id: string;
   movieId: string;
@@ -82,8 +80,6 @@ export interface MovieCrewInputItem {
   name?: string | null;
   email?: string | null;
 }
-
-
 
 export interface CreateMovie {
   title: string;

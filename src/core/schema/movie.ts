@@ -1,18 +1,23 @@
 import { z } from "zod";
 
-export const ratingSchema = z.object({
-  movieId: z.string(),
-  userId: z.string(),
-  stars: z.number().min(1).max(5),
-  comment: z.string().optional().nullable(),
-  createdAt: z.union([z.string(), z.date()]).optional(),
-  updatedAt: z.union([z.string(), z.date()]).optional(),
-  user: z.object({
-    id: z.string(),
-    name: z.string(),
-    email: z.string(),
-  }).partial().optional(),
-}).partial();
+export const ratingSchema = z
+  .object({
+    movieId: z.string(),
+    userId: z.string(),
+    stars: z.number().min(1).max(5),
+    comment: z.string().optional().nullable(),
+    createdAt: z.union([z.string(), z.date()]).optional(),
+    updatedAt: z.union([z.string(), z.date()]).optional(),
+    user: z
+      .object({
+        id: z.string(),
+        name: z.string(),
+        email: z.string(),
+      })
+      .partial()
+      .optional(),
+  })
+  .partial();
 
 export const masterDataSchema = z.object({
   id: z.string().uuid(),
@@ -54,7 +59,7 @@ export const movieSchema = z.object({
   ratings: z.array(ratingSchema).optional(),
   year: z.number().int().min(1900).max(2100),
   matchRate: z.number().min(0).max(100).optional(),
-  aspectRatio: z.string().min(1, "Aspect ratio is required").regex(/^\d+:\d+$/, "Aspect ratio must be in format W:H (e.g. 16:9)"),
+  aspectRatio: z.string().min(1, "Aspect ratio is required"),
   ageRating: masterDataSchema,
   duration: z.number().min(1, "Duration is required"),
   university: masterDataSchema.optional().nullable(),
@@ -84,9 +89,14 @@ export const createMovieSchema = z.object({
   categoryId: z.string().uuid("Category is required"),
   thumbnail: z.unknown().refine((val) => val !== null, "Thumbnail is required"),
   youtubeUrl: z.string().url("Must be a valid URL"),
-  trailerUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")).nullable(),
+  trailerUrl: z
+    .string()
+    .url("Must be a valid URL")
+    .optional()
+    .or(z.literal(""))
+    .nullable(),
   year: z.number().int().min(1900).max(2100),
-  aspectRatio: z.string().min(1, "Aspect ratio is required").regex(/^\d+:\d+$/, "Aspect ratio must be in format W:H (e.g. 16:9)"),
+  aspectRatio: z.string().min(1, "Aspect ratio is required"),
   ageRatingId: z.string().uuid("Age rating is required"),
   duration: z.number().min(1, "Duration is required"),
   universityId: z.string().uuid().optional().nullable().or(z.literal("")),
@@ -109,11 +119,21 @@ export const updateMovieSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
   categoryId: z.string().uuid("Category is required"),
-  thumbnail: z.unknown().refine((val) => val !== null && val !== undefined, "Thumbnail is required"),
+  thumbnail: z
+    .unknown()
+    .refine(
+      (val) => val !== null && val !== undefined,
+      "Thumbnail is required",
+    ),
   youtubeUrl: z.string().url("Must be a valid URL"),
-  trailerUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")).nullable(),
+  trailerUrl: z
+    .string()
+    .url("Must be a valid URL")
+    .optional()
+    .or(z.literal(""))
+    .nullable(),
   year: z.number().int().min(1900).max(2100),
-  aspectRatio: z.string().min(1, "Aspect ratio is required").regex(/^\d+:\d+$/, "Aspect ratio must be in format W:H (e.g. 16:9)"),
+  aspectRatio: z.string().min(1, "Aspect ratio is required"),
   ageRatingId: z.string().uuid("Age rating is required"),
   duration: z.number().min(1, "Duration is required"),
   universityId: z.string().uuid().optional().nullable().or(z.literal("")),
@@ -134,11 +154,13 @@ export const updateMovieSchema = z.object({
 
 export const movieIdSchema = z.string().min(1, "Movie ID is required");
 
-export const movieFilterParamsSchema = z.object({
-  search: z.string().optional(),
-  searchby: z.string().optional(),
-  page: z.union([z.number(), z.string()]).optional(),
-  pagesize: z.union([z.number(), z.string()]).optional(),
-  sort: z.string().optional(),
-  sortby: z.string().optional(),
-}).optional();
+export const movieFilterParamsSchema = z
+  .object({
+    search: z.string().optional(),
+    searchby: z.string().optional(),
+    page: z.union([z.number(), z.string()]).optional(),
+    pagesize: z.union([z.number(), z.string()]).optional(),
+    sort: z.string().optional(),
+    sortby: z.string().optional(),
+  })
+  .optional();
