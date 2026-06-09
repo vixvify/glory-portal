@@ -229,8 +229,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
   const watchedYoutubeUrl = useWatch({ control, name: "youtubeUrl" });
   const watchedTrailerUrl = useWatch({ control, name: "trailerUrl" });
-  const watchedProfanity =
-    useWatch({ control, name: "hasProfanity" }) ?? false;
+  const watchedProfanity = useWatch({ control, name: "hasProfanity" }) ?? false;
   const watchedDrugs = useWatch({ control, name: "hasDrugs" }) ?? false;
 
   const selectedWarnings = [

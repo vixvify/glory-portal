@@ -1,6 +1,7 @@
 export const COLOR_OPTIONS = [
   { value: "color", label: "ภาพสี" },
   { value: "black_and_white", label: "ขาวดำ" },
+  { value: "color_and_black_and_white", label: "ภาพสีและขาวดำ" },
 ];
 
 export const ASPECT_RATIO_OPTIONS = [
