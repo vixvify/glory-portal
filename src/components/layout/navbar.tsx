@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import SearchIcon from "@mui/icons-material/Search";
@@ -51,29 +51,27 @@ export default function Navbar() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showMoviesMenu, setShowMoviesMenu] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
+  const moviesMenuRef = useRef<HTMLDivElement>(null);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest(".relative")) {
-        setShowProfileMenu(false);
+      const target = e.target as Node;
+      if (moviesMenuRef.current && !moviesMenuRef.current.contains(target)) {
         setShowMoviesMenu(false);
       }
+      if (profileMenuRef.current && !profileMenuRef.current.contains(target)) {
+        setShowProfileMenu(false);
+      }
     };
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   if (pathname.startsWith("/watch")) {
@@ -106,7 +104,7 @@ export default function Navbar() {
             หน้าแรก
           </Link>
 
-          <div className="relative">
+          <div className="relative" ref={moviesMenuRef}>
             <button
               onClick={() => setShowMoviesMenu(!showMoviesMenu)}
               className="flex items-center gap-1 cursor-pointer transition-colors duration-300 hover:text-white focus:outline-none text-white font-semibold"
@@ -233,7 +231,7 @@ export default function Navbar() {
         </div>
 
         {currentUser ? (
-          <div className="relative">
+          <div className="relative" ref={profileMenuRef}>
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
               className="flex items-center gap-1.5 cursor-pointer group"

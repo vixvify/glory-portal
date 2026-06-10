@@ -33,22 +33,15 @@ export default function Page() {
     pagesize: 10,
   });
 
-  const { data: categories = [], isLoading: isCatLoading } =
-    useCategoriesQuery();
+  const { data: categories = [], isLoading: isCatLoading } = useCategoriesQuery();
 
   const { data: directorsList = [], isLoading: isDirsLoading } =
-    useCrewMembersQuery({
-      search: "director",
-      searchby: "role",
-    });
+    useCrewMembersQuery({ search: "director", searchby: "role" });
 
   const { data: actorsList = [], isLoading: isActorsLoading } =
-    useCrewMembersQuery({
-      search: "cast",
-      searchby: "role",
-    });
+    useCrewMembersQuery({ search: "cast", searchby: "role" });
 
-  const { data: portaitMovie = [], isLoading: isPortaitLoading } =
+  const { data: portraitMovies = [], isLoading: isPortraitLoading } =
     useMoviesQuery({
       search: "แนวตั้ง",
       searchby: "aspectRatio",
@@ -90,19 +83,19 @@ export default function Page() {
     })),
   });
 
-  const isAnyLoading =
+  const isCoreLoading =
     isRecLoading ||
     isPopLoading ||
     isCatLoading ||
-    isMovieUniLoading ||
     isDirsLoading ||
     isActorsLoading ||
     isStatsLoading ||
-    isPortaitLoading ||
+    isPortraitLoading ||
+    isMovieUniLoading ||
     (!!currentUser && isFavsLoading) ||
     categoryMovieQueries.some((q) => q.isLoading);
 
-  if (isAnyLoading) {
+  if (isCoreLoading) {
     return <Loading />;
   }
 
@@ -120,7 +113,7 @@ export default function Page() {
       categories={categories}
       directorsList={directorsList}
       actorsList={actorsList}
-      portaitMovie={portaitMovie}
+      portraitMovies={portraitMovies}
       universityMovies={movieByUniversity}
       categoryMoviesMap={categoryMoviesMap}
       favorites={serverFavorites}

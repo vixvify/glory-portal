@@ -1,4 +1,4 @@
-import { ApiResponse } from "@/infra/interface/response";
+import { ApiResponse } from "@/core/ports/response";
 import { CrewMember, CrewFilterParams, CreateCrewMember, UpdateCrewMember } from "../domain/crew";
 
 export interface CrewMemberRepository {

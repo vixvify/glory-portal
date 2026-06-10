@@ -30,3 +30,42 @@ export const CREW_TAB_OPTIONS = [
 ] as const;
 
 export type CrewTabId = (typeof CREW_TAB_OPTIONS)[number]["id"];
+
+export const CREW_TAB_CONFIG = [
+  {
+    id: "director" as CrewTabId,
+    label: "ผู้กำกับ",
+    placeholder: "พิมพ์ชื่อ หรือเลือกผู้กำกับจากคลังรายชื่อ...",
+    addLabel: "เพิ่มรายชื่อผู้กำกับ",
+  },
+  {
+    id: "producer" as CrewTabId,
+    label: "ผู้อำนวยการสร้าง",
+    placeholder: "พิมพ์ชื่อ หรือเลือกผู้อำนวยการสร้าง...",
+    addLabel: "เพิ่มรายชื่อผู้อำนวยการสร้าง",
+  },
+  {
+    id: "writer" as CrewTabId,
+    label: "ผู้เขียนบท",
+    placeholder: "พิมพ์ชื่อ หรือเลือกผู้เขียนบท...",
+    addLabel: "เพิ่มรายชื่อผู้เขียนบท",
+  },
+  {
+    id: "cast" as CrewTabId,
+    label: "นักแสดงนำ",
+    placeholder: "พิมพ์ชื่อ หรือเลือกนักแสดง...",
+    addLabel: "เพิ่มรายชื่อนักแสดง",
+  },
+  {
+    id: "dop" as CrewTabId,
+    label: "ผู้กำกับภาพ",
+    placeholder: "พิมพ์ชื่อ หรือเลือกผู้กำกับภาพ...",
+    addLabel: "เพิ่มรายชื่อผู้กำกับภาพ",
+  },
+  {
+    id: "editor" as CrewTabId,
+    label: "ผู้ลำดับภาพ",
+    placeholder: "พิมพ์ชื่อ หรือเลือกผู้ลำดับภาพ...",
+    addLabel: "เพิ่มรายชื่อผู้ลำดับภาพ",
+  },
+];

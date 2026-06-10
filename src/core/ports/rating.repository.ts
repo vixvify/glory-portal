@@ -1,4 +1,4 @@
-import { ApiResponse } from "@/infra/interface/response";
+import { ApiResponse } from "@/core/ports/response";
 import { Rating, RatingParams, CreateRating, UpdateRating } from "../domain/rating";
 
 export interface RatingRepository {

@@ -1,4 +1,4 @@
-import { ApiResponse } from "@/infra/interface/response";
+import { ApiResponse } from "@/core/ports/response";
 import { LoginUser, User } from "../domain/user";
 
 export interface AuthRepository {

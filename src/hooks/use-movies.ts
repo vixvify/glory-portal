@@ -79,3 +79,17 @@ export function useMovieByUniversityQuery(university: string) {
     queryFn: () => movieService.getMoviesByUniversity(university),
   });
 }
+
+export function useCategoryMoviesQuery(categoryName: string) {
+  return useQuery<Movie[], Error>({
+    queryKey: ["movies", { search: categoryName, searchby: "category", page: 1, pagesize: 10 }],
+    queryFn: () =>
+      movieService.getMovies({
+        search: categoryName,
+        searchby: "category",
+        page: 1,
+        pagesize: 10,
+      }),
+    enabled: !!categoryName,
+  });
+}

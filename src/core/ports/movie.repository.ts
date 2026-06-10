@@ -1,4 +1,4 @@
-import { ApiResponse } from "@/infra/interface/response";
+import { ApiResponse } from "@/core/ports/response";
 import { Movie, MovieFilterParams } from "../domain/movie";
 
 export interface MovieRepository {

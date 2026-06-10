@@ -23,7 +23,7 @@ interface Props {
   universityMovies: Movie[];
   categoryMoviesMap: Record<string, Movie[]>;
   favorites: Movie[];
-  portaitMovie: Movie[];
+  portraitMovies: Movie[];
 }
 
 export default function HomePage(props: Props) {
@@ -36,10 +36,10 @@ export default function HomePage(props: Props) {
     universityMovies,
     categoryMoviesMap,
     favorites,
-    portaitMovie,
+    portraitMovies,
   } = props;
   const router = useRouter();
-  const { currentUser, showToast, searchQuery, setSearchQuery } = useAppStore();
+  const { currentUser, showToast, searchQuery } = useAppStore();
 
   const { playMovie: handlePlayMovie } = useMoviePlayer();
 
@@ -56,8 +56,6 @@ export default function HomePage(props: Props) {
     useMoviesQuery(movieParams, { enabled: !!activeSearchQuery.trim() });
 
   const toggleFavoriteMutation = useToggleFavoriteMutation();
-
-  const moviesData = fetchedMovies;
 
   const handleToggleFavorite = useCallback(
     (movieId: string) => {
@@ -83,13 +81,7 @@ export default function HomePage(props: Props) {
         },
       );
     },
-    [
-      currentUser,
-      favorites,
-      toggleFavoriteMutation,
-      showToast,
-      router,
-    ],
+    [currentUser, favorites, toggleFavoriteMutation, showToast, router],
   );
 
   const isSearching =
@@ -109,18 +101,17 @@ export default function HomePage(props: Props) {
           favorites={favorites}
           handlePlayMovie={handlePlayMovie}
           handleToggleFavorite={handleToggleFavorite}
-          setSearchQuery={setSearchQuery}
-          portaitMovie={portaitMovie}
+          portraitMovies={portraitMovies}
         />
       ) : (
         <SearchView
           searchQuery={searchQuery}
-          filteredMovies={moviesData}
+          filteredMovies={fetchedMovies}
           isSearching={isSearching}
           handlePlayMovie={handlePlayMovie}
           handleToggleFavorite={handleToggleFavorite}
           favorites={favorites}
-          setSearchQuery={setSearchQuery}
+          setSearchQuery={useAppStore.getState().setSearchQuery}
         />
       )}
 
