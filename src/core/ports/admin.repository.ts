@@ -1,4 +1,4 @@
-import { ApiResponse } from "@/infra/interface/response";
+import { ApiResponse } from "@/core/ports/response";
 import { AdminStats } from "../domain/admin";
 
 export interface AdminRepository {

@@ -1,30 +1,29 @@
 import { create } from "zustand";
 import { User } from "@/core/domain/user";
-import { authService } from "@/infra/container";
+
+type ToastType = "success" | "error" | "info" | "warning";
+
+interface Toast {
+  message: string;
+  type: ToastType;
+  isVisible: boolean;
+}
 
 interface AppState {
   currentUser: User | null;
   setCurrentUser: (user: User | null) => void;
-  checkAuth: () => Promise<void>;
 
-  toast: {
-    message: string;
-    type: "success" | "error" | "info" | "warning";
-    isVisible: boolean;
-  } | null;
-
-  showToast: (
-    message: string,
-    type?: "success" | "error" | "info" | "warning",
-  ) => void;
-
+  toast: Toast | null;
+  showToast: (message: string, type?: ToastType) => void;
   hideToast: () => void;
 
   searchQuery: string;
   setSearchQuery: (query: string) => void;
 }
 
-export const useAppStore = create<AppState>()((set, get) => ({
+let toastTimer: ReturnType<typeof setTimeout> | null = null;
+
+export const useAppStore = create<AppState>()((set) => ({
   currentUser: null,
   toast: null,
   searchQuery: "",
@@ -33,17 +32,11 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
   setSearchQuery: (query) => set({ searchQuery: query }),
 
-  checkAuth: async () => {
-    try {
-      const user = await authService.getCurrentUser();
-      set({ currentUser: user });
-    } catch (error) {
-      console.error("Auth check failed, removing stale user session:", error);
-      set({ currentUser: null });
-    }
-  },
-
   showToast: (message, type = "success") => {
+    if (toastTimer) {
+      clearTimeout(toastTimer);
+    }
+
     set({
       toast: {
         message,
@@ -52,21 +45,21 @@ export const useAppStore = create<AppState>()((set, get) => ({
       },
     });
 
-    setTimeout(() => {
-      get().hideToast();
+    toastTimer = setTimeout(() => {
+      set((state) => ({
+        toast: state.toast ? { ...state.toast, isVisible: false } : null,
+      }));
+      toastTimer = null;
     }, 4000);
   },
 
   hideToast: () => {
-    const currentToast = get().toast;
-
-    if (currentToast) {
-      set({
-        toast: {
-          ...currentToast,
-          isVisible: false,
-        },
-      });
+    if (toastTimer) {
+      clearTimeout(toastTimer);
+      toastTimer = null;
     }
+    set((state) => ({
+      toast: state.toast ? { ...state.toast, isVisible: false } : null,
+    }));
   },
 }));

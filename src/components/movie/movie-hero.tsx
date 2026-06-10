@@ -37,10 +37,7 @@ export default function MovieHero({
   }, []);
 
   const startTimer = useCallback(() => {
-    if (heroMovies.length <= 1) {
-      return;
-    }
-
+    if (heroMovies.length <= 1) return;
     stopTimer();
     timerRef.current = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % heroMovies.length);
@@ -98,6 +95,7 @@ export default function MovieHero({
       <div className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           onClick={handlePrev}
+          aria-label="ภาพยนตร์ก่อนหน้า"
           className="p-2 rounded-full bg-black/40 text-white hover:bg-black/75 cursor-pointer hover:scale-105 active:scale-95 transition-all"
         >
           <ChevronLeftIcon className="text-2xl md:text-3xl" />
@@ -107,6 +105,7 @@ export default function MovieHero({
       <div className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           onClick={handleNext}
+          aria-label="ภาพยนตร์ถัดไป"
           className="p-2 rounded-full bg-black/40 text-white hover:bg-black/75 cursor-pointer hover:scale-105 active:scale-95 transition-all"
         >
           <ChevronRightIcon className="text-2xl md:text-3xl" />
@@ -198,6 +197,7 @@ export default function MovieHero({
           <button
             key={index}
             onClick={() => setActiveIndex(index)}
+            aria-label={`ไปยังภาพยนตร์ที่ ${index + 1}`}
             className={`w-2.5 h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
               index === activeIndex
                 ? "bg-brand scale-125 w-6"

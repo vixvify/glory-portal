@@ -6,7 +6,7 @@ import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 
 const kanit = Kanit({
-  subsets: ["latin"],
+  subsets: ["latin", "thai"],
   variable: "--font-kanit",
   weight: ["400", "700"],
 });

@@ -41,12 +41,11 @@ function MovieCard({
     onToggleFavorite(movie.id);
   };
 
-  const isPortraitMode = isPortrait;
 
   return (
     <div className="group relative cursor-pointer glass-card rounded-xl overflow-hidden z-10 hover:z-20 flex flex-col h-full">
       <div className={`relative w-full overflow-hidden bg-zinc-950 transition-all duration-300 ${
-        isPortraitMode ? "aspect-[2/3]" : "aspect-video"
+        isPortrait ? "aspect-[2/3]" : "aspect-video"
       }`}>
         <Image
           src={movie.thumbnail}

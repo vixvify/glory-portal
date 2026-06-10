@@ -1,8 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useAppStore } from "@/store/use-store";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useCheckAuth } from "@/hooks/use-check-auth";
+
+function AuthInitializer() {
+  useCheckAuth();
+  return null;
+}
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -17,15 +23,13 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       })
   );
 
-  const checkAuth = useAppStore((state) => state.checkAuth);
-
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
-
   return (
     <QueryClientProvider client={queryClient}>
+      <AuthInitializer />
       {children}
+      {process.env.NODE_ENV === "development" && (
+        <ReactQueryDevtools initialIsOpen={false} />
+      )}
     </QueryClientProvider>
   );
 }

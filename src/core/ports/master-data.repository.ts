@@ -1,4 +1,4 @@
-import { ApiResponse } from "@/infra/interface/response";
+import { ApiResponse } from "@/core/ports/response";
 import { Category, University, AgeRating, Language, TargetGroup } from "../domain/movie";
 
 export interface MasterDataRepository {
