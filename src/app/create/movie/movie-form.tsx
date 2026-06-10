@@ -1,16 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import MovieIcon from "@mui/icons-material/Movie";
-import EmailIcon from "@mui/icons-material/Email";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { CreatableSearchSelect } from "@/components/ui/search-select";
 import { MultiSelect } from "@/components/ui/multi-select";
 import {
   Movie,
@@ -22,7 +20,7 @@ import {
 } from "@/core/domain/movie";
 import { CrewMember } from "@/core/domain/crew";
 import { parseSchema } from "@/lib/validation";
-import { createMovieSchema } from "@/core/schema/movie";
+import { createMovieSchema, updateMovieSchema } from "@/core/schema/movie";
 import { LOCALIZATION } from "@/core/constants/localization";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 import { useAppStore } from "@/store/use-store";
@@ -40,97 +38,10 @@ import {
 } from "@/hooks/use-movies";
 import { CreateMovie, UpdateMovie } from "@/core/domain/movie";
 import { CrewStateItem } from "@/core/domain/crew";
-import { getYouTubeId } from "@/utils/youtube";
 import { mapCrewToState, mapStateToCrewInput } from "@/utils/crew";
-
-interface CrewSectionProps {
-  label: string;
-  list: CrewStateItem[];
-  setList: React.Dispatch<React.SetStateAction<CrewStateItem[]>>;
-  placeholder: string;
-  addButtonLabel: string;
-  crewOptions: Array<{
-    id: string;
-    name: string;
-    photoUrl?: string | null;
-    email: string;
-  }>;
-}
-
-const CrewSection: React.FC<CrewSectionProps> = ({
-  label,
-  list,
-  setList,
-  placeholder,
-  addButtonLabel,
-  crewOptions,
-}) => {
-  return (
-    <div className="space-y-2">
-      <label className="text-xs font-semibold text-zinc-300">{label}</label>
-      <div className="space-y-4">
-        {list.map((item, idx) => (
-          <div
-            key={idx}
-            className="flex gap-3 items-center p-3 bg-zinc-900/10 border border-zinc-900 rounded-2xl"
-          >
-            <div className="flex-1 space-y-2">
-              <CreatableSearchSelect
-                value={{ id: item.id, name: item.name, email: item.email }}
-                options={crewOptions}
-                placeholder={placeholder}
-                onChange={(val) => {
-                  const newList = [...list];
-                  newList[idx] = {
-                    id: val.id,
-                    name: val.name,
-                    email: val.email || "",
-                  };
-                  setList(newList);
-                }}
-                className="w-full"
-              />
-              <Input
-                type="email"
-                placeholder="เช่น example@email.com"
-                value={item.email}
-                readOnly={!!item.id}
-                onChange={(e) => {
-                  const newList = [...list];
-                  newList[idx] = {
-                    ...newList[idx],
-                    email: e.target.value,
-                  };
-                  setList(newList);
-                }}
-                className="bg-black/25 border-zinc-900/80 focus:border-brand/45 rounded-lg py-1.5 text-xs text-zinc-300 read-only:opacity-60 read-only:cursor-not-allowed h-8"
-                icon={<EmailIcon className="text-sm" />}
-              />
-            </div>
-            {list.length > 1 && (
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => setList(list.filter((_, i) => i !== idx))}
-                className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all flex-shrink-0 h-auto self-center"
-              >
-                <CloseIcon className="text-sm" />
-              </Button>
-            )}
-          </div>
-        ))}
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={() => setList([...list, { id: "", name: "", email: "" }])}
-          className="py-2 px-4 text-xs flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 hover:text-white text-zinc-300 font-semibold rounded-xl"
-        >
-          <AddIcon className="text-sm" /> {addButtonLabel}
-        </Button>
-      </div>
-    </div>
-  );
-};
+import YoutubePreview from "@/components/preview/youtube";
+import { CREW_TAB_CONFIG } from "@/core/constants/movie-form";
+import { CrewSection } from "@/components/crew/crew-section";
 
 interface MovieFormProps {
   editingMovie?: Movie | null;
@@ -169,6 +80,17 @@ type MovieFormInputs = {
   btsVideo?: string[];
 };
 
+const DEFAULT_CREW_ITEM: CrewStateItem = { id: "", name: "", email: "" };
+
+const INITIAL_CREW_STATE: Record<CrewTabId, CrewStateItem[]> = {
+  director: [{ ...DEFAULT_CREW_ITEM }],
+  producer: [{ ...DEFAULT_CREW_ITEM }],
+  writer: [{ ...DEFAULT_CREW_ITEM }],
+  cast: [{ ...DEFAULT_CREW_ITEM }],
+  dop: [{ ...DEFAULT_CREW_ITEM }],
+  editor: [{ ...DEFAULT_CREW_ITEM }],
+};
+
 export const MovieForm: React.FC<MovieFormProps> = ({
   editingMovie = null,
   categories,
@@ -188,25 +110,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
   );
   const [isSavingLocal, setIsSavingLocal] = useState(false);
   const [activeCrewTab, setActiveCrewTab] = useState<CrewTabId>("director");
-
-  const [directors, setDirectors] = useState<CrewStateItem[]>([
-    { id: "", name: "", email: "" },
-  ]);
-  const [producers, setProducers] = useState<CrewStateItem[]>([
-    { id: "", name: "", email: "" },
-  ]);
-  const [writers, setWriters] = useState<CrewStateItem[]>([
-    { id: "", name: "", email: "" },
-  ]);
-  const [castMembers, setCastMembers] = useState<CrewStateItem[]>([
-    { id: "", name: "", email: "" },
-  ]);
-  const [dops, setDops] = useState<CrewStateItem[]>([
-    { id: "", name: "", email: "" },
-  ]);
-  const [editors, setEditors] = useState<CrewStateItem[]>([
-    { id: "", name: "", email: "" },
-  ]);
+  const [crewState, setCrewState] =
+    useState<Record<CrewTabId, CrewStateItem[]>>(INITIAL_CREW_STATE);
 
   const createMovieMutation = useCreateMovieMutation();
   const updateMovieMutation = useUpdateMovieMutation();
@@ -217,6 +122,13 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     photoUrl: c.user?.photoUrl,
     email: c.email || "",
   }));
+
+  const setCrewList = useCallback(
+    (tab: CrewTabId) => (list: CrewStateItem[]) => {
+      setCrewState((prev) => ({ ...prev, [tab]: list }));
+    },
+    [],
+  );
 
   const {
     register,
@@ -237,7 +149,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     ...(watchedDrugs ? ["drugs"] : []),
   ];
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    return () => {
+      if (movieCoverPreview?.startsWith("blob:")) {
+        URL.revokeObjectURL(movieCoverPreview);
+      }
+    };
+  }, [movieCoverPreview]);
+
   useEffect(() => {
     if (editingMovie) {
       setSelectedFileName(null);
@@ -252,12 +171,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           : [""],
       );
 
-      setDirectors(mapCrewToState(editingMovie.crew, "director"));
-      setProducers(mapCrewToState(editingMovie.crew, "producer"));
-      setWriters(mapCrewToState(editingMovie.crew, "writer"));
-      setCastMembers(mapCrewToState(editingMovie.crew, "cast"));
-      setDops(mapCrewToState(editingMovie.crew, "dop"));
-      setEditors(mapCrewToState(editingMovie.crew, "editor"));
+      setCrewState({
+        director: mapCrewToState(editingMovie.crew, "director"),
+        producer: mapCrewToState(editingMovie.crew, "producer"),
+        writer: mapCrewToState(editingMovie.crew, "writer"),
+        cast: mapCrewToState(editingMovie.crew, "cast"),
+        dop: mapCrewToState(editingMovie.crew, "dop"),
+        editor: mapCrewToState(editingMovie.crew, "editor"),
+      });
 
       reset({
         title: editingMovie.title,
@@ -289,12 +210,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
       setSelectedFileName(null);
       setMovieCoverPreview(null);
       setBtsVideos([""]);
-      setDirectors([{ id: "", name: "", email: "" }]);
-      setProducers([{ id: "", name: "", email: "" }]);
-      setWriters([{ id: "", name: "", email: "" }]);
-      setCastMembers([{ id: "", name: "", email: "" }]);
-      setDops([{ id: "", name: "", email: "" }]);
-      setEditors([{ id: "", name: "", email: "" }]);
+      setCrewState(INITIAL_CREW_STATE);
       reset({
         title: "",
         description: "",
@@ -323,17 +239,15 @@ export const MovieForm: React.FC<MovieFormProps> = ({
       });
     }
   }, [editingMovie, reset, categories, ageRatings]);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   const onSubmitForm = async (data: MovieFormInputs) => {
     try {
       setIsSavingLocal(true);
       const activeVideos = btsVideos.map((v) => v.trim()).filter(Boolean);
-      const thumbnailFile = data.thumbnail;
 
-      const validated = parseSchema(createMovieSchema, {
+      const rawPayload = {
         ...data,
-        thumbnail: thumbnailFile || editingMovie?.thumbnail,
+        thumbnail: data.thumbnail || editingMovie?.thumbnail,
         year: Number(data.year),
         duration: Number(data.duration),
         universityId: data.universityId || null,
@@ -344,15 +258,16 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         colorType: data.colorType || "color",
         studio: data.studio || null,
         btsVideo: activeVideos,
-        director: mapStateToCrewInput(directors),
-        producer: mapStateToCrewInput(producers),
-        writer: mapStateToCrewInput(writers),
-        cast: mapStateToCrewInput(castMembers),
-        dop: mapStateToCrewInput(dops),
-        editor: mapStateToCrewInput(editors),
-      });
+        director: mapStateToCrewInput(crewState.director),
+        producer: mapStateToCrewInput(crewState.producer),
+        writer: mapStateToCrewInput(crewState.writer),
+        cast: mapStateToCrewInput(crewState.cast),
+        dop: mapStateToCrewInput(crewState.dop),
+        editor: mapStateToCrewInput(crewState.editor),
+      };
 
       if (editingMovie) {
+        const validated = parseSchema(updateMovieSchema, rawPayload);
         const updatedPayload: UpdateMovie = {
           id: editingMovie.id,
           title: validated.title,
@@ -388,6 +303,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         await updateMovieMutation.mutateAsync(updatedPayload);
         showToast(LOCALIZATION.TOAST.EDIT_MOVIE_SUCCESS, "success");
       } else {
+        const validated = parseSchema(createMovieSchema, rawPayload);
         const createPayload: CreateMovie = {
           title: validated.title,
           description: validated.description,
@@ -462,26 +378,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   required: "กรุณากรอกลิงก์ภาพยนตร์",
                 })}
               />
-              {watchedYoutubeUrl &&
-                (() => {
-                  const ytid = getYouTubeId(watchedYoutubeUrl);
-                  return ytid ? (
-                    <div className="mt-2 relative rounded-2xl overflow-hidden border border-zinc-800 bg-black/50 aspect-[16/9] w-full max-w-md shadow-lg shadow-black/50 transition-all hover:border-brand/30">
-                      <iframe
-                        src={`https://www.youtube.com/embed/${ytid}`}
-                        title="YouTube Movie Preview"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                        className="absolute inset-0 w-full h-full"
-                      />
-                    </div>
-                  ) : watchedYoutubeUrl.trim() ? (
-                    <p className="text-[10px] text-zinc-555 pl-1">
-                      ลิงก์ YouTube ไม่ถูกต้อง
-                    </p>
-                  ) : null;
-                })()}
+              <YoutubePreview url={watchedYoutubeUrl} />
             </div>
 
             <Input
@@ -503,7 +400,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 {...register("description", {
                   required: "กรุณากรอกเรื่องย่อภาพยนตร์",
                 })}
-                className={`w-full bg-black/40 border ${errors.description ? "border-red-500" : "border-zinc-800 focus:border-brand"} rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors resize-none`}
+                className={`w-full bg-black/40 border ${
+                  errors.description
+                    ? "border-red-500"
+                    : "border-zinc-800 focus:border-brand"
+                } rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors resize-none`}
               />
               {errors.description && (
                 <span className="text-[10px] text-red-500 block pl-1 font-semibold">
@@ -516,21 +417,16 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               <Select
                 label="หมวดหมู่"
                 error={errors.categoryId?.message}
-                {...register("categoryId", {
-                  required: "กรุณาเลือกหมวดหมู่",
-                })}
+                {...register("categoryId", { required: "กรุณาเลือกหมวดหมู่" })}
                 options={categories.map((cat) => ({
                   value: cat.id,
                   label: CATEGORY_TITLE_MAPPING[cat.name] || cat.name,
                 }))}
               />
-
               <Select
                 label="เรตอายุที่แนะนำ"
                 error={errors.ageRatingId?.message}
-                {...register("ageRatingId", {
-                  required: "กรุณาเลือกเรตอายุ",
-                })}
+                {...register("ageRatingId", { required: "กรุณาเลือกเรตอายุ" })}
                 options={ageRatings.map((rating) => ({
                   value: rating.id,
                   label: rating.name,
@@ -551,7 +447,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   })),
                 ]}
               />
-
               <Select
                 label="กลุ่มเป้าหมายผู้ชม"
                 error={errors.targetGroupId?.message}
@@ -564,7 +459,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   })),
                 ]}
               />
-
               <Select
                 label="โทนสีภาพยนตร์"
                 error={errors.colorType?.message}
@@ -583,17 +477,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 error={errors.year?.message}
                 {...register("year", {
                   required: "กรุณากรอกปีที่ฉาย",
-                  min: {
-                    value: 1900,
-                    message: "ปีที่ฉายต้องไม่เก่ากว่า 1900",
-                  },
-                  max: {
-                    value: 2100,
-                    message: "ปีที่ฉายต้องไม่เกิน 2100",
-                  },
+                  min: { value: 1900, message: "ปีที่ฉายต้องไม่เก่ากว่า 1900" },
+                  max: { value: 2100, message: "ปีที่ฉายต้องไม่เกิน 2100" },
                 })}
               />
-
               <Select
                 label="อัตราส่วนภาพ"
                 error={errors.aspectRatio?.message}
@@ -602,7 +489,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 })}
                 options={ASPECT_RATIO_OPTIONS}
               />
-
               <Input
                 label="ความยาวภาพยนตร์ (นาที)"
                 placeholder="เช่น 120"
@@ -633,7 +519,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 error={errors.studio?.message}
                 {...register("studio")}
               />
-
               <MultiSelect
                 label="คำเตือนเนื้อหา"
                 options={CONTENT_WARNING_OPTIONS}
@@ -684,7 +569,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     )}
                   />
                   <div
-                    className={`w-full bg-black/40 border ${errors.thumbnail ? "border-red-500" : "border-zinc-800 group-hover/file:border-brand"} rounded-xl px-4 py-3 text-sm text-zinc-400 flex items-center justify-between transition-colors`}
+                    className={`w-full bg-black/40 border ${
+                      errors.thumbnail
+                        ? "border-red-500"
+                        : "border-zinc-800 group-hover/file:border-brand"
+                    } rounded-xl px-4 py-3 text-sm text-zinc-400 flex items-center justify-between transition-colors`}
                   >
                     <span
                       className={
@@ -750,26 +639,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   error={errors.trailerUrl?.message}
                   {...register("trailerUrl")}
                 />
-                {watchedTrailerUrl &&
-                  (() => {
-                    const ytid = getYouTubeId(watchedTrailerUrl);
-                    return ytid ? (
-                      <div className="mt-2 relative rounded-2xl overflow-hidden border border-zinc-800 bg-black/50 aspect-[16/9] w-full shadow-lg shadow-black/50 transition-all hover:border-brand/30">
-                        <iframe
-                          src={`https://www.youtube.com/embed/${ytid}`}
-                          title="YouTube Trailer Preview"
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                          allowFullScreen
-                          className="absolute inset-0 w-full h-full"
-                        />
-                      </div>
-                    ) : watchedTrailerUrl.trim() ? (
-                      <p className="text-[10px] text-zinc-555 pl-1">
-                        ลิงก์ YouTube ไม่ถูกต้อง
-                      </p>
-                    ) : null;
-                  })()}
+                <YoutubePreview url={watchedTrailerUrl} />
               </div>
             </div>
           </div>
@@ -801,65 +671,19 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               </div>
 
               <div className="bg-zinc-900/10 border border-zinc-800/30 rounded-3xl p-5 md:p-6 min-h-[200px]">
-                {activeCrewTab === "director" && (
-                  <CrewSection
-                    label="ผู้กำกับ"
-                    list={directors}
-                    setList={setDirectors}
-                    placeholder="พิมพ์ชื่อ หรือเลือกผู้กำกับจากคลังรายชื่อ..."
-                    addButtonLabel="เพิ่มรายชื่อผู้กำกับ"
-                    crewOptions={crewOptions}
-                  />
-                )}
-                {activeCrewTab === "producer" && (
-                  <CrewSection
-                    label="ผู้อำนวยการสร้าง"
-                    list={producers}
-                    setList={setProducers}
-                    placeholder="พิมพ์ชื่อ หรือเลือกผู้อำนวยการสร้าง..."
-                    addButtonLabel="เพิ่มรายชื่อผู้อำนวยการสร้าง"
-                    crewOptions={crewOptions}
-                  />
-                )}
-                {activeCrewTab === "writer" && (
-                  <CrewSection
-                    label="ผู้เขียนบท"
-                    list={writers}
-                    setList={setWriters}
-                    placeholder="พิมพ์ชื่อ หรือเลือกผู้เขียนบท..."
-                    addButtonLabel="เพิ่มรายชื่อผู้เขียนบท"
-                    crewOptions={crewOptions}
-                  />
-                )}
-                {activeCrewTab === "cast" && (
-                  <CrewSection
-                    label="นักแสดงนำ"
-                    list={castMembers}
-                    setList={setCastMembers}
-                    placeholder="พิมพ์ชื่อ หรือเลือกนักแสดง..."
-                    addButtonLabel="เพิ่มรายชื่อนักแสดง"
-                    crewOptions={crewOptions}
-                  />
-                )}
-                {activeCrewTab === "dop" && (
-                  <CrewSection
-                    label="ผู้กำกับภาพ"
-                    list={dops}
-                    setList={setDops}
-                    placeholder="พิมพ์ชื่อ หรือเลือกผู้กำกับภาพ..."
-                    addButtonLabel="เพิ่มรายชื่อผู้กำกับภาพ"
-                    crewOptions={crewOptions}
-                  />
-                )}
-                {activeCrewTab === "editor" && (
-                  <CrewSection
-                    label="ผู้ลำดับภาพ"
-                    list={editors}
-                    setList={setEditors}
-                    placeholder="พิมพ์ชื่อ หรือเลือกผู้ลำดับภาพ..."
-                    addButtonLabel="เพิ่มรายชื่อผู้ลำดับภาพ"
-                    crewOptions={crewOptions}
-                  />
+                {CREW_TAB_CONFIG.map(
+                  (tab) =>
+                    activeCrewTab === tab.id && (
+                      <CrewSection
+                        key={tab.id}
+                        label={tab.label}
+                        list={crewState[tab.id]}
+                        setList={setCrewList(tab.id)}
+                        placeholder={tab.placeholder}
+                        addButtonLabel={tab.addLabel}
+                        crewOptions={crewOptions}
+                      />
+                    ),
                 )}
               </div>
 
@@ -900,26 +724,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                           </Button>
                         )}
                       </div>
-                      {videoUrl &&
-                        (() => {
-                          const ytid = getYouTubeId(videoUrl);
-                          return ytid ? (
-                            <div className="mt-2 relative rounded-2xl overflow-hidden border border-zinc-800 bg-black/50 aspect-[16/9] w-full max-w-md shadow-lg shadow-black/50 transition-all hover:border-brand/30">
-                              <iframe
-                                src={`https://www.youtube.com/embed/${ytid}`}
-                                title={`YouTube BTS Video Preview ${idx + 1}`}
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                allowFullScreen
-                                className="absolute inset-0 w-full h-full"
-                              />
-                            </div>
-                          ) : videoUrl.trim() ? (
-                            <p className="text-[10px] text-zinc-500 pl-1 font-light">
-                              ลิงก์ YouTube ไม่ถูกต้อง
-                            </p>
-                          ) : null;
-                        })()}
+                      <YoutubePreview url={videoUrl} />
                     </div>
                   ))}
                   <Button
@@ -941,12 +746,15 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               type="button"
               variant="secondary"
               onClick={() => router.push("/")}
+              disabled={isSavingLocal}
               className="flex-1 py-3 text-sm font-semibold rounded-xl"
             >
               ยกเลิก
             </Button>
             <Button
               type="submit"
+              isLoading={isSavingLocal}
+              disabled={isSavingLocal}
               className="flex-1 py-3 text-sm font-semibold rounded-xl"
             >
               {editingMovie ? "บันทึกข้อมูลภาพยนตร์" : "เพิ่มภาพยนตร์ใหม่"}
@@ -964,14 +772,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             </div>
             <div className="space-y-1.5 text-center">
               <h3 className="text-xl font-bold tracking-wide text-white">
-                {editingMovie
-                  ? LOCALIZATION.LOADING.SAVE_MOVIE
-                  : LOCALIZATION.LOADING.SAVE_MOVIE}
+                {LOCALIZATION.LOADING.SAVE_MOVIE}
               </h3>
               <p className="text-xs text-zinc-400 font-light">
-                {editingMovie
-                  ? LOCALIZATION.LOADING.SUB_SAVE_MOVIE
-                  : LOCALIZATION.LOADING.SUB_SAVE_MOVIE}
+                {LOCALIZATION.LOADING.SUB_SAVE_MOVIE}
               </p>
             </div>
           </div>
