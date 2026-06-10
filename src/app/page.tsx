@@ -33,7 +33,8 @@ export default function Page() {
     pagesize: 10,
   });
 
-  const { data: categories = [], isLoading: isCatLoading } = useCategoriesQuery();
+  const { data: categories = [], isLoading: isCatLoading } =
+    useCategoriesQuery();
 
   const { data: directorsList = [], isLoading: isDirsLoading } =
     useCrewMembersQuery({ search: "director", searchby: "role" });

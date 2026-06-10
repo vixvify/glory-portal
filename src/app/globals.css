@@ -1,4 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;505;600;700;800&family=Cinzel:wght@400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
+
 
 :root {
   --theme-primary: #8b5cf6;
@@ -48,7 +50,8 @@
   --color-brand-hover: var(--theme-primary-hover);
   --color-card: var(--theme-card);
   --color-card-hover: var(--theme-card-hover);
-  --font-sans: var(--font-kanit), Arial, Helvetica, sans-serif;
+  --font-sans: 'Kanit', Arial, Helvetica, sans-serif;
+  --font-serif: 'Cinzel', Georgia, serif;
   --font-mono: var(--font-geist-mono);
 }
 
@@ -295,3 +298,51 @@ html {
   font-weight: 950;
   filter: drop-shadow(0px 10px 10px rgba(0, 0, 0, 0.95));
 }
+
+/* Luxury Utilities */
+.font-serif {
+  font-family: var(--font-serif), Georgia, serif;
+}
+
+.text-luxury-gold {
+  background: linear-gradient(135deg, #f9df95 0%, #e5b842 50%, #b38820 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.bg-luxury-gold {
+  background: linear-gradient(135deg, #f9df95 0%, #e5b842 50%, #b38820 100%);
+}
+
+.border-luxury-gold {
+  border-image: linear-gradient(135deg, #f9df95 0%, #e5b842 50%, #b38820 100%) 1;
+}
+
+/* Luxury slide indicator for navbar */
+.nav-link-premium {
+  position: relative;
+  padding: 0.25rem 0;
+  transition: color 0.3s ease;
+}
+
+.nav-link-premium::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #f9df95, #e5b842, #b38820);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-link-premium:hover::after,
+.nav-link-premium.active::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+

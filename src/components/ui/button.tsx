@@ -9,14 +9,14 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = "brand", size = "md", isLoading, children, className = "", ...props }, ref) => {
     const baseStyle =
-      "inline-flex items-center justify-center font-bold rounded-lg transition-all duration-200 active:scale-[0.98] select-none cursor-pointer focus:outline-none disabled:opacity-50 disabled:pointer-events-none";
+      "inline-flex items-center justify-center font-bold rounded-md transition-all duration-300 active:scale-[0.98] select-none cursor-pointer focus:outline-none disabled:opacity-50 disabled:pointer-events-none tracking-wide";
 
     const variants = {
-      brand: "bg-brand text-white hover:bg-brand-hover shadow-md shadow-brand/10",
-      secondary: "bg-zinc-800/60 backdrop-blur-md hover:bg-zinc-700/80 text-white border border-zinc-700/40",
-      outline: "border border-zinc-700/30 hover:bg-zinc-850 text-zinc-300 hover:text-white backdrop-blur-sm",
-      ghost: "text-zinc-400 hover:text-brand bg-transparent hover:bg-zinc-800/30",
-      white: "bg-white text-black hover:bg-white/90 shadow-md shadow-white/5",
+      brand: "bg-brand text-zinc-950 hover:bg-brand-hover shadow-lg hover:shadow-brand/25 border border-brand/25 transition-all duration-300",
+      secondary: "bg-zinc-900/80 backdrop-blur-md hover:bg-zinc-800/90 text-zinc-100 border border-zinc-700/50 hover:border-brand/40 transition-all duration-300",
+      outline: "border border-zinc-700/60 hover:border-brand/50 hover:bg-brand/5 text-zinc-300 hover:text-brand transition-all duration-300",
+      ghost: "text-zinc-400 hover:text-brand bg-transparent hover:bg-zinc-800/30 transition-all duration-300",
+      white: "bg-white text-zinc-950 hover:bg-zinc-100 shadow-md shadow-white/5 transition-all duration-300",
       glass: "glass-button",
     };
 

@@ -59,7 +59,7 @@ export default function MovieRatingPanel({
   };
 
   return (
-    <div className="p-6 rounded-2xl glass-panel-gold space-y-6 shadow-xl animate-fade-in">
+    <div className="p-6 rounded-lg glass-panel-gold space-y-6 shadow-xl animate-fade-in">
       <div className="text-center space-y-3">
         <span className="text-zinc-450 text-[10px] uppercase tracking-widest font-semibold block">
           คะแนนเฉลี่ยจากผู้ชม
@@ -130,7 +130,7 @@ export default function MovieRatingPanel({
             <button
               onClick={handleDelete}
               disabled={isPending}
-              className="flex-1 bg-red-950/20 text-red-400 hover:bg-red-900/30 hover:text-red-300 border border-red-900/30 text-sm font-bold rounded-lg cursor-pointer transition-colors active:scale-95 flex items-center justify-center py-2.5 disabled:opacity-50 disabled:pointer-events-none"
+              className="flex-1 bg-red-950/20 text-red-400 hover:bg-red-900/30 hover:text-red-300 border border-red-900/30 text-sm font-bold rounded-md cursor-pointer transition-colors active:scale-95 flex items-center justify-center py-2.5 disabled:opacity-50 disabled:pointer-events-none"
               title="ลบคะแนน"
             >
               ลบ

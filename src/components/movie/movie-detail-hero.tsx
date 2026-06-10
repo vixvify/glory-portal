@@ -41,7 +41,7 @@ export default function MovieDetailHero({
   }, [backgroundEmbedUrl]);
 
   return (
-    <div className="relative rounded-3xl overflow-hidden shadow-2xl glass-panel">
+    <div className="relative rounded-lg overflow-hidden shadow-2xl glass-panel">
       <div className="relative h-[420px] md:h-[520px] w-full bg-black/45 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center transition-all duration-1000 z-0"
@@ -61,7 +61,7 @@ export default function MovieDetailHero({
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               className={`absolute top-1/2 left-1/2 w-[100vw] h-[56.25vw] min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 pointer-events-none scale-[1.35] transition-opacity duration-1000 ${
                 videoLoaded ? "opacity-45" : "opacity-0"
-              }`}
+               }`}
               style={{ pointerEvents: "none" }}
               tabIndex={-1}
             />
@@ -82,7 +82,7 @@ export default function MovieDetailHero({
 
         <button
           onClick={() => router.back()}
-          className="absolute top-6 left-6 w-11 h-11 rounded-full bg-black/50 hover:bg-black/80 border border-zinc-700/60 backdrop-blur-md flex items-center justify-center text-white cursor-pointer shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 z-20"
+          className="absolute top-6 left-6 w-11 h-11 rounded-md bg-black/50 hover:bg-black/80 border border-zinc-700/60 backdrop-blur-md flex items-center justify-center text-white cursor-pointer shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 z-20"
           aria-label="ย้อนกลับ"
         >
           <ArrowBackIcon className="text-xl" />
@@ -91,29 +91,29 @@ export default function MovieDetailHero({
         <div className="absolute bottom-6 left-6 md:left-12 flex flex-wrap items-end gap-4 z-20 w-[90%]">
           <div>
             {movie.creator && (
-              <div className="text-xs font-semibold tracking-widest text-brand mb-2.5 bg-brand/10 border border-brand/20 px-2.5 py-1 rounded-md inline-block">
+              <div className="text-[10px] font-extrabold tracking-widest text-brand mb-2.5 bg-brand/5 border border-brand/25 px-2.5 py-1 rounded-sm inline-block uppercase">
                 GLORY ORIGINAL
               </div>
             )}
 
-            <h1 className="text-3xl md:text-5xl font-extrabold text-white tracking-wide drop-shadow-md mb-5 leading-tight">
+            <h1 className="text-3xl md:text-5xl font-bold text-white tracking-wide drop-shadow-lg mb-5 leading-tight">
               {movie.title}
             </h1>
 
             <div className="flex flex-wrap items-center gap-3">
-              <Button variant="white" size="md" onClick={onPlayClick}>
+              <Button variant="brand" size="md" onClick={onPlayClick} className="text-zinc-950 font-extrabold px-6">
                 <PlayArrowIcon className="text-xl mr-1.5" />
                 เล่น
               </Button>
 
               {movie.trailerUrl && (
-                <Button variant="secondary" size="md" onClick={onTrailerClick}>
+                <Button variant="secondary" size="md" onClick={onTrailerClick} className="px-6">
                   <PlayArrowIcon className="text-xl mr-1.5 text-brand" />
                   ตัวอย่างภาพยนตร์
                 </Button>
               )}
 
-              <button className="flex items-center justify-center w-11 h-11 rounded-full border border-zinc-700 bg-zinc-900/60 hover:bg-zinc-800 text-emerald-400 cursor-pointer transition-colors">
+              <button className="flex items-center justify-center w-11 h-11 rounded-md border border-zinc-700 bg-zinc-900/60 hover:bg-zinc-800 text-emerald-400 cursor-pointer transition-colors">
                 <CheckIcon className="text-xl" />
               </button>
             </div>

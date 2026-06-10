@@ -137,7 +137,7 @@ export default function RegisterPage() {
         className={`w-full ${showOptional ? "max-w-5xl" : "max-w-xl"} glass-panel-gold rounded-[2rem] shadow-2xl p-10 space-y-8 transition-all duration-500 ease-in-out`}
       >
         <div className="text-center space-y-2">
-          <h2 className="text-3xl font-extrabold tracking-wide bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent">
+          <h2 className="text-3xl font-bold tracking-wide bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent">
             สร้างบัญชีใหม่
           </h2>
           <p className="text-xs text-zinc-400 font-light max-w-sm mx-auto leading-relaxed">
@@ -199,7 +199,6 @@ export default function RegisterPage() {
               <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest font-mono border-b border-zinc-800/50 pb-2">
                 ข้อมูลหลักของบัญชี
               </p>
-
               <div className="space-y-4">
                 <Input
                   label="ชื่อเต็ม"
@@ -260,7 +259,8 @@ export default function RegisterPage() {
                   error={errors.confirmPassword?.message}
                   {...register("confirmPassword")}
                 />
-              </div>              {showOptional && (
+              </div>{" "}
+              {showOptional && (
                 <div className="space-y-4 pt-3 border-t border-zinc-800/50 animate-fade-in">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Input

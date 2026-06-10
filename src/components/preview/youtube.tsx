@@ -22,7 +22,7 @@ export default function YoutubePreview({
 
   return (
     <div
-      className={`mt-2 relative rounded-2xl overflow-hidden border border-zinc-800 bg-black/50 aspect-[16/9] w-full ${maxWidthClass} shadow-lg shadow-black/50 transition-all hover:border-brand/30`}
+      className={`mt-2 relative rounded-md overflow-hidden border border-zinc-800 bg-black/50 aspect-[16/9] w-full ${maxWidthClass} shadow-lg shadow-black/50 transition-all hover:border-brand/30`}
     >
       <iframe
         src={`https://www.youtube.com/embed/${ytid}`}

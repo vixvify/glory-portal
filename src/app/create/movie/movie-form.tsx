@@ -361,7 +361,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         </div>
 
         <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-8">
-          <div className="bg-card border border-zinc-800/35 rounded-3xl p-6 md:p-8 shadow-xl backdrop-blur-md space-y-6">
+          <div className="bg-card border border-zinc-850 rounded-lg p-6 md:p-8 shadow-xl backdrop-blur-md space-y-6">
             <div className="flex items-center gap-2 border-b border-zinc-800/40 pb-4">
               <span className="w-1.5 h-6 bg-brand rounded-full" />
               <h2 className="text-lg font-bold text-white">
@@ -644,7 +644,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             </div>
           </div>
 
-          <div className="bg-card border border-zinc-800/35 rounded-3xl p-6 md:p-8 shadow-xl backdrop-blur-md space-y-6">
+          <div className="bg-card border border-zinc-850 rounded-lg p-6 md:p-8 shadow-xl backdrop-blur-md space-y-6">
             <div className="flex items-center gap-2 border-b border-zinc-800/40 pb-4">
               <span className="w-1.5 h-6 bg-brand rounded-full" />
               <h2 className="text-lg font-bold text-white">
@@ -670,7 +670,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 ))}
               </div>
 
-              <div className="bg-zinc-900/10 border border-zinc-800/30 rounded-3xl p-5 md:p-6 min-h-[200px]">
+              <div className="bg-zinc-900/10 border border-zinc-800/40 rounded-lg p-5 md:p-6 min-h-[200px]">
                 {CREW_TAB_CONFIG.map(
                   (tab) =>
                     activeCrewTab === tab.id && (
@@ -695,7 +695,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   {btsVideos.map((videoUrl, idx) => (
                     <div
                       key={idx}
-                      className="space-y-2 p-4 bg-zinc-900/30 border border-zinc-800/40 rounded-2xl"
+                      className="space-y-2 p-4 bg-zinc-900/30 border border-zinc-800/45 rounded-md"
                     >
                       <div className="flex gap-2 items-center">
                         <Input
@@ -718,7 +718,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                                 btsVideos.filter((_, i) => i !== idx),
                               )
                             }
-                            className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 transition-all h-auto"
+                            className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-md border border-red-500/20 transition-all h-auto"
                           >
                             <CloseIcon className="text-sm" />
                           </Button>
@@ -731,7 +731,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     type="button"
                     variant="secondary"
                     onClick={() => setBtsVideos([...btsVideos, ""])}
-                    className="py-2 px-4 text-xs w-fit flex items-center gap-1.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 transition-colors"
+                    className="py-2 px-4 text-xs w-fit flex items-center gap-1.5 rounded-md bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 transition-colors"
                   >
                     <AddIcon className="text-sm" />{" "}
                     เพิ่มลิงก์วิดีโอเบื้องหลังอื่น
@@ -747,7 +747,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               variant="secondary"
               onClick={() => router.push("/")}
               disabled={isSavingLocal}
-              className="flex-1 py-3 text-sm font-semibold rounded-xl"
+              className="flex-1 py-3 text-sm font-semibold rounded-md"
             >
               ยกเลิก
             </Button>
@@ -755,7 +755,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               type="submit"
               isLoading={isSavingLocal}
               disabled={isSavingLocal}
-              className="flex-1 py-3 text-sm font-semibold rounded-xl"
+              className="flex-1 py-3 text-sm font-semibold rounded-md"
             >
               {editingMovie ? "บันทึกข้อมูลภาพยนตร์" : "เพิ่มภาพยนตร์ใหม่"}
             </Button>
