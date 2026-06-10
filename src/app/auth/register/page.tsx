@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
@@ -137,7 +138,7 @@ export default function RegisterPage() {
         className={`w-full ${showOptional ? "max-w-5xl" : "max-w-xl"} glass-panel-gold rounded-[2rem] shadow-2xl p-10 space-y-8 transition-all duration-500 ease-in-out`}
       >
         <div className="text-center space-y-2">
-          <h2 className="text-3xl font-extrabold tracking-wide bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent">
+          <h2 className="text-3xl font-bold tracking-wide bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent">
             สร้างบัญชีใหม่
           </h2>
           <p className="text-xs text-zinc-400 font-light max-w-sm mx-auto leading-relaxed">
@@ -158,12 +159,14 @@ export default function RegisterPage() {
               onClick={handleAvatarClick}
               className="relative w-28 h-28 rounded-full p-[3px] bg-gradient-to-tr from-brand to-zinc-800 cursor-pointer overflow-hidden group flex items-center justify-center transition-all duration-300 hover:scale-105 shadow-lg shadow-black/50"
             >
-              <div className="w-full h-full rounded-full bg-zinc-900 overflow-hidden flex items-center justify-center">
+              <div className="w-full h-full rounded-full bg-zinc-900 overflow-hidden flex items-center justify-center relative">
                 {croppedPreviewUrl ? (
-                  <img
+                  <Image
                     src={croppedPreviewUrl}
                     alt="Profile Preview"
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    unoptimized
                   />
                 ) : (
                   <PersonIcon className="text-zinc-500 text-6xl" />
@@ -199,7 +202,6 @@ export default function RegisterPage() {
               <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest font-mono border-b border-zinc-800/50 pb-2">
                 ข้อมูลหลักของบัญชี
               </p>
-
               <div className="space-y-4">
                 <Input
                   label="ชื่อเต็ม"
@@ -260,7 +262,8 @@ export default function RegisterPage() {
                   error={errors.confirmPassword?.message}
                   {...register("confirmPassword")}
                 />
-              </div>              {showOptional && (
+              </div>{" "}
+              {showOptional && (
                 <div className="space-y-4 pt-3 border-t border-zinc-800/50 animate-fade-in">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Input

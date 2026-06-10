@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import PersonIcon from "@mui/icons-material/Person";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -55,10 +56,13 @@ export default function MovieCrewRow({ crew }: Props) {
               className="flex items-center gap-3.5 glass-card p-3 rounded-2xl group flex-shrink-0 w-60 snap-start cursor-pointer block"
             >
               {member.crewMember?.user?.photoUrl ? (
-                <img
+                <Image
                   src={member.crewMember.user.photoUrl}
                   alt={member.crewMember.name}
+                  width={48}
+                  height={48}
                   className="w-12 h-12 rounded-full object-cover bg-zinc-800 border border-zinc-700/50 group-hover:border-brand/40 transition-colors flex-shrink-0"
+                  unoptimized
                 />
               ) : (
                 <div className="w-12 h-12 rounded-full bg-brand/10 border border-brand/20 flex items-center justify-center text-brand flex-shrink-0">

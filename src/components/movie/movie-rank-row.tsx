@@ -31,7 +31,7 @@ export default function MovieRankRow({
 
   return (
     <div className="space-y-4 group/row relative">
-      <h3 className="text-base md:text-xl font-bold text-zinc-100 tracking-wide hover:text-white cursor-pointer transition-colors duration-200 pl-1 inline-block">
+      <h3 className="text-base md:text-lg lg:text-xl font-bold text-zinc-100 tracking-wide hover:text-white cursor-pointer transition-colors duration-200 pl-3.5 border-l-3 border-brand/85 inline-block">
         {title}
       </h3>
 

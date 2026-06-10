@@ -82,24 +82,25 @@ export default function Navbar() {
     <nav
       className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 md:px-16 py-4 transition-all duration-500 ease-out ${
         isScrolled
-          ? "glass-nav shadow-2xl shadow-black/35 py-3.5"
+          ? "glass-nav shadow-2xl shadow-black/35 py-3.5 border-b border-[#e5b842]/10"
           : "bg-transparent border-b border-transparent"
       }`}
-      style={{ fontFamily: "var(--font-kanit), Arial, Helvetica, sans-serif" }}
+      style={{ fontFamily: "var(--font-sans), Arial, Helvetica, sans-serif" }}
     >
       <div className="flex items-center gap-8">
         <Link
           href="/"
-          className="text-3xl font-extrabold tracking-tighter text-brand cursor-pointer transition-transform duration-300 hover:scale-105 active:scale-95"
-          style={{ textShadow: `0 0 10px rgba(var(--theme-primary-rgb),0.35)` }}
+          className="text-2xl md:text-3xl font-bold tracking-[0.25em] font-serif text-luxury-gold cursor-pointer transition-transform duration-300 hover:scale-[1.02] active:scale-95"
         >
           GLORY
         </Link>
 
-        <div className="hidden md:flex items-center gap-6 text-sm text-zinc-300">
+        <div className="hidden md:flex items-center gap-8 text-sm text-zinc-300">
           <Link
             href="/"
-            className="cursor-pointer transition-colors duration-300 hover:text-white"
+            className={`cursor-pointer text-xs uppercase tracking-wider font-semibold text-zinc-300 hover:text-brand nav-link-premium ${
+              pathname === "/" ? "active text-brand" : ""
+            }`}
           >
             หน้าแรก
           </Link>
@@ -107,45 +108,52 @@ export default function Navbar() {
           <div className="relative" ref={moviesMenuRef}>
             <button
               onClick={() => setShowMoviesMenu(!showMoviesMenu)}
-              className="flex items-center gap-1 cursor-pointer transition-colors duration-300 hover:text-white focus:outline-none text-white font-semibold"
+              className={`flex items-center gap-1.5 cursor-pointer text-xs uppercase tracking-wider font-semibold hover:text-brand focus:outline-none nav-link-premium ${
+                pathname.startsWith("/movies/category") ||
+                pathname.startsWith("/movies/university")
+                  ? "active text-brand"
+                  : "text-zinc-300"
+              }`}
             >
               ภาพยนตร์
               <div
-                className={`w-0 h-0 border-l-4 border-r-4 border-t-4 border-t-zinc-400 border-l-transparent border-r-transparent transition-transform duration-300 ${showMoviesMenu ? "rotate-180 border-t-white" : ""}`}
+                className={`w-0 h-0 border-l-3 border-r-3 border-t-3 border-t-zinc-400 border-l-transparent border-r-transparent transition-transform duration-300 ${
+                  showMoviesMenu ? "rotate-180 border-t-brand" : ""
+                }`}
               />
             </button>
 
             {showMoviesMenu && (
-              <div className="absolute left-0 mt-3 w-64 glass-panel bg-[#090807]/95 border-zinc-800/80 rounded-xl p-3.5 shadow-2xl animate-fade-in z-50">
-                <div className="flex border-b border-white/5 mb-2.5 pb-1.5 gap-1.5">
+              <div className="absolute left-0 mt-4.5 w-64 glass-panel bg-[#090807]/98 border-[#e5b842]/20 rounded-md p-4 shadow-2xl shadow-black/85 animate-fade-in z-50">
+                <div className="flex border-b border-white/5 mb-3 pb-2 gap-2">
                   <button
                     onClick={() => setActiveTab("category")}
-                    className={`flex-1 text-center py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                    className={`flex-1 text-center py-2 text-xs font-semibold rounded-md transition-all cursor-pointer ${
                       activeTab === "category"
                         ? "bg-brand/15 text-brand border border-brand/25"
-                        : "text-zinc-400 hover:text-white border border-transparent"
+                        : "text-zinc-450 hover:text-white border border-transparent"
                     }`}
                   >
                     หมวดหมู่
                   </button>
                   <button
                     onClick={() => setActiveTab("university")}
-                    className={`flex-1 text-center py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                    className={`flex-1 text-center py-2 text-xs font-semibold rounded-md transition-all cursor-pointer ${
                       activeTab === "university"
                         ? "bg-brand/15 text-brand border border-brand/25"
-                        : "text-zinc-400 hover:text-white border border-transparent"
+                        : "text-zinc-450 hover:text-white border border-transparent"
                     }`}
                   >
                     มหาวิทยาลัย
                   </button>
                 </div>
 
-                <div className="max-h-60 overflow-y-auto pr-1 no-scrollbar space-y-0.5">
+                <div className="max-h-60 overflow-y-auto pr-1 no-scrollbar space-y-1">
                   {activeTab === "category" ? (
                     <>
                       <button
                         onClick={() => handleNavClick(null)}
-                        className="w-full text-left px-3 py-2 text-xs rounded-lg cursor-pointer transition-colors text-zinc-350 hover:bg-brand/10 hover:text-brand"
+                        className="w-full text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand"
                       >
                         หนังทั้งหมด
                       </button>
@@ -153,7 +161,7 @@ export default function Navbar() {
                         <button
                           key={cat.id}
                           onClick={() => handleNavClick(cat.name)}
-                          className="w-full text-left px-3 py-2 text-xs rounded-lg cursor-pointer transition-colors text-zinc-350 hover:bg-brand/10 hover:text-brand"
+                          className="w-full text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand"
                         >
                           {CATEGORY_TITLE_MAPPING[cat.name] || cat.name}
                         </button>
@@ -162,7 +170,7 @@ export default function Navbar() {
                   ) : (
                     <>
                       {universities.length === 0 ? (
-                        <p className="text-center text-zinc-500 py-3 text-xs font-light">
+                        <p className="text-center text-zinc-550 py-3 text-xs font-light">
                           ไม่มีข้อมูลมหาวิทยาลัย
                         </p>
                       ) : (
@@ -170,7 +178,7 @@ export default function Navbar() {
                           <button
                             key={uni.id}
                             onClick={() => handleUniversityClick(uni.name)}
-                            className="w-full text-left px-3 py-2 text-xs rounded-lg cursor-pointer transition-colors text-zinc-350 hover:bg-brand/10 hover:text-brand"
+                            className="w-full text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand"
                           >
                             {uni.name}
                           </button>
@@ -183,7 +191,12 @@ export default function Navbar() {
             )}
           </div>
 
-          <Link href="/movies/favorites" className="cursor-pointer transition-colors duration-300 text-zinc-300 hover:text-white">
+          <Link
+            href="/movies/favorites"
+            className={`cursor-pointer text-xs uppercase tracking-wider font-semibold text-zinc-300 hover:text-brand nav-link-premium ${
+              pathname === "/movies/favorites" ? "active text-brand" : ""
+            }`}
+          >
             รายการของฉัน
           </Link>
         </div>
@@ -245,26 +258,26 @@ export default function Navbar() {
             </button>
 
             {showProfileMenu && (
-              <div className="absolute right-0 mt-3 w-48 glass-panel bg-[#090807]/95 border-zinc-800/80 rounded-xl p-2 shadow-xl animate-fade-in z-50">
-                <div className="px-3 py-2 border-b border-white/5 mb-1">
+              <div className="absolute right-0 mt-4.5 w-48 glass-panel bg-[#090807]/98 border-[#e5b842]/20 rounded-md p-2.5 shadow-2xl shadow-black/85 animate-fade-in z-50">
+                <div className="px-3 py-2 border-b border-white/5 mb-1.5">
                   <p className="text-xs text-white font-semibold truncate">
                     {currentUser.name || currentUser.email}
                   </p>
-                  <p className="text-[10px] text-zinc-400 truncate mt-0.5">
+                  <p className="text-[10px] text-zinc-455 truncate mt-0.5">
                     {currentUser.email}
                   </p>
                 </div>
                 <Link
                   href="/profile"
                   onClick={() => setShowProfileMenu(false)}
-                  className="w-full block text-left px-3 py-2 text-xs text-zinc-355 hover:text-brand hover:bg-brand/10 rounded-lg cursor-pointer transition-colors mb-1"
+                  className="w-full block text-left px-3 py-2 text-xs text-zinc-300 hover:text-brand hover:bg-brand/10 rounded-md cursor-pointer transition-colors mb-1"
                 >
                   โปรไฟล์ของฉัน
                 </Link>
                 <Link
                   href="/create/movie"
                   onClick={() => setShowProfileMenu(false)}
-                  className="w-full block text-left px-3 py-2 text-xs text-zinc-355 hover:text-brand hover:bg-brand/10 rounded-lg cursor-pointer transition-colors mb-1"
+                  className="w-full block text-left px-3 py-2 text-xs text-zinc-300 hover:text-brand hover:bg-brand/10 rounded-md cursor-pointer transition-colors mb-1"
                 >
                   เพิ่มภาพยนตร์
                 </Link>
@@ -273,7 +286,7 @@ export default function Navbar() {
                     onSignOut();
                     setShowProfileMenu(false);
                   }}
-                  className="w-full text-left px-3 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg cursor-pointer transition-colors"
+                  className="w-full text-left px-3 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md cursor-pointer transition-colors"
                 >
                   ออกจากระบบ
                 </button>

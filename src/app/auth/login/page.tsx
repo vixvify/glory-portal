@@ -52,12 +52,10 @@ export default function LoginPage() {
     <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
       <div className="w-full max-w-md glass-panel-gold rounded-2xl shadow-2xl p-8 space-y-6">
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-white tracking-tight mb-2">
+          <h2 className="text-3xl font-bold text-white tracking-tight mb-2">
             เข้าสู่ระบบ
           </h2>
-          <p className="text-xs text-zinc-400">
-            ยินดีต้อนรับกลับสู่ ThaiFlix
-          </p>
+          <p className="text-xs text-zinc-400">ยินดีต้อนรับกลับสู่ ThaiFlix</p>
         </div>
 
         {error && (
@@ -109,7 +107,9 @@ export default function LoginPage() {
 
         <div className="relative flex py-4 items-center">
           <div className="flex-grow border-t border-zinc-800/80"></div>
-          <span className="flex-shrink mx-3 text-[10px] text-zinc-500 uppercase tracking-widest font-semibold font-mono">Or</span>
+          <span className="flex-shrink mx-3 text-[10px] text-zinc-500 uppercase tracking-widest font-semibold font-mono">
+            Or
+          </span>
           <div className="flex-grow border-t border-zinc-800/80"></div>
         </div>
 

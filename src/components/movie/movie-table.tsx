@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import StarIcon from "@mui/icons-material/Star";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -56,10 +57,12 @@ export const MovieTable: React.FC<MovieTableProps> = ({
               >
                 <td className="py-4 px-6 flex items-center gap-4">
                   <div className="relative w-12 h-16 rounded-lg overflow-hidden border border-zinc-800/50 shadow-md flex-shrink-0">
-                    <img
+                    <Image
                       src={movie.thumbnail}
                       alt={movie.title}
-                      className="w-full h-full object-cover group-hover/row:scale-105 transition-transform duration-300"
+                      fill
+                      className="object-cover group-hover/row:scale-105 transition-transform duration-300"
+                      unoptimized
                     />
                   </div>
                   <div className="space-y-0.5">

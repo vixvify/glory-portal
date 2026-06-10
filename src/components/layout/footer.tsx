@@ -20,10 +20,7 @@ export default function Footer() {
         <div className="lg:col-span-2 space-y-6">
           <Link
             href="/"
-            className="text-3xl font-black tracking-tighter text-brand inline-block hover:scale-[1.02] transition-transform duration-300"
-            style={{
-              textShadow: `0 0 10px rgba(var(--theme-primary-rgb),0.35)`,
-            }}
+            className="text-2xl md:text-3xl font-bold tracking-[0.25em] font-serif text-luxury-gold inline-block hover:scale-[1.02] transition-transform duration-300"
           >
             GLORY
           </Link>
@@ -158,14 +155,14 @@ export default function Footer() {
           <p className="text-xs text-zinc-400 font-light leading-relaxed">
             รับข้อมูลอัปเดตเกี่ยวกับภาพยนตร์สั้นเทศกาลใหม่และการประกวดรางวัล
           </p>
-          <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-1.5 gap-2 focus-within:border-brand/40 focus-within:bg-zinc-900/60 transition-all duration-300">
+          <div className="flex items-center bg-zinc-900 border border-zinc-850 rounded-md px-3.5 py-2 gap-2 focus-within:border-brand/50 focus-within:bg-zinc-900/70 transition-all duration-300 shadow-inner">
             <EmailIcon className="text-sm text-zinc-500" />
             <input
               type="email"
               placeholder="อีเมลของคุณ..."
               className="bg-transparent text-xs text-white placeholder-zinc-500 focus:outline-none w-full"
             />
-            <button className="text-[10px] uppercase font-bold text-brand hover:text-brand-hover tracking-wider cursor-pointer">
+            <button className="text-[10px] uppercase font-extrabold text-brand hover:text-brand-hover tracking-wider cursor-pointer transition-colors duration-250">
               ส่ง
             </button>
           </div>

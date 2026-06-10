@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonIcon from "@mui/icons-material/Person";
@@ -50,10 +51,13 @@ export const CrewTable: React.FC<CrewTableProps> = ({
                 >
                   <td className="py-4 px-6 flex items-center gap-4">
                     {member?.user?.photoUrl ? (
-                      <img
+                      <Image
                         src={member.user.photoUrl}
                         alt={member.name}
+                        width={40}
+                        height={40}
                         className="w-10 h-10 rounded-full object-cover border border-zinc-800 flex-shrink-0"
+                        unoptimized
                       />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-brand/10 border border-brand/20 flex items-center justify-center text-brand flex-shrink-0">

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import AddIcon from "@mui/icons-material/Add";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { Input } from "./input";
@@ -90,10 +91,13 @@ export function CreatableSearchSelect({
           const pUrl = matchedOpt?.photoUrl || value.photoUrl;
           if (pUrl) {
             return (
-              <img
+              <Image
                 src={pUrl}
                 alt={value.name}
+                width={20}
+                height={20}
                 className="w-5 h-5 rounded-full object-cover border border-zinc-700"
+                unoptimized
               />
             );
           }
@@ -114,10 +118,13 @@ export function CreatableSearchSelect({
                 >
                   <div className="flex items-center gap-2 truncate">
                     {opt.photoUrl ? (
-                      <img
+                      <Image
                         src={opt.photoUrl}
                         alt={opt.name}
+                        width={24}
+                        height={24}
                         className="w-6 h-6 rounded-full object-cover border border-zinc-800 flex-shrink-0"
+                        unoptimized
                       />
                     ) : (
                       <div className="w-6 h-6 rounded-full bg-brand/10 border border-brand/20 flex items-center justify-center text-brand flex-shrink-0">
