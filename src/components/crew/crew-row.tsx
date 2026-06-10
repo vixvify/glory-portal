@@ -49,7 +49,7 @@ export default function CrewRow({ title, crew }: CrewRowProps) {
                   <img
                     src={member.user.photoUrl}
                     alt={member.name}
-                    className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover"
                   />
                 ) : (
                   <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-zinc-500 group-hover/item:text-brand transition-colors">
