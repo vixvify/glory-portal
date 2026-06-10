@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -96,10 +97,12 @@ export default function CrewProfilePage() {
 
           <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-3 border-brand/50 shadow-2xl shrink-0 group aspect-square">
             {crewMember.user?.photoUrl ? (
-              <img
+              <Image
                 src={crewMember.user.photoUrl}
                 alt={crewMember.name}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                fill
+                className="object-cover"
+                unoptimized
               />
             ) : (
               <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-zinc-600">
@@ -168,10 +171,12 @@ export default function CrewProfilePage() {
                       >
                         <div className="bg-zinc-900/30 border border-zinc-850 hover:border-brand/45 rounded-2xl overflow-hidden shadow-lg hover:shadow-brand/5 hover:bg-zinc-900/40 transition-all duration-300 flex flex-col h-full">
                           <div className="relative aspect-[2/3] overflow-hidden bg-zinc-950">
-                            <img
+                            <Image
                               src={movie.thumbnail}
                               alt={movie.title}
-                              className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
+                              fill
+                              className="object-cover"
+                              unoptimized
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-end p-4">
                               <span className="text-[10px] font-bold text-black bg-brand px-2.5 py-1 rounded-md shadow-md">

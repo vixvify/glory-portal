@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-store";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -173,10 +174,12 @@ export default function ProfilePage() {
             <div className="relative w-32 h-32 rounded-full p-[3px] bg-gradient-to-tr from-brand to-zinc-800 shadow-2xl overflow-hidden shrink-0 aspect-square">
               <div className="w-full h-full rounded-full bg-zinc-900 overflow-hidden flex items-center justify-center">
                 {currentUser.photoUrl ? (
-                  <img
+                  <Image
                     src={currentUser.photoUrl}
                     alt={currentUser.name}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    unoptimized
                   />
                 ) : (
                   <PersonIcon className="text-zinc-600 text-7xl" />

@@ -6,6 +6,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PersonIcon from "@mui/icons-material/Person";
 import { CrewMember } from "@/core/domain/crew";
 import Link from "next/link";
+import Image from "next/image";
 
 interface CrewRowProps {
   title: string;
@@ -46,10 +47,12 @@ export default function CrewRow({ title, crew }: CrewRowProps) {
             >
               <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-2 border-zinc-800/60 group-hover/item:border-brand/80 transition-all duration-300 shadow-md relative aspect-square">
                 {member.user?.photoUrl ? (
-                  <img
+                  <Image
                     src={member.user.photoUrl}
                     alt={member.name}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    unoptimized
                   />
                 ) : (
                   <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-zinc-500 group-hover/item:text-brand transition-colors">

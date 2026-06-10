@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
@@ -158,12 +159,14 @@ export default function RegisterPage() {
               onClick={handleAvatarClick}
               className="relative w-28 h-28 rounded-full p-[3px] bg-gradient-to-tr from-brand to-zinc-800 cursor-pointer overflow-hidden group flex items-center justify-center transition-all duration-300 hover:scale-105 shadow-lg shadow-black/50"
             >
-              <div className="w-full h-full rounded-full bg-zinc-900 overflow-hidden flex items-center justify-center">
+              <div className="w-full h-full rounded-full bg-zinc-900 overflow-hidden flex items-center justify-center relative">
                 {croppedPreviewUrl ? (
-                  <img
+                  <Image
                     src={croppedPreviewUrl}
                     alt="Profile Preview"
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    unoptimized
                   />
                 ) : (
                   <PersonIcon className="text-zinc-500 text-6xl" />

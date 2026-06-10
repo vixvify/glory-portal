@@ -87,26 +87,26 @@ export interface CreateMovie {
   categoryId: string;
   thumbnail: File | null;
   youtubeUrl: string;
-  trailerUrl?: string;
+  trailerUrl?: string | null;
   year: number;
   matchRate?: number;
   aspectRatio: string;
   ageRatingId: string;
   duration: number;
-  universityId?: string;
-  languageId?: string;
-  targetGroupId?: string;
-  director?: MovieCrewInputItem[];
-  producer?: MovieCrewInputItem[];
-  writer?: MovieCrewInputItem[];
-  cast?: MovieCrewInputItem[];
-  dop?: MovieCrewInputItem[];
-  editor?: MovieCrewInputItem[];
-  btsVideo?: string[];
+  universityId?: string | null;
+  languageId?: string | null;
+  targetGroupId?: string | null;
+  director?: MovieCrewInputItem[] | null;
+  producer?: MovieCrewInputItem[] | null;
+  writer?: MovieCrewInputItem[] | null;
+  cast?: MovieCrewInputItem[] | null;
+  dop?: MovieCrewInputItem[] | null;
+  editor?: MovieCrewInputItem[] | null;
+  btsVideo?: string[] | null;
   hasProfanity?: boolean;
   hasDrugs?: boolean;
   colorType: string;
-  studio?: string;
+  studio?: string | null;
 }
 
 export interface UpdateMovie {

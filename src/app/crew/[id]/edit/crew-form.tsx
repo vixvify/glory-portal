@@ -1,6 +1,7 @@
 "use client";
  
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import PeopleIcon from "@mui/icons-material/People";
@@ -117,10 +118,12 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
             {editingCrew?.user?.photoUrl && (
               <div className="flex items-center gap-4 mt-4 pl-1">
                 <div className="relative w-20 h-20 rounded-full overflow-hidden border border-zinc-855 bg-black/40 shadow-inner flex-shrink-0 animate-fade-in">
-                  <img
+                  <Image
                     src={editingCrew.user.photoUrl}
                     alt="Crew Preview"
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    unoptimized
                   />
                 </div>
                 <div className="flex flex-col">

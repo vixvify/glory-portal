@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Image from "next/image";
 import CloseIcon from "@mui/icons-material/Close";
 import { Button } from "../ui/button";
 import { LOCALIZATION } from "@/core/constants/localization";
@@ -92,7 +93,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
   };
 
   const handleCropConfirm = () => {
-    const img = new Image();
+    const img = new window.Image();
     img.src = imageSrc;
     img.onload = () => {
       const canvas = document.createElement("canvas");
@@ -159,7 +160,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleMouseUp}
         >
-          <img
+          <Image
             src={imageSrc}
             alt="To Crop"
             className="absolute max-w-none origin-center pointer-events-none"
@@ -170,6 +171,9 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
               transition: isDragging ? "none" : "transform 0.1s ease-out",
             }}
             onLoad={handleImageLoad}
+            width={imgNaturalSize.w || 100}
+            height={imgNaturalSize.h || 100}
+            unoptimized
           />
 
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
