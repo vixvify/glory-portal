@@ -10,7 +10,7 @@ import AddIcon from "@mui/icons-material/Add";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Loading from "@/app/loading";
 import { StatsCard } from "@/components/ui/stats-card";
-import { useAdminStatsQuery } from "@/hooks/use-admin";
+import { useAdminStatsQuery } from "@/hooks/db/use-admin";
 
 export default function AdminPage() {
   const { data: stats, isLoading: isStatsLoading } = useAdminStatsQuery();

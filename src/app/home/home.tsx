@@ -2,15 +2,15 @@
 
 import { useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useMoviePlayer } from "@/hooks/use-movie-player";
+import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import { Movie } from "@/core/domain/movie";
 import { useAppStore } from "@/store/use-store";
 import { Toast } from "@/components/ui/toast";
-import { useMoviesQuery } from "@/hooks/use-movies";
-import { useToggleFavoriteMutation } from "@/hooks/use-favorites";
+import { useMoviesQuery } from "@/hooks/db/use-movies";
+import { useToggleFavoriteMutation } from "@/hooks/db/use-favorites";
 import { Category } from "@/core/domain/movie";
 import { CrewMember } from "@/core/domain/crew";
-import { useDebounce } from "@/hooks/use-debounce";
+import { useDebounce } from "@/hooks/system/use-debounce";
 import HomeView from "@/components/views/home-view";
 import SearchView from "@/components/views/search-view";
 

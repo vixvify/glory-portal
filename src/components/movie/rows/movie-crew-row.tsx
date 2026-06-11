@@ -6,7 +6,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { MovieCrew } from "@/core/domain/movie";
-import { useScrollRow } from "@/hooks/use-scroll-row";
+import { useScrollRow } from "@/hooks/system/use-scroll-row";
 
 interface Props {
   crew: MovieCrew[];

@@ -13,7 +13,7 @@ import { useAppStore } from "@/store/use-store";
 import {
   useCreateCrewMemberMutation,
   useUpdateCrewMemberMutation,
-} from "@/hooks/use-crew-members";
+} from "@/hooks/db/use-crew-members";
  
 interface CrewFormProps {
   editingCrew?: CrewMember | null;

@@ -13,8 +13,6 @@ export default function Footer() {
 
   return (
     <footer className="relative z-30 bg-zinc-950/40 border-t border-white/5 pt-16 pb-8 px-6 md:px-16 text-zinc-400 select-none overflow-hidden">
-      <div className="absolute top-0 left-1/4 w-[500px] h-[200px] bg-brand/5 rounded-full blur-[120px] pointer-events-none -translate-y-1/2" />
-      <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] bg-brand/3 rounded-full blur-[100px] pointer-events-none translate-y-1/2" />
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12 relative z-10">
         <div className="lg:col-span-2 space-y-6">

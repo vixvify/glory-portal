@@ -20,10 +20,10 @@ export function Toast() {
   };
 
   const borderColors = {
-    success: "border-emerald-500/20 shadow-emerald-500/5",
-    error: "border-red-500/20 shadow-red-500/5",
-    info: "border-blue-500/20 shadow-blue-500/5",
-    warning: "border-amber-500/20 shadow-amber-500/5",
+    success: "border-emerald-500/20",
+    error: "border-red-500/20",
+    info: "border-blue-500/20",
+    warning: "border-amber-500/20",
   };
 
   const glows = {
@@ -43,9 +43,7 @@ export function Toast() {
           : "opacity-0 -translate-y-4 scale-95 pointer-events-none"
       }`}
     >
-      <div
-        className={`absolute inset-0 rounded-xl opacity-30 blur-[2px] pointer-events-none ${glows[toast.type]}`}
-      />
+
 
       <div className="relative z-10 flex-shrink-0">{icons[toast.type]}</div>
 

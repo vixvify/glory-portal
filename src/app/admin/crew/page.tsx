@@ -13,8 +13,8 @@ import { ConfirmModal } from "@/components/modal/confirm-modal";
 import {
   useCrewMembersQuery,
   useDeleteCrewMemberMutation,
-} from "@/hooks/use-crew-members";
-import { useDebounce } from "@/hooks/use-debounce";
+} from "@/hooks/db/use-crew-members";
+import { useDebounce } from "@/hooks/system/use-debounce";
 import { LOCALIZATION } from "@/core/constants/localization";
 
 export default function AdminCrewPage() {

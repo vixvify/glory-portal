@@ -36,7 +36,7 @@ import {
 import {
   useCreateMovieMutation,
   useUpdateMovieMutation,
-} from "@/hooks/use-movies";
+} from "@/hooks/db/use-movies";
 import { CreateMovie, UpdateMovie } from "@/core/domain/movie";
 import { CrewStateItem } from "@/core/domain/crew";
 import { mapCrewToState, mapStateToCrewInput } from "@/utils/crew";

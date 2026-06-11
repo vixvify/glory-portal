@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginUserSchema } from "@/core/schema/auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useLoginMutation } from "@/hooks/use-auth";
+import { useLoginMutation } from "@/hooks/db/use-auth";
 import Link from "next/link";
 import { Toast } from "@/components/ui/toast";
 

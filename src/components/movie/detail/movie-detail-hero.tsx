@@ -51,7 +51,7 @@ export default function MovieDetailHero({
       }`}>
         <div
           className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 z-0 ${
-            isPortrait ? "scale-110 blur-3xl opacity-35" : ""
+            isPortrait ? "hidden" : ""
           }`}
           style={{
             backgroundImage: `url(${movie.thumbnail})`,
@@ -94,7 +94,7 @@ export default function MovieDetailHero({
 
         <button
           onClick={() => router.back()}
-          className="absolute top-6 left-6 w-11 h-11 rounded-md bg-black/50 hover:bg-black/80 border border-zinc-700/60 backdrop-blur-md flex items-center justify-center text-white cursor-pointer shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 z-20"
+          className="absolute top-6 left-6 w-11 h-11 rounded-md bg-black/50 hover:bg-black/80 border border-zinc-700/60 flex items-center justify-center text-white cursor-pointer shadow-sm hover:scale-105 active:scale-95 transition-all duration-300 z-20"
           aria-label="ย้อนกลับ"
         >
           <ArrowBackIcon className="text-xl" />

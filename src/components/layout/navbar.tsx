@@ -8,12 +8,14 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Button } from "@/components/ui/button";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 import { useAppStore } from "@/store/use-store";
-import { useCategoriesQuery, useUniversitiesQuery } from "@/hooks/use-master-data";
-import { useLogoutMutation } from "@/hooks/use-auth";
+import { useCategoriesQuery, useUniversitiesQuery } from "@/hooks/db/use-master-data";
+import { useLogoutMutation } from "@/hooks/db/use-auth";
+import { useSearchPlaceholder } from "@/hooks/system/use-search-placeholder";
 
 export default function Navbar() {
   const router = useRouter();
   const { searchQuery, setSearchQuery, currentUser } = useAppStore();
+  const currentPlaceholder = useSearchPlaceholder(30000);
 
   const { data: categories = [] } = useCategoriesQuery();
   const { data: universities = [] } = useUniversitiesQuery();
@@ -220,7 +222,7 @@ export default function Navbar() {
             <>
               <input
                 type="text"
-                placeholder="วันนี้อยากดูอะไร..."
+                placeholder={currentPlaceholder}
                 value={searchQuery}
                 onChange={(e) => {
                   if (pathname !== "/") {
@@ -249,7 +251,7 @@ export default function Navbar() {
               onClick={() => setShowProfileMenu(!showProfileMenu)}
               className="flex items-center gap-1.5 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-black font-bold text-sm shadow-md shadow-brand/20 border border-brand/40">
+              <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-black font-bold text-sm shadow-sm border border-brand/40">
                 {(currentUser.name || currentUser.email || "U")
                   .charAt(0)
                   .toUpperCase()}

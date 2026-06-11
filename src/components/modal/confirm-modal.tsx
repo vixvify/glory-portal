@@ -53,8 +53,8 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
   const confirmBtnStyles =
     variant === "danger"
-      ? "bg-red-500 hover:bg-red-600 text-white border-0 shadow-lg shadow-red-500/20"
-      : "bg-brand hover:bg-brand-hover text-white border-0 shadow-lg shadow-brand/20";
+      ? "bg-red-500 hover:bg-red-600 text-white border-0 shadow-sm"
+      : "bg-brand hover:bg-brand-hover text-white border-0 shadow-sm";
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center animate-fade-in bg-black/60 backdrop-blur-sm p-4">

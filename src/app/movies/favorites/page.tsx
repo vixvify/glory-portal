@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import {
   useFavoritesQuery,
   useToggleFavoriteMutation,
-} from "@/hooks/use-favorites";
+} from "@/hooks/db/use-favorites";
 import { useAppStore } from "@/store/use-store";
 import MovieGrid from "@/components/movie/grids/movie-grid";
 import Loading from "@/app/loading";
-import { useMoviePlayer } from "@/hooks/use-movie-player";
+import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import LockIcon from "@mui/icons-material/Lock";

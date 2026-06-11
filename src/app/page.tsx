@@ -2,11 +2,11 @@
 
 import { useQueries } from "@tanstack/react-query";
 import { movieService } from "@/infra/container";
-import { useMoviesQuery } from "@/hooks/use-movies";
-import { useFavoritesQuery } from "@/hooks/use-favorites";
-import { useCategoriesQuery } from "@/hooks/use-master-data";
-import { useCrewMembersQuery } from "@/hooks/use-crew-members";
-import { useAdminStatsQuery } from "@/hooks/use-admin";
+import { useMoviesQuery } from "@/hooks/db/use-movies";
+import { useFavoritesQuery } from "@/hooks/db/use-favorites";
+import { useCategoriesQuery } from "@/hooks/db/use-master-data";
+import { useCrewMembersQuery } from "@/hooks/db/use-crew-members";
+import { useAdminStatsQuery } from "@/hooks/db/use-admin";
 import { useAppStore } from "@/store/use-store";
 import HomePage from "./home/home";
 import Loading from "./loading";

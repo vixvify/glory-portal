@@ -16,11 +16,11 @@ import CakeIcon from "@mui/icons-material/Cake";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import LockIcon from "@mui/icons-material/Lock";
 import { Button } from "@/components/ui/button";
-import { useMyMoviesQuery, useDeleteMovieMutation, useMyContributedMoviesQuery } from "@/hooks/use-movies";
+import { useMyMoviesQuery, useDeleteMovieMutation, useMyContributedMoviesQuery } from "@/hooks/db/use-movies";
 import {
   useMyCrewMembersQuery,
   useDeleteCrewMemberMutation,
-} from "@/hooks/use-crew-members";
+} from "@/hooks/db/use-crew-members";
 import { MovieTable } from "@/components/movie/tables/movie-table";
 import { CrewTable } from "@/components/crew/crew-table";
 import { ConfirmModal } from "@/components/modal/confirm-modal";

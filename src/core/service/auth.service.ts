@@ -45,7 +45,7 @@ export class AuthService {
       throw error;
     }
   }
-  async getCurrentUser(): Promise<User> {
+  async getCurrentUser(): Promise<User | null> {
     try {
       const response = await this.authRepository.getCurrentUser();
       if (response.error) {
@@ -53,8 +53,7 @@ export class AuthService {
       }
       return response.data;
     } catch (error) {
-      console.error("Error in getCurrentUser:", error);
-      throw error;
+      return null;
     }
   }
 }

@@ -8,12 +8,12 @@ import {
   useUpdateRatingMutation,
   useDeleteRatingMutation,
   useMovieUserRatingQuery,
-} from "@/hooks/use-ratings";
-import { useMovieQueryById } from "@/hooks/use-movies";
+} from "@/hooks/db/use-ratings";
+import { useMovieQueryById } from "@/hooks/db/use-movies";
 import { useAppStore } from "@/store/use-store";
 import Loading from "@/app/loading";
 import PlayerModal from "@/components/modal/player-modal";
-import { useMoviePlayer } from "@/hooks/use-movie-player";
+import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import MovieDetailHero from "@/components/movie/detail/movie-detail-hero";
 import MovieRatingPanel from "@/components/movie/detail/movie-rating-panel";
 import MovieInfoPanel from "@/components/movie/detail/movie-info-panel";
