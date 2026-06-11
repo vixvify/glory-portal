@@ -18,7 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { registerUserSchema } from "@/core/schema/auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useRegisterMutation } from "@/hooks/use-auth";
+import { useRegisterMutation } from "@/hooks/db/use-auth";
 import { ImageCropper } from "@/components/modal/image-cropper";
 import Link from "next/link";
 import { Toast } from "@/components/ui/toast";

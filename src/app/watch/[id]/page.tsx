@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useMovieQueryById } from "@/hooks/use-movies";
+import { useMovieQueryById } from "@/hooks/db/use-movies";
 import { getYouTubeEmbedUrl } from "@/utils/youtube";
 import Loading from "@/app/loading";
 

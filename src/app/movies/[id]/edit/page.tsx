@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useMovieQueryById } from "@/hooks/use-movies";
+import { useMovieQueryById } from "@/hooks/db/use-movies";
 import Loading from "@/app/loading";
 import {
   useCategoriesQuery,
@@ -9,8 +9,8 @@ import {
   useUniversitiesQuery,
   useLanguagesQuery,
   useTargetGroupsQuery,
-} from "@/hooks/use-master-data";
-import { useCrewMembersQuery } from "@/hooks/use-crew-members";
+} from "@/hooks/db/use-master-data";
+import { useCrewMembersQuery } from "@/hooks/db/use-crew-members";
 import { MovieForm } from "@/app/create/movie/movie-form";
 
 export default function EditMoviePage() {

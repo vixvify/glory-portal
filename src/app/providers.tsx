@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { useCheckAuth } from "@/hooks/use-check-auth";
+import { useCheckAuth } from "@/hooks/db/use-check-auth";
 
 function AuthInitializer() {
   useCheckAuth();

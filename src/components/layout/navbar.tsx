@@ -8,12 +8,14 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Button } from "@/components/ui/button";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 import { useAppStore } from "@/store/use-store";
-import { useCategoriesQuery, useUniversitiesQuery } from "@/hooks/use-master-data";
-import { useLogoutMutation } from "@/hooks/use-auth";
+import { useCategoriesQuery, useUniversitiesQuery } from "@/hooks/db/use-master-data";
+import { useLogoutMutation } from "@/hooks/db/use-auth";
+import { useSearchPlaceholder } from "@/hooks/system/use-search-placeholder";
 
 export default function Navbar() {
   const router = useRouter();
   const { searchQuery, setSearchQuery, currentUser } = useAppStore();
+  const currentPlaceholder = useSearchPlaceholder(30000);
 
   const { data: categories = [] } = useCategoriesQuery();
   const { data: universities = [] } = useUniversitiesQuery();
@@ -220,7 +222,7 @@ export default function Navbar() {
             <>
               <input
                 type="text"
-                placeholder="วันนี้อยากดูอะไร..."
+                placeholder={currentPlaceholder}
                 value={searchQuery}
                 onChange={(e) => {
                   if (pathname !== "/") {

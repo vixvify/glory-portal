@@ -7,8 +7,8 @@ import {
   useUniversitiesQuery,
   useLanguagesQuery,
   useTargetGroupsQuery,
-} from "@/hooks/use-master-data";
-import { useCrewMembersQuery } from "@/hooks/use-crew-members";
+} from "@/hooks/db/use-master-data";
+import { useCrewMembersQuery } from "@/hooks/db/use-crew-members";
 import { MovieForm } from "./movie-form";
 
 export default function CreateMoviePage() {

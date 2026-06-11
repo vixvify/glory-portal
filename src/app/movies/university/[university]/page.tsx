@@ -2,18 +2,18 @@
 
 import { useCallback, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useMoviesQuery } from "@/hooks/use-movies";
+import { useMoviesQuery } from "@/hooks/db/use-movies";
 import {
   useFavoritesQuery,
   useToggleFavoriteMutation,
-} from "@/hooks/use-favorites";
+} from "@/hooks/db/use-favorites";
 import { useAppStore } from "@/store/use-store";
 import MovieGrid from "@/components/movie/grids/movie-grid";
 import MovieCardPortrait from "@/components/movie/cards/movie-card-portrait";
 import Link from "next/link";
 import Loading from "@/app/loading";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useMoviePlayer } from "@/hooks/use-movie-player";
+import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import { getAspectRatio } from "@/utils/aspect-ratio";
 
 export default function UniversityPage() {

@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import Loading from "@/app/loading";
 import { CrewForm } from "./crew-form";
-import { useCrewMemberQueryById } from "@/hooks/use-crew-members";
+import { useCrewMemberQueryById } from "@/hooks/db/use-crew-members";
 
 export default function EditCrewPage() {
   const params = useParams<{ id: string }>();
