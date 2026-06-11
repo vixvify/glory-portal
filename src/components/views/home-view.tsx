@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { Movie, Category } from "@/core/domain/movie";
 import { CrewMember } from "@/core/domain/crew";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
@@ -14,7 +15,8 @@ interface HomeViewProps {
   staffList: CrewMember[];
   actorList: CrewMember[];
   universityMovies: Movie[];
-  categoryMoviesMap: Record<string, Movie[]>;
+  categoryMoviesByViews: Record<string, Movie[]>;
+  categoryMoviesByRating: Record<string, Movie[]>;
   favorites: Movie[];
   portraitMovies: Movie[];
   handlePlayMovie: (movie: Movie) => void;
@@ -28,7 +30,8 @@ export default function HomeView({
   staffList,
   actorList,
   universityMovies,
-  categoryMoviesMap,
+  categoryMoviesByViews,
+  categoryMoviesByRating,
   favorites,
   portraitMovies,
   handlePlayMovie,
@@ -87,14 +90,24 @@ export default function HomeView({
         />
 
         {categories.map((category) => (
-          <MovieRow
-            key={category.id}
-            title={CATEGORY_TITLE_MAPPING[category.name]}
-            movies={categoryMoviesMap[category.id] || []}
-            onPlayClick={handlePlayMovie}
-            favorites={favorites}
-            onToggleFavorite={handleToggleFavorite}
-          />
+          <Fragment key={category.id}>
+            <MovieRow
+              key={`${category.id}-views`}
+              title={`${CATEGORY_TITLE_MAPPING[category.name]}ยอดนิยม`}
+              movies={categoryMoviesByViews[category.id] || []}
+              onPlayClick={handlePlayMovie}
+              favorites={favorites}
+              onToggleFavorite={handleToggleFavorite}
+            />
+            <MovieRow
+              key={`${category.id}-rating`}
+              title={`${CATEGORY_TITLE_MAPPING[category.name]}ถูกใจผู้ชม`}
+              movies={categoryMoviesByRating[category.id] || []}
+              onPlayClick={handlePlayMovie}
+              favorites={favorites}
+              onToggleFavorite={handleToggleFavorite}
+            />
+          </Fragment>
         ))}
       </div>
     </main>

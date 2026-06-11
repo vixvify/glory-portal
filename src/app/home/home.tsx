@@ -21,7 +21,8 @@ interface Props {
   staffList: CrewMember[];
   actorList: CrewMember[];
   universityMovies: Movie[];
-  categoryMoviesMap: Record<string, Movie[]>;
+  categoryMoviesByViews: Record<string, Movie[]>;
+  categoryMoviesByRating: Record<string, Movie[]>;
   favorites: Movie[];
   portraitMovies: Movie[];
 }
@@ -34,7 +35,8 @@ export default function HomePage(props: Props) {
     staffList,
     actorList,
     universityMovies,
-    categoryMoviesMap,
+    categoryMoviesByViews,
+    categoryMoviesByRating,
     favorites,
     portraitMovies,
   } = props;
@@ -97,7 +99,8 @@ export default function HomePage(props: Props) {
           staffList={staffList}
           actorList={actorList}
           universityMovies={universityMovies}
-          categoryMoviesMap={categoryMoviesMap}
+          categoryMoviesByViews={categoryMoviesByViews}
+          categoryMoviesByRating={categoryMoviesByRating}
           favorites={favorites}
           handlePlayMovie={handlePlayMovie}
           handleToggleFavorite={handleToggleFavorite}

@@ -11,10 +11,9 @@ import { useAppStore } from "@/store/use-store";
 import MovieGrid from "@/components/movie/grids/movie-grid";
 import MovieCardPortrait from "@/components/movie/cards/movie-card-portrait";
 import Link from "next/link";
-import Loading from "@/app/loading";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
-import { getAspectRatio } from "@/utils/aspect-ratio";
+import { isEmptyAll } from "@/utils/check";
 
 export default function UniversityPage() {
   const params = useParams<{ university: string }>();
@@ -26,15 +25,17 @@ export default function UniversityPage() {
   const { playMovie: handlePlayMovie } = useMoviePlayer();
   const { currentUser, showToast } = useAppStore();
 
-  const { data: movies = [], isLoading } = useMoviesQuery({
+  const { data: landscapeMovies = [] } = useMoviesQuery({
     search: universityName,
     searchby: "university",
+    aspectRatio: "แนวนอน",
   });
 
-  const { landscapeMovies, portraitMovies } = useMemo(
-    () => getAspectRatio(movies),
-    [movies],
-  );
+  const { data: portraitMovies = [] } = useMoviesQuery({
+    search: universityName,
+    searchby: "university",
+    aspectRatio: "แนวตั้ง",
+  });
 
   const { data: favorites = [] } = useFavoritesQuery(!!currentUser);
   const toggleFavoriteMutation = useToggleFavoriteMutation();
@@ -66,10 +67,6 @@ export default function UniversityPage() {
     [currentUser, favorites, toggleFavoriteMutation, showToast, router],
   );
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
   return (
     <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-brand selection:text-black">
       <main className="max-w-8xl mx-auto w-full px-6 md:px-16 pt-28 pb-16 space-y-8 animate-fade-in">
@@ -88,7 +85,7 @@ export default function UniversityPage() {
           </div>
         </div>
 
-        {movies.length === 0 ? (
+        {isEmptyAll(landscapeMovies, portraitMovies) ? (
           <div className="text-center py-24 space-y-3">
             <p className="text-lg text-zinc-500 font-light">
               ไม่พบภาพยนตร์จากสถาบันนี้ในระบบ
@@ -98,9 +95,6 @@ export default function UniversityPage() {
           <div className="space-y-12 pb-10">
             {landscapeMovies.length > 0 && (
               <div className="space-y-5">
-                <h2 className="text-lg md:text-xl font-bold text-zinc-200 tracking-wide border-l-3 border-brand pl-3">
-                  ภาพยนตร์แนวนอน
-                </h2>
                 <MovieGrid
                   movies={landscapeMovies}
                   onPlayClick={handlePlayMovie}

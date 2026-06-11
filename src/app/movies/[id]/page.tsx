@@ -155,6 +155,7 @@ export default function MovieDetails() {
           <div className="space-y-6">
             <MovieRatingPanel
               movieId={movie.id}
+              averageRating={movie.averageRating}
               ratings={movie.ratings ?? []}
               userRating={userRating}
               isLoggedIn={!!currentUser}

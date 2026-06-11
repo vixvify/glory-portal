@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
 import {
@@ -11,11 +11,10 @@ import { useAppStore } from "@/store/use-store";
 import MovieGrid from "@/components/movie/grids/movie-grid";
 import MovieCardPortrait from "@/components/movie/cards/movie-card-portrait";
 import Link from "next/link";
-import Loading from "@/app/loading";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
-import { getAspectRatio } from "@/utils/aspect-ratio";
+import { isEmptyAll } from "@/utils/check";
 
 export default function CategoryPage() {
   const params = useParams<{ category: string }>();
@@ -28,15 +27,37 @@ export default function CategoryPage() {
 
   const { currentUser, showToast } = useAppStore();
 
-  const { data: movies = [], isLoading } = useMoviesQuery({
+  const { data: landscapeByViews = [] } = useMoviesQuery({
     search: categoryName,
     searchby: "category",
+    sort: "desc",
+    sortby: "views",
+    aspectRatio: "แนวนอน",
   });
 
-  const { landscapeMovies, portraitMovies } = useMemo(
-    () => getAspectRatio(movies),
-    [movies],
-  );
+  const { data: landscapeByRating = [] } = useMoviesQuery({
+    search: categoryName,
+    searchby: "category",
+    sort: "desc",
+    sortby: "averageRating",
+    aspectRatio: "แนวนอน",
+  });
+
+  const { data: portraitByViews = [] } = useMoviesQuery({
+    search: categoryName,
+    searchby: "category",
+    sort: "desc",
+    sortby: "views",
+    aspectRatio: "แนวตั้ง",
+  });
+
+  const { data: portraitByRating = [] } = useMoviesQuery({
+    search: categoryName,
+    searchby: "category",
+    sort: "desc",
+    sortby: "averageRating",
+    aspectRatio: "แนวตั้ง",
+  });
 
   const { data: favorites = [] } = useFavoritesQuery(!!currentUser);
   const toggleFavoriteMutation = useToggleFavoriteMutation();
@@ -68,10 +89,6 @@ export default function CategoryPage() {
     [currentUser, favorites, toggleFavoriteMutation, showToast, router],
   );
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
   const categoryDisplayTitle =
     CATEGORY_TITLE_MAPPING[categoryName] || categoryName;
 
@@ -93,7 +110,12 @@ export default function CategoryPage() {
           </div>
         </div>
 
-        {movies.length === 0 ? (
+        {isEmptyAll(
+          landscapeByViews,
+          landscapeByRating,
+          portraitByViews,
+          portraitByRating,
+        ) ? (
           <div className="text-center py-24 space-y-3">
             <p className="text-lg text-zinc-500 font-light">
               ไม่พบภาพยนตร์ในหมวดหมู่นี้
@@ -101,13 +123,13 @@ export default function CategoryPage() {
           </div>
         ) : (
           <div className="space-y-12 pb-10">
-            {landscapeMovies.length > 0 && (
+            {landscapeByViews.length > 0 && (
               <div className="space-y-5">
                 <h2 className="text-lg md:text-xl font-bold text-zinc-200 tracking-wide border-l-3 border-brand pl-3">
-                  ภาพยนตร์แนวนอน
+                  ภาพยนตร์ยอดนิยม
                 </h2>
                 <MovieGrid
-                  movies={landscapeMovies}
+                  movies={landscapeByViews}
                   onPlayClick={handlePlayMovie}
                   favorites={favorites}
                   onToggleFavorite={handleToggleFavorite}
@@ -115,13 +137,49 @@ export default function CategoryPage() {
               </div>
             )}
 
-            {portraitMovies.length > 0 && (
+            {landscapeByRating.length > 0 && (
               <div className="space-y-5">
                 <h2 className="text-lg md:text-xl font-bold text-zinc-200 tracking-wide border-l-3 border-brand pl-3">
-                  ภาพยนตร์แนวตั้ง
+                  ภาพยนตร์ถูกใจผู้ชม
+                </h2>
+                <MovieGrid
+                  movies={landscapeByRating}
+                  onPlayClick={handlePlayMovie}
+                  favorites={favorites}
+                  onToggleFavorite={handleToggleFavorite}
+                />
+              </div>
+            )}
+
+            {portraitByViews.length > 0 && (
+              <div className="space-y-5">
+                <h2 className="text-lg md:text-xl font-bold text-zinc-200 tracking-wide border-l-3 border-brand pl-3">
+                  ภาพยนตร์แนวตั้งยอดนิยม
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                  {portraitMovies.map((movie) => (
+                  {portraitByViews.map((movie) => (
+                    <Link href={`/movies/${movie.id}`} key={movie.id}>
+                      <MovieCardPortrait
+                        movie={movie}
+                        onPlayClick={handlePlayMovie}
+                        isFavorite={favorites.some(
+                          (fav) => fav.id === movie.id,
+                        )}
+                        onToggleFavorite={handleToggleFavorite}
+                      />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {portraitByRating.length > 0 && (
+              <div className="space-y-5">
+                <h2 className="text-lg md:text-xl font-bold text-zinc-200 tracking-wide border-l-3 border-brand pl-3">
+                  ภาพยนตร์แนวตั้งถูกใจผู้ชม
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+                  {portraitByRating.map((movie) => (
                     <Link href={`/movies/${movie.id}`} key={movie.id}>
                       <MovieCardPortrait
                         movie={movie}
