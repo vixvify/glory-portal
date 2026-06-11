@@ -49,7 +49,7 @@ export default function MovieRow({
         >
           {movies.map((movie) => (
             <Link href={`/movies/${movie.id}`} key={movie.id}>
-              <div className="flex-none snap-start transition-all duration-300 w-[200px] sm:w-[240px] md:w-[280px]">
+              <div className="flex-none snap-start transition-all duration-300 w-[240px] sm:w-[300px] md:w-[350px]">
                 <MovieCard
                   movie={movie}
                   onPlayClick={onPlayClick}

@@ -158,9 +158,10 @@ export default function ProfilePage() {
         <div className="space-y-2">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-brand cursor-pointer transition-colors bg-transparent border-none focus:outline-none"
+            className="w-8 h-8 rounded-full bg-zinc-900/60 border border-zinc-800 hover:border-brand/40 hover:text-brand flex items-center justify-center text-zinc-400 cursor-pointer transition-all duration-300 shadow-md focus:outline-none"
+            aria-label="ย้อนกลับ"
           >
-            <ArrowBackIcon className="text-sm" /> ย้อนกลับ
+            <ArrowBackIcon className="text-sm" />
           </button>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-wide bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent">
             โปรไฟล์ของฉัน

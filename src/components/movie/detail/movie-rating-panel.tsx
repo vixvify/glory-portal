@@ -9,6 +9,7 @@ import { calculateRatingStats } from "@/utils/rating";
 
 interface Props {
   movieId: string;
+  averageRating: number;
   ratings: Rating[];
   userRating: Rating | null | undefined;
   isLoggedIn: boolean;
@@ -21,6 +22,7 @@ interface Props {
 
 export default function MovieRatingPanel({
   movieId,
+  averageRating,
   ratings,
   userRating,
   isLoggedIn,
@@ -33,7 +35,7 @@ export default function MovieRatingPanel({
   const [draftStars, setDraftStars] = useState<number | null>(null);
   const [draftComment, setDraftComment] = useState<string | null>(null);
 
-  const { averageRating, ratingCount } = calculateRatingStats(ratings);
+  const { ratingCount } = calculateRatingStats(ratings);
 
   const selectedStars = draftStars ?? userRating?.stars ?? 0;
   const commentText = draftComment ?? userRating?.comment ?? "";
@@ -66,7 +68,7 @@ export default function MovieRatingPanel({
         </span>
 
         <div className="flex items-baseline justify-center gap-1.5">
-          <span className="text-5xl font-extrabold text-white tracking-tighter">
+          <span className="text-5xl font-bold text-white tracking-tighter">
             {averageRating > 0 ? averageRating : "0.0"}
           </span>
           <span className="text-zinc-550 text-base">/ 5.0</span>

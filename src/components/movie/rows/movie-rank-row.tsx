@@ -31,7 +31,7 @@ export default function MovieRankRow({
 
   return (
     <div className="space-y-4 group/row relative">
-      <h3 className="text-base md:text-lg lg:text-xl font-bold text-zinc-100 tracking-wide hover:text-white cursor-pointer transition-colors duration-200 pl-3.5 border-l-3 border-brand/85 inline-block">
+      <h3 className="text-base md:text-lg lg:text-xl font-bold text-[#e5b842] tracking-wide hover:opacity-90 cursor-pointer transition-opacity duration-200 pl-3.5 border-l-3 border-brand/85 inline-block">
         {title}
       </h3>
 
@@ -47,35 +47,26 @@ export default function MovieRankRow({
 
         <div
           ref={rowRef}
-          className="flex overflow-x-auto gap-6 pt-6 pb-16 px-4 no-scrollbar scroll-smooth snap-x snap-mandatory overflow-y-hidden"
+          className="flex overflow-x-auto gap-4 py-4 px-1.5 no-scrollbar scroll-smooth snap-x snap-mandatory"
         >
           {topTenMovies.map((movie, index) => {
             return (
-              <Link href={`/movies/${movie.id}`} key={movie.id}>
-                <div className="flex-none w-[210px] sm:w-[250px] md:w-[290px] relative snap-start group/rank flex items-end h-[180px] sm:h-[220px] md:h-[260px] select-none">
-                  <div
-                    className={`absolute ${
-                      index === 0
-                        ? "left-0"
-                        : "left-[-25px] sm:left-[-22px] md:left-[-28px]"
-                    } bottom-[-1.5rem] sm:bottom-[-2.2rem] md:bottom-[-2.8rem] z-0 select-none text-stroke-netflix font-black leading-none flex items-end transition-all duration-300 group-hover/rank:scale-[1.08] group-hover/rank:-translate-y-1.5`}
-                    style={{
-                      fontSize: "clamp(7rem, 15vw, 14.5rem)",
-                      transform: `scale(0.8)`,
-                      transformOrigin: "bottom left",
-                    }}
-                  >
-                    {index + 1}
-                  </div>
-                  <div className="w-[80%] ml-auto relative z-10 h-full">
-                    <MovieCard
-                      movie={movie}
-                      onPlayClick={onPlayClick}
-                      isFavorite={favorites.some((fav) => fav.id === movie.id)}
-                      onToggleFavorite={onToggleFavorite}
-                    />
-                  </div>
+              <Link
+                href={`/movies/${movie.id}`}
+                key={movie.id}
+                className="relative flex-none snap-start transition-all duration-300 w-[240px] sm:w-[300px] md:w-[350px] group/rank"
+              >
+                {/* Dark gradient overlay behind the rank number for better legibility */}
+                <div className="absolute top-0 left-0 w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-gradient-to-br from-black/85 via-black/45 to-transparent rounded-tl-lg z-20 pointer-events-none" />
+                <div className="absolute top-2.5 left-2.5 z-25 font-sans text-4xl sm:text-5xl md:text-6xl font-black text-luxury-gold drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] select-none">
+                  {index + 1}
                 </div>
+                <MovieCard
+                  movie={movie}
+                  onPlayClick={onPlayClick}
+                  isFavorite={favorites.some((fav) => fav.id === movie.id)}
+                  onToggleFavorite={onToggleFavorite}
+                />
               </Link>
             );
           })}

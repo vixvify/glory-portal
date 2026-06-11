@@ -57,6 +57,7 @@ export interface Movie {
   ratings: Rating[];
   year: number;
   matchRate: number;
+  averageRating: number;
   aspectRatio: string;
   ageRating: AgeRating;
   duration: number;
