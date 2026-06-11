@@ -145,4 +145,5 @@ export interface MovieFilterParams {
   pagesize?: number | string;
   sort?: string;
   sortby?: string;
+  aspectRatio?: string;
 }

@@ -1,10 +1,11 @@
 import { Movie, Category } from "@/core/domain/movie";
 import { CrewMember } from "@/core/domain/crew";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
-import MovieRow from "@/components/movie/movie-row";
-import MovieRankRow from "@/components/movie/movie-rank-row";
+import MovieRow from "@/components/movie/rows/movie-row";
+import MovieRowPortrait from "@/components/movie/rows/movie-row-portrait";
+import MovieRankRow from "@/components/movie/rows/movie-rank-row";
 import CrewRow from "@/components/crew/crew-row";
-import MovieHero from "@/components/movie/movie-hero";
+import MovieHero from "@/components/movie/heros/movie-hero";
 
 interface HomeViewProps {
   recommendedMovies: Movie[];
@@ -81,13 +82,12 @@ export default function HomeView({
           <CrewRow title="นักแสดงและทีมงาน" crew={actorsList} />
         )}
 
-        <MovieRow
+        <MovieRowPortrait
           title="ภาพยนตร์แนวตั้ง"
           movies={portraitMovies}
           onPlayClick={handlePlayMovie}
           favorites={favorites}
           onToggleFavorite={handleToggleFavorite}
-          isPortrait={true}
         />
 
         {categories.map((category) => (

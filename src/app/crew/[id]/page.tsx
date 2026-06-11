@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -9,6 +9,12 @@ import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 import Loading from "@/app/loading";
 import { useCrewMemberQueryById } from "@/hooks/use-crew-members";
+import { useFavoritesQuery, useToggleFavoriteMutation } from "@/hooks/use-favorites";
+import { useAppStore } from "@/store/use-store";
+import { useMoviePlayer } from "@/hooks/use-movie-player";
+import MovieCard from "@/components/movie/cards/movie-card";
+import MovieCardPortrait from "@/components/movie/cards/movie-card-portrait";
+import { Toast } from "@/components/ui/toast";
 
 const ROLE_MAPPING: Record<string, string> = {
   director: "ผู้กำกับ",
@@ -26,6 +32,38 @@ export default function CrewProfilePage() {
     isLoading,
     error,
   } = useCrewMemberQueryById(params.id);
+
+  const { playMovie: handlePlayMovie } = useMoviePlayer();
+  const { currentUser, showToast } = useAppStore();
+  const { data: favorites = [] } = useFavoritesQuery(!!currentUser);
+  const toggleFavoriteMutation = useToggleFavoriteMutation();
+
+  const handleToggleFavorite = useCallback(
+    (movieId: string) => {
+      if (!currentUser) {
+        router.push("/auth/login");
+        return;
+      }
+      const isCurrentlyFavorite = favorites.some((m) => m.id === movieId);
+
+      toggleFavoriteMutation.mutate(
+        { movieId, isFavorite: isCurrentlyFavorite },
+        {
+          onSuccess: () => {
+            if (isCurrentlyFavorite) {
+              showToast("นำออกจากรายการโปรดแล้ว", "info");
+            } else {
+              showToast("เพิ่มลงในรายการโปรดแล้ว", "success");
+            }
+          },
+          onError: () => {
+            showToast("เกิดข้อผิดพลาดในการปรับปรุงรายการโปรด", "error");
+          },
+        },
+      );
+    },
+    [currentUser, favorites, toggleFavoriteMutation, showToast, router],
+  );
 
   const groupedMovies = useMemo(() => {
     if (!crewMember?.movies) return {};
@@ -158,7 +196,7 @@ export default function CrewProfilePage() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {items.map((mc) => {
                     const movie = mc.movie;
                     if (!movie) return null;
@@ -167,39 +205,22 @@ export default function CrewProfilePage() {
                       <Link
                         href={`/movies/${movie.id}`}
                         key={mc.id}
-                        className="group/card block"
                       >
-                        <div className="bg-zinc-900/30 border border-zinc-850 hover:border-brand/45 rounded-2xl overflow-hidden shadow-lg hover:shadow-brand/5 hover:bg-zinc-900/40 transition-all duration-300 flex flex-col h-full">
-                          <div className="relative aspect-[2/3] overflow-hidden bg-zinc-950">
-                            <Image
-                              src={movie.thumbnail}
-                              alt={movie.title}
-                              fill
-                              className="object-cover"
-                              unoptimized
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                              <span className="text-[10px] font-bold text-black bg-brand px-2.5 py-1 rounded-md shadow-md">
-                                คลิกเพื่อดูรายละเอียด
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="p-4 flex-1 flex flex-col justify-between">
-                            <div className="space-y-1">
-                              <h3 className="font-bold text-sm sm:text-base text-zinc-100 group-hover/card:text-brand line-clamp-1 transition-colors">
-                                {movie.title}
-                              </h3>
-                              <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 font-semibold">
-                                <span>{movie.year}</span>
-                                <span>•</span>
-                                <span className="text-zinc-450">
-                                  {movie.category.name}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                        {movie.aspectRatio === "แนวตั้ง" ? (
+                          <MovieCardPortrait
+                            movie={movie}
+                            onPlayClick={handlePlayMovie}
+                            isFavorite={favorites.some((fav) => fav.id === movie.id)}
+                            onToggleFavorite={handleToggleFavorite}
+                          />
+                        ) : (
+                          <MovieCard
+                            movie={movie}
+                            onPlayClick={handlePlayMovie}
+                            isFavorite={favorites.some((fav) => fav.id === movie.id)}
+                            onToggleFavorite={handleToggleFavorite}
+                          />
+                        )}
                       </Link>
                     );
                   })}
@@ -215,6 +236,7 @@ export default function CrewProfilePage() {
           )}
         </div>
       </main>
+      <Toast />
     </div>
   );
 }

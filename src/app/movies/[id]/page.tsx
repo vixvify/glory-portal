@@ -14,11 +14,11 @@ import { useAppStore } from "@/store/use-store";
 import Loading from "@/app/loading";
 import PlayerModal from "@/components/modal/player-modal";
 import { useMoviePlayer } from "@/hooks/use-movie-player";
-import MovieDetailHero from "@/components/movie/movie-detail-hero";
-import MovieRatingPanel from "@/components/movie/movie-rating-panel";
-import MovieInfoPanel from "@/components/movie/movie-info-panel";
-import MovieCrewRow from "@/components/movie/movie-crew-row";
-import MovieBtsSection from "@/components/movie/movie-bts-section";
+import MovieDetailHero from "@/components/movie/detail/movie-detail-hero";
+import MovieRatingPanel from "@/components/movie/detail/movie-rating-panel";
+import MovieInfoPanel from "@/components/movie/detail/movie-info-panel";
+import MovieCrewRow from "@/components/movie/rows/movie-crew-row";
+import MovieBtsSection from "@/components/movie/detail/movie-bts-section";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 
 export default function MovieDetails() {

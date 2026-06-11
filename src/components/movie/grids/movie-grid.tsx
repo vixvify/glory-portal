@@ -1,7 +1,7 @@
 "use client";
 
 import { Movie } from "@/core/domain/movie";
-import MovieCard from "@/components/movie/movie-card";
+import MovieCard from "../cards/movie-card";
 import Link from "next/link";
 
 interface Props {
@@ -18,7 +18,7 @@ export default function MovieGrid({
   onToggleFavorite,
 }: Props) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {movies.map((movie) => (
         <Link href={`/movies/${movie.id}`} key={movie.id}>
           <MovieCard

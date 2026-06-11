@@ -7,7 +7,7 @@ import {
   useToggleFavoriteMutation,
 } from "@/hooks/use-favorites";
 import { useAppStore } from "@/store/use-store";
-import MovieGrid from "@/components/movie/movie-grid";
+import MovieGrid from "@/components/movie/grids/movie-grid";
 import Loading from "@/app/loading";
 import { useMoviePlayer } from "@/hooks/use-movie-player";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";

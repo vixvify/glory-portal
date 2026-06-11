@@ -11,7 +11,7 @@ import Loading from "@/app/loading";
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/ui/search-input";
 import { FilterSelect } from "@/components/ui/filter-select";
-import { MovieTable } from "@/components/movie/movie-table";
+import { MovieTable } from "@/components/movie/tables/movie-table";
 import { ConfirmModal } from "@/components/modal/confirm-modal";
 import { useMoviesQuery, useDeleteMovieMutation } from "@/hooks/use-movies";
 import { useCategoriesQuery } from "@/hooks/use-master-data";
