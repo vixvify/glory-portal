@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useMoviesQuery } from "@/hooks/use-movies";
 import {
@@ -8,10 +8,13 @@ import {
   useToggleFavoriteMutation,
 } from "@/hooks/use-favorites";
 import { useAppStore } from "@/store/use-store";
-import MovieGrid from "@/components/movie/movie-grid";
+import MovieGrid from "@/components/movie/grids/movie-grid";
+import MovieCardPortrait from "@/components/movie/cards/movie-card-portrait";
+import Link from "next/link";
 import Loading from "@/app/loading";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useMoviePlayer } from "@/hooks/use-movie-player";
+import { getAspectRatio } from "@/utils/aspect-ratio";
 
 export default function UniversityPage() {
   const params = useParams<{ university: string }>();
@@ -27,6 +30,11 @@ export default function UniversityPage() {
     search: universityName,
     searchby: "university",
   });
+
+  const { landscapeMovies, portraitMovies } = useMemo(
+    () => getAspectRatio(movies),
+    [movies]
+  );
 
   const { data: favorites = [] } = useFavoritesQuery(!!currentUser);
   const toggleFavoriteMutation = useToggleFavoriteMutation();
@@ -89,13 +97,40 @@ export default function UniversityPage() {
             </p>
           </div>
         ) : (
-          <div className="pb-10">
-            <MovieGrid
-              movies={movies}
-              onPlayClick={handlePlayMovie}
-              favorites={favorites}
-              onToggleFavorite={handleToggleFavorite}
-            />
+          <div className="space-y-12 pb-10">
+            {landscapeMovies.length > 0 && (
+              <div className="space-y-5">
+                <h2 className="text-lg md:text-xl font-bold text-zinc-200 tracking-wide border-l-3 border-brand pl-3">
+                  ภาพยนตร์แนวนอน
+                </h2>
+                <MovieGrid
+                  movies={landscapeMovies}
+                  onPlayClick={handlePlayMovie}
+                  favorites={favorites}
+                  onToggleFavorite={handleToggleFavorite}
+                />
+              </div>
+            )}
+
+            {portraitMovies.length > 0 && (
+              <div className="space-y-5">
+                <h2 className="text-lg md:text-xl font-bold text-zinc-200 tracking-wide border-l-3 border-brand pl-3">
+                  ภาพยนตร์แนวตั้ง
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+                  {portraitMovies.map((movie) => (
+                    <Link href={`/movies/${movie.id}`} key={movie.id}>
+                      <MovieCardPortrait
+                        movie={movie}
+                        onPlayClick={handlePlayMovie}
+                        isFavorite={favorites.some((fav) => fav.id === movie.id)}
+                        onToggleFavorite={handleToggleFavorite}
+                      />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </main>

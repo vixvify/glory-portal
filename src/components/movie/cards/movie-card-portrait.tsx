@@ -6,7 +6,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
 import StarIcon from "@mui/icons-material/Star";
-import { Movie } from "../../core/domain/movie";
+import { Movie } from "@/core/domain/movie";
 import { useAppStore } from "@/store/use-store";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 import { calculateRatingStats } from "@/utils/rating";
@@ -16,15 +16,13 @@ interface Props {
   onPlayClick: (movie: Movie) => void;
   isFavorite: boolean;
   onToggleFavorite: (movieId: string) => void;
-  isPortrait?: boolean;
 }
 
-function MovieCard({
+function MovieCardPortrait({
   movie,
   onPlayClick,
   isFavorite,
   onToggleFavorite,
-  isPortrait,
 }: Props) {
   const { averageRating } = calculateRatingStats(movie.ratings);
   const { currentUser } = useAppStore();
@@ -41,12 +39,9 @@ function MovieCard({
     onToggleFavorite(movie.id);
   };
 
-
   return (
     <div className="group relative cursor-pointer glass-card rounded-lg overflow-hidden z-10 hover:z-20 flex flex-col h-full border border-white/5 transition-all duration-300">
-      <div className={`relative w-full overflow-hidden bg-zinc-950 transition-all duration-300 ${
-        isPortrait ? "aspect-[2/3]" : "aspect-video"
-      }`}>
+      <div className="relative w-full overflow-hidden bg-zinc-950 transition-all duration-300 aspect-[2/3]">
         <Image
           src={movie.thumbnail}
           alt={movie.title}
@@ -126,4 +121,4 @@ function MovieCard({
   );
 }
 
-export default memo(MovieCard);
+export default memo(MovieCardPortrait);

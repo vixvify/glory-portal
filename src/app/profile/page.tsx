@@ -21,7 +21,7 @@ import {
   useMyCrewMembersQuery,
   useDeleteCrewMemberMutation,
 } from "@/hooks/use-crew-members";
-import { MovieTable } from "@/components/movie/movie-table";
+import { MovieTable } from "@/components/movie/tables/movie-table";
 import { CrewTable } from "@/components/crew/crew-table";
 import { ConfirmModal } from "@/components/modal/confirm-modal";
 import { LOCALIZATION } from "@/core/constants/localization";

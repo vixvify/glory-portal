@@ -124,7 +124,7 @@ export default function Navbar() {
             </button>
 
             {showMoviesMenu && (
-              <div className="absolute left-0 mt-4.5 w-64 glass-panel bg-[#090807]/98 border-[#e5b842]/20 rounded-md p-4 shadow-2xl shadow-black/85 animate-fade-in z-50">
+              <div className="absolute left-0 mt-4.5 w-64 bg-[#121110] border border-[#e5b842]/30 rounded-md p-4 shadow-2xl shadow-black/90 animate-fade-in z-50">
                 <div className="flex border-b border-white/5 mb-3 pb-2 gap-2">
                   <button
                     onClick={() => setActiveTab("category")}
@@ -258,7 +258,7 @@ export default function Navbar() {
             </button>
 
             {showProfileMenu && (
-              <div className="absolute right-0 mt-4.5 w-48 glass-panel bg-[#090807]/98 border-[#e5b842]/20 rounded-md p-2.5 shadow-2xl shadow-black/85 animate-fade-in z-50">
+              <div className="absolute right-0 mt-4.5 w-48 bg-[#121110] border border-[#e5b842]/30 rounded-md p-2.5 shadow-2xl shadow-black/90 animate-fade-in z-50">
                 <div className="px-3 py-2 border-b border-white/5 mb-1.5">
                   <p className="text-xs text-white font-semibold truncate">
                     {currentUser.name || currentUser.email}
