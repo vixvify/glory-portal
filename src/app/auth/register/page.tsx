@@ -447,7 +447,7 @@ export default function RegisterPage() {
             <Button
               type="submit"
               isLoading={registerMutation.isPending}
-              className="w-full max-w-md py-3 bg-brand text-white hover:bg-brand-hover shadow-lg shadow-brand/10 text-sm font-bold uppercase tracking-wider rounded-xl transition-all active:scale-[0.98]"
+              className="w-full max-w-md py-3 bg-brand text-white hover:bg-brand-hover shadow-sm text-sm font-bold uppercase tracking-wider rounded-xl transition-all active:scale-[0.98]"
             >
               สมัครสมาชิก
             </Button>

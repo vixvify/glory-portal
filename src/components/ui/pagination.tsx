@@ -85,7 +85,7 @@ export default function Pagination({
               onClick={() => onPageChange(pageNum)}
               className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-semibold transition-all duration-250 cursor-pointer shadow-md ${
                 isActive
-                  ? "bg-brand text-black font-extrabold scale-105 border border-brand/50 shadow-brand/20 shadow-lg"
+                  ? "bg-brand text-black font-extrabold scale-105 border border-brand/50 shadow-sm"
                   : "bg-zinc-900/60 border border-zinc-800/40 text-zinc-400 hover:text-white hover:bg-zinc-800/80 hover:border-zinc-700/50"
               }`}
             >

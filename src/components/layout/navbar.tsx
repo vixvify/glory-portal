@@ -251,7 +251,7 @@ export default function Navbar() {
               onClick={() => setShowProfileMenu(!showProfileMenu)}
               className="flex items-center gap-1.5 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-black font-bold text-sm shadow-md shadow-brand/20 border border-brand/40">
+              <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-black font-bold text-sm shadow-sm border border-brand/40">
                 {(currentUser.name || currentUser.email || "U")
                   .charAt(0)
                   .toUpperCase()}

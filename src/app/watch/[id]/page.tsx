@@ -67,7 +67,7 @@ export default function WatchPage() {
       >
         <button
           onClick={() => router.back()}
-          className="w-11 h-11 rounded-full bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700/50 backdrop-blur-md flex items-center justify-center text-white cursor-pointer shadow-lg hover:scale-105 active:scale-95 transition-all duration-300"
+          className="w-11 h-11 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/50 flex items-center justify-center text-white cursor-pointer shadow-sm hover:scale-105 active:scale-95 transition-all duration-300"
           aria-label="ย้อนกลับ"
         >
           <ArrowBackIcon className="text-xl" />

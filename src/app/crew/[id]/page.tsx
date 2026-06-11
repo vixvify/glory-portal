@@ -105,7 +105,7 @@ export default function CrewProfilePage() {
           </p>
           <button
             onClick={() => router.push("/")}
-            className="px-6 py-2.5 bg-brand hover:bg-brand-hover text-black font-semibold rounded-xl transition-all cursor-pointer shadow-lg active:scale-95 flex items-center gap-2 justify-center mx-auto"
+            className="px-6 py-2.5 bg-brand hover:bg-brand-hover text-black font-semibold rounded-xl transition-all cursor-pointer shadow-sm active:scale-95 flex items-center gap-2 justify-center mx-auto"
           >
             <ArrowBackIcon className="text-lg" /> กลับหน้าหลัก
           </button>
@@ -130,8 +130,7 @@ export default function CrewProfilePage() {
           <span className="text-zinc-200">{crewMember.name}</span>
         </div>
 
-        <div className="relative overflow-hidden bg-zinc-900/25 border border-zinc-800/40 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row gap-8 items-center md:items-start shadow-xl backdrop-blur-md">
-          <div className="absolute -top-32 -left-32 w-96 h-96 bg-brand/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative overflow-hidden bg-card border border-zinc-800/40 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row gap-8 items-center md:items-start shadow-xl">
 
           <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-3 border-brand/50 shadow-2xl shrink-0 group aspect-square">
             {crewMember.user?.photoUrl ? (
