@@ -287,7 +287,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         <div className="space-y-2">
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-wide bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent flex items-center gap-2">
             <MovieIcon className="text-brand" />{" "}
-            {editingMovie ? "แก้ไขข้อมูลภาพยนตร์" : "สร้างภาพยนตร์ใหม่"}
+            {editingMovie ? "แก้ไขข้อมูล" : "อัพโหลด"}
           </h1>
           <p className="text-xs text-zinc-400 font-light">
             กรอกข้อมูลรายละเอียดของภาพยนตร์สั้น ลิงก์ตัวอย่าง อัปโหลดใบปิด
@@ -296,7 +296,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         </div>
 
         <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-8">
-          <div className="bg-card border border-zinc-850 rounded-lg p-6 md:p-8 shadow-xl backdrop-blur-md space-y-6">
+          <div className="rounded-lg p-6 md:p-8 shadow-xl space-y-6">
             <div className="flex items-center gap-2 border-b border-zinc-800/40 pb-4">
               <span className="w-1.5 h-6 bg-brand rounded-full" />
               <h2 className="text-lg font-bold text-white">
@@ -326,12 +326,12 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             />
 
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-zinc-300">
-                เรื่องย่อ
+              <label className="text-xs font-medium text-zinc-400">
+                เรื่องย่อขนาดสั้น (ไม่เกิน 200 คำ)
               </label>
               <textarea
                 rows={5}
-                placeholder="กรอกรายละเอียดเรื่องย่อภาพยนตร์เพื่อดึงดูดผู้ชม..."
+                placeholder="กรอกรายละเอียดเรื่องย่อภาพยนตร์"
                 {...register("description", {
                   required: "กรุณากรอกเรื่องย่อภาพยนตร์",
                 })}
@@ -371,7 +371,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <Select
-                label="ภาษาของภาพยนตร์"
+                label="ภาษา"
                 error={errors.languageId?.message}
                 {...register("languageId")}
                 options={[
@@ -435,7 +435,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             </div>
 
             <Select
-              label="สถาบัน / มหาวิทยาลัย"
+              label="สถาบัน"
               error={errors.universityId?.message}
               {...register("universityId")}
               options={[
@@ -470,7 +470,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-zinc-800/20">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 ">
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-zinc-300">
                   ภาพปกภาพยนตร์
@@ -578,15 +578,62 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 />
                 <YoutubePreview url={watchedTrailerUrl} />
               </div>
+
+              <div className="space-y-2 pt-4 ">
+                <label className="text-xs font-semibold text-zinc-300">
+                  ลิงก์วิดีโอเบื้องหลัง
+                </label>
+                <div className="space-y-4">
+                  {btsVideos.map((videoUrl, idx) => (
+                    <div key={idx} className="space-y-2">
+                      <div className="flex gap-2 items-center">
+                        <Input
+                          type="text"
+                          placeholder="https://www.youtube.com/watch?v=..."
+                          value={videoUrl}
+                          onChange={(e) => {
+                            const newVideos = [...btsVideos];
+                            newVideos[idx] = e.target.value;
+                            setBtsVideos(newVideos);
+                          }}
+                          className="flex-1 bg-black/40 border-zinc-800 focus:border-brand rounded-xl"
+                        />
+                        {btsVideos.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() =>
+                              setBtsVideos(
+                                btsVideos.filter((_, i) => i !== idx),
+                              )
+                            }
+                            className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-md border border-red-500/20 transition-all h-auto"
+                          >
+                            <CloseIcon className="text-sm" />
+                          </Button>
+                        )}
+                      </div>
+                      <YoutubePreview url={videoUrl} />
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => setBtsVideos([...btsVideos, ""])}
+                    className="py-2 px-4 text-xs w-fit flex items-center gap-1.5 rounded-md bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 transition-colors"
+                  >
+                    <AddIcon className="text-sm" />{" "}
+                    เพิ่มลิงก์วิดีโอเบื้องหลังอื่น
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="bg-card border border-zinc-850 rounded-lg p-6 md:p-8 shadow-xl backdrop-blur-md space-y-6">
+          <div className="rounded-lg p-6 md:p-8 shadow-xl  space-y-6">
             <div className="flex items-center gap-2 border-b border-zinc-800/40 pb-4">
               <span className="w-1.5 h-6 bg-brand rounded-full" />
-              <h2 className="text-lg font-bold text-white">
-                ข้อมูลทีมงานและเบื้องหลัง
-              </h2>
+              <h2 className="text-lg font-bold text-white">ทีมงาน</h2>
             </div>
 
             <div className="space-y-4">
@@ -622,58 +669,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       />
                     ),
                 )}
-              </div>
-
-              <div className="space-y-2 pt-4 border-t border-zinc-800/40">
-                <label className="text-xs font-semibold text-zinc-300">
-                  ลิงก์วิดีโอเบื้องหลัง
-                </label>
-                <div className="space-y-4">
-                  {btsVideos.map((videoUrl, idx) => (
-                    <div
-                      key={idx}
-                      className="space-y-2 p-4 bg-zinc-900/30 border border-zinc-800/45 rounded-md"
-                    >
-                      <div className="flex gap-2 items-center">
-                        <Input
-                          type="text"
-                          placeholder="https://www.youtube.com/watch?v=..."
-                          value={videoUrl}
-                          onChange={(e) => {
-                            const newVideos = [...btsVideos];
-                            newVideos[idx] = e.target.value;
-                            setBtsVideos(newVideos);
-                          }}
-                          className="flex-1 bg-black/40 border-zinc-800 focus:border-brand rounded-xl px-4 py-2.5"
-                        />
-                        {btsVideos.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            onClick={() =>
-                              setBtsVideos(
-                                btsVideos.filter((_, i) => i !== idx),
-                              )
-                            }
-                            className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-md border border-red-500/20 transition-all h-auto"
-                          >
-                            <CloseIcon className="text-sm" />
-                          </Button>
-                        )}
-                      </div>
-                      <YoutubePreview url={videoUrl} />
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => setBtsVideos([...btsVideos, ""])}
-                    className="py-2 px-4 text-xs w-fit flex items-center gap-1.5 rounded-md bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 transition-colors"
-                  >
-                    <AddIcon className="text-sm" />{" "}
-                    เพิ่มลิงก์วิดีโอเบื้องหลังอื่น
-                  </Button>
-                </div>
               </div>
             </div>
           </div>

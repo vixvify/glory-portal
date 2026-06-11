@@ -113,18 +113,6 @@ export default function MovieHero({
       </div>
 
       <div className="max-w-4xl relative z-10 space-y-4 md:space-y-6 pt-16 md:pt-20 transition-all duration-500 transform translate-y-0">
-        <div
-          className="flex items-center gap-2.5 animate-fade-in"
-          key={`badge-${currentMovie.id}`}
-        >
-          <span className="bg-brand text-zinc-950 text-[9px] md:text-[10px] font-extrabold px-2 py-0.5 rounded-sm tracking-widest leading-none shadow-md uppercase">
-            ภาพยนตร์
-          </span>
-          <span className="text-zinc-300 text-xs md:text-sm font-bold tracking-widest uppercase">
-            ยอดนิยม
-          </span>
-        </div>
-
         <Link
           href={`/movies/${currentMovie.id}`}
           className="inline-block group/title"
@@ -192,13 +180,13 @@ export default function MovieHero({
         </div>
       </div>
 
-      <div className="absolute bottom-6 right-6 md:right-16 z-20 flex gap-2">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
         {heroMovies.map((_, index) => (
           <button
             key={index}
             onClick={() => setActiveIndex(index)}
             aria-label={`ไปยังภาพยนตร์ที่ ${index + 1}`}
-            className={`w-2.5 h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+            className={`w-2.5 h-2.5 rounded-sm transition-all duration-300 cursor-pointer ${
               index === activeIndex
                 ? "bg-brand scale-125 w-6"
                 : "bg-zinc-600/80 hover:bg-zinc-400"

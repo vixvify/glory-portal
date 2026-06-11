@@ -49,7 +49,7 @@ export default function MovieRowPortrait({
         >
           {movies.map((movie) => (
             <Link href={`/movies/${movie.id}`} key={movie.id}>
-              <div className="flex-none snap-start transition-all duration-300 w-[130px] sm:w-[160px] md:w-[190px]">
+              <div className="flex-none snap-start transition-all duration-300 w-[160px] sm:w-[200px] md:w-[240px]">
                 <MovieCardPortrait
                   movie={movie}
                   onPlayClick={onPlayClick}

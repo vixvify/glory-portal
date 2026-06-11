@@ -35,7 +35,7 @@ export default function CategoryPage() {
 
   const { landscapeMovies, portraitMovies } = useMemo(
     () => getAspectRatio(movies),
-    [movies]
+    [movies],
   );
 
   const { data: favorites = [] } = useFavoritesQuery(!!currentUser);
@@ -77,21 +77,19 @@ export default function CategoryPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-brand selection:text-black">
-      <main className="max-w-7xl mx-auto w-full px-6 md:px-16 pt-28 pb-16 space-y-8 animate-fade-in">
+      <main className="max-w-8xl mx-auto w-full px-6 md:px-16 pt-28 pb-16 space-y-8 animate-fade-in">
         <div className="space-y-2">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-brand cursor-pointer transition-colors bg-transparent border-none focus:outline-none"
+            className="w-8 h-8 rounded-full bg-zinc-900/60 border border-zinc-800 hover:border-brand/40 hover:text-brand flex items-center justify-center text-zinc-400 cursor-pointer transition-all duration-300 shadow-md focus:outline-none"
+            aria-label="ย้อนกลับ"
           >
-            <ArrowBackIcon className="text-sm" /> กลับ
+            <ArrowBackIcon className="text-sm" />
           </button>
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-zinc-800 pb-4">
-            <h1 className="text-3xl font-extrabold tracking-wide bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 pb-4">
+            <h1 className="text-3xl font-bold text-white">
               ภาพยนตร์แนว {categoryDisplayTitle}
             </h1>
-            <span className="text-sm text-zinc-400 font-light">
-              พบทั้งหมด {movies.length} เรื่อง
-            </span>
           </div>
         </div>
 
@@ -128,7 +126,9 @@ export default function CategoryPage() {
                       <MovieCardPortrait
                         movie={movie}
                         onPlayClick={handlePlayMovie}
-                        isFavorite={favorites.some((fav) => fav.id === movie.id)}
+                        isFavorite={favorites.some(
+                          (fav) => fav.id === movie.id,
+                        )}
                         onToggleFavorite={handleToggleFavorite}
                       />
                     </Link>

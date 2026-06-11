@@ -29,6 +29,15 @@ export const CREW_TAB_OPTIONS = [
   { id: "editor", label: "ผู้ลำดับภาพ" },
 ] as const;
 
+export const CREW_MAPPING = [
+  { id: "director", label: "ผู้กำกับ" },
+  { id: "producer", label: "ผู้อำนวยการสร้าง" },
+  { id: "writer", label: "ผู้เขียนบท" },
+  { id: "cast", label: "นักแสดง" },
+  { id: "dop", label: "ผู้กำกับภาพ" },
+  { id: "editor", label: "ผู้ลำดับภาพ" },
+] as const;
+
 export type CrewTabId = (typeof CREW_TAB_OPTIONS)[number]["id"];
 
 export const CREW_TAB_CONFIG = [

@@ -34,10 +34,10 @@ export default function Page() {
   const { data: categories = [], isLoading: isCatLoading } =
     useCategoriesQuery();
 
-  const { data: directorsList = [], isLoading: isDirsLoading } =
-    useCrewMembersQuery({ search: "director", searchby: "role" });
+  const { data: staffList = [], isLoading: isStaffsLoading } =
+    useCrewMembersQuery();
 
-  const { data: actorsList = [], isLoading: isActorsLoading } =
+  const { data: actorList = [], isLoading: isActorsLoading } =
     useCrewMembersQuery({ search: "cast", searchby: "role" });
 
   const { data: portraitMovies = [], isLoading: isPortraitLoading } =
@@ -88,7 +88,7 @@ export default function Page() {
     isRecLoading ||
     isPopLoading ||
     isCatLoading ||
-    isDirsLoading ||
+    isStaffsLoading ||
     isActorsLoading ||
     isStatsLoading ||
     isPortraitLoading ||
@@ -112,8 +112,8 @@ export default function Page() {
       recommendedMovies={recommendedMovies}
       popularMovies={popularMovies}
       categories={categories}
-      directorsList={directorsList}
-      actorsList={actorsList}
+      staffList={staffList}
+      actorList={actorList}
       portraitMovies={portraitMovies}
       universityMovies={movieByUniversity}
       categoryMoviesMap={categoryMoviesMap}
