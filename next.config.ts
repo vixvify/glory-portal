@@ -27,6 +27,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "m.media-amazon.com",
       },
+      {
+        protocol: "https",
+        hostname: "www.wallpaperflare.com",
+      },
+      {
+        protocol: "https",
+        hostname: "4kwallpapers.com",
+      },
     ],
   },
 };

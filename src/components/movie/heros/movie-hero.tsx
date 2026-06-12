@@ -78,11 +78,10 @@ export default function MovieHero({
       {heroMovies.map((movie, index) => (
         <div
           key={movie.id}
-          className="absolute inset-0 bg-cover bg-center transition-opacity duration-500 ease-in-out pointer-events-none"
+          className="absolute inset-0 bg-cover bg-center transition-opacity duration-500 ease-in-out pointer-events-none z-0"
           style={{
             backgroundImage: `
-              linear-gradient(to top, var(--theme-bg) 0%, rgba(var(--theme-bg-rgb), 0.4) 60%, rgba(var(--theme-bg-rgb), 0.85) 100%),
-              linear-gradient(to right, rgba(var(--theme-bg-rgb), 0.95) 0%, rgba(var(--theme-bg-rgb), 0.3) 40%, transparent 100%),
+              linear-gradient(to right, rgba(var(--theme-bg-rgb), 0.9) 0%, rgba(var(--theme-bg-rgb), 0.35) 45%, transparent 100%),
               url(${movie.thumbnail})
             `,
             opacity: index === activeIndex ? 1 : 0,
@@ -90,7 +89,28 @@ export default function MovieHero({
         />
       ))}
 
-      <div className="absolute inset-0 bg-black/5 pointer-events-none" />
+      <div
+        className="absolute inset-x-0 bottom-0 h-[260px] md:h-[360px] pointer-events-none z-5"
+        style={{
+          maskImage: "linear-gradient(to top, black 0%, transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to top, black 0%, transparent 100%)",
+        }}
+      >
+        {heroMovies.map((movie, index) => (
+          <div
+            key={`ambient-${movie.id}`}
+            className="absolute inset-0 bg-cover bg-center transition-opacity duration-700 ease-in-out blur-[70px] md:blur-[110px] scale-130"
+            style={{
+              backgroundImage: `url(${movie.thumbnail})`,
+              opacity: index === activeIndex ? 0.8 : 0,
+            }}
+          />
+        ))}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+      </div>
+
+      <div className="absolute inset-0 bg-black/5 pointer-events-none z-0" />
 
       <div className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
@@ -135,7 +155,8 @@ export default function MovieHero({
           </span>
           {currentMovie.category && (
             <span className="px-2.5 py-0.5 text-[10px] md:text-xs font-medium bg-white/10 border border-white/20 text-zinc-200 rounded-full">
-              {CATEGORY_TITLE_MAPPING[currentMovie.category.name] || currentMovie.category.name}
+              {CATEGORY_TITLE_MAPPING[currentMovie.category.name] ||
+                currentMovie.category.name}
             </span>
           )}
         </div>

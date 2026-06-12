@@ -8,9 +8,8 @@ import {
   useToggleFavoriteMutation,
 } from "@/hooks/db/use-favorites";
 import { useAppStore } from "@/store/use-store";
-import MovieGrid from "@/components/movie/grids/movie-grid";
-import MovieCardPortrait from "@/components/movie/cards/movie-card-portrait";
-import Link from "next/link";
+import MovieRow from "@/components/movie/rows/movie-row";
+import MovieRowPortrait from "@/components/movie/rows/movie-row-portrait";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
@@ -26,6 +25,12 @@ export default function CategoryPage() {
   const { playMovie: handlePlayMovie } = useMoviePlayer();
 
   const { currentUser, showToast } = useAppStore();
+
+  const { data: moviesByCategory = [] } = useMoviesQuery({
+    search: categoryName,
+    searchby: "category",
+    aspectRatio: "แนวนอน",
+  });
 
   const { data: landscapeByViews = [] } = useMoviesQuery({
     search: categoryName,
@@ -103,11 +108,6 @@ export default function CategoryPage() {
           >
             <ArrowBackIcon className="text-sm" />
           </button>
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 pb-4">
-            <h1 className="text-3xl font-bold text-white">
-              ภาพยนตร์แนว {categoryDisplayTitle}
-            </h1>
-          </div>
         </div>
 
         {isEmptyAll(
@@ -123,76 +123,54 @@ export default function CategoryPage() {
           </div>
         ) : (
           <div className="space-y-12 pb-10">
+            {moviesByCategory.length > 0 && (
+              <MovieRow
+                title={categoryDisplayTitle}
+                movies={moviesByCategory}
+                onPlayClick={handlePlayMovie}
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+              />
+            )}
+
             {landscapeByViews.length > 0 && (
-              <div className="space-y-5">
-                <h2 className="text-lg md:text-xl font-bold text-zinc-200 tracking-wide border-l-3 border-brand pl-3">
-                  ภาพยนตร์ยอดนิยม
-                </h2>
-                <MovieGrid
-                  movies={landscapeByViews}
-                  onPlayClick={handlePlayMovie}
-                  favorites={favorites}
-                  onToggleFavorite={handleToggleFavorite}
-                />
-              </div>
+              <MovieRow
+                title={`${categoryDisplayTitle}ยอดนิยม`}
+                movies={landscapeByViews}
+                onPlayClick={handlePlayMovie}
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+              />
             )}
 
             {landscapeByRating.length > 0 && (
-              <div className="space-y-5">
-                <h2 className="text-lg md:text-xl font-bold text-zinc-200 tracking-wide border-l-3 border-brand pl-3">
-                  ภาพยนตร์ถูกใจผู้ชม
-                </h2>
-                <MovieGrid
-                  movies={landscapeByRating}
-                  onPlayClick={handlePlayMovie}
-                  favorites={favorites}
-                  onToggleFavorite={handleToggleFavorite}
-                />
-              </div>
+              <MovieRow
+                title={`${categoryDisplayTitle}ถูกใจผู้ชม`}
+                movies={landscapeByRating}
+                onPlayClick={handlePlayMovie}
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+              />
             )}
 
             {portraitByViews.length > 0 && (
-              <div className="space-y-5">
-                <h2 className="text-lg md:text-xl font-bold text-zinc-200 tracking-wide border-l-3 border-brand pl-3">
-                  ภาพยนตร์แนวตั้งยอดนิยม
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                  {portraitByViews.map((movie) => (
-                    <Link href={`/movies/${movie.id}`} key={movie.id}>
-                      <MovieCardPortrait
-                        movie={movie}
-                        onPlayClick={handlePlayMovie}
-                        isFavorite={favorites.some(
-                          (fav) => fav.id === movie.id,
-                        )}
-                        onToggleFavorite={handleToggleFavorite}
-                      />
-                    </Link>
-                  ))}
-                </div>
-              </div>
+              <MovieRowPortrait
+                title={`${categoryDisplayTitle}แนวตั้งยอดนิยม`}
+                movies={portraitByViews}
+                onPlayClick={handlePlayMovie}
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+              />
             )}
 
             {portraitByRating.length > 0 && (
-              <div className="space-y-5">
-                <h2 className="text-lg md:text-xl font-bold text-zinc-200 tracking-wide border-l-3 border-brand pl-3">
-                  ภาพยนตร์แนวตั้งถูกใจผู้ชม
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                  {portraitByRating.map((movie) => (
-                    <Link href={`/movies/${movie.id}`} key={movie.id}>
-                      <MovieCardPortrait
-                        movie={movie}
-                        onPlayClick={handlePlayMovie}
-                        isFavorite={favorites.some(
-                          (fav) => fav.id === movie.id,
-                        )}
-                        onToggleFavorite={handleToggleFavorite}
-                      />
-                    </Link>
-                  ))}
-                </div>
-              </div>
+              <MovieRowPortrait
+                title={`${categoryDisplayTitle}แนวตั้งถูกใจผู้ชม`}
+                movies={portraitByRating}
+                onPlayClick={handlePlayMovie}
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+              />
             )}
           </div>
         )}

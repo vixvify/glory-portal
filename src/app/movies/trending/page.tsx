@@ -45,24 +45,6 @@ export default function TrendingPage() {
       aspectRatio: "แนวนอน",
     });
 
-  const { data: trendingMovies = [], isLoading: isLoadingTrending } =
-    useMoviesQuery({
-      sort: "desc",
-      sortby: "matchRate",
-      page: 1,
-      pagesize: 10,
-      aspectRatio: "แนวนอน",
-    });
-
-  const { data: trendingRatedMovies = [], isLoading: isLoadingTrendingRated } =
-    useMoviesQuery({
-      sort: "desc",
-      sortby: "averageRating",
-      page: 2,
-      pagesize: 10,
-      aspectRatio: "แนวนอน",
-    });
-
   const { data: favorites = [], isLoading: isLoadingFavs } =
     useFavoritesQuery(!!currentUser);
   const toggleFavoriteMutation = useToggleFavoriteMutation();
@@ -98,8 +80,6 @@ export default function TrendingPage() {
     isLoadingNew ||
     isLoadingPopNew ||
     isLoadingRatedNew ||
-    isLoadingTrending ||
-    isLoadingTrendingRated ||
     (!!currentUser && isLoadingFavs);
 
   if (isPageLoading) {
@@ -129,7 +109,7 @@ export default function TrendingPage() {
           />
 
           <MovieRow
-            title="ใหม่ยอดนิยม"
+            title="มาแรง"
             movies={popularNewMovies}
             onPlayClick={handlePlayMovie}
             favorites={favorites}
@@ -137,24 +117,8 @@ export default function TrendingPage() {
           />
 
           <MovieRow
-            title="ใหม่ถูกใจผู้ชม"
+            title="ถูกใจผู้ชม"
             movies={ratedNewMovies}
-            onPlayClick={handlePlayMovie}
-            favorites={favorites}
-            onToggleFavorite={handleToggleFavorite}
-          />
-
-          <MovieRow
-            title="มาแรง"
-            movies={trendingMovies}
-            onPlayClick={handlePlayMovie}
-            favorites={favorites}
-            onToggleFavorite={handleToggleFavorite}
-          />
-
-          <MovieRow
-            title="มาแรงถูกใจผู้ชม"
-            movies={trendingRatedMovies}
             onPlayClick={handlePlayMovie}
             favorites={favorites}
             onToggleFavorite={handleToggleFavorite}

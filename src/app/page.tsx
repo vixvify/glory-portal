@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useQueries } from "@tanstack/react-query";
 import { movieService } from "@/infra/container";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
@@ -61,34 +62,16 @@ export default function Page() {
       aspectRatio: "แนวนอน",
     });
 
-  const categoryMovieQueriesByViews = useQueries({
-    queries: categories.map((category) => ({
-      queryKey: [
-        "movies",
-        {
-          search: category.name,
-          searchby: "category",
-          page: 1,
-          pagesize: 10,
-          aspectRatio: "แนวนอน",
-          sort: "desc",
-          sortby: "views",
-        },
-      ],
-      queryFn: () =>
-        movieService.getMovies({
-          search: category.name,
-          searchby: "category",
-          page: 1,
-          pagesize: 10,
-          aspectRatio: "แนวนอน",
-          sort: "desc",
-          sortby: "views",
-        }),
-    })),
-  });
+  const { data: moviesByRating = [], isLoading: isMovieRatingLoading } =
+    useMoviesQuery({
+      sort: "desc",
+      sortby: "averageRating",
+      page: 1,
+      pagesize: 10,
+      aspectRatio: "แนวนอน",
+    });
 
-  const categoryMovieQueriesByRating = useQueries({
+  const categoryMovie = useQueries({
     queries: categories.map((category) => ({
       queryKey: [
         "movies",
@@ -98,8 +81,6 @@ export default function Page() {
           page: 1,
           pagesize: 10,
           aspectRatio: "แนวนอน",
-          sort: "desc",
-          sortby: "averageRating",
         },
       ],
       queryFn: () =>
@@ -109,8 +90,6 @@ export default function Page() {
           page: 1,
           pagesize: 10,
           aspectRatio: "แนวนอน",
-          sort: "desc",
-          sortby: "averageRating",
         }),
     })),
   });
@@ -124,24 +103,18 @@ export default function Page() {
     isStatsLoading ||
     isPortraitLoading ||
     isMovieUniLoading ||
+    isMovieRatingLoading ||
     (!!currentUser && isFavsLoading) ||
-    categoryMovieQueriesByViews.some((q) => q.isLoading);
+    categoryMovie.some((q) => q.isLoading);
 
   if (isCoreLoading) {
     return <Loading />;
   }
 
-  const categoryMoviesByViewsMap = Object.fromEntries(
+  const categoryMoviesMap = Object.fromEntries(
     categories.map((category, index) => [
       category.id,
-      categoryMovieQueriesByViews[index]?.data || [],
-    ]),
-  );
-
-  const categoryMoviesByRatingMap = Object.fromEntries(
-    categories.map((category, index) => [
-      category.id,
-      categoryMovieQueriesByRating[index]?.data || [],
+      categoryMovie[index]?.data || [],
     ]),
   );
 
@@ -154,8 +127,8 @@ export default function Page() {
       actorList={actorList}
       portraitMovies={portraitMovies}
       universityMovies={movieByUniversity}
-      categoryMoviesByViews={categoryMoviesByViewsMap}
-      categoryMoviesByRating={categoryMoviesByRatingMap}
+      moviesByRating={moviesByRating}
+      categoryMoviesMap={categoryMoviesMap}
       favorites={serverFavorites}
     />
   );
