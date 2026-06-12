@@ -10,18 +10,13 @@ interface Props {
   onPlayClick: (movie: Movie) => void;
   isFavorite: boolean;
   onToggleFavorite: (movieId: string) => void;
-  isPortrait?: boolean;
 }
 
-function MovieCard({ movie, isPortrait }: Props) {
-  const isPortraitMode = isPortrait ?? (movie.aspectRatio === "แนวตั้ง");
-
+function MovieCard({ movie }: Props) {
   return (
     <div className="group relative cursor-pointer glass-card rounded-lg overflow-hidden z-10 hover:z-20 flex flex-col h-full border border-white/5 transition-all duration-300">
       <div
-        className={`relative w-full overflow-hidden bg-zinc-950 transition-all duration-300 ${
-          isPortraitMode ? "aspect-[2/3]" : "aspect-video"
-        }`}
+        className={`relative w-full overflow-hidden bg-zinc-950 transition-all duration-300 aspect-video`}
       >
         <Image
           src={movie.thumbnail}

@@ -21,7 +21,7 @@ export default function Page() {
       sortby: "matchRate",
       page: 1,
       pagesize: 5,
-      aspectRatio: "แนวนอน",
+      aspectRatio: "landscape",
     });
 
   const { data: popularMovies = [], isLoading: isPopLoading } = useMoviesQuery({
@@ -29,7 +29,7 @@ export default function Page() {
     sortby: "views",
     page: 1,
     pagesize: 10,
-    aspectRatio: "แนวนอน",
+    aspectRatio: "landscape",
   });
 
   const { data: categories = [], isLoading: isCatLoading } =
@@ -45,7 +45,7 @@ export default function Page() {
     useMoviesQuery({
       page: 1,
       pagesize: 10,
-      aspectRatio: "แนวตั้ง",
+      aspectRatio: "portrait",
     });
 
   const { data: serverFavorites = [], isLoading: isFavsLoading } =
@@ -59,7 +59,7 @@ export default function Page() {
       searchby: "university",
       page: 1,
       pagesize: 10,
-      aspectRatio: "แนวนอน",
+      aspectRatio: "landscape",
     });
 
   const { data: moviesByRating = [], isLoading: isMovieRatingLoading } =
@@ -68,7 +68,7 @@ export default function Page() {
       sortby: "averageRating",
       page: 1,
       pagesize: 10,
-      aspectRatio: "แนวนอน",
+      aspectRatio: "landscape",
     });
 
   const categoryMovie = useQueries({
@@ -80,7 +80,7 @@ export default function Page() {
           searchby: "category",
           page: 1,
           pagesize: 10,
-          aspectRatio: "แนวนอน",
+          aspectRatio: "landscape",
         },
       ],
       queryFn: () =>
@@ -89,7 +89,7 @@ export default function Page() {
           searchby: "category",
           page: 1,
           pagesize: 10,
-          aspectRatio: "แนวนอน",
+          aspectRatio: "landscape",
         }),
     })),
   });

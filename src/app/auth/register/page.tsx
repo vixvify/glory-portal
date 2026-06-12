@@ -15,7 +15,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerUserSchema } from "@/core/schema/auth";
+import { registerFormSchema } from "@/core/schema/auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRegisterMutation } from "@/hooks/db/use-auth";
@@ -63,7 +63,7 @@ export default function RegisterPage() {
     setValue,
     formState: { errors },
   } = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerUserSchema),
+    resolver: zodResolver(registerFormSchema),
     defaultValues: {
       name: "",
       email: "",

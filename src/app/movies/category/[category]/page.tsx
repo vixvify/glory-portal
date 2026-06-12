@@ -29,7 +29,7 @@ export default function CategoryPage() {
   const { data: moviesByCategory = [] } = useMoviesQuery({
     search: categoryName,
     searchby: "category",
-    aspectRatio: "แนวนอน",
+    aspectRatio: "landscape",
   });
 
   const { data: landscapeByViews = [] } = useMoviesQuery({
@@ -37,7 +37,7 @@ export default function CategoryPage() {
     searchby: "category",
     sort: "desc",
     sortby: "views",
-    aspectRatio: "แนวนอน",
+    aspectRatio: "landscape",
   });
 
   const { data: landscapeByRating = [] } = useMoviesQuery({
@@ -45,7 +45,7 @@ export default function CategoryPage() {
     searchby: "category",
     sort: "desc",
     sortby: "averageRating",
-    aspectRatio: "แนวนอน",
+    aspectRatio: "landscape",
   });
 
   const { data: portraitByViews = [] } = useMoviesQuery({
@@ -53,7 +53,7 @@ export default function CategoryPage() {
     searchby: "category",
     sort: "desc",
     sortby: "views",
-    aspectRatio: "แนวตั้ง",
+    aspectRatio: "portrait",
   });
 
   const { data: portraitByRating = [] } = useMoviesQuery({
@@ -61,7 +61,7 @@ export default function CategoryPage() {
     searchby: "category",
     sort: "desc",
     sortby: "averageRating",
-    aspectRatio: "แนวตั้ง",
+    aspectRatio: "portrait",
   });
 
   const { data: favorites = [] } = useFavoritesQuery(!!currentUser);

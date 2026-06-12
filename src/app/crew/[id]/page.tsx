@@ -205,7 +205,7 @@ export default function CrewProfilePage() {
                         href={`/movies/${movie.id}`}
                         key={mc.id}
                       >
-                        {movie.aspectRatio === "แนวตั้ง" ? (
+                        {movie.aspectRatio === "portrait" || movie.aspectRatio === "portait" ? (
                           <MovieCardPortrait
                             movie={movie}
                             onPlayClick={handlePlayMovie}

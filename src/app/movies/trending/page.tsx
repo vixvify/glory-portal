@@ -24,7 +24,7 @@ export default function TrendingPage() {
     sortby: "createdAt",
     page: 1,
     pagesize: 10,
-    aspectRatio: "แนวนอน",
+    aspectRatio: "landscape",
   });
 
   const { data: popularNewMovies = [], isLoading: isLoadingPopNew } =
@@ -33,7 +33,7 @@ export default function TrendingPage() {
       sortby: "views",
       page: 1,
       pagesize: 10,
-      aspectRatio: "แนวนอน",
+      aspectRatio: "landscape",
     });
 
   const { data: ratedNewMovies = [], isLoading: isLoadingRatedNew } =
@@ -42,7 +42,7 @@ export default function TrendingPage() {
       sortby: "averageRating",
       page: 1,
       pagesize: 10,
-      aspectRatio: "แนวนอน",
+      aspectRatio: "landscape",
     });
 
   const { data: favorites = [], isLoading: isLoadingFavs } =

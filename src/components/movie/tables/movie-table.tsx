@@ -84,11 +84,11 @@ export const MovieTable: React.FC<MovieTableProps> = ({
                 <td className="py-4 px-6 space-y-1">
                   <div className="flex items-center gap-1.5 text-xs text-zinc-300 font-semibold">
                     <CalendarTodayIcon className="text-[10px] text-zinc-500" />
-                    {movie.year}
+                    {movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : ""}
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="px-1 py-0.5 text-[9px] font-bold border border-zinc-700 text-zinc-400 rounded leading-none">
-                      {movie.ageRating?.name}
+                      {movie.ageRating}
                     </span>
                   </div>
                 </td>

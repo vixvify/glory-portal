@@ -40,7 +40,7 @@ export default function MovieDetailHero({
     return () => clearTimeout(timer);
   }, [backgroundEmbedUrl]);
 
-  const isPortrait = movie.aspectRatio === "แนวตั้ง";
+  const isPortrait = movie.aspectRatio === "portrait" || movie.aspectRatio === "portait";
 
   return (
     <div className="relative rounded-lg overflow-hidden shadow-2xl glass-panel">

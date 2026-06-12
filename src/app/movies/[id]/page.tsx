@@ -101,11 +101,13 @@ export default function MovieDetails() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-2 md:px-4">
           <div className="lg:col-span-2 space-y-6">
             <div className="flex flex-wrap items-center gap-x-3.5 gap-y-2 text-sm text-zinc-400">
-              <span className="text-zinc-200">{movie.year}</span>
+              <span className="text-zinc-200">
+                {movie.releaseDate ? new Date(movie.releaseDate).toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" }) : ""}
+              </span>
 
               <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
               <span className="px-1.5 py-0.5 text-xs font-bold border border-zinc-800 text-zinc-300 rounded bg-zinc-900/50">
-                {movie.ageRating?.name}
+                {movie.ageRating}
               </span>
 
               <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />

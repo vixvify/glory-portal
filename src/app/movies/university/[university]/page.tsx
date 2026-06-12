@@ -28,13 +28,13 @@ export default function UniversityPage() {
   const { data: landscapeMovies = [] } = useMoviesQuery({
     search: universityName,
     searchby: "university",
-    aspectRatio: "แนวนอน",
+    aspectRatio: "landscape",
   });
 
   const { data: portraitMovies = [] } = useMoviesQuery({
     search: universityName,
     searchby: "university",
-    aspectRatio: "แนวตั้ง",
+    aspectRatio: "portrait",
   });
 
   const { data: favorites = [] } = useFavoritesQuery(!!currentUser);

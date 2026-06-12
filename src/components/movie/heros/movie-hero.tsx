@@ -149,9 +149,13 @@ export default function MovieHero({
           className="flex items-center gap-3 text-xs md:text-sm animate-fade-in"
           key={`meta-${currentMovie.id}`}
         >
-          <span className="text-zinc-300">{currentMovie.year}</span>
+          <span className="text-zinc-300">
+            {currentMovie.releaseDate
+              ? new Date(currentMovie.releaseDate).getFullYear()
+              : ""}
+          </span>
           <span className="px-1.5 py-0.5 text-[10px] md:text-xs font-bold border border-zinc-700 text-zinc-300 rounded-sm leading-none bg-zinc-900/40">
-            {currentMovie.ageRating?.name}
+            {currentMovie.ageRating}
           </span>
           {currentMovie.category && (
             <span className="px-2.5 py-0.5 text-[10px] md:text-xs font-medium bg-white/10 border border-white/20 text-zinc-200 rounded-full">

@@ -8,12 +8,6 @@ export interface Category {
   createdAt: Date;
 }
 
-export interface University {
-  id: string;
-  name: string;
-  createdAt: Date;
-}
-
 export interface AgeRating {
   id: string;
   name: string;
@@ -21,12 +15,6 @@ export interface AgeRating {
 }
 
 export interface Language {
-  id: string;
-  name: string;
-  createdAt: Date;
-}
-
-export interface TargetGroup {
   id: string;
   name: string;
   createdAt: Date;
@@ -55,15 +43,16 @@ export interface Movie {
   trailerUrl?: string | null;
   views: number;
   ratings: Rating[];
-  year: number;
+  releaseDate: string | Date;
   matchRate: number;
   averageRating: number;
   aspectRatio: string;
-  ageRating: AgeRating;
+  ageRating: string;
   duration: number;
-  university?: University | null;
-  language?: Language | null;
-  targetGroup?: TargetGroup | null;
+  university?: string | null;
+  school?: string | null;
+  language?: string | null;
+  awards: string[];
   hasProfanity: boolean;
   hasDrugs: boolean;
   colorType: string;
@@ -89,14 +78,14 @@ export interface CreateMovie {
   thumbnail: File | null;
   youtubeUrl: string;
   trailerUrl?: string | null;
-  year: number;
+  releaseDate: string;
   matchRate?: number;
   aspectRatio: string;
-  ageRatingId: string;
+  ageRating: string;
   duration: number;
-  universityId?: string | null;
-  languageId?: string | null;
-  targetGroupId?: string | null;
+  university?: string | null;
+  school?: string | null;
+  language?: string | null;
   director?: MovieCrewInputItem[] | null;
   producer?: MovieCrewInputItem[] | null;
   writer?: MovieCrewInputItem[] | null;
@@ -108,6 +97,7 @@ export interface CreateMovie {
   hasDrugs?: boolean;
   colorType: string;
   studio?: string | null;
+  awards?: string[];
 }
 
 export interface UpdateMovie {
@@ -118,14 +108,14 @@ export interface UpdateMovie {
   thumbnail: File | string;
   youtubeUrl: string;
   trailerUrl?: string | null;
-  year: number;
+  releaseDate: string;
   matchRate?: number;
   aspectRatio: string;
-  ageRatingId: string;
+  ageRating: string;
   duration: number;
-  universityId?: string | null;
-  languageId?: string | null;
-  targetGroupId?: string | null;
+  university?: string | null;
+  school?: string | null;
+  language?: string | null;
   director?: MovieCrewInputItem[] | null;
   producer?: MovieCrewInputItem[] | null;
   writer?: MovieCrewInputItem[] | null;
@@ -137,6 +127,7 @@ export interface UpdateMovie {
   hasDrugs?: boolean;
   colorType: string;
   studio?: string | null;
+  awards?: string[];
 }
 
 export interface MovieFilterParams {
