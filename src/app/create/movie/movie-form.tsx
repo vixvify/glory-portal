@@ -307,7 +307,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             <div className="space-y-2">
               <Input
                 label="ลิงก์ภาพยนตร์"
-                placeholder="https://www.youtube.com/watch?v=..."
+                placeholder="กรอกลิงก์ภาพยนตร์"
                 error={errors.youtubeUrl?.message}
                 {...register("youtubeUrl", {
                   required: "กรุณากรอกลิงก์ภาพยนตร์",
@@ -318,15 +318,15 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
             <Input
               label="ชื่อเรื่อง"
-              placeholder="เช่น Interstellar"
+              placeholder="กรอกชื่อภาพยนตร์"
               error={errors.title?.message}
               {...register("title", {
                 required: "กรุณากรอกชื่อเรื่อง",
               })}
             />
 
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-zinc-400">
+            <div className="space-y-1 w-full text-left">
+              <label className="text-xs text-zinc-400 font-medium block">
                 เรื่องย่อขนาดสั้น (ไม่เกิน 200 คำ)
               </label>
               <textarea
@@ -335,11 +335,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 {...register("description", {
                   required: "กรุณากรอกเรื่องย่อภาพยนตร์",
                 })}
-                className={`w-full bg-black/40 border ${
+                className={`w-full bg-zinc-900 border ${
                   errors.description
-                    ? "border-red-500"
+                    ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
                     : "border-zinc-800 focus:border-brand"
-                } rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors resize-none`}
+                } rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none transition-colors placeholder-zinc-650 font-light resize-none`}
               />
               {errors.description && (
                 <span className="text-[10px] text-red-500 block pl-1 font-semibold">
@@ -408,7 +408,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               <Input
                 label="ปีที่ฉาย"
                 type="number"
-                placeholder="เช่น 2014"
+                placeholder="กรอกปีที่ฉาย"
                 error={errors.year?.message}
                 {...register("year", {
                   required: "กรุณากรอกปีที่ฉาย",
@@ -426,7 +426,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               />
               <Input
                 label="ความยาวภาพยนตร์ (นาที)"
-                placeholder="เช่น 120"
+                placeholder="กรอกความยาวภาพยนตร์"
                 error={errors.duration?.message}
                 {...register("duration", {
                   required: "กรุณากรอกความยาวภาพยนตร์",
@@ -450,7 +450,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <Input
                 label="สังกัด"
-                placeholder="พิมพ์ชื่อสังกัดหรือสตูดิโอ..."
+                placeholder="กรอกชื่อสังกัดหรือสตูดิโอ"
                 error={errors.studio?.message}
                 {...register("studio")}
               />
@@ -471,8 +471,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 ">
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-zinc-300">
+              <div className="space-y-1 w-full text-left">
+                <label className="text-xs text-zinc-400 font-medium block">
                   ภาพปกภาพยนตร์
                 </label>
                 <div className="relative group/file">
@@ -504,17 +504,17 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     )}
                   />
                   <div
-                    className={`w-full bg-black/40 border ${
+                    className={`w-full bg-zinc-900 border ${
                       errors.thumbnail
-                        ? "border-red-500"
+                        ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
                         : "border-zinc-800 group-hover/file:border-brand"
-                    } rounded-xl px-4 py-3 text-sm text-zinc-400 flex items-center justify-between transition-colors`}
+                    } rounded-lg px-4 py-2.5 text-sm text-zinc-450 flex items-center justify-between transition-colors min-h-[42px] font-light`}
                   >
                     <span
                       className={
                         selectedFileName
                           ? "text-white font-medium truncate max-w-[70%]"
-                          : "text-zinc-400"
+                          : "text-zinc-600"
                       }
                     >
                       {selectedFileName || "อัปโหลดภาพปกภาพยนตร์..."}
@@ -572,15 +572,15 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               <div className="space-y-2">
                 <Input
                   label="ลิงก์ตัวอย่างภาพยนตร์"
-                  placeholder="https://www.youtube.com/watch?v=..."
+                  placeholder="กรอกลิงก์ตัวอย่างภาพยนตร์"
                   error={errors.trailerUrl?.message}
                   {...register("trailerUrl")}
                 />
                 <YoutubePreview url={watchedTrailerUrl} />
               </div>
 
-              <div className="space-y-2 pt-4 ">
-                <label className="text-xs font-semibold text-zinc-300">
+              <div className="space-y-1 w-full text-left pt-4">
+                <label className="text-xs text-zinc-400 font-medium block">
                   ลิงก์วิดีโอเบื้องหลัง
                 </label>
                 <div className="space-y-4">
@@ -589,14 +589,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       <div className="flex gap-2 items-center">
                         <Input
                           type="text"
-                          placeholder="https://www.youtube.com/watch?v=..."
+                          placeholder="กรอกลิงก์วิดีโอเบื้องหลัง"
                           value={videoUrl}
                           onChange={(e) => {
                             const newVideos = [...btsVideos];
                             newVideos[idx] = e.target.value;
                             setBtsVideos(newVideos);
                           }}
-                          className="flex-1 bg-black/40 border-zinc-800 focus:border-brand rounded-xl"
+                          className="flex-1"
                         />
                         {btsVideos.length > 1 && (
                           <Button
@@ -607,7 +607,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                                 btsVideos.filter((_, i) => i !== idx),
                               )
                             }
-                            className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-md border border-red-500/20 transition-all h-auto"
+                            className="px-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg border border-red-500/20 transition-all h-[42px] flex items-center justify-center flex-shrink-0"
                           >
                             <CloseIcon className="text-sm" />
                           </Button>

@@ -85,7 +85,6 @@ export function CreatableSearchSelect({
         onChange={handleInputChange}
         onFocus={handleFocus}
         placeholder={placeholder}
-        className="bg-black/40 border-zinc-800 focus:border-brand rounded-xl py-2.5"
         icon={(() => {
           const matchedOpt = options.find((o) => o.id === value.id);
           const pUrl = matchedOpt?.photoUrl || value.photoUrl;
