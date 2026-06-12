@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { useQueries } from "@tanstack/react-query";
 import { movieService } from "@/infra/container";
 import { useMoviesQuery } from "@/hooks/db/use-movies";

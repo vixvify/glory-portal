@@ -11,7 +11,6 @@ import { useAppStore } from "@/store/use-store";
 import MovieRow from "@/components/movie/rows/movie-row";
 import Loading from "@/app/loading";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import WhatshotIcon from "@mui/icons-material/Whatshot";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 
 export default function TrendingPage() {

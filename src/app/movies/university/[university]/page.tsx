@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
 import {

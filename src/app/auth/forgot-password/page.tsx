@@ -14,7 +14,6 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { Toast } from "@/components/ui/toast";
 import { useAppStore } from "@/store/use-store";
 
@@ -75,6 +74,7 @@ export default function ForgotPasswordPage() {
       setStep("verify");
     } catch (err) {
       setError("เกิดข้อผิดพลาดในการส่งอีเมล");
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
