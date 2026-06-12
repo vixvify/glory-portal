@@ -81,6 +81,18 @@ export class MovieService {
       throw error;
     }
   }
+  async getMoviesWithAward(): Promise<Movie[]> {
+    try {
+      const response = await this.movieRepository.getMovieWithAward();
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      return response.data;
+    } catch (error) {
+      console.error("Error in getMoviesWithAward:", error);
+      throw error;
+    }
+  }
   async createMovie(movie: CreateMovie): Promise<Movie> {
     try {
       const validated = parseSchema(createMovieSchema, movie);

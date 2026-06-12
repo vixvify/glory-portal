@@ -7,6 +7,7 @@ import { useFavoritesQuery } from "@/hooks/db/use-favorites";
 import { useCategoriesQuery } from "@/hooks/db/use-master-data";
 import { useCrewMembersQuery } from "@/hooks/db/use-crew-members";
 import { useAdminStatsQuery } from "@/hooks/db/use-admin";
+import { useMovieWithAwardQuery } from "@/hooks/db/use-movies";
 import { useAppStore } from "@/store/use-store";
 import HomePage from "./home/home";
 import Loading from "./loading";
@@ -70,6 +71,9 @@ export default function Page() {
       aspectRatio: "landscape",
     });
 
+  const { data: moviesWithAward = [], isLoading: isMovieAwardLoading } =
+    useMovieWithAwardQuery();
+
   const categoryMovie = useQueries({
     queries: categories.map((category) => ({
       queryKey: [
@@ -121,6 +125,7 @@ export default function Page() {
     <HomePage
       recommendedMovies={recommendedMovies}
       popularMovies={popularMovies}
+      awardsMovies={moviesWithAward}
       categories={categories}
       staffList={staffList}
       actorList={actorList}

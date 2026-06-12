@@ -10,6 +10,7 @@ import MovieHero from "@/components/movie/heros/movie-hero";
 interface HomeViewProps {
   recommendedMovies: Movie[];
   popularMovies: Movie[];
+  awardsMovies: Movie[];
   categories: Category[];
   staffList: CrewMember[];
   actorList: CrewMember[];
@@ -25,6 +26,7 @@ interface HomeViewProps {
 export default function HomeView({
   recommendedMovies,
   popularMovies,
+  awardsMovies,
   categories,
   staffList,
   actorList,
@@ -36,7 +38,7 @@ export default function HomeView({
   handlePlayMovie,
   handleToggleFavorite,
 }: HomeViewProps) {
-  const universityName = universityMovies[0]?.university?.name;
+  const universityName = universityMovies[0]?.university;
 
   return (
     <main className="flex-1 flex flex-col">
@@ -57,6 +59,14 @@ export default function HomeView({
             onToggleFavorite={handleToggleFavorite}
           />
         )}
+
+        <MovieRow
+          title="ชนะรางวัล"
+          movies={awardsMovies}
+          onPlayClick={handlePlayMovie}
+          favorites={favorites}
+          onToggleFavorite={handleToggleFavorite}
+        />
 
         <MovieRow
           title="ถูกใจผู้ชม"

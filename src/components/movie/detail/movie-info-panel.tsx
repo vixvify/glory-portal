@@ -17,26 +17,33 @@ function InfoRow({ label, value, withBorder = false }: InfoRowProps) {
         withBorder ? "pt-3 border-t border-zinc-900/40" : ""
       }`}
     >
-      <span className="text-zinc-550 font-light whitespace-nowrap">{label}</span>
-      <span className="text-zinc-200 font-medium text-right max-w-40">{value}</span>
+      <span className="text-zinc-550 font-light whitespace-nowrap">
+        {label}
+      </span>
+      <span className="text-zinc-200 font-medium text-right max-w-40">
+        {value}
+      </span>
     </div>
   );
 }
 
 export default function MovieInfoPanel({ movie }: Props) {
   const rows = [
-    movie.university && { label: "มหาวิทยาลัย / สถาบัน", value: movie.university.name },
-    movie.school && { label: "โรงเรียน", value: movie.school.name },
+    movie.university && {
+      label: "มหาวิทยาลัย / สถาบัน",
+      value: movie.university,
+    },
+    movie.school && { label: "โรงเรียน", value: movie.school },
     movie.studio && { label: "ค่าย / สังกัด", value: movie.studio },
-    movie.language && { label: "ภาษา", value: movie.language.name },
+    movie.language && { label: "ภาษา", value: movie.language },
     movie.aspectRatio && {
       label: "อัตราส่วนภาพ",
       value:
         movie.aspectRatio === "landscape"
           ? "แนวนอน"
           : movie.aspectRatio === "portrait"
-          ? "แนวตั้ง"
-          : movie.aspectRatio,
+            ? "แนวตั้ง"
+            : movie.aspectRatio,
     },
     movie.colorType && {
       label: "โทนสี",
@@ -44,15 +51,16 @@ export default function MovieInfoPanel({ movie }: Props) {
         movie.colorType === "color"
           ? "ภาพสี"
           : movie.colorType === "black_and_white"
-          ? "ขาวดำ"
-          : movie.colorType === "color_and_black_and_white"
-          ? "ภาพสีและขาวดำ"
-          : movie.colorType,
+            ? "ขาวดำ"
+            : movie.colorType === "color_and_black_and_white"
+              ? "ภาพสีและขาวดำ"
+              : movie.colorType,
     },
-    movie.awards && movie.awards.length > 0 && {
-      label: "รางวัลที่ได้รับ",
-      value: movie.awards.filter(Boolean).join(", "),
-    },
+    movie.awards &&
+      movie.awards.length > 0 && {
+        label: "รางวัลที่ได้รับ",
+        value: movie.awards.filter(Boolean).join(", "),
+      },
   ].filter(Boolean) as { label: string; value: string }[];
 
   if (rows.length === 0) return null;
