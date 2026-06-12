@@ -5,8 +5,8 @@ export const COLOR_OPTIONS = [
 ];
 
 export const ASPECT_RATIO_OPTIONS = [
-  { value: "แนวนอน", label: "แนวนอน" },
-  { value: "แนวตั้ง", label: "แนวตั้ง" },
+  { value: "landscape", label: "แนวนอน" },
+  { value: "portrait", label: "แนวตั้ง" },
 ];
 
 export const CONTENT_WARNING_OPTIONS = [
@@ -16,8 +16,8 @@ export const CONTENT_WARNING_OPTIONS = [
 
 export const DROPDOWN_PLACEHOLDERS = {
   LANGUAGE: { value: "", label: "เลือกภาษาของภาพยนตร์..." },
-  TARGET_GROUP: { value: "", label: "เลือกกลุ่มเป้าหมาย..." },
   UNIVERSITY: { value: "", label: "ไม่ระบุ / เลือกสถาบันการศึกษา..." },
+  SCHOOL: { value: "", label: "ไม่ระบุ / เลือกโรงเรียน..." },
 };
 
 export const CREW_TAB_OPTIONS = [
@@ -39,6 +39,10 @@ export const CREW_MAPPING = [
 ] as const;
 
 export type CrewTabId = (typeof CREW_TAB_OPTIONS)[number]["id"];
+
+export const AGE_RATING_OPTIONS = ["G", "PG", "PG-13", "NC-17", "R"];
+
+export const LANGUAGE_OPTIONS = ["ไทย", "อังกฤษ", "เกาหลี", "ญี่ปุ่น", "จีน"];
 
 export const CREW_TAB_CONFIG = [
   {

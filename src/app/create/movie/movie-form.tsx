@@ -11,14 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
-import {
-  Movie,
-  Category,
-  AgeRating,
-  University,
-  Language,
-  TargetGroup,
-} from "@/core/domain/movie";
+import { SearchSelect } from "@/components/ui/search-select";
+import { Movie, Category } from "@/core/domain/movie";
 import { CrewMember } from "@/core/domain/crew";
 import { parseSchema } from "@/lib/validation";
 import { createMovieSchema, updateMovieSchema } from "@/core/schema/movie";
@@ -29,9 +23,10 @@ import {
   COLOR_OPTIONS,
   ASPECT_RATIO_OPTIONS,
   CONTENT_WARNING_OPTIONS,
-  DROPDOWN_PLACEHOLDERS,
   CREW_TAB_OPTIONS,
   CrewTabId,
+  AGE_RATING_OPTIONS,
+  LANGUAGE_OPTIONS,
 } from "@/core/constants/movie-form";
 import {
   useCreateMovieMutation,
@@ -47,10 +42,7 @@ import { CrewSection } from "@/components/crew/crew-section";
 interface MovieFormProps {
   editingMovie?: Movie | null;
   categories: Category[];
-  ageRatings: AgeRating[];
-  universities: University[];
-  languages: Language[];
-  targetGroups: TargetGroup[];
+  universities: string[];
   availableCrew: CrewMember[];
 }
 
@@ -61,13 +53,13 @@ type MovieFormInputs = {
   thumbnail?: File | null;
   youtubeUrl: string;
   trailerUrl?: string;
-  year: number;
+  releaseDate: string;
   aspectRatio: string;
-  ageRatingId: string;
+  ageRating: string;
   duration: number;
-  universityId?: string;
-  languageId?: string;
-  targetGroupId?: string;
+  university?: string;
+  school?: string;
+  language?: string;
   hasProfanity: boolean;
   hasDrugs: boolean;
   colorType: string;
@@ -79,6 +71,7 @@ type MovieFormInputs = {
   dop?: string[];
   editor?: string[];
   btsVideo?: string[];
+  awards?: string[];
 };
 
 const DEFAULT_CREW_ITEM: CrewStateItem = { id: "", name: "", email: "" };
@@ -95,10 +88,7 @@ const INITIAL_CREW_STATE: Record<CrewTabId, CrewStateItem[]> = {
 export const MovieForm: React.FC<MovieFormProps> = ({
   editingMovie = null,
   categories,
-  ageRatings,
   universities,
-  languages,
-  targetGroups,
   availableCrew,
 }) => {
   const router = useRouter();
@@ -150,6 +140,20 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     [],
   );
 
+  const [affiliationType, setAffiliationType] = useState<
+    "university" | "school" | "studio"
+  >(() => {
+    if (editingMovie?.school) return "school";
+    if (editingMovie?.studio) return "studio";
+    return "university";
+  });
+
+  const [awards, setAwards] = useState<string[]>(() =>
+    editingMovie?.awards && editingMovie.awards.length > 0
+      ? editingMovie.awards
+      : [""],
+  );
+
   const {
     register,
     handleSubmit,
@@ -163,11 +167,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           categoryId: editingMovie.category.id,
           thumbnail: null,
           trailerUrl: editingMovie.trailerUrl || "",
-          aspectRatio: editingMovie.aspectRatio || "แนวนอน",
-          ageRatingId: editingMovie.ageRating.id,
-          universityId: editingMovie.university?.id || "",
-          languageId: editingMovie.language?.id || "",
-          targetGroupId: editingMovie.targetGroup?.id || "",
+          aspectRatio: editingMovie.aspectRatio || "landscape",
+          ageRating: editingMovie.ageRating || "",
+          university: editingMovie.university || "",
+          school: editingMovie.school || "",
+          language: editingMovie.language || "",
           hasProfanity: editingMovie.hasProfanity ?? false,
           hasDrugs: editingMovie.hasDrugs ?? false,
           colorType: editingMovie.colorType || "color",
@@ -179,6 +183,12 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           dop: [],
           editor: [],
           btsVideo: editingMovie.btsVideos || [],
+          awards: editingMovie.awards || [],
+          releaseDate: editingMovie.releaseDate
+            ? typeof editingMovie.releaseDate === "string"
+              ? editingMovie.releaseDate.split("T")[0]
+              : editingMovie.releaseDate.toISOString().split("T")[0]
+            : "",
         }
       : {
           title: "",
@@ -187,13 +197,13 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           thumbnail: null,
           youtubeUrl: "",
           trailerUrl: "",
-          year: new Date().getFullYear(),
-          aspectRatio: "แนวนอน",
-          ageRatingId: ageRatings[0]?.id || "",
+          releaseDate: new Date().toISOString().split("T")[0],
+          aspectRatio: "landscape",
+          ageRating: AGE_RATING_OPTIONS[0] || "",
           duration: 120,
-          universityId: "",
-          languageId: "",
-          targetGroupId: "",
+          university: "",
+          school: "",
+          language: LANGUAGE_OPTIONS[0],
           hasProfanity: false,
           hasDrugs: false,
           colorType: "color",
@@ -205,6 +215,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           dop: [],
           editor: [],
           btsVideo: [],
+          awards: [""],
         },
   });
 
@@ -230,13 +241,29 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     try {
       setIsSavingLocal(true);
       const activeVideos = btsVideos.map((v) => v.trim()).filter(Boolean);
+      const activeAwards = awards.map((a) => a.trim()).filter(Boolean);
+
+      let university = null;
+      let school = null;
+      let studio = null;
+
+      if (affiliationType === "university") {
+        university = data.university || null;
+      } else if (affiliationType === "school") {
+        school = data.school || null;
+      } else if (affiliationType === "studio") {
+        studio = data.studio || null;
+      }
 
       const rawPayload = {
         ...data,
         thumbnail: data.thumbnail || editingMovie?.thumbnail,
-        year: Number(data.year),
         duration: Number(data.duration),
         btsVideo: activeVideos,
+        awards: activeAwards,
+        university,
+        school,
+        studio,
         director: mapStateToCrewInput(crewState.director),
         producer: mapStateToCrewInput(crewState.producer),
         writer: mapStateToCrewInput(crewState.writer),
@@ -250,6 +277,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         const updatedPayload: UpdateMovie = {
           ...validated,
           id: editingMovie.id,
+          awards: validated.awards ?? undefined,
           thumbnail:
             validated.thumbnail instanceof File ||
             typeof validated.thumbnail === "string"
@@ -263,6 +291,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         const validated = parseSchema(createMovieSchema, rawPayload);
         const createPayload: CreateMovie = {
           ...validated,
+          awards: validated.awards ?? undefined,
           thumbnail: validated.thumbnail as File,
         };
 
@@ -307,7 +336,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             <div className="space-y-2">
               <Input
                 label="ลิงก์ภาพยนตร์"
-                placeholder="https://www.youtube.com/watch?v=..."
+                placeholder="กรอกลิงก์ภาพยนตร์"
                 error={errors.youtubeUrl?.message}
                 {...register("youtubeUrl", {
                   required: "กรุณากรอกลิงก์ภาพยนตร์",
@@ -318,15 +347,15 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
             <Input
               label="ชื่อเรื่อง"
-              placeholder="เช่น Interstellar"
+              placeholder="กรอกชื่อภาพยนตร์"
               error={errors.title?.message}
               {...register("title", {
                 required: "กรุณากรอกชื่อเรื่อง",
               })}
             />
 
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-zinc-400">
+            <div className="space-y-1 w-full text-left">
+              <label className="text-xs text-zinc-400 font-medium block">
                 เรื่องย่อขนาดสั้น (ไม่เกิน 200 คำ)
               </label>
               <textarea
@@ -335,11 +364,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 {...register("description", {
                   required: "กรุณากรอกเรื่องย่อภาพยนตร์",
                 })}
-                className={`w-full bg-black/40 border ${
+                className={`w-full bg-zinc-900 border ${
                   errors.description
-                    ? "border-red-500"
+                    ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
                     : "border-zinc-800 focus:border-brand"
-                } rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors resize-none`}
+                } rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none transition-colors placeholder-zinc-650 font-light resize-none`}
               />
               {errors.description && (
                 <span className="text-[10px] text-red-500 block pl-1 font-semibold">
@@ -360,39 +389,24 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               />
               <Select
                 label="เรตอายุที่แนะนำ"
-                error={errors.ageRatingId?.message}
-                {...register("ageRatingId", { required: "กรุณาเลือกเรตอายุ" })}
-                options={ageRatings.map((rating) => ({
-                  value: rating.id,
-                  label: rating.name,
+                error={errors.ageRating?.message}
+                {...register("ageRating", { required: "กรุณาเลือกเรตอายุ" })}
+                options={AGE_RATING_OPTIONS.map((rating) => ({
+                  value: rating,
+                  label: rating,
                 }))}
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <Select
                 label="ภาษา"
-                error={errors.languageId?.message}
-                {...register("languageId")}
-                options={[
-                  DROPDOWN_PLACEHOLDERS.LANGUAGE,
-                  ...languages.map((lang) => ({
-                    value: lang.id,
-                    label: lang.name,
-                  })),
-                ]}
-              />
-              <Select
-                label="กลุ่มเป้าหมายผู้ชม"
-                error={errors.targetGroupId?.message}
-                {...register("targetGroupId")}
-                options={[
-                  DROPDOWN_PLACEHOLDERS.TARGET_GROUP,
-                  ...targetGroups.map((tg) => ({
-                    value: tg.id,
-                    label: tg.name,
-                  })),
-                ]}
+                error={errors.language?.message}
+                {...register("language")}
+                options={LANGUAGE_OPTIONS.map((language) => ({
+                  value: language,
+                  label: language,
+                }))}
               />
               <Select
                 label="โทนสีภาพยนตร์"
@@ -406,14 +420,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <Input
-                label="ปีที่ฉาย"
-                type="number"
-                placeholder="เช่น 2014"
-                error={errors.year?.message}
-                {...register("year", {
-                  required: "กรุณากรอกปีที่ฉาย",
-                  min: { value: 1900, message: "ปีที่ฉายต้องไม่เก่ากว่า 1900" },
-                  max: { value: 2100, message: "ปีที่ฉายต้องไม่เกิน 2100" },
+                label="วันที่เผยแพร่"
+                type="date"
+                error={errors.releaseDate?.message}
+                {...register("releaseDate", {
+                  required: "กรุณาเลือกวันที่เผยแพร่",
                 })}
               />
               <Select
@@ -426,7 +437,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               />
               <Input
                 label="ความยาวภาพยนตร์ (นาที)"
-                placeholder="เช่น 120"
+                placeholder="กรอกความยาวภาพยนตร์"
                 error={errors.duration?.message}
                 {...register("duration", {
                   required: "กรุณากรอกความยาวภาพยนตร์",
@@ -434,26 +445,89 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               />
             </div>
 
-            <Select
-              label="สถาบัน"
-              error={errors.universityId?.message}
-              {...register("universityId")}
-              options={[
-                DROPDOWN_PLACEHOLDERS.UNIVERSITY,
-                ...universities.map((uni) => ({
-                  value: uni.id,
-                  label: uni.name,
-                })),
-              ]}
-            />
+            <div className="space-y-4 pt-2 border-t border-zinc-800/40">
+              <div className="space-y-2">
+                <label className="text-xs text-zinc-400 font-medium block">
+                  ส่งผลงานในนาม
+                </label>
+                <div className="flex gap-2 bg-zinc-900/50 p-1.5 rounded-lg w-fit border border-zinc-800/60">
+                  {(["university", "school", "studio"] as const).map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => setAffiliationType(type)}
+                      className={`px-4 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer border-0 ${
+                        affiliationType === type
+                          ? "bg-brand text-zinc-950 font-bold shadow-md"
+                          : "text-zinc-450 hover:text-white hover:bg-zinc-850/50"
+                      }`}
+                    >
+                      {type === "university"
+                        ? "มหาวิทยาลัย"
+                        : type === "school"
+                          ? "โรงเรียน"
+                          : "สตูดิโอ / ค่ายอิสระ"}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <Input
-                label="สังกัด"
-                placeholder="พิมพ์ชื่อสังกัดหรือสตูดิโอ..."
-                error={errors.studio?.message}
-                {...register("studio")}
-              />
+              {affiliationType === "university" && (
+                <div className="space-y-1 animate-fade-in relative z-20">
+                  <Controller
+                    name="university"
+                    control={control}
+                    render={({ field }) => (
+                      <SearchSelect
+                        label="มหาวิทยาลัย"
+                        placeholder="พิมพ์เพื่อค้นหา หรือเลือกมหาวิทยาลัย..."
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        error={errors.university?.message}
+                        options={universities.map((uni) => ({
+                          value: uni,
+                          label: uni,
+                        }))}
+                      />
+                    )}
+                  />
+                </div>
+              )}
+
+              {affiliationType === "school" && (
+                <div className="space-y-1 animate-fade-in relative z-20">
+                  <Input
+                    label="โรงเรียน"
+                    placeholder="กรอกชื่อโรงเรียนที่ผลิต"
+                    error={errors.school?.message}
+                    {...register("school", {
+                      required:
+                        affiliationType === "school"
+                          ? "กรุณากรอกชื่อโรงเรียน"
+                          : false,
+                    })}
+                  />
+                </div>
+              )}
+
+              {affiliationType === "studio" && (
+                <div className="animate-fade-in">
+                  <Input
+                    label="สตูดิโอ / สังกัด"
+                    placeholder="กรอกชื่อสังกัดหรือสตูดิโอที่ผลิต"
+                    error={errors.studio?.message}
+                    {...register("studio", {
+                      required:
+                        affiliationType === "studio"
+                          ? "กรุณากรอกชื่อสตูดิโอ"
+                          : false,
+                    })}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 gap-6">
               <MultiSelect
                 label="คำเตือนเนื้อหา"
                 options={CONTENT_WARNING_OPTIONS}
@@ -471,8 +545,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 ">
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-zinc-300">
+              <div className="space-y-1 w-full text-left">
+                <label className="text-xs text-zinc-400 font-medium block">
                   ภาพปกภาพยนตร์
                 </label>
                 <div className="relative group/file">
@@ -504,17 +578,17 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     )}
                   />
                   <div
-                    className={`w-full bg-black/40 border ${
+                    className={`w-full bg-zinc-900 border ${
                       errors.thumbnail
-                        ? "border-red-500"
+                        ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
                         : "border-zinc-800 group-hover/file:border-brand"
-                    } rounded-xl px-4 py-3 text-sm text-zinc-400 flex items-center justify-between transition-colors`}
+                    } rounded-lg px-4 py-2.5 text-sm text-zinc-450 flex items-center justify-between transition-colors min-h-[42px] font-light`}
                   >
                     <span
                       className={
                         selectedFileName
                           ? "text-white font-medium truncate max-w-[70%]"
-                          : "text-zinc-400"
+                          : "text-zinc-600"
                       }
                     >
                       {selectedFileName || "อัปโหลดภาพปกภาพยนตร์..."}
@@ -572,15 +646,15 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               <div className="space-y-2">
                 <Input
                   label="ลิงก์ตัวอย่างภาพยนตร์"
-                  placeholder="https://www.youtube.com/watch?v=..."
+                  placeholder="กรอกลิงก์ตัวอย่างภาพยนตร์"
                   error={errors.trailerUrl?.message}
                   {...register("trailerUrl")}
                 />
                 <YoutubePreview url={watchedTrailerUrl} />
               </div>
 
-              <div className="space-y-2 pt-4 ">
-                <label className="text-xs font-semibold text-zinc-300">
+              <div className="space-y-1 w-full text-left pt-4">
+                <label className="text-xs text-zinc-400 font-medium block">
                   ลิงก์วิดีโอเบื้องหลัง
                 </label>
                 <div className="space-y-4">
@@ -589,14 +663,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       <div className="flex gap-2 items-center">
                         <Input
                           type="text"
-                          placeholder="https://www.youtube.com/watch?v=..."
+                          placeholder="กรอกลิงก์วิดีโอเบื้องหลัง"
                           value={videoUrl}
                           onChange={(e) => {
                             const newVideos = [...btsVideos];
                             newVideos[idx] = e.target.value;
                             setBtsVideos(newVideos);
                           }}
-                          className="flex-1 bg-black/40 border-zinc-800 focus:border-brand rounded-xl"
+                          className="flex-1"
                         />
                         {btsVideos.length > 1 && (
                           <Button
@@ -607,7 +681,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                                 btsVideos.filter((_, i) => i !== idx),
                               )
                             }
-                            className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-md border border-red-500/20 transition-all h-auto"
+                            className="px-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg border border-red-500/20 transition-all h-[42px] flex items-center justify-center flex-shrink-0"
                           >
                             <CloseIcon className="text-sm" />
                           </Button>
@@ -624,6 +698,49 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   >
                     <AddIcon className="text-sm" />{" "}
                     เพิ่มลิงก์วิดีโอเบื้องหลังอื่น
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-1 w-full text-left pt-4">
+                <label className="text-xs text-zinc-400 font-medium block">
+                  รางวัลที่ได้รับ
+                </label>
+                <div className="space-y-4">
+                  {awards.map((awardName, idx) => (
+                    <div key={idx} className="flex gap-2 items-center">
+                      <Input
+                        type="text"
+                        placeholder="กรอกชื่อรางวัลที่ได้รับ (ถ้ามี)"
+                        value={awardName}
+                        onChange={(e) => {
+                          const newAwards = [...awards];
+                          newAwards[idx] = e.target.value;
+                          setAwards(newAwards);
+                        }}
+                        className="flex-1"
+                      />
+                      {awards.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          onClick={() =>
+                            setAwards(awards.filter((_, i) => i !== idx))
+                          }
+                          className="px-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg border border-red-500/20 transition-all h-[42px] flex items-center justify-center flex-shrink-0"
+                        >
+                          <CloseIcon className="text-sm" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => setAwards([...awards, ""])}
+                    className="py-2 px-4 text-xs w-fit flex items-center gap-1.5 rounded-md bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 transition-colors"
+                  >
+                    <AddIcon className="text-sm" /> เพิ่มรางวัลอื่น
                   </Button>
                 </div>
               </div>

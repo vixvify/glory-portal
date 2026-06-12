@@ -62,7 +62,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
   const displayValue = selectedLabels || placeholder;
 
   return (
-    <div ref={containerRef} className={`space-y-1 w-full text-left relative ${className}`}>
+    <div ref={containerRef} className={`space-y-1 w-full text-left relative ${isOpen ? "z-50" : "z-10"} ${className}`}>
       {label && (
         <label className="text-xs text-zinc-400 font-medium block">
           {label}

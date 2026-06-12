@@ -26,13 +26,32 @@ function InfoRow({ label, value, withBorder = false }: InfoRowProps) {
 export default function MovieInfoPanel({ movie }: Props) {
   const rows = [
     movie.university && { label: "มหาวิทยาลัย / สถาบัน", value: movie.university.name },
+    movie.school && { label: "โรงเรียน", value: movie.school.name },
     movie.studio && { label: "ค่าย / สังกัด", value: movie.studio },
-    movie.targetGroup && { label: "กลุ่มเป้าหมาย", value: movie.targetGroup.name },
     movie.language && { label: "ภาษา", value: movie.language.name },
-    movie.aspectRatio && { label: "อัตราส่วนภาพ", value: movie.aspectRatio },
+    movie.aspectRatio && {
+      label: "อัตราส่วนภาพ",
+      value:
+        movie.aspectRatio === "landscape"
+          ? "แนวนอน"
+          : movie.aspectRatio === "portrait"
+          ? "แนวตั้ง"
+          : movie.aspectRatio,
+    },
     movie.colorType && {
       label: "โทนสี",
-      value: movie.colorType === "color" ? "ภาพสี" : "ขาวดำ",
+      value:
+        movie.colorType === "color"
+          ? "ภาพสี"
+          : movie.colorType === "black_and_white"
+          ? "ขาวดำ"
+          : movie.colorType === "color_and_black_and_white"
+          ? "ภาพสีและขาวดำ"
+          : movie.colorType,
+    },
+    movie.awards && movie.awards.length > 0 && {
+      label: "รางวัลที่ได้รับ",
+      value: movie.awards.filter(Boolean).join(", "),
     },
   ].filter(Boolean) as { label: string; value: string }[];
 

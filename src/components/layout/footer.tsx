@@ -13,7 +13,6 @@ export default function Footer() {
 
   return (
     <footer className="relative z-30 bg-zinc-950/40 border-t border-white/5 pt-16 pb-8 px-6 md:px-16 text-zinc-400 select-none overflow-hidden">
-
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12 relative z-10">
         <div className="lg:col-span-2 space-y-6">
           <Link
@@ -126,13 +125,13 @@ export default function Footer() {
           </h4>
           <ul className="space-y-2.5 text-xs md:text-sm font-light">
             {[
-              { label: "ภาพยนตร์ดราม่า", href: "/movies/category/drama" },
-              { label: "ตลก / คอมเมดี้", href: "/movies/category/comedy" },
+              { label: "ภาพยนตร์ดราม่า", href: "/movies/category/Drama" },
+              { label: "ตลก / คอมเมดี้", href: "/movies/category/Comedy" },
               {
                 label: "สยองขวัญ / ระทึกขวัญ",
-                href: "/movies/category/horror",
+                href: "/movies/category/Horror",
               },
-              { label: "ไซไฟ / แฟนตาซี", href: "/movies/category/sci-fi" },
+              { label: "ไซไฟ / แฟนตาซี", href: "/movies/category/Sci-Fi" },
             ].map((link) => (
               <li key={link.label}>
                 <Link

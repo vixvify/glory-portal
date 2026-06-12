@@ -55,7 +55,7 @@ export const CrewSection: React.FC<CrewSectionProps> = ({
               />
               <Input
                 type="email"
-                placeholder="เช่น example@email.com"
+                placeholder="กรอกอีเมล"
                 value={item.email}
                 readOnly={!!item.id}
                 onChange={(e) => {
@@ -63,7 +63,7 @@ export const CrewSection: React.FC<CrewSectionProps> = ({
                   newList[idx] = { ...newList[idx], email: e.target.value };
                   setList(newList);
                 }}
-                className="bg-black/25 border-zinc-900/80 focus:border-brand/45 rounded-lg py-1.5 text-xs text-zinc-300 read-only:opacity-60 read-only:cursor-not-allowed h-8"
+                className="read-only:opacity-60 read-only:cursor-not-allowed"
                 icon={<EmailIcon className="text-sm" />}
               />
             </div>

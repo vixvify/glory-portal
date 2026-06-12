@@ -20,7 +20,7 @@ import { LOCALIZATION } from "@/core/constants/localization";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 import { MovieFilterParams } from "@/core/domain/movie";
 
-type Sortby = "title" | "year" | "views";
+type Sortby = "title" | "releasedate" | "views";
 
 export default function AdminMoviesPage() {
   const router = useRouter();
@@ -142,7 +142,7 @@ export default function AdminMoviesPage() {
                 onChange={(val) => setSortBy(val as Sortby)}
                 options={[
                   { value: "title", label: "ตามตัวอักษร" },
-                  { value: "year", label: "ปีที่ฉาย" },
+                  { value: "releasedate", label: "ปีที่ฉาย" },
                   { value: "views", label: "ยอดความนิยม" },
                 ]}
               />

@@ -1,4 +1,4 @@
-import { Category, University, AgeRating, Language, TargetGroup } from "../domain/movie";
+import { Category } from "../domain/movie";
 import { MasterDataRepository } from "../ports/master-data.repository";
 
 export class MasterDataService {
@@ -17,20 +17,7 @@ export class MasterDataService {
     }
   }
 
-  async getAgeRatings(): Promise<AgeRating[]> {
-    try {
-      const response = await this.masterDataRepository.getAgeRatings();
-      if (response.error) {
-        throw new Error(response.error);
-      }
-      return response.data;
-    } catch (error) {
-      console.error("Error in getAgeRatings:", error);
-      throw error;
-    }
-  }
-
-  async getUniversities(): Promise<University[]> {
+  async getUniversities(): Promise<string[]> {
     try {
       const response = await this.masterDataRepository.getUniversities();
       if (response.error) {
@@ -39,32 +26,6 @@ export class MasterDataService {
       return response.data;
     } catch (error) {
       console.error("Error in getUniversities:", error);
-      throw error;
-    }
-  }
-
-  async getLanguages(): Promise<Language[]> {
-    try {
-      const response = await this.masterDataRepository.getLanguages();
-      if (response.error) {
-        throw new Error(response.error);
-      }
-      return response.data;
-    } catch (error) {
-      console.error("Error in getLanguages:", error);
-      throw error;
-    }
-  }
-
-  async getTargetGroups(): Promise<TargetGroup[]> {
-    try {
-      const response = await this.masterDataRepository.getTargetGroups();
-      if (response.error) {
-        throw new Error(response.error);
-      }
-      return response.data;
-    } catch (error) {
-      console.error("Error in getTargetGroups:", error);
       throw error;
     }
   }

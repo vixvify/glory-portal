@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
 import {
@@ -28,13 +28,13 @@ export default function UniversityPage() {
   const { data: landscapeMovies = [] } = useMoviesQuery({
     search: universityName,
     searchby: "university",
-    aspectRatio: "แนวนอน",
+    aspectRatio: "landscape",
   });
 
   const { data: portraitMovies = [] } = useMoviesQuery({
     search: universityName,
     searchby: "university",
-    aspectRatio: "แนวตั้ง",
+    aspectRatio: "portrait",
   });
 
   const { data: favorites = [] } = useFavoritesQuery(!!currentUser);

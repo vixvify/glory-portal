@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import { Movie, Category } from "@/core/domain/movie";
 import { CrewMember } from "@/core/domain/crew";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
@@ -14,9 +13,9 @@ interface HomeViewProps {
   categories: Category[];
   staffList: CrewMember[];
   actorList: CrewMember[];
+  moviesByRating: Movie[];
   universityMovies: Movie[];
-  categoryMoviesByViews: Record<string, Movie[]>;
-  categoryMoviesByRating: Record<string, Movie[]>;
+  categoryMoviesMap: Record<string, Movie[]>;
   favorites: Movie[];
   portraitMovies: Movie[];
   handlePlayMovie: (movie: Movie) => void;
@@ -30,8 +29,8 @@ export default function HomeView({
   staffList,
   actorList,
   universityMovies,
-  categoryMoviesByViews,
-  categoryMoviesByRating,
+  categoryMoviesMap,
+  moviesByRating,
   favorites,
   portraitMovies,
   handlePlayMovie,
@@ -59,8 +58,16 @@ export default function HomeView({
           />
         )}
 
+        <MovieRow
+          title="ถูกใจผู้ชม"
+          movies={moviesByRating}
+          onPlayClick={handlePlayMovie}
+          favorites={favorites}
+          onToggleFavorite={handleToggleFavorite}
+        />
+
         <MovieRankRow
-          title="หนังยอดนิยม"
+          title="ติดอันดับ"
           movies={popularMovies}
           onPlayClick={handlePlayMovie}
           favorites={favorites}
@@ -77,9 +84,16 @@ export default function HomeView({
           />
         )}
 
-        {staffList.length > 0 && <CrewRow title="ทีมงาน" crew={staffList} />}
-
-        {actorList.length > 0 && <CrewRow title="นักแสดง" crew={actorList} />}
+        {categories.map((category) => (
+          <MovieRow
+            key={`${category.id}-views`}
+            title={`${CATEGORY_TITLE_MAPPING[category.name]}`}
+            movies={categoryMoviesMap[category.id] || []}
+            onPlayClick={handlePlayMovie}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
+          />
+        ))}
 
         <MovieRowPortrait
           title="ภาพยนตร์แนวตั้ง"
@@ -89,26 +103,9 @@ export default function HomeView({
           onToggleFavorite={handleToggleFavorite}
         />
 
-        {categories.map((category) => (
-          <Fragment key={category.id}>
-            <MovieRow
-              key={`${category.id}-views`}
-              title={`${CATEGORY_TITLE_MAPPING[category.name]}ยอดนิยม`}
-              movies={categoryMoviesByViews[category.id] || []}
-              onPlayClick={handlePlayMovie}
-              favorites={favorites}
-              onToggleFavorite={handleToggleFavorite}
-            />
-            <MovieRow
-              key={`${category.id}-rating`}
-              title={`${CATEGORY_TITLE_MAPPING[category.name]}ถูกใจผู้ชม`}
-              movies={categoryMoviesByRating[category.id] || []}
-              onPlayClick={handlePlayMovie}
-              favorites={favorites}
-              onToggleFavorite={handleToggleFavorite}
-            />
-          </Fragment>
-        ))}
+        {staffList.length > 0 && <CrewRow title="ทีมงาน" crew={staffList} />}
+
+        {actorList.length > 0 && <CrewRow title="นักแสดง" crew={actorList} />}
       </div>
     </main>
   );
