@@ -26,13 +26,6 @@ export function Toast() {
     warning: "border-amber-500/20",
   };
 
-  const glows = {
-    success: "bg-emerald-500/10",
-    error: "bg-red-500/10",
-    info: "bg-blue-500/10",
-    warning: "bg-amber-500/10",
-  };
-
   return (
     <div
       className={`fixed top-6 right-6 z-[9999] flex items-center gap-3 max-w-sm px-4 py-3 rounded-xl border bg-zinc-950/80 backdrop-blur-md shadow-2xl transition-all duration-300 ${
@@ -43,8 +36,6 @@ export function Toast() {
           : "opacity-0 -translate-y-4 scale-95 pointer-events-none"
       }`}
     >
-
-
       <div className="relative z-10 flex-shrink-0">{icons[toast.type]}</div>
 
       <div className="relative z-10 flex-grow pr-2">

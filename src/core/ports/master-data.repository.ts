@@ -1,5 +1,5 @@
 import { ApiResponse } from "@/core/ports/response";
-import { Category, Language } from "../domain/movie";
+import { Category } from "../domain/movie";
 
 export interface MasterDataRepository {
   getCategories(): Promise<ApiResponse<Category[]>>;

@@ -1,4 +1,4 @@
-import { Category, Language } from "../domain/movie";
+import { Category } from "../domain/movie";
 import { MasterDataRepository } from "../ports/master-data.repository";
 
 export class MasterDataService {
