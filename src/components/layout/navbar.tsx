@@ -28,9 +28,9 @@ export default function Navbar() {
   const { data: favorites = [] } = useFavoritesQuery(!!currentUser);
   const logoutMutation = useLogoutMutation();
 
-  const [activeTab, setActiveTab] = useState<"category" | "university" | "favorites">(
-    "category",
-  );
+  const [activeTab, setActiveTab] = useState<
+    "category" | "university" | "favorites"
+  >("category");
 
   const onSignOut = () => {
     logoutMutation.mutate();
@@ -91,206 +91,182 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const getTitle = () => {
-    if (pathname === "/") return "หน้าหลัก";
-    if (pathname === "/movies/favorites") return "รายการของฉัน";
-    if (pathname.startsWith("/movies/category/")) {
-      const cat = pathname.split("/").pop();
-      if (cat === "all" || !cat) return "ภาพยนตร์";
-      return (
-        CATEGORY_TITLE_MAPPING[decodeURIComponent(cat)] ||
-        decodeURIComponent(cat)
-      );
-    }
-    if (pathname.startsWith("/movies/university/")) {
-      const uni = pathname.split("/").pop();
-      return decodeURIComponent(uni || "");
-    }
-    if (pathname === "/profile") return "โปรไฟล์";
-    if (pathname === "/create/movie") return "เพิ่มภาพยนตร์";
-    return "หน้าหลัก";
-  };
-
   if (pathname.startsWith("/watch")) {
     return null;
   }
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 flex flex-col px-6 md:px-16 transition-all duration-500 ease-out bg-zinc-950/50 backdrop-blur-md border-b border-white/5 shadow-2xl shadow-black/35 ${
-        isScrolled ? "py-3" : "py-4"
+      className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 md:px-16 transition-all duration-500 ease-out bg-zinc-950/50 backdrop-blur-md border-b border-white/5 shadow-2xl shadow-black/35 ${
+        isScrolled ? "py-2.5" : "py-5"
       }`}
       style={{ fontFamily: "var(--font-sans), Arial, Helvetica, sans-serif" }}
     >
-      <div className="flex items-center justify-between w-full h-12">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center gap-6">
+        <Link
+          href="/"
+          className="cursor-pointer transition-transform duration-300 hover:scale-[1.02] active:scale-95 flex items-center flex-shrink-0"
+        >
+          <Image
+            src="/logo.png"
+            alt="GLORY"
+            width={32}
+            height={32}
+            className="w-8 h-8 object-contain"
+            priority
+          />
+        </Link>
+
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar select-none">
           <Link
             href="/"
-            className="cursor-pointer transition-transform duration-300 hover:scale-[1.02] active:scale-95 flex items-center"
-          >
-            <Image
-              src="/logo.png"
-              alt="GLORY"
-              width={32}
-              height={32}
-              className="w-8 h-8 object-contain"
-              priority
-            />
-          </Link>
-          <span className="text-lg md:text-xl font-bold text-white tracking-wide ml-1">
-            {getTitle()}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-4 md:gap-5">
-          <div
-            className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-              isSearchExpanded
-                ? "w-40 md:w-64 glass-input border-white/10 scale-100 opacity-100"
-                : "w-8 bg-transparent border-transparent"
+            className={`px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all duration-300 whitespace-nowrap border ${
+              pathname === "/" && !showMoviesMenu
+                ? "bg-white/15 text-white border-white/20 font-semibold shadow-md"
+                : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/5"
             }`}
           >
-            <button
-              onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-              className="text-zinc-300 hover:text-white transition-colors cursor-pointer"
-            >
-              <SearchIcon className="text-xl" />
-            </button>
-            {isSearchExpanded && (
-              <>
-                <input
-                  type="text"
-                  placeholder={currentPlaceholder}
-                  value={searchQuery}
-                  onChange={(e) => {
-                    if (pathname !== "/") {
-                      router.push("/");
-                    }
-                    setSearchQuery(e.target.value);
-                  }}
-                  className="w-full bg-transparent text-sm text-white focus:outline-none placeholder-zinc-500"
-                  autoFocus
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery("")}
-                    className="text-zinc-400 hover:text-white transition-colors"
-                  >
-                    <CloseIcon className="text-sm" />
-                  </button>
-                )}
-              </>
-            )}
-          </div>
+            หน้าแรก
+          </Link>
 
-          {currentUser ? (
-            <div className="relative" ref={profileMenuRef}>
-              <button
-                onClick={() => setShowProfileMenu(!showProfileMenu)}
-                className="flex items-center gap-1.5 cursor-pointer group"
-              >
-                <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-black font-bold text-sm shadow-sm border border-brand/40">
-                  {(currentUser.name || currentUser.email || "U")
-                    .charAt(0)
-                    .toUpperCase()}
-                </div>
-              </button>
+          <button
+            onClick={() => {
+              router.push("/movies/trending");
+              setShowMoviesMenu(false);
+              setSearchQuery("");
+            }}
+            className={`px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all duration-300 whitespace-nowrap border ${
+              pathname === "/movies/trending"
+                ? "bg-white/15 text-white border-white/20 font-semibold shadow-md"
+                : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/5"
+            }`}
+          >
+            ใหม่และมาแรง
+          </button>
 
-              {showProfileMenu && (
-                <div className="absolute right-0 mt-4.5 w-48 bg-[#121110] border border-[#e5b842]/30 rounded-md p-2.5 shadow-2xl shadow-black/90 animate-fade-in z-50">
-                  <div className="px-3 py-2 border-b border-white/5 mb-1.5">
-                    <p className="text-xs text-white font-semibold truncate">
-                      {currentUser.name || currentUser.email}
-                    </p>
-                    <p className="text-[10px] text-zinc-450 truncate mt-0.5">
-                      {currentUser.email}
-                    </p>
-                  </div>
-                  <Link
-                    href="/profile"
-                    onClick={() => setShowProfileMenu(false)}
-                    className="w-full block text-left px-3 py-2 text-xs text-zinc-300 hover:text-brand hover:bg-brand/10 rounded-md cursor-pointer transition-colors mb-1"
-                  >
-                    โปรไฟล์ของฉัน
-                  </Link>
-                  <Link
-                    href="/create/movie"
-                    onClick={() => setShowProfileMenu(false)}
-                    className="w-full block text-left px-3 py-2 text-xs text-zinc-300 hover:text-brand hover:bg-brand/10 rounded-md cursor-pointer transition-colors mb-1"
-                  >
-                    เพิ่มภาพยนตร์
-                  </Link>
-                  <button
-                    onClick={() => {
-                      onSignOut();
-                      setShowProfileMenu(false);
-                    }}
-                    className="w-full text-left px-3 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md cursor-pointer transition-colors"
-                  >
-                    ออกจากระบบ
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <Button onClick={onSignInClick} size="sm">
-              เข้าสู่ระบบ
-            </Button>
-          )}
+          <button
+            ref={buttonRef}
+            onClick={() => setShowMoviesMenu(!showMoviesMenu)}
+            className={`flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all duration-300 whitespace-nowrap border ${
+              showMoviesMenu ||
+              pathname.startsWith("/movies/category") ||
+              pathname.startsWith("/movies/university")
+                ? "bg-white/15 text-white border-white/20 font-semibold shadow-md"
+                : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/5"
+            }`}
+          >
+            หมวดหมู่
+            <KeyboardArrowDownIcon
+              className={`text-sm transition-transform duration-300 ${
+                showMoviesMenu ? "rotate-180 text-brand" : "text-zinc-400"
+              }`}
+            />
+          </button>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2 w-full select-none mt-1">
-        <Link
-          href="/"
-          className={`px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all duration-300 whitespace-nowrap border ${
-            pathname === "/" && !showMoviesMenu
-              ? "bg-white/15 text-white border-white/20 font-semibold shadow-md"
-              : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/5"
+      {/* Right side: Search + User Actions */}
+      <div className="flex items-center gap-4 md:gap-5 flex-shrink-0">
+        <div
+          className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            isSearchExpanded
+              ? "w-40 md:w-64 glass-input border-white/10 scale-100 opacity-100"
+              : "w-8 bg-transparent border-transparent"
           }`}
         >
-          หน้าแรก
-        </Link>
+          <button
+            onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+            className="text-zinc-300 hover:text-white transition-colors cursor-pointer"
+          >
+            <SearchIcon className="text-xl" />
+          </button>
+          {isSearchExpanded && (
+            <>
+              <input
+                type="text"
+                placeholder={currentPlaceholder}
+                value={searchQuery}
+                onChange={(e) => {
+                  if (pathname !== "/") {
+                    router.push("/");
+                  }
+                  setSearchQuery(e.target.value);
+                }}
+                className="w-full bg-transparent text-sm text-white focus:outline-none placeholder-zinc-500"
+                autoFocus
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="text-zinc-400 hover:text-white transition-colors"
+                >
+                  <CloseIcon className="text-sm" />
+                </button>
+              )}
+            </>
+          )}
+        </div>
 
-        <button
-          onClick={() => {
-            router.push("/");
-            setShowMoviesMenu(false);
-            setSearchQuery("");
-          }}
-          className={`px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all duration-300 whitespace-nowrap border ${
-            pathname === "/" && !showMoviesMenu
-              ? "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/5"
-              : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/5"
-          }`}
-        >
-          ใหม่และมาแรง
-        </button>
+        {currentUser ? (
+          <div className="relative" ref={profileMenuRef}>
+            <button
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              className="flex items-center gap-1.5 cursor-pointer group"
+            >
+              <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-black font-bold text-sm shadow-sm border border-brand/40">
+                {(currentUser.name || currentUser.email || "U")
+                  .charAt(0)
+                  .toUpperCase()}
+              </div>
+            </button>
 
-        <button
-          ref={buttonRef}
-          onClick={() => setShowMoviesMenu(!showMoviesMenu)}
-          className={`flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all duration-300 whitespace-nowrap border ${
-            showMoviesMenu ||
-            pathname.startsWith("/movies/category") ||
-            pathname.startsWith("/movies/university")
-              ? "bg-white/15 text-white border-white/20 font-semibold shadow-md"
-              : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/5"
-          }`}
-        >
-          หมวดหมู่
-          <KeyboardArrowDownIcon
-            className={`text-sm transition-transform duration-300 ${
-              showMoviesMenu ? "rotate-180 text-brand" : "text-zinc-400"
-            }`}
-          />
-        </button>
+            {showProfileMenu && (
+              <div className="absolute right-0 mt-4.5 w-48 bg-[#121110] border border-[#e5b842]/30 rounded-md p-2.5 shadow-2xl shadow-black/90 animate-fade-in z-50">
+                <div className="px-3 py-2 border-b border-white/5 mb-1.5">
+                  <p className="text-xs text-white font-semibold truncate">
+                    {currentUser.name || currentUser.email}
+                  </p>
+                  <p className="text-[10px] text-zinc-400 truncate mt-0.5">
+                    {currentUser.email}
+                  </p>
+                </div>
+                <Link
+                  href="/profile"
+                  onClick={() => setShowProfileMenu(false)}
+                  className="w-full block text-left px-3 py-2 text-xs text-zinc-300 hover:text-brand hover:bg-brand/10 rounded-md cursor-pointer transition-colors mb-1"
+                >
+                  โปรไฟล์ของฉัน
+                </Link>
+                <Link
+                  href="/create/movie"
+                  onClick={() => setShowProfileMenu(false)}
+                  className="w-full block text-left px-3 py-2 text-xs text-zinc-300 hover:text-brand hover:bg-brand/10 rounded-md cursor-pointer transition-colors mb-1"
+                >
+                  เพิ่มภาพยนตร์
+                </Link>
+                <button
+                  onClick={() => {
+                    onSignOut();
+                    setShowProfileMenu(false);
+                  }}
+                  className="w-full text-left px-3 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md cursor-pointer transition-colors"
+                >
+                  ออกจากระบบ
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <Button onClick={onSignInClick} size="sm">
+            เข้าสู่ระบบ
+          </Button>
+        )}
       </div>
 
       {showMoviesMenu && (
         <div
           ref={moviesMenuRef}
-          className="absolute left-6 md:left-[230px] top-full mt-1.5 w-64 bg-[#121110] border border-[#e5b842]/30 rounded-md p-4 shadow-2xl shadow-black/90 animate-fade-in z-50"
+          className="absolute left-6 md:left-[170px] top-full mt-1.5 w-64 bg-[#121110] border border-[#e5b842]/30 rounded-md p-4 shadow-2xl shadow-black/90 animate-fade-in z-50"
         >
           <div className="flex border-b border-white/5 mb-3 pb-2 gap-1">
             <button
@@ -298,7 +274,7 @@ export default function Navbar() {
               className={`flex-1 text-center py-2 text-[10px] font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === "category"
                   ? "bg-brand/15 text-brand border border-brand/25"
-                  : "text-zinc-450 hover:text-white border border-transparent"
+                  : "text-zinc-400 hover:text-white border border-transparent"
               }`}
             >
               หมวดหมู่
@@ -308,7 +284,7 @@ export default function Navbar() {
               className={`flex-1 text-center py-2 text-[10px] font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === "university"
                   ? "bg-brand/15 text-brand border border-brand/25"
-                  : "text-zinc-450 hover:text-white border border-transparent"
+                  : "text-zinc-400 hover:text-white border border-transparent"
               }`}
             >
               มหาวิทยาลัย
@@ -318,7 +294,7 @@ export default function Navbar() {
               className={`flex-1 text-center py-2 text-[10px] font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === "favorites"
                   ? "bg-brand/15 text-brand border border-brand/25"
-                  : "text-zinc-450 hover:text-white border border-transparent"
+                  : "text-zinc-400 hover:text-white border border-transparent"
               }`}
             >
               รายการของฉัน
@@ -347,7 +323,7 @@ export default function Navbar() {
             ) : activeTab === "university" ? (
               <>
                 {universities.length === 0 ? (
-                  <p className="text-center text-zinc-550 py-3 text-xs font-light">
+                  <p className="text-center text-zinc-500 py-3 text-xs font-light">
                     ไม่มีข้อมูลมหาวิทยาลัย
                   </p>
                 ) : (
@@ -367,7 +343,11 @@ export default function Navbar() {
                 {!currentUser ? (
                   <div className="text-center text-zinc-500 py-4 text-xs font-light">
                     <p className="mb-2">กรุณาเข้าสู่ระบบเพื่อดูรายการของคุณ</p>
-                    <Button onClick={onSignInClick} size="sm" className="h-7 text-[10px] px-3">
+                    <Button
+                      onClick={onSignInClick}
+                      size="sm"
+                      className="h-7 text-[10px] px-3"
+                    >
                       เข้าสู่ระบบ
                     </Button>
                   </div>

@@ -42,14 +42,13 @@ export default function MovieRow({
             <ChevronLeftIcon className="text-3xl hover:scale-125 transition-transform" />
           </button>
         )}
-
         <div
           ref={rowRef}
           className="flex overflow-x-auto gap-4 py-4 px-1.5 no-scrollbar scroll-smooth snap-x snap-mandatory"
         >
           {movies.map((movie) => (
             <Link href={`/movies/${movie.id}`} key={movie.id}>
-              <div className="flex-none snap-start transition-all duration-300 w-[240px] sm:w-[300px] md:w-[350px]">
+              <div className="flex-none snap-start transition-all duration-300 w-[280px] sm:w-[340px] md:w-[400px]">
                 <MovieCard
                   movie={movie}
                   onPlayClick={onPlayClick}

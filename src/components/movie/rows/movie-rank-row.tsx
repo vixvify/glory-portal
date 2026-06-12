@@ -54,7 +54,7 @@ export default function MovieRankRow({
               <Link
                 href={`/movies/${movie.id}`}
                 key={movie.id}
-                className="relative flex-none snap-start transition-all duration-300 w-[240px] sm:w-[300px] md:w-[350px] group/rank"
+                className="relative flex-none snap-start transition-all duration-300 w-[280px] sm:w-[340px] md:w-[400px] group/rank"
               >
                 {/* Dark gradient overlay behind the rank number for better legibility */}
                 <div className="absolute top-0 left-0 w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-gradient-to-br from-black/85 via-black/45 to-transparent rounded-tl-lg z-20 pointer-events-none" />

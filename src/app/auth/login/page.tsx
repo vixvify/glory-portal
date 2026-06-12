@@ -96,6 +96,15 @@ export default function LoginPage() {
             {...register("password")}
           />
 
+          <div className="flex justify-end text-xs -mt-1 pb-1">
+            <Link
+              href="/auth/forgot-password"
+              className="text-zinc-400 hover:text-brand transition-colors cursor-pointer"
+            >
+              ลืมรหัสผ่าน?
+            </Link>
+          </div>
+
           <Button
             type="submit"
             isLoading={loginMutation.isPending}

@@ -133,6 +133,11 @@ export default function MovieHero({
           <span className="px-1.5 py-0.5 text-[10px] md:text-xs font-bold border border-zinc-700 text-zinc-300 rounded-sm leading-none bg-zinc-900/40">
             {currentMovie.ageRating?.name}
           </span>
+          {currentMovie.category && (
+            <span className="px-2.5 py-0.5 text-[10px] md:text-xs font-medium bg-white/10 border border-white/20 text-zinc-200 rounded-full">
+              {CATEGORY_TITLE_MAPPING[currentMovie.category.name] || currentMovie.category.name}
+            </span>
+          )}
         </div>
 
         <p
@@ -154,7 +159,7 @@ export default function MovieHero({
           <Button
             variant="outline"
             onClick={() => onToggleFavorite(currentMovie.id)}
-            className={`px-3 md:px-3 py-2.5 md:py-2 flex items-center gap-2 border transition-all ${
+            className={`px-3 md:px-5 py-2.5 md:py-2 flex items-center gap-2 border transition-all ${
               favorites.some((fav) => fav.id === currentMovie.id)
                 ? "bg-brand/10 border-brand/50 text-brand hover:border-brand/70"
                 : "bg-zinc-900/40 border-zinc-700/60 text-white hover:border-brand/40"
