@@ -7,6 +7,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { MovieCrew } from "@/core/domain/movie";
 import { useScrollRow } from "@/hooks/system/use-scroll-row";
+import { getCrewRoleLabel } from "@/core/constants/movie-form";
 
 interface Props {
   crew: MovieCrew[];
@@ -80,7 +81,7 @@ export default function MovieCrewRow({ crew }: Props) {
                   )}
                 </p>
                 <p className="text-[10px] text-brand uppercase tracking-widest font-medium mt-0.5 truncate">
-                  {member.role}
+                  {getCrewRoleLabel(member.role)}
                 </p>
               </div>
             </Link>

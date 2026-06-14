@@ -42,6 +42,14 @@ export function useMovieQueryById(id?: string) {
   });
 }
 
+export function useMovieWithAwardQuery(options?: { enabled?: boolean }) {
+  return useQuery<Movie[], Error>({
+    queryKey: ["movies", "with-award"],
+    queryFn: () => movieService.getMoviesWithAward(),
+    ...options,
+  });
+}
+
 export function useCreateMovieMutation() {
   const queryClient = useQueryClient();
   return useMutation<Movie, Error, CreateMovie>({
@@ -82,7 +90,10 @@ export function useMovieByUniversityQuery(university: string) {
 
 export function useCategoryMoviesQuery(categoryName: string) {
   return useQuery<Movie[], Error>({
-    queryKey: ["movies", { search: categoryName, searchby: "category", page: 1, pagesize: 10 }],
+    queryKey: [
+      "movies",
+      { search: categoryName, searchby: "category", page: 1, pagesize: 10 },
+    ],
     queryFn: () =>
       movieService.getMovies({
         search: categoryName,

@@ -16,12 +16,7 @@ import MovieCard from "@/components/movie/cards/movie-card";
 import MovieCardPortrait from "@/components/movie/cards/movie-card-portrait";
 import { Toast } from "@/components/ui/toast";
 
-const ROLE_MAPPING: Record<string, string> = {
-  director: "ผู้กำกับ",
-  producer: "ผู้อำนวยการสร้าง",
-  writer: "ผู้เขียนบท",
-  cast: "นักแสดง",
-};
+import { getCrewRoleLabel } from "@/core/constants/movie-form";
 
 export default function CrewProfilePage() {
   const params = useParams<{ id: string }>();
@@ -70,8 +65,7 @@ export default function CrewProfilePage() {
     const groups: Record<string, typeof crewMember.movies> = {};
 
     crewMember.movies.forEach((mc) => {
-      const roleLower = mc.role.toLowerCase();
-      const roleTitle = ROLE_MAPPING[roleLower] || mc.role;
+      const roleTitle = getCrewRoleLabel(mc.role);
 
       if (!groups[roleTitle]) {
         groups[roleTitle] = [];

@@ -17,6 +17,7 @@ import SearchView from "@/components/views/search-view";
 interface Props {
   recommendedMovies: Movie[];
   popularMovies: Movie[];
+  awardsMovies: Movie[];
   categories: Category[];
   staffList: CrewMember[];
   actorList: CrewMember[];
@@ -31,6 +32,7 @@ export default function HomePage(props: Props) {
   const {
     recommendedMovies,
     popularMovies,
+    awardsMovies,
     categories,
     staffList,
     actorList,
@@ -95,6 +97,7 @@ export default function HomePage(props: Props) {
         <HomeView
           recommendedMovies={recommendedMovies}
           popularMovies={popularMovies}
+          awardsMovies={awardsMovies}
           categories={categories}
           staffList={staffList}
           actorList={actorList}

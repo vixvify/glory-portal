@@ -71,6 +71,10 @@ export interface MovieCrewInputItem {
   email?: string | null;
 }
 
+export interface MovieCrewInputItemWithRole extends MovieCrewInputItem {
+  role: string;
+}
+
 export interface CreateMovie {
   title: string;
   description: string;
@@ -86,12 +90,7 @@ export interface CreateMovie {
   university?: string | null;
   school?: string | null;
   language?: string | null;
-  director?: MovieCrewInputItem[] | null;
-  producer?: MovieCrewInputItem[] | null;
-  writer?: MovieCrewInputItem[] | null;
-  cast?: MovieCrewInputItem[] | null;
-  dop?: MovieCrewInputItem[] | null;
-  editor?: MovieCrewInputItem[] | null;
+  crew?: MovieCrewInputItemWithRole[] | null;
   btsVideo?: string[] | null;
   hasProfanity?: boolean;
   hasDrugs?: boolean;
@@ -116,12 +115,7 @@ export interface UpdateMovie {
   university?: string | null;
   school?: string | null;
   language?: string | null;
-  director?: MovieCrewInputItem[] | null;
-  producer?: MovieCrewInputItem[] | null;
-  writer?: MovieCrewInputItem[] | null;
-  cast?: MovieCrewInputItem[] | null;
-  dop?: MovieCrewInputItem[] | null;
-  editor?: MovieCrewInputItem[] | null;
+  crew?: MovieCrewInputItemWithRole[] | null;
   btsVideo?: string[] | null;
   hasProfanity?: boolean;
   hasDrugs?: boolean;

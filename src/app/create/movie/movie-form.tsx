@@ -12,7 +12,11 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { SearchSelect } from "@/components/ui/search-select";
-import { Movie, Category } from "@/core/domain/movie";
+import {
+  Movie,
+  Category,
+  MovieCrewInputItemWithRole,
+} from "@/core/domain/movie";
 import { CrewMember } from "@/core/domain/crew";
 import { parseSchema } from "@/lib/validation";
 import { createMovieSchema, updateMovieSchema } from "@/core/schema/movie";
@@ -27,6 +31,8 @@ import {
   CrewTabId,
   AGE_RATING_OPTIONS,
   LANGUAGE_OPTIONS,
+  CREW_CATEGORIES,
+  FLAT_CREW_ROLES,
 } from "@/core/constants/movie-form";
 import {
   useCreateMovieMutation,
@@ -64,26 +70,20 @@ type MovieFormInputs = {
   hasDrugs: boolean;
   colorType: string;
   studio?: string;
-  director?: string[];
-  producer?: string[];
-  writer?: string[];
-  cast?: string[];
-  dop?: string[];
-  editor?: string[];
+  crew?: MovieCrewInputItemWithRole[];
   btsVideo?: string[];
   awards?: string[];
 };
 
 const DEFAULT_CREW_ITEM: CrewStateItem = { id: "", name: "", email: "" };
 
-const INITIAL_CREW_STATE: Record<CrewTabId, CrewStateItem[]> = {
-  director: [{ ...DEFAULT_CREW_ITEM }],
-  producer: [{ ...DEFAULT_CREW_ITEM }],
-  writer: [{ ...DEFAULT_CREW_ITEM }],
-  cast: [{ ...DEFAULT_CREW_ITEM }],
-  dop: [{ ...DEFAULT_CREW_ITEM }],
-  editor: [{ ...DEFAULT_CREW_ITEM }],
-};
+const INITIAL_CREW_STATE = FLAT_CREW_ROLES.reduce(
+  (acc, role) => {
+    acc[role.id as CrewTabId] = [{ ...DEFAULT_CREW_ITEM }];
+    return acc;
+  },
+  {} as Record<CrewTabId, CrewStateItem[]>,
+);
 
 export const MovieForm: React.FC<MovieFormProps> = ({
   editingMovie = null,
@@ -107,21 +107,42 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         : null,
   );
   const [isSavingLocal, setIsSavingLocal] = useState(false);
+  const [activeCrewCategory, setActiveCrewCategory] = useState<string>(
+    CREW_CATEGORIES[0]?.id || "",
+  );
+  const currentCategory = CREW_CATEGORIES.find(
+    (c) => c.id === activeCrewCategory,
+  );
+  const activeCategoryRoles = currentCategory?.roles || [];
+
   const [activeCrewTab, setActiveCrewTab] = useState<CrewTabId>("director");
+
+  useEffect(() => {
+    if (activeCategoryRoles.length > 0) {
+      const isTabInRoles = activeCategoryRoles.some(
+        (r) => r.id === activeCrewTab,
+      );
+      if (!isTabInRoles) {
+        setActiveCrewTab(activeCategoryRoles[0].id as CrewTabId);
+      }
+    }
+  }, [activeCrewCategory, activeCategoryRoles, activeCrewTab]);
+
   const [crewState, setCrewState] = useState<
     Record<CrewTabId, CrewStateItem[]>
-  >(() =>
-    editingMovie
-      ? {
-          director: mapCrewToState(editingMovie.crew, "director"),
-          producer: mapCrewToState(editingMovie.crew, "producer"),
-          writer: mapCrewToState(editingMovie.crew, "writer"),
-          cast: mapCrewToState(editingMovie.crew, "cast"),
-          dop: mapCrewToState(editingMovie.crew, "dop"),
-          editor: mapCrewToState(editingMovie.crew, "editor"),
-        }
-      : INITIAL_CREW_STATE,
-  );
+  >(() => {
+    if (editingMovie) {
+      const state = {} as Record<CrewTabId, CrewStateItem[]>;
+      FLAT_CREW_ROLES.forEach((role) => {
+        state[role.id as CrewTabId] = mapCrewToState(
+          editingMovie.crew,
+          role.id,
+        );
+      });
+      return state;
+    }
+    return INITIAL_CREW_STATE;
+  });
 
   const createMovieMutation = useCreateMovieMutation();
   const updateMovieMutation = useUpdateMovieMutation();
@@ -176,12 +197,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           hasDrugs: editingMovie.hasDrugs ?? false,
           colorType: editingMovie.colorType || "color",
           studio: editingMovie.studio || "",
-          director: [],
-          producer: [],
-          writer: [],
-          cast: [],
-          dop: [],
-          editor: [],
           btsVideo: editingMovie.btsVideos || [],
           awards: editingMovie.awards || [],
           releaseDate: editingMovie.releaseDate
@@ -208,12 +223,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           hasDrugs: false,
           colorType: "color",
           studio: "",
-          director: [],
-          producer: [],
-          writer: [],
-          cast: [],
-          dop: [],
-          editor: [],
           btsVideo: [],
           awards: [""],
         },
@@ -255,6 +264,17 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         studio = data.studio || null;
       }
 
+      const dynamicCrewPayload: MovieCrewInputItemWithRole[] =
+        FLAT_CREW_ROLES.flatMap((role) => {
+          const list = crewState[role.id as CrewTabId] || [];
+          return mapStateToCrewInput(list).map((item) => ({
+            role: role.code,
+            crewMemberId: item.crewMemberId,
+            name: item.name,
+            email: item.email,
+          }));
+        });
+
       const rawPayload = {
         ...data,
         thumbnail: data.thumbnail || editingMovie?.thumbnail,
@@ -264,12 +284,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         university,
         school,
         studio,
-        director: mapStateToCrewInput(crewState.director),
-        producer: mapStateToCrewInput(crewState.producer),
-        writer: mapStateToCrewInput(crewState.writer),
-        cast: mapStateToCrewInput(crewState.cast),
-        dop: mapStateToCrewInput(crewState.dop),
-        editor: mapStateToCrewInput(crewState.editor),
+        crew: dynamicCrewPayload,
       };
 
       if (editingMovie) {
@@ -754,19 +769,41 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             </div>
 
             <div className="space-y-4">
-              <div className="flex flex-wrap gap-2 border-b border-zinc-800/40 pb-4">
-                {CREW_TAB_OPTIONS.map((tab) => (
+              <div className="space-y-1">
+                <label className="text-xs text-zinc-400 font-medium">
+                  หมวดหมู่ทีมงาน
+                </label>
+                <div className="relative">
+                  <select
+                    value={activeCrewCategory}
+                    onChange={(e) => setActiveCrewCategory(e.target.value)}
+                    className="w-full bg-zinc-900 border border-zinc-850 focus:border-brand rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer appearance-none"
+                  >
+                    {CREW_CATEGORIES.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-zinc-400">
+                    ▼
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 border-b border-zinc-800/40 pb-4 pt-2">
+                {activeCategoryRoles.map((role) => (
                   <button
-                    key={tab.id}
+                    key={role.id}
                     type="button"
-                    onClick={() => setActiveCrewTab(tab.id)}
+                    onClick={() => setActiveCrewTab(role.id as CrewTabId)}
                     className={`px-4 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
-                      activeCrewTab === tab.id
+                      activeCrewTab === role.id
                         ? "bg-brand/10 border-brand text-brand font-bold"
                         : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-850"
                     }`}
                   >
-                    {tab.label}
+                    {role.label}
                   </button>
                 ))}
               </div>
@@ -778,8 +815,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       <CrewSection
                         key={tab.id}
                         label={tab.label}
-                        list={crewState[tab.id]}
-                        setList={setCrewList(tab.id)}
+                        list={crewState[tab.id as CrewTabId]}
+                        setList={setCrewList(tab.id as CrewTabId)}
                         placeholder={tab.placeholder}
                         addButtonLabel={tab.addLabel}
                         crewOptions={crewOptions}

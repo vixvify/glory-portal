@@ -84,6 +84,13 @@ export const movieCrewInputItemSchema = z.object({
   email: z.string().optional().nullable().or(z.literal("")),
 });
 
+export const movieCrewInputItemWithRoleSchema = z.object({
+  role: z.string(),
+  crewMemberId: z.string().uuid().optional().nullable(),
+  name: z.string().optional().nullable(),
+  email: z.string().optional().nullable().or(z.literal("")),
+});
+
 export const createMovieSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
@@ -103,12 +110,7 @@ export const createMovieSchema = z.object({
   university: z.string().optional().nullable().or(z.literal("")),
   school: z.string().optional().nullable().or(z.literal("")),
   language: z.string().optional().nullable().or(z.literal("")),
-  director: z.array(movieCrewInputItemSchema).optional().nullable(),
-  producer: z.array(movieCrewInputItemSchema).optional().nullable(),
-  writer: z.array(movieCrewInputItemSchema).optional().nullable(),
-  cast: z.array(movieCrewInputItemSchema).optional().nullable(),
-  dop: z.array(movieCrewInputItemSchema).optional().nullable(),
-  editor: z.array(movieCrewInputItemSchema).optional().nullable(),
+  crew: z.array(movieCrewInputItemWithRoleSchema).optional().nullable(),
   btsVideo: z.array(z.string()).optional().nullable(),
   hasProfanity: z.boolean().optional(),
   hasDrugs: z.boolean().optional(),
@@ -141,12 +143,7 @@ export const updateMovieSchema = z.object({
   university: z.string().optional().nullable().or(z.literal("")),
   school: z.string().optional().nullable().or(z.literal("")),
   language: z.string().optional().nullable().or(z.literal("")),
-  director: z.array(movieCrewInputItemSchema).optional().nullable(),
-  producer: z.array(movieCrewInputItemSchema).optional().nullable(),
-  writer: z.array(movieCrewInputItemSchema).optional().nullable(),
-  cast: z.array(movieCrewInputItemSchema).optional().nullable(),
-  dop: z.array(movieCrewInputItemSchema).optional().nullable(),
-  editor: z.array(movieCrewInputItemSchema).optional().nullable(),
+  crew: z.array(movieCrewInputItemWithRoleSchema).optional().nullable(),
   btsVideo: z.array(z.string()).optional().nullable(),
   hasProfanity: z.boolean().optional(),
   hasDrugs: z.boolean().optional(),
