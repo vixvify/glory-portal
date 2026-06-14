@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useMemo } from "react";
 import Image from "next/image";
-import { useForm, Controller, useWatch } from "react-hook-form";
+import { useForm, Controller, useWatch, useFieldArray } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
@@ -22,17 +22,13 @@ import {
   CrewTabId,
   AGE_RATING_OPTIONS,
   LANGUAGE_OPTIONS,
+  FLAT_CREW_ROLES,
 } from "@/core/constants/movie-form";
 import {
   useCreateMovieMutation,
   useUpdateMovieMutation,
 } from "@/hooks/db/use-movies";
-import { CrewStateItem } from "@/core/domain/crew";
-import {
-  getFilteredCategories,
-  getCrewOptions,
-  getInitialCrewState,
-} from "@/utils/crew";
+import { getFilteredCategories, getCrewOptions } from "@/utils/crew";
 import YoutubePreview from "@/components/preview/youtube";
 import { CREW_TAB_CONFIG } from "@/core/constants/movie-form";
 import { CrewSection } from "@/components/crew/crew-section";
@@ -57,16 +53,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 }) => {
   const router = useRouter();
   const { showToast } = useAppStore();
-
-  const {
-    selectedFileName,
-    previewUrl: movieCoverPreview,
-    resetPreview: resetMovieCoverPreview,
-    setFilePreview: setMovieCoverPreview,
-  } = useMovieCoverPreview(editingMovie);
-  const btsVideos = useDynamicStringList(editingMovie?.btsVideos);
-  const awards = useDynamicStringList(editingMovie?.awards);
+  const createMovieMutation = useCreateMovieMutation();
+  const updateMovieMutation = useUpdateMovieMutation();
   const [isSavingLocal, setIsSavingLocal] = useState(false);
+
   const filteredCategories = useMemo(
     () => getFilteredCategories(crewRoles),
     [crewRoles],
@@ -74,44 +64,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({
   const crewOptions = useMemo(
     () => getCrewOptions(availableCrew),
     [availableCrew],
-  );
-
-  const [activeCrewCategory, setActiveCrewCategory] = useState<string>(
-    filteredCategories[0]?.id || "",
-  );
-
-  const activeCategoryRoles = useMemo(() => {
-    const currentCategory = filteredCategories.find(
-      (c) => c.id === activeCrewCategory,
-    );
-    return currentCategory?.roles || [];
-  }, [filteredCategories, activeCrewCategory]);
-
-  const [activeCrewTab, setActiveCrewTab] = useState<CrewTabId>(() => {
-    const firstCat = filteredCategories[0];
-    return (firstCat?.roles[0]?.id as CrewTabId) || "director";
-  });
-  const activeCrewConfig = useMemo(
-    () => CREW_TAB_CONFIG.find((tab) => tab.id === activeCrewTab),
-    [activeCrewTab],
-  );
-
-  const [crewState, setCrewState] = useState<
-    Record<CrewTabId, CrewStateItem[]>
-  >(() => getInitialCrewState(editingMovie));
-
-  const createMovieMutation = useCreateMovieMutation();
-  const updateMovieMutation = useUpdateMovieMutation();
-
-  const setCrewList = useCallback(
-    (tab: CrewTabId) => (list: CrewStateItem[]) => {
-      setCrewState((prev) => ({ ...prev, [tab]: list }));
-    },
-    [],
-  );
-
-  const [affiliationType, setAffiliationType] = useState(() =>
-    getInitialAffiliationType(editingMovie),
   );
 
   const {
@@ -134,6 +86,90 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     [watchedProfanity, watchedDrugs],
   );
 
+  const {
+    selectedFileName,
+    previewUrl: movieCoverPreview,
+    resetPreview: resetMovieCoverPreview,
+    setFilePreview: setMovieCoverPreview,
+  } = useMovieCoverPreview(editingMovie);
+
+  const btsVideos = useDynamicStringList(editingMovie?.btsVideos);
+  const awards = useDynamicStringList(editingMovie?.awards);
+  const [affiliationType, setAffiliationType] = useState(() =>
+    getInitialAffiliationType(editingMovie),
+  );
+
+  const [activeCrewCategory, setActiveCrewCategory] = useState<string>(
+    filteredCategories[0]?.id || "",
+  );
+  const activeCategoryRoles = useMemo(() => {
+    const currentCategory = filteredCategories.find(
+      (c) => c.id === activeCrewCategory,
+    );
+    return currentCategory?.roles || [];
+  }, [filteredCategories, activeCrewCategory]);
+
+  const [activeCrewTab, setActiveCrewTab] = useState<CrewTabId>(() => {
+    const firstCat = filteredCategories[0];
+    return (firstCat?.roles[0]?.id as CrewTabId) || "director";
+  });
+  const activeCrewConfig = useMemo(
+    () => CREW_TAB_CONFIG.find((tab) => tab.id === activeCrewTab),
+    [activeCrewTab],
+  );
+  const activeRoleDef = useMemo(
+    () => FLAT_CREW_ROLES.find((role) => role.id === activeCrewTab),
+    [activeCrewTab],
+  );
+
+  const { fields, append, remove, update } = useFieldArray({
+    control,
+    name: "crew",
+  });
+
+  const activeFields = useMemo(() => {
+    if (!activeRoleDef) return [];
+    return fields
+      .map((field, idx) => ({ ...field, index: idx }))
+      .filter(
+        (field) =>
+          field.role.toUpperCase() === activeRoleDef.code.toUpperCase(),
+      );
+  }, [fields, activeRoleDef]);
+
+  const handleAddCrew = useCallback(() => {
+    if (!activeRoleDef) return;
+    append({
+      role: activeRoleDef.code,
+      crewMemberId: null,
+      name: "",
+      email: "",
+    });
+  }, [activeRoleDef, append]);
+
+  const handleRemoveCrew = useCallback(
+    (index: number) => {
+      remove(index);
+    },
+    [remove],
+  );
+
+  const handleUpdateCrew = useCallback(
+    (
+      index: number,
+      val: { id: string | null; name: string; email: string },
+    ) => {
+      if (!activeRoleDef) return;
+      update(index, {
+        role: activeRoleDef.code,
+        crewMemberId: val.id,
+        name: val.name,
+        email: val.email,
+      });
+    },
+    [activeRoleDef, update],
+  );
+
   const onSubmitForm = async (data: MovieFormInputs) => {
     try {
       setIsSavingLocal(true);
@@ -143,7 +179,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         affiliationType,
         btsVideos: btsVideos.items,
         awards: awards.items,
-        crewState,
       });
 
       if (editingMovie) {
@@ -637,8 +672,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   <CrewSection
                     key={activeCrewConfig.id}
                     label={activeCrewConfig.label}
-                    list={crewState[activeCrewConfig.id]}
-                    setList={setCrewList(activeCrewConfig.id)}
+                    fields={activeFields}
+                    onAdd={handleAddCrew}
+                    onRemove={handleRemoveCrew}
+                    onUpdate={handleUpdateCrew}
                     placeholder={activeCrewConfig.placeholder}
                     addButtonLabel={activeCrewConfig.addLabel}
                     crewOptions={crewOptions}
