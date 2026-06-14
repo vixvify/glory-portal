@@ -133,3 +133,36 @@ export interface MovieFilterParams {
   sortby?: string;
   aspectRatio?: string;
 }
+
+export interface MovieFormProps {
+  editingMovie?: Movie | null;
+  categories: Category[];
+  universities: string[];
+  crewRoles: CrewRole[];
+  availableCrew: CrewMember[];
+}
+
+export type AffiliationType = "university" | "school" | "studio";
+
+export type MovieFormInputs = {
+  title: string;
+  description: string;
+  categoryId: string;
+  thumbnail?: File | null;
+  youtubeUrl: string;
+  trailerUrl?: string;
+  releaseDate: string;
+  aspectRatio: string;
+  ageRating: string;
+  duration: number;
+  university?: string;
+  school?: string;
+  language?: string;
+  hasProfanity: boolean;
+  hasDrugs: boolean;
+  colorType: string;
+  studio?: string;
+  crew?: MovieCrewInputItemWithRole[];
+  btsVideo?: string[];
+  awards?: string[];
+};
