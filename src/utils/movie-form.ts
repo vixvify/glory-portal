@@ -1,16 +1,13 @@
 import { Category, CreateMovie, Movie, UpdateMovie } from "@/core/domain/movie";
-import { CrewStateItem } from "@/core/domain/crew";
 import {
   CrewTabId,
   AGE_RATING_OPTIONS,
   LANGUAGE_OPTIONS,
+  FLAT_CREW_ROLES,
 } from "@/core/constants/movie-form";
 import { createMovieSchema, updateMovieSchema } from "@/core/schema/movie";
 import { parseSchema } from "@/lib/validation";
-import { transformCrewStateToPayload } from "@/utils/crew";
-import { AffiliationType, MovieFormInputs } from "@/core/domain/movie";
-
-type CrewState = Record<CrewTabId, CrewStateItem[]>;
+import { AffiliationType, MovieFormInputs, MovieCrewInputItemWithRole } from "@/core/domain/movie";
 
 type MovieFormPayloadOptions = {
   data: MovieFormInputs;
@@ -18,7 +15,6 @@ type MovieFormPayloadOptions = {
   affiliationType: AffiliationType;
   btsVideos: string[];
   awards: string[];
-  crewState: CrewState;
 };
 
 export function formatInputDate(date?: string | Date): string {
@@ -29,6 +25,38 @@ export function formatInputDate(date?: string | Date): string {
   return typeof date === "string"
     ? date.split("T")[0]
     : date.toISOString().split("T")[0];
+}
+
+export function getInitialCrewFormValues(
+  editingMovie: Movie | null,
+): MovieCrewInputItemWithRole[] {
+  return FLAT_CREW_ROLES.flatMap((role) => {
+    if (editingMovie && editingMovie.crew) {
+      const items = editingMovie.crew
+        .filter(
+          (c) =>
+            c.role.toLowerCase() === role.code.toLowerCase() ||
+            c.role.toLowerCase() === role.id.toLowerCase(),
+        )
+        .map((c) => ({
+          role: role.code,
+          crewMemberId: c.crewMember?.id || null,
+          name: c.crewMember?.name || "",
+          email: c.crewMember?.email || "",
+        }));
+      if (items.length > 0) {
+        return items;
+      }
+    }
+    return [
+      {
+        role: role.code,
+        crewMemberId: null,
+        name: "",
+        email: "",
+      },
+    ];
+  });
 }
 
 export function getMovieFormDefaultValues(
@@ -53,6 +81,7 @@ export function getMovieFormDefaultValues(
       btsVideo: editingMovie.btsVideos || [],
       awards: editingMovie.awards || [],
       releaseDate: formatInputDate(editingMovie.releaseDate),
+      crew: getInitialCrewFormValues(editingMovie),
     };
   }
 
@@ -76,6 +105,7 @@ export function getMovieFormDefaultValues(
     studio: "",
     btsVideo: [],
     awards: [""],
+    crew: getInitialCrewFormValues(null),
   };
 }
 
@@ -113,11 +143,18 @@ export function buildMovieFormPayload({
   affiliationType,
   btsVideos,
   awards,
-  crewState,
 }: MovieFormPayloadOptions) {
   const activeVideos = btsVideos.map((video) => video.trim()).filter(Boolean);
   const activeAwards = awards.map((award) => award.trim()).filter(Boolean);
-  const dynamicCrewPayload = transformCrewStateToPayload(crewState);
+
+  const filteredCrew = (data.crew || [])
+    .filter((item) => item.name && item.name.trim() !== "")
+    .map((item) => ({
+      role: item.role,
+      crewMemberId: item.crewMemberId || null,
+      name: (item.name || "").trim(),
+      email: item.email?.trim() || null,
+    }));
 
   return {
     ...data,
@@ -129,7 +166,7 @@ export function buildMovieFormPayload({
       affiliationType === "university" ? data.university || null : null,
     school: affiliationType === "school" ? data.school || null : null,
     studio: affiliationType === "studio" ? data.studio || null : null,
-    crew: dynamicCrewPayload,
+    crew: filteredCrew,
   };
 }
 
