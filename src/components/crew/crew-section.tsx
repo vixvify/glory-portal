@@ -4,7 +4,7 @@ import AddIcon from "@mui/icons-material/Add";
 import EmailIcon from "@mui/icons-material/Email";
 import { CreatableSearchSelect } from "../ui/search-select";
 import { Input } from "../ui/input";
-import { CrewStateItem } from "@/core/domain/crew";
+import { CrewStateItem, CrewOption } from "@/core/domain/crew";
 
 interface CrewSectionProps {
   label: string;
@@ -12,12 +12,7 @@ interface CrewSectionProps {
   setList: (list: CrewStateItem[]) => void;
   placeholder: string;
   addButtonLabel: string;
-  crewOptions: Array<{
-    id: string;
-    name: string;
-    photoUrl?: string | null;
-    email: string;
-  }>;
+  crewOptions: CrewOption[];
 }
 
 export const CrewSection: React.FC<CrewSectionProps> = ({

@@ -25,6 +25,14 @@ export interface CrewStateItem {
   email: string;
 }
 
+export interface CrewOption {
+  id: string;
+  name: string;
+  photoUrl?: string | null;
+  email: string;
+}
+
+
 export interface CreateCrewMember {
   name: string;
   email?: string;

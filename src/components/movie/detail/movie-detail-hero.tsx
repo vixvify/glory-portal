@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import Image from "next/image";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckIcon from "@mui/icons-material/Check";
@@ -103,10 +104,13 @@ export default function MovieDetailHero({
         {isPortrait ? (
           <div className="relative z-20 flex flex-col md:flex-row items-center gap-6 md:gap-8 w-full mt-12 md:mt-0">
             <div className="relative w-36 sm:w-44 md:w-52 aspect-[2/3] rounded-xl overflow-hidden border-2 border-white/10 shadow-2xl shrink-0 group/poster">
-              <img
+              <Image
                 src={movie.thumbnail}
                 alt={movie.title}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover/poster:scale-105"
+                fill
+                sizes="(max-width: 640px) 144px, (max-width: 768px) 176px, 208px"
+                className="object-cover transition-transform duration-500 group-hover/poster:scale-105"
+                priority
               />
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/poster:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                 <button

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { useRouter } from "next/navigation";
@@ -12,14 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { SearchSelect } from "@/components/ui/search-select";
-import {
-  Movie,
-  Category,
-  MovieCrewInputItemWithRole,
-} from "@/core/domain/movie";
-import { CrewMember } from "@/core/domain/crew";
-import { parseSchema } from "@/lib/validation";
-import { createMovieSchema, updateMovieSchema } from "@/core/schema/movie";
 import { LOCALIZATION } from "@/core/constants/localization";
 import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 import { useAppStore } from "@/store/use-store";
@@ -27,132 +19,89 @@ import {
   COLOR_OPTIONS,
   ASPECT_RATIO_OPTIONS,
   CONTENT_WARNING_OPTIONS,
-  CREW_TAB_OPTIONS,
   CrewTabId,
   AGE_RATING_OPTIONS,
   LANGUAGE_OPTIONS,
-  CREW_CATEGORIES,
-  FLAT_CREW_ROLES,
 } from "@/core/constants/movie-form";
 import {
   useCreateMovieMutation,
   useUpdateMovieMutation,
 } from "@/hooks/db/use-movies";
-import { CreateMovie, UpdateMovie } from "@/core/domain/movie";
 import { CrewStateItem } from "@/core/domain/crew";
-import { mapCrewToState, mapStateToCrewInput } from "@/utils/crew";
+import {
+  getFilteredCategories,
+  getCrewOptions,
+  getInitialCrewState,
+} from "@/utils/crew";
 import YoutubePreview from "@/components/preview/youtube";
 import { CREW_TAB_CONFIG } from "@/core/constants/movie-form";
 import { CrewSection } from "@/components/crew/crew-section";
-
-interface MovieFormProps {
-  editingMovie?: Movie | null;
-  categories: Category[];
-  universities: string[];
-  availableCrew: CrewMember[];
-}
-
-type MovieFormInputs = {
-  title: string;
-  description: string;
-  categoryId: string;
-  thumbnail?: File | null;
-  youtubeUrl: string;
-  trailerUrl?: string;
-  releaseDate: string;
-  aspectRatio: string;
-  ageRating: string;
-  duration: number;
-  university?: string;
-  school?: string;
-  language?: string;
-  hasProfanity: boolean;
-  hasDrugs: boolean;
-  colorType: string;
-  studio?: string;
-  crew?: MovieCrewInputItemWithRole[];
-  btsVideo?: string[];
-  awards?: string[];
-};
-
-const DEFAULT_CREW_ITEM: CrewStateItem = { id: "", name: "", email: "" };
-
-const INITIAL_CREW_STATE = FLAT_CREW_ROLES.reduce(
-  (acc, role) => {
-    acc[role.id as CrewTabId] = [{ ...DEFAULT_CREW_ITEM }];
-    return acc;
-  },
-  {} as Record<CrewTabId, CrewStateItem[]>,
-);
+import { MovieFormInputs, MovieFormProps } from "@/core/domain/movie";
+import {
+  buildMovieFormPayload,
+  getInitialAffiliationType,
+  getMovieFormDefaultValues,
+  getSelectedContentWarnings,
+  toCreateMoviePayload,
+  toUpdateMoviePayload,
+} from "@/utils/movie-form";
+import { useDynamicStringList } from "@/hooks/system/use-dynamic-string-list";
+import { useMovieCoverPreview } from "@/hooks/system/use-movie-cover-preview";
 
 export const MovieForm: React.FC<MovieFormProps> = ({
   editingMovie = null,
   categories,
   universities,
+  crewRoles,
   availableCrew,
 }) => {
   const router = useRouter();
   const { showToast } = useAppStore();
 
-  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
-  const [btsVideos, setBtsVideos] = useState<string[]>(() =>
-    editingMovie?.btsVideos && editingMovie.btsVideos.length > 0
-      ? editingMovie.btsVideos
-      : [""],
-  );
-  const [movieCoverPreview, setMovieCoverPreview] = useState<string | null>(
-    () =>
-      editingMovie && typeof editingMovie.thumbnail === "string"
-        ? editingMovie.thumbnail
-        : null,
-  );
+  const {
+    selectedFileName,
+    previewUrl: movieCoverPreview,
+    resetPreview: resetMovieCoverPreview,
+    setFilePreview: setMovieCoverPreview,
+  } = useMovieCoverPreview(editingMovie);
+  const btsVideos = useDynamicStringList(editingMovie?.btsVideos);
+  const awards = useDynamicStringList(editingMovie?.awards);
   const [isSavingLocal, setIsSavingLocal] = useState(false);
+  const filteredCategories = useMemo(
+    () => getFilteredCategories(crewRoles),
+    [crewRoles],
+  );
+  const crewOptions = useMemo(
+    () => getCrewOptions(availableCrew),
+    [availableCrew],
+  );
+
   const [activeCrewCategory, setActiveCrewCategory] = useState<string>(
-    CREW_CATEGORIES[0]?.id || "",
+    filteredCategories[0]?.id || "",
   );
-  const currentCategory = CREW_CATEGORIES.find(
-    (c) => c.id === activeCrewCategory,
+
+  const activeCategoryRoles = useMemo(() => {
+    const currentCategory = filteredCategories.find(
+      (c) => c.id === activeCrewCategory,
+    );
+    return currentCategory?.roles || [];
+  }, [filteredCategories, activeCrewCategory]);
+
+  const [activeCrewTab, setActiveCrewTab] = useState<CrewTabId>(() => {
+    const firstCat = filteredCategories[0];
+    return (firstCat?.roles[0]?.id as CrewTabId) || "director";
+  });
+  const activeCrewConfig = useMemo(
+    () => CREW_TAB_CONFIG.find((tab) => tab.id === activeCrewTab),
+    [activeCrewTab],
   );
-  const activeCategoryRoles = currentCategory?.roles || [];
-
-  const [activeCrewTab, setActiveCrewTab] = useState<CrewTabId>("director");
-
-  useEffect(() => {
-    if (activeCategoryRoles.length > 0) {
-      const isTabInRoles = activeCategoryRoles.some(
-        (r) => r.id === activeCrewTab,
-      );
-      if (!isTabInRoles) {
-        setActiveCrewTab(activeCategoryRoles[0].id as CrewTabId);
-      }
-    }
-  }, [activeCrewCategory, activeCategoryRoles, activeCrewTab]);
 
   const [crewState, setCrewState] = useState<
     Record<CrewTabId, CrewStateItem[]>
-  >(() => {
-    if (editingMovie) {
-      const state = {} as Record<CrewTabId, CrewStateItem[]>;
-      FLAT_CREW_ROLES.forEach((role) => {
-        state[role.id as CrewTabId] = mapCrewToState(
-          editingMovie.crew,
-          role.id,
-        );
-      });
-      return state;
-    }
-    return INITIAL_CREW_STATE;
-  });
+  >(() => getInitialCrewState(editingMovie));
 
   const createMovieMutation = useCreateMovieMutation();
   const updateMovieMutation = useUpdateMovieMutation();
-
-  const crewOptions = availableCrew.map((c) => ({
-    id: c.id,
-    name: c.name,
-    photoUrl: c.user?.photoUrl,
-    email: c.email || "",
-  }));
 
   const setCrewList = useCallback(
     (tab: CrewTabId) => (list: CrewStateItem[]) => {
@@ -161,18 +110,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     [],
   );
 
-  const [affiliationType, setAffiliationType] = useState<
-    "university" | "school" | "studio"
-  >(() => {
-    if (editingMovie?.school) return "school";
-    if (editingMovie?.studio) return "studio";
-    return "university";
-  });
-
-  const [awards, setAwards] = useState<string[]>(() =>
-    editingMovie?.awards && editingMovie.awards.length > 0
-      ? editingMovie.awards
-      : [""],
+  const [affiliationType, setAffiliationType] = useState(() =>
+    getInitialAffiliationType(editingMovie),
   );
 
   const {
@@ -182,50 +121,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     control,
     formState: { errors },
   } = useForm<MovieFormInputs>({
-    defaultValues: editingMovie
-      ? {
-          ...editingMovie,
-          categoryId: editingMovie.category.id,
-          thumbnail: null,
-          trailerUrl: editingMovie.trailerUrl || "",
-          aspectRatio: editingMovie.aspectRatio || "landscape",
-          ageRating: editingMovie.ageRating || "",
-          university: editingMovie.university || "",
-          school: editingMovie.school || "",
-          language: editingMovie.language || "",
-          hasProfanity: editingMovie.hasProfanity ?? false,
-          hasDrugs: editingMovie.hasDrugs ?? false,
-          colorType: editingMovie.colorType || "color",
-          studio: editingMovie.studio || "",
-          btsVideo: editingMovie.btsVideos || [],
-          awards: editingMovie.awards || [],
-          releaseDate: editingMovie.releaseDate
-            ? typeof editingMovie.releaseDate === "string"
-              ? editingMovie.releaseDate.split("T")[0]
-              : editingMovie.releaseDate.toISOString().split("T")[0]
-            : "",
-        }
-      : {
-          title: "",
-          description: "",
-          categoryId: categories[0]?.id || "",
-          thumbnail: null,
-          youtubeUrl: "",
-          trailerUrl: "",
-          releaseDate: new Date().toISOString().split("T")[0],
-          aspectRatio: "landscape",
-          ageRating: AGE_RATING_OPTIONS[0] || "",
-          duration: 120,
-          university: "",
-          school: "",
-          language: LANGUAGE_OPTIONS[0],
-          hasProfanity: false,
-          hasDrugs: false,
-          colorType: "color",
-          studio: "",
-          btsVideo: [],
-          awards: [""],
-        },
+    defaultValues: getMovieFormDefaultValues(editingMovie, categories),
   });
 
   const watchedYoutubeUrl = useWatch({ control, name: "youtubeUrl" });
@@ -233,84 +129,30 @@ export const MovieForm: React.FC<MovieFormProps> = ({
   const watchedProfanity = useWatch({ control, name: "hasProfanity" }) ?? false;
   const watchedDrugs = useWatch({ control, name: "hasDrugs" }) ?? false;
 
-  const selectedWarnings = [
-    ...(watchedProfanity ? ["profanity"] : []),
-    ...(watchedDrugs ? ["drugs"] : []),
-  ];
-
-  useEffect(() => {
-    return () => {
-      if (movieCoverPreview?.startsWith("blob:")) {
-        URL.revokeObjectURL(movieCoverPreview);
-      }
-    };
-  }, [movieCoverPreview]);
+  const selectedWarnings = useMemo(
+    () => getSelectedContentWarnings(watchedProfanity, watchedDrugs),
+    [watchedProfanity, watchedDrugs],
+  );
 
   const onSubmitForm = async (data: MovieFormInputs) => {
     try {
       setIsSavingLocal(true);
-      const activeVideos = btsVideos.map((v) => v.trim()).filter(Boolean);
-      const activeAwards = awards.map((a) => a.trim()).filter(Boolean);
-
-      let university = null;
-      let school = null;
-      let studio = null;
-
-      if (affiliationType === "university") {
-        university = data.university || null;
-      } else if (affiliationType === "school") {
-        school = data.school || null;
-      } else if (affiliationType === "studio") {
-        studio = data.studio || null;
-      }
-
-      const dynamicCrewPayload: MovieCrewInputItemWithRole[] =
-        FLAT_CREW_ROLES.flatMap((role) => {
-          const list = crewState[role.id as CrewTabId] || [];
-          return mapStateToCrewInput(list).map((item) => ({
-            role: role.code,
-            crewMemberId: item.crewMemberId,
-            name: item.name,
-            email: item.email,
-          }));
-        });
-
-      const rawPayload = {
-        ...data,
-        thumbnail: data.thumbnail || editingMovie?.thumbnail,
-        duration: Number(data.duration),
-        btsVideo: activeVideos,
-        awards: activeAwards,
-        university,
-        school,
-        studio,
-        crew: dynamicCrewPayload,
-      };
+      const rawPayload = buildMovieFormPayload({
+        data,
+        editingMovie,
+        affiliationType,
+        btsVideos: btsVideos.items,
+        awards: awards.items,
+        crewState,
+      });
 
       if (editingMovie) {
-        const validated = parseSchema(updateMovieSchema, rawPayload);
-        const updatedPayload: UpdateMovie = {
-          ...validated,
-          id: editingMovie.id,
-          awards: validated.awards ?? undefined,
-          thumbnail:
-            validated.thumbnail instanceof File ||
-            typeof validated.thumbnail === "string"
-              ? validated.thumbnail
-              : editingMovie.thumbnail,
-        };
-
-        await updateMovieMutation.mutateAsync(updatedPayload);
+        await updateMovieMutation.mutateAsync(
+          toUpdateMoviePayload(rawPayload, editingMovie),
+        );
         showToast(LOCALIZATION.TOAST.EDIT_MOVIE_SUCCESS, "success");
       } else {
-        const validated = parseSchema(createMovieSchema, rawPayload);
-        const createPayload: CreateMovie = {
-          ...validated,
-          awards: validated.awards ?? undefined,
-          thumbnail: validated.thumbnail as File,
-        };
-
-        await createMovieMutation.mutateAsync(createPayload);
+        await createMovieMutation.mutateAsync(toCreateMoviePayload(rawPayload));
         showToast(LOCALIZATION.TOAST.ADD_MOVIE_SUCCESS, "success");
       }
 
@@ -455,6 +297,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 placeholder="กรอกความยาวภาพยนตร์"
                 error={errors.duration?.message}
                 {...register("duration", {
+                  valueAsNumber: true,
                   required: "กรุณากรอกความยาวภาพยนตร์",
                 })}
               />
@@ -577,17 +420,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                         onChange={(e) => {
                           const file = e.target.files?.[0] ?? null;
                           field.onChange(file);
-                          setSelectedFileName(file?.name ?? null);
-                          if (file) {
-                            setMovieCoverPreview(URL.createObjectURL(file));
-                          } else {
-                            setMovieCoverPreview(
-                              editingMovie &&
-                                typeof editingMovie.thumbnail === "string"
-                                ? editingMovie.thumbnail
-                                : null,
-                            );
-                          }
+                          setMovieCoverPreview(file);
                         }}
                       />
                     )}
@@ -627,13 +460,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       type="button"
                       onClick={() => {
                         setValue("thumbnail", null);
-                        setSelectedFileName(null);
-                        setMovieCoverPreview(
-                          editingMovie &&
-                            typeof editingMovie.thumbnail === "string"
-                            ? editingMovie.thumbnail
-                            : null,
-                        );
+                        resetMovieCoverPreview();
                       }}
                       className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500 hover:text-white text-zinc-400 rounded-full transition-colors cursor-pointer border-0 shadow-md opacity-0 group-hover/preview:opacity-100"
                     >
@@ -673,29 +500,23 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   ลิงก์วิดีโอเบื้องหลัง
                 </label>
                 <div className="space-y-4">
-                  {btsVideos.map((videoUrl, idx) => (
+                  {btsVideos.items.map((videoUrl, idx) => (
                     <div key={idx} className="space-y-2">
                       <div className="flex gap-2 items-center">
                         <Input
                           type="text"
                           placeholder="กรอกลิงก์วิดีโอเบื้องหลัง"
                           value={videoUrl}
-                          onChange={(e) => {
-                            const newVideos = [...btsVideos];
-                            newVideos[idx] = e.target.value;
-                            setBtsVideos(newVideos);
-                          }}
+                          onChange={(e) =>
+                            btsVideos.updateItem(idx, e.target.value)
+                          }
                           className="flex-1"
                         />
-                        {btsVideos.length > 1 && (
+                        {btsVideos.items.length > 1 && (
                           <Button
                             type="button"
                             variant="secondary"
-                            onClick={() =>
-                              setBtsVideos(
-                                btsVideos.filter((_, i) => i !== idx),
-                              )
-                            }
+                            onClick={() => btsVideos.removeItem(idx)}
                             className="px-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg border border-red-500/20 transition-all h-[42px] flex items-center justify-center flex-shrink-0"
                           >
                             <CloseIcon className="text-sm" />
@@ -708,7 +529,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   <Button
                     type="button"
                     variant="secondary"
-                    onClick={() => setBtsVideos([...btsVideos, ""])}
+                    onClick={btsVideos.addItem}
                     className="py-2 px-4 text-xs w-fit flex items-center gap-1.5 rounded-md bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 transition-colors"
                   >
                     <AddIcon className="text-sm" />{" "}
@@ -722,26 +543,20 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   รางวัลที่ได้รับ
                 </label>
                 <div className="space-y-4">
-                  {awards.map((awardName, idx) => (
+                  {awards.items.map((awardName, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
                       <Input
                         type="text"
                         placeholder="กรอกชื่อรางวัลที่ได้รับ (ถ้ามี)"
                         value={awardName}
-                        onChange={(e) => {
-                          const newAwards = [...awards];
-                          newAwards[idx] = e.target.value;
-                          setAwards(newAwards);
-                        }}
+                        onChange={(e) => awards.updateItem(idx, e.target.value)}
                         className="flex-1"
                       />
-                      {awards.length > 1 && (
+                      {awards.items.length > 1 && (
                         <Button
                           type="button"
                           variant="secondary"
-                          onClick={() =>
-                            setAwards(awards.filter((_, i) => i !== idx))
-                          }
+                          onClick={() => awards.removeItem(idx)}
                           className="px-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg border border-red-500/20 transition-all h-[42px] flex items-center justify-center flex-shrink-0"
                         >
                           <CloseIcon className="text-sm" />
@@ -752,7 +567,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   <Button
                     type="button"
                     variant="secondary"
-                    onClick={() => setAwards([...awards, ""])}
+                    onClick={awards.addItem}
                     className="py-2 px-4 text-xs w-fit flex items-center gap-1.5 rounded-md bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 transition-colors"
                   >
                     <AddIcon className="text-sm" /> เพิ่มรางวัลอื่น
@@ -776,10 +591,19 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 <div className="relative">
                   <select
                     value={activeCrewCategory}
-                    onChange={(e) => setActiveCrewCategory(e.target.value)}
+                    onChange={(e) => {
+                      const newCatId = e.target.value;
+                      setActiveCrewCategory(newCatId);
+                      const cat = filteredCategories.find(
+                        (c) => c.id === newCatId,
+                      );
+                      if (cat && cat.roles.length > 0) {
+                        setActiveCrewTab(cat.roles[0].id as CrewTabId);
+                      }
+                    }}
                     className="w-full bg-zinc-900 border border-zinc-850 focus:border-brand rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer appearance-none"
                   >
-                    {CREW_CATEGORIES.map((cat) => (
+                    {filteredCategories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.label}
                       </option>
@@ -809,19 +633,16 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               </div>
 
               <div className="bg-zinc-900/10 border border-zinc-800/40 rounded-lg p-5 md:p-6 min-h-[200px]">
-                {CREW_TAB_CONFIG.map(
-                  (tab) =>
-                    activeCrewTab === tab.id && (
-                      <CrewSection
-                        key={tab.id}
-                        label={tab.label}
-                        list={crewState[tab.id as CrewTabId]}
-                        setList={setCrewList(tab.id as CrewTabId)}
-                        placeholder={tab.placeholder}
-                        addButtonLabel={tab.addLabel}
-                        crewOptions={crewOptions}
-                      />
-                    ),
+                {activeCrewConfig && (
+                  <CrewSection
+                    key={activeCrewConfig.id}
+                    label={activeCrewConfig.label}
+                    list={crewState[activeCrewConfig.id]}
+                    setList={setCrewList(activeCrewConfig.id)}
+                    placeholder={activeCrewConfig.placeholder}
+                    addButtonLabel={activeCrewConfig.addLabel}
+                    crewOptions={crewOptions}
+                  />
                 )}
               </div>
             </div>

@@ -195,6 +195,7 @@ export function SearchSelect({
         !containerRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
+        setSearchTerm("");
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -202,12 +203,6 @@ export function SearchSelect({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  useEffect(() => {
-    if (!isOpen) {
-      setSearchTerm("");
-    }
-  }, [isOpen]);
 
   const filteredOptions = searchTerm.trim()
     ? options.filter((opt) =>
@@ -218,6 +213,7 @@ export function SearchSelect({
   const handleSelectOption = (val: string) => {
     onChange(val);
     setIsOpen(false);
+    setSearchTerm("");
   };
 
   return (
@@ -226,7 +222,12 @@ export function SearchSelect({
       <div className="relative">
         <button
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            if (isOpen) {
+              setSearchTerm("");
+            }
+            setIsOpen(!isOpen);
+          }}
           className={`w-full bg-zinc-900 border rounded-lg py-2.5 px-4 pr-10 text-sm text-left text-white focus:outline-none transition-colors font-light cursor-pointer flex items-center justify-between ${
             error
               ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
