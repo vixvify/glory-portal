@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { useRouter } from "next/navigation";
@@ -17,7 +17,6 @@ import {
   Category,
   MovieCrewInputItemWithRole,
 } from "@/core/domain/movie";
-import { CrewMember } from "@/core/domain/crew";
 import { parseSchema } from "@/lib/validation";
 import { createMovieSchema, updateMovieSchema } from "@/core/schema/movie";
 import { LOCALIZATION } from "@/core/constants/localization";
@@ -27,20 +26,22 @@ import {
   COLOR_OPTIONS,
   ASPECT_RATIO_OPTIONS,
   CONTENT_WARNING_OPTIONS,
-  CREW_TAB_OPTIONS,
   CrewTabId,
   AGE_RATING_OPTIONS,
   LANGUAGE_OPTIONS,
-  CREW_CATEGORIES,
-  FLAT_CREW_ROLES,
 } from "@/core/constants/movie-form";
 import {
   useCreateMovieMutation,
   useUpdateMovieMutation,
 } from "@/hooks/db/use-movies";
 import { CreateMovie, UpdateMovie } from "@/core/domain/movie";
-import { CrewStateItem } from "@/core/domain/crew";
-import { mapCrewToState, mapStateToCrewInput } from "@/utils/crew";
+import { CrewStateItem, CrewMember, CrewRole } from "@/core/domain/crew";
+import {
+  getFilteredCategories,
+  getCrewOptions,
+  getInitialCrewState,
+  transformCrewStateToPayload,
+} from "@/utils/crew";
 import YoutubePreview from "@/components/preview/youtube";
 import { CREW_TAB_CONFIG } from "@/core/constants/movie-form";
 import { CrewSection } from "@/components/crew/crew-section";
@@ -49,6 +50,7 @@ interface MovieFormProps {
   editingMovie?: Movie | null;
   categories: Category[];
   universities: string[];
+  crewRoles: CrewRole[];
   availableCrew: CrewMember[];
 }
 
@@ -75,20 +77,11 @@ type MovieFormInputs = {
   awards?: string[];
 };
 
-const DEFAULT_CREW_ITEM: CrewStateItem = { id: "", name: "", email: "" };
-
-const INITIAL_CREW_STATE = FLAT_CREW_ROLES.reduce(
-  (acc, role) => {
-    acc[role.id as CrewTabId] = [{ ...DEFAULT_CREW_ITEM }];
-    return acc;
-  },
-  {} as Record<CrewTabId, CrewStateItem[]>,
-);
-
 export const MovieForm: React.FC<MovieFormProps> = ({
   editingMovie = null,
   categories,
   universities,
+  crewRoles,
   availableCrew,
 }) => {
   const router = useRouter();
@@ -107,10 +100,19 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         : null,
   );
   const [isSavingLocal, setIsSavingLocal] = useState(false);
-  const [activeCrewCategory, setActiveCrewCategory] = useState<string>(
-    CREW_CATEGORIES[0]?.id || "",
+  const filteredCategories = useMemo(
+    () => getFilteredCategories(crewRoles),
+    [crewRoles],
   );
-  const currentCategory = CREW_CATEGORIES.find(
+  const crewOptions = useMemo(
+    () => getCrewOptions(availableCrew),
+    [availableCrew],
+  );
+
+  const [activeCrewCategory, setActiveCrewCategory] = useState<string>(
+    filteredCategories[0]?.id || "",
+  );
+  const currentCategory = filteredCategories.find(
     (c) => c.id === activeCrewCategory,
   );
   const activeCategoryRoles = currentCategory?.roles || [];
@@ -130,29 +132,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
   const [crewState, setCrewState] = useState<
     Record<CrewTabId, CrewStateItem[]>
-  >(() => {
-    if (editingMovie) {
-      const state = {} as Record<CrewTabId, CrewStateItem[]>;
-      FLAT_CREW_ROLES.forEach((role) => {
-        state[role.id as CrewTabId] = mapCrewToState(
-          editingMovie.crew,
-          role.id,
-        );
-      });
-      return state;
-    }
-    return INITIAL_CREW_STATE;
-  });
+  >(() => getInitialCrewState(editingMovie));
 
   const createMovieMutation = useCreateMovieMutation();
   const updateMovieMutation = useUpdateMovieMutation();
-
-  const crewOptions = availableCrew.map((c) => ({
-    id: c.id,
-    name: c.name,
-    photoUrl: c.user?.photoUrl,
-    email: c.email || "",
-  }));
 
   const setCrewList = useCallback(
     (tab: CrewTabId) => (list: CrewStateItem[]) => {
@@ -264,16 +247,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         studio = data.studio || null;
       }
 
-      const dynamicCrewPayload: MovieCrewInputItemWithRole[] =
-        FLAT_CREW_ROLES.flatMap((role) => {
-          const list = crewState[role.id as CrewTabId] || [];
-          return mapStateToCrewInput(list).map((item) => ({
-            role: role.code,
-            crewMemberId: item.crewMemberId,
-            name: item.name,
-            email: item.email,
-          }));
-        });
+      const dynamicCrewPayload = transformCrewStateToPayload(crewState);
 
       const rawPayload = {
         ...data,
@@ -779,7 +753,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     onChange={(e) => setActiveCrewCategory(e.target.value)}
                     className="w-full bg-zinc-900 border border-zinc-850 focus:border-brand rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer appearance-none"
                   >
-                    {CREW_CATEGORIES.map((cat) => (
+                    {filteredCategories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.label}
                       </option>

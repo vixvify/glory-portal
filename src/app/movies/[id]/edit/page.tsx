@@ -6,6 +6,7 @@ import Loading from "@/app/loading";
 import {
   useCategoriesQuery,
   useUniversitiesQuery,
+  useCrewRolesQuery,
 } from "@/hooks/db/use-master-data";
 import { useCrewMembersQuery } from "@/hooks/db/use-crew-members";
 import { MovieForm } from "@/app/create/movie/movie-form";
@@ -19,6 +20,8 @@ export default function EditMoviePage() {
     useCategoriesQuery();
   const { data: universities = [], isLoading: isUniversitiesLoading } =
     useUniversitiesQuery();
+  const { data: crewRoles = [], isLoading: isCrewRolesLoading } =
+    useCrewRolesQuery();
   const { data: availableCrew = [], isLoading: isCrewLoading } =
     useCrewMembersQuery();
 
@@ -26,6 +29,7 @@ export default function EditMoviePage() {
     isMovieLoading ||
     isCategoriesLoading ||
     isUniversitiesLoading ||
+    isCrewRolesLoading ||
     isCrewLoading;
 
   if (isMasterLoading) {
@@ -47,6 +51,7 @@ export default function EditMoviePage() {
       editingMovie={movie}
       categories={categories}
       universities={universities}
+      crewRoles={crewRoles}
       availableCrew={availableCrew}
     />
   );

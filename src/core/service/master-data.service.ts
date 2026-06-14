@@ -1,5 +1,6 @@
 import { Category } from "../domain/movie";
 import { MasterDataRepository } from "../ports/master-data.repository";
+import { CrewRole } from "../domain/crew";
 
 export class MasterDataService {
   constructor(private readonly masterDataRepository: MasterDataRepository) {}
@@ -26,6 +27,19 @@ export class MasterDataService {
       return response.data;
     } catch (error) {
       console.error("Error in getUniversities:", error);
+      throw error;
+    }
+  }
+
+  async getCrewRoles(): Promise<CrewRole[]> {
+    try {
+      const response = await this.masterDataRepository.getCrewRoles();
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      return response.data;
+    } catch (error) {
+      console.error("Error in getCrewRoles:", error);
       throw error;
     }
   }
