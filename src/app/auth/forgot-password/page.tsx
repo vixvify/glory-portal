@@ -17,7 +17,6 @@ import { Button } from "@/components/ui/button";
 import { Toast } from "@/components/ui/toast";
 import { useAppStore } from "@/store/use-store";
 
-// Validation Schemas
 const requestSchema = z.object({
   email: z.string().email("กรุณากรอกที่อยู่อีเมลที่ถูกต้อง"),
 });
@@ -84,17 +83,19 @@ export default function ForgotPasswordPage() {
     setError("");
     setIsLoading(true);
     try {
-      // Mock code check
       if (data.code !== "123456") {
         throw new Error("รหัสยืนยันไม่ถูกต้อง (กรุณาใช้รหัส 123456)");
       }
 
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
       showToast("รีเซ็ตรหัสผ่านสำเร็จแล้ว", "success");
       setStep("success");
-    } catch (err: any) {
-      setError(err.message || "เกิดข้อผิดพลาดในการรีเซ็ตรหัสผ่าน");
+    } catch (err: unknown) {
+      const errMsg =
+        err instanceof Error
+          ? err.message
+          : "เกิดข้อผิดพลาดในการรีเซ็ตรหัสผ่าน";
+      setError(errMsg);
     } finally {
       setIsLoading(false);
     }

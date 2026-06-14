@@ -112,23 +112,18 @@ export const MovieForm: React.FC<MovieFormProps> = ({
   const [activeCrewCategory, setActiveCrewCategory] = useState<string>(
     filteredCategories[0]?.id || "",
   );
-  const currentCategory = filteredCategories.find(
-    (c) => c.id === activeCrewCategory,
-  );
-  const activeCategoryRoles = currentCategory?.roles || [];
 
-  const [activeCrewTab, setActiveCrewTab] = useState<CrewTabId>("director");
+  const activeCategoryRoles = useMemo(() => {
+    const currentCategory = filteredCategories.find(
+      (c) => c.id === activeCrewCategory,
+    );
+    return currentCategory?.roles || [];
+  }, [filteredCategories, activeCrewCategory]);
 
-  useEffect(() => {
-    if (activeCategoryRoles.length > 0) {
-      const isTabInRoles = activeCategoryRoles.some(
-        (r) => r.id === activeCrewTab,
-      );
-      if (!isTabInRoles) {
-        setActiveCrewTab(activeCategoryRoles[0].id as CrewTabId);
-      }
-    }
-  }, [activeCrewCategory, activeCategoryRoles, activeCrewTab]);
+  const [activeCrewTab, setActiveCrewTab] = useState<CrewTabId>(() => {
+    const firstCat = filteredCategories[0];
+    return (firstCat?.roles[0]?.id as CrewTabId) || "director";
+  });
 
   const [crewState, setCrewState] = useState<
     Record<CrewTabId, CrewStateItem[]>
@@ -750,7 +745,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 <div className="relative">
                   <select
                     value={activeCrewCategory}
-                    onChange={(e) => setActiveCrewCategory(e.target.value)}
+                    onChange={(e) => {
+                      const newCatId = e.target.value;
+                      setActiveCrewCategory(newCatId);
+                      const cat = filteredCategories.find((c) => c.id === newCatId);
+                      if (cat && cat.roles.length > 0) {
+                        setActiveCrewTab(cat.roles[0].id as CrewTabId);
+                      }
+                    }}
                     className="w-full bg-zinc-900 border border-zinc-850 focus:border-brand rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer appearance-none"
                   >
                     {filteredCategories.map((cat) => (

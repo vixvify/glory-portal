@@ -107,6 +107,7 @@ export default function Page() {
     isPortraitLoading ||
     isMovieUniLoading ||
     isMovieRatingLoading ||
+    isMovieAwardLoading ||
     (!!currentUser && isFavsLoading) ||
     categoryMovie.some((q) => q.isLoading);
 
