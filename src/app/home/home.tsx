@@ -8,7 +8,7 @@ import { useAppStore } from "@/store/use-store";
 import { Toast } from "@/components/ui/toast";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
 import { useToggleFavoriteMutation } from "@/hooks/db/use-favorites";
-import { Category } from "@/core/domain/movie";
+import { Category } from "@/core/domain/master-data";
 import { CrewMember } from "@/core/domain/crew";
 import { useDebounce } from "@/hooks/system/use-debounce";
 import HomeView from "@/components/views/home-view";
