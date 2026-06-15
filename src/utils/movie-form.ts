@@ -1,13 +1,18 @@
 import { Category, CreateMovie, Movie, UpdateMovie } from "@/core/domain/movie";
+import { CrewRole, CrewOption, CrewMember } from "@/core/domain/crew";
 import {
-  CrewTabId,
   AGE_RATING_OPTIONS,
   LANGUAGE_OPTIONS,
-  FLAT_CREW_ROLES,
+  CrewCategory,
+  CrewRoleDefinition,
 } from "@/core/constants/movie-form";
 import { createMovieSchema, updateMovieSchema } from "@/core/schema/movie";
 import { parseSchema } from "@/lib/validation";
-import { AffiliationType, MovieFormInputs, MovieCrewInputItemWithRole } from "@/core/domain/movie";
+import {
+  AffiliationType,
+  MovieFormInputs,
+  MovieCrewInputItemWithRole,
+} from "@/core/domain/movie";
 
 type MovieFormPayloadOptions = {
   data: MovieFormInputs;
@@ -29,17 +34,18 @@ export function formatInputDate(date?: string | Date): string {
 
 export function getInitialCrewFormValues(
   editingMovie: Movie | null,
+  crewRoles: CrewRole[],
 ): MovieCrewInputItemWithRole[] {
-  return FLAT_CREW_ROLES.flatMap((role) => {
+  return crewRoles.flatMap((role) => {
     if (editingMovie && editingMovie.crew) {
       const items = editingMovie.crew
         .filter(
           (c) =>
-            c.role.toLowerCase() === role.code.toLowerCase() ||
+            c.role.toLowerCase() === role.name.toLowerCase() ||
             c.role.toLowerCase() === role.id.toLowerCase(),
         )
         .map((c) => ({
-          role: role.code,
+          role: role.name,
           crewMemberId: c.crewMember?.id || null,
           name: c.crewMember?.name || "",
           email: c.crewMember?.email || "",
@@ -50,7 +56,7 @@ export function getInitialCrewFormValues(
     }
     return [
       {
-        role: role.code,
+        role: role.name,
         crewMemberId: null,
         name: "",
         email: "",
@@ -62,11 +68,12 @@ export function getInitialCrewFormValues(
 export function getMovieFormDefaultValues(
   editingMovie: Movie | null,
   categories: Category[],
+  crewRoles: CrewRole[],
 ): MovieFormInputs {
   if (editingMovie) {
     return {
       ...editingMovie,
-      categoryId: editingMovie.category.id,
+      categoryIds: editingMovie.categories.map((c) => c.id),
       thumbnail: null,
       trailerUrl: editingMovie.trailerUrl || "",
       aspectRatio: editingMovie.aspectRatio || "landscape",
@@ -81,14 +88,14 @@ export function getMovieFormDefaultValues(
       btsVideo: editingMovie.btsVideos || [],
       awards: editingMovie.awards || [],
       releaseDate: formatInputDate(editingMovie.releaseDate),
-      crew: getInitialCrewFormValues(editingMovie),
+      crew: getInitialCrewFormValues(editingMovie, crewRoles),
     };
   }
 
   return {
     title: "",
     description: "",
-    categoryId: categories[0]?.id || "",
+    categoryIds: categories[0] ? [categories[0].id] : [],
     thumbnail: null,
     youtubeUrl: "",
     trailerUrl: "",
@@ -105,7 +112,7 @@ export function getMovieFormDefaultValues(
     studio: "",
     btsVideo: [],
     awards: [""],
-    crew: getInitialCrewFormValues(null),
+    crew: getInitialCrewFormValues(null, crewRoles),
   };
 }
 
@@ -196,4 +203,78 @@ export function toUpdateMoviePayload(
         ? validated.thumbnail
         : editingMovie.thumbnail,
   };
+}
+
+export function getFilteredCategories(crewRoles: CrewRole[]): CrewCategory[] {
+  const categoriesMap = new Map<
+    string,
+    { label: string; roles: CrewRoleDefinition[] }
+  >();
+
+  const categoryOrder = [
+    "production_management",
+    "directing",
+    "screenplay",
+    "camera",
+    "lighting",
+    "grip",
+    "sound",
+    "art",
+    "costume",
+    "makeup",
+    "cast",
+    "vfx",
+    "post_production",
+  ];
+
+  for (const role of crewRoles) {
+    const catId = role.category || "other";
+    const catLabel = role.categoryLabelTh || role.category || "อื่นๆ";
+
+    if (!categoriesMap.has(catId)) {
+      categoriesMap.set(catId, {
+        label: catLabel,
+        roles: [],
+      });
+    }
+
+    categoriesMap.get(catId)!.roles.push({
+      id: role.name.toLowerCase(),
+      code: role.name,
+      label: role.labelTh || role.name,
+    });
+  }
+
+  const result: CrewCategory[] = [];
+  for (const catId of categoryOrder) {
+    const cat = categoriesMap.get(catId);
+    if (cat && cat.roles.length > 0) {
+      result.push({
+        id: catId,
+        label: cat.label,
+        roles: cat.roles,
+      });
+    }
+  }
+
+  for (const [catId, cat] of categoriesMap.entries()) {
+    if (!categoryOrder.includes(catId) && cat.roles.length > 0) {
+      result.push({
+        id: catId,
+        label: cat.label,
+        roles: cat.roles,
+      });
+    }
+  }
+
+  return result;
+}
+
+export function getCrewOptions(availableCrew: CrewMember[]): CrewOption[] {
+  return availableCrew.map((c) => ({
+    id: c.id,
+    name: c.name,
+    photoUrl: c.user?.photoUrl,
+    email: c.email || "",
+  }));
 }

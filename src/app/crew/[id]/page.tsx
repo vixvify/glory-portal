@@ -16,8 +16,6 @@ import MovieCard from "@/components/movie/cards/movie-card";
 import MovieCardPortrait from "@/components/movie/cards/movie-card-portrait";
 import { Toast } from "@/components/ui/toast";
 
-import { getCrewRoleLabel } from "@/core/constants/movie-form";
-
 export default function CrewProfilePage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -65,7 +63,7 @@ export default function CrewProfilePage() {
     const groups: Record<string, typeof crewMember.movies> = {};
 
     crewMember.movies.forEach((mc) => {
-      const roleTitle = getCrewRoleLabel(mc.role);
+      const roleTitle = mc.crewRole?.labelTh || mc.role;
 
       if (!groups[roleTitle]) {
         groups[roleTitle] = [];

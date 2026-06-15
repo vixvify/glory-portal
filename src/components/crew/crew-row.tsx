@@ -7,7 +7,6 @@ import PersonIcon from "@mui/icons-material/Person";
 import { CrewMember } from "@/core/domain/crew";
 import Link from "next/link";
 import Image from "next/image";
-import { CREW_MAPPING } from "@/core/constants/movie-form";
 
 interface CrewRowProps {
   title: string;
@@ -67,12 +66,7 @@ export default function CrewRow({ title, crew }: CrewRowProps) {
               {member.movies && member.movies.length > 0 && (
                 <span className="text-[10px] sm:text-xs text-zinc-400 group-hover/item:text-white font-medium tracking-wide mt-0.5 truncate w-full text-center transition-colors">
                   {member.movies
-                    .map(
-                      (mc) =>
-                        CREW_MAPPING.find(
-                          (m) => m.id.toLowerCase() === mc.role.toLowerCase()
-                        )?.label || mc.role
-                    )
+                    .map((mc) => mc.crewRole?.labelTh || mc.role)
                     .join(" / ")}
                 </span>
               )}

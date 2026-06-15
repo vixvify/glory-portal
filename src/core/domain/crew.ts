@@ -4,6 +4,9 @@ import { MovieCrew } from "./movie";
 export interface CrewRole {
   id: string;
   name: string;
+  labelTh: string;
+  category: string;
+  categoryLabelTh: string;
   createdAt: Date;
 }
 
