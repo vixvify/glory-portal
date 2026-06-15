@@ -5,6 +5,7 @@ import { CrewRole, CrewMember } from "./crew";
 export interface Category {
   id: string;
   name: string;
+  labelTh: string;
   createdAt: Date;
 }
 
@@ -37,7 +38,7 @@ export interface Movie {
   id: string;
   title: string;
   description: string;
-  category: Category;
+  categories: Category[];
   thumbnail: string;
   youtubeUrl: string;
   trailerUrl?: string | null;
@@ -78,7 +79,7 @@ export interface MovieCrewInputItemWithRole extends MovieCrewInputItem {
 export interface CreateMovie {
   title: string;
   description: string;
-  categoryId: string;
+  categoryIds: string[];
   thumbnail: File | null;
   youtubeUrl: string;
   trailerUrl?: string | null;
@@ -103,7 +104,7 @@ export interface UpdateMovie {
   id: string;
   title: string;
   description: string;
-  categoryId: string;
+  categoryIds: string[];
   thumbnail: File | string;
   youtubeUrl: string;
   trailerUrl?: string | null;
@@ -147,7 +148,7 @@ export type AffiliationType = "university" | "school" | "studio";
 export type MovieFormInputs = {
   title: string;
   description: string;
-  categoryId: string;
+  categoryIds: string[];
   thumbnail?: File | null;
   youtubeUrl: string;
   trailerUrl?: string;

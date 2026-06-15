@@ -17,7 +17,6 @@ import { useMoviesQuery, useDeleteMovieMutation } from "@/hooks/db/use-movies";
 import { useCategoriesQuery } from "@/hooks/db/use-master-data";
 import { useDebounce } from "@/hooks/system/use-debounce";
 import { LOCALIZATION } from "@/core/constants/localization";
-import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 import { MovieFilterParams } from "@/core/domain/movie";
 
 type Sortby = "title" | "releasedate" | "views";
@@ -131,7 +130,7 @@ export default function AdminMoviesPage() {
                   { value: "", label: "ทุกหมวดหมู่" },
                   ...availableCategories.map((cat) => ({
                     value: cat.name,
-                    label: CATEGORY_TITLE_MAPPING[cat.name] || cat.name,
+                    label: cat.labelTh || cat.name,
                   })),
                 ]}
               />

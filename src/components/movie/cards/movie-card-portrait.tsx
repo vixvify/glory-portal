@@ -3,7 +3,6 @@
 import { memo } from "react";
 import Image from "next/image";
 import { Movie } from "@/core/domain/movie";
-import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 
 interface Props {
   movie: Movie;
@@ -24,9 +23,16 @@ function MovieCardPortrait({ movie }: Props) {
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
-        <span className="absolute top-2 left-2 px-2 py-0.5 text-[9px] font-bold tracking-wider bg-black/60 backdrop-blur-md text-zinc-300 border border-zinc-700/50 rounded uppercase">
-          {movie.category ? (CATEGORY_TITLE_MAPPING[movie.category.name] || movie.category.name) : ""}
-        </span>
+        <div className="absolute top-2 left-2 flex flex-wrap gap-1 max-w-[calc(100%-16px)]">
+          {movie.categories && movie.categories.map((cat) => (
+            <span
+              key={cat.id}
+              className="px-2 py-0.5 text-[9px] font-bold tracking-wider bg-black/60 backdrop-blur-md text-zinc-300 border border-zinc-700/50 rounded uppercase whitespace-nowrap"
+            >
+              {cat.labelTh || cat.name}
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );

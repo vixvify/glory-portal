@@ -7,8 +7,6 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Movie } from "@/core/domain/movie";
-import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
-
 import { Button } from "@/components/ui/button";
 
 interface MovieTableProps {
@@ -76,9 +74,20 @@ export const MovieTable: React.FC<MovieTableProps> = ({
                 </td>
 
                 <td className="py-4 px-6">
-                  <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-brand/10 text-brand border border-brand/20">
-                    {movie.category ? (CATEGORY_TITLE_MAPPING[movie.category.name] || movie.category.name) : ""}
-                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {movie.categories && movie.categories.length > 0 ? (
+                      movie.categories.map((cat) => (
+                        <span
+                          key={cat.id}
+                          className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-brand/10 text-brand border border-brand/20 whitespace-nowrap"
+                        >
+                          {cat.labelTh || cat.name}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-zinc-500 text-xs">-</span>
+                    )}
+                  </div>
                 </td>
 
                 <td className="py-4 px-6 space-y-1">

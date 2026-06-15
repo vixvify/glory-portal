@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import {
@@ -19,7 +19,6 @@ import MovieRatingPanel from "@/components/movie/detail/movie-rating-panel";
 import MovieInfoPanel from "@/components/movie/detail/movie-info-panel";
 import MovieCrewRow from "@/components/movie/rows/movie-crew-row";
 import MovieBtsSection from "@/components/movie/detail/movie-bts-section";
-import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 
 export default function MovieDetails() {
   const params = useParams<{ id: string }>();
@@ -86,9 +85,6 @@ export default function MovieDetails() {
   if (isLoading) return <Loading />;
   if (!movie) return null;
 
-  const categoryLabel =
-    CATEGORY_TITLE_MAPPING[movie.category?.name] || movie.category?.name || "";
-
   return (
     <div className="min-h-screen bg-transparent text-white font-sans selection:bg-brand selection:text-black">
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-28 pb-16 space-y-10 animate-fade-in">
@@ -113,14 +109,14 @@ export default function MovieDetails() {
               <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
               <span className="text-zinc-200">{movie.duration} นาที</span>
 
-              {categoryLabel && (
-                <>
+              {movie.categories && movie.categories.map((cat) => (
+                <React.Fragment key={cat.id}>
                   <span className="w-1.5 h-1.5 bg-zinc-700 rounded-full" />
-                  <span className="px-2.5 py-0.5 text-xs font-bold bg-brand/10 border border-brand/20 text-brand rounded-full">
-                    {categoryLabel}
+                  <span className="px-2.5 py-0.5 text-xs font-bold bg-brand/10 border border-brand/20 text-brand rounded-full whitespace-nowrap">
+                    {cat.labelTh || cat.name}
                   </span>
-                </>
-              )}
+                </React.Fragment>
+              ))}
             </div>
 
             <div className="space-y-2">
