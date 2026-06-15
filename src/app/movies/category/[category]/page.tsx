@@ -12,7 +12,7 @@ import MovieRow from "@/components/movie/rows/movie-row";
 import MovieRowPortrait from "@/components/movie/rows/movie-row-portrait";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
-import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
+import { useCategoriesQuery } from "@/hooks/db/use-master-data";
 import { isEmptyAll } from "@/utils/check";
 
 export default function CategoryPage() {
@@ -23,8 +23,16 @@ export default function CategoryPage() {
     : "";
 
   const { playMovie: handlePlayMovie } = useMoviePlayer();
-
   const { currentUser, showToast } = useAppStore();
+
+  const { data: categories = [] } = useCategoriesQuery();
+  const currentCategory = categories.find(
+    (c) => c.name.toLowerCase() === categoryName.toLowerCase()
+  );
+
+  const categoryDisplayTitle = currentCategory
+    ? (currentCategory.labelTh || currentCategory.name)
+    : categoryName;
 
   const { data: moviesByCategory = [] } = useMoviesQuery({
     search: categoryName,
@@ -93,9 +101,6 @@ export default function CategoryPage() {
     },
     [currentUser, favorites, toggleFavoriteMutation, showToast, router],
   );
-
-  const categoryDisplayTitle =
-    CATEGORY_TITLE_MAPPING[categoryName] || categoryName;
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-brand selection:text-black">

@@ -13,24 +13,19 @@ import { Select } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { SearchSelect } from "@/components/ui/search-select";
 import { LOCALIZATION } from "@/core/constants/localization";
-import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 import { useAppStore } from "@/store/use-store";
 import {
   COLOR_OPTIONS,
   ASPECT_RATIO_OPTIONS,
   CONTENT_WARNING_OPTIONS,
-  CrewTabId,
   AGE_RATING_OPTIONS,
   LANGUAGE_OPTIONS,
-  FLAT_CREW_ROLES,
 } from "@/core/constants/movie-form";
 import {
   useCreateMovieMutation,
   useUpdateMovieMutation,
 } from "@/hooks/db/use-movies";
-import { getFilteredCategories, getCrewOptions } from "@/utils/crew";
 import YoutubePreview from "@/components/preview/youtube";
-import { CREW_TAB_CONFIG } from "@/core/constants/movie-form";
 import { CrewSection } from "@/components/crew/crew-section";
 import { MovieFormInputs, MovieFormProps } from "@/core/domain/movie";
 import {
@@ -40,6 +35,8 @@ import {
   getSelectedContentWarnings,
   toCreateMoviePayload,
   toUpdateMoviePayload,
+  getFilteredCategories,
+  getCrewOptions,
 } from "@/utils/movie-form";
 import { useDynamicStringList } from "@/hooks/system/use-dynamic-string-list";
 import { useMovieCoverPreview } from "@/hooks/system/use-movie-cover-preview";
@@ -73,7 +70,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     control,
     formState: { errors },
   } = useForm<MovieFormInputs>({
-    defaultValues: getMovieFormDefaultValues(editingMovie, categories),
+    defaultValues: useMemo(
+      () => getMovieFormDefaultValues(editingMovie, categories, crewRoles),
+      [editingMovie, categories, crewRoles]
+    ),
   });
 
   const watchedYoutubeUrl = useWatch({ control, name: "youtubeUrl" });
@@ -109,18 +109,33 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     return currentCategory?.roles || [];
   }, [filteredCategories, activeCrewCategory]);
 
-  const [activeCrewTab, setActiveCrewTab] = useState<CrewTabId>(() => {
+  const flatCrewRoles = useMemo(() => {
+    return crewRoles.map((role) => ({
+      id: role.name.toLowerCase(),
+      code: role.name,
+      label: role.labelTh || role.name,
+    }));
+  }, [crewRoles]);
+
+  const [activeCrewTab, setActiveCrewTab] = useState<string>(() => {
     const firstCat = filteredCategories[0];
-    return (firstCat?.roles[0]?.id as CrewTabId) || "director";
+    return firstCat?.roles[0]?.id || "director";
   });
-  const activeCrewConfig = useMemo(
-    () => CREW_TAB_CONFIG.find((tab) => tab.id === activeCrewTab),
-    [activeCrewTab],
-  );
+
   const activeRoleDef = useMemo(
-    () => FLAT_CREW_ROLES.find((role) => role.id === activeCrewTab),
-    [activeCrewTab],
+    () => flatCrewRoles.find((role) => role.id === activeCrewTab),
+    [flatCrewRoles, activeCrewTab],
   );
+
+  const activeCrewConfig = useMemo(() => {
+    if (!activeRoleDef) return null;
+    return {
+      id: activeRoleDef.id,
+      label: activeRoleDef.label,
+      placeholder: `พิมพ์ชื่อ หรือเลือก${activeRoleDef.label}...`,
+      addLabel: `เพิ่มรายชื่อ${activeRoleDef.label}`,
+    };
+  }, [activeRoleDef]);
 
   const { fields, append, remove, update } = useFieldArray({
     control,
@@ -270,14 +285,26 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <Select
-                label="หมวดหมู่"
-                error={errors.categoryId?.message}
-                {...register("categoryId", { required: "กรุณาเลือกหมวดหมู่" })}
-                options={categories.map((cat) => ({
-                  value: cat.id,
-                  label: CATEGORY_TITLE_MAPPING[cat.name] || cat.name,
-                }))}
+              <Controller
+                name="categoryIds"
+                control={control}
+                rules={{
+                  required: "กรุณาเลือกหมวดหมู่ภาพยนตร์อย่างน้อยหนึ่งประเภท",
+                  validate: (value) => (value && value.length > 0) || "กรุณาเลือกหมวดหมู่ภาพยนตร์อย่างน้อยหนึ่งประเภท"
+                }}
+                render={({ field }) => (
+                  <MultiSelect
+                    label="หมวดหมู่"
+                    error={errors.categoryIds?.message}
+                    options={categories.map((cat) => ({
+                      value: cat.id,
+                      label: cat.labelTh || cat.name,
+                    }))}
+                    selectedValues={field.value || []}
+                    onChange={field.onChange}
+                    placeholder="เลือกหมวดหมู่..."
+                  />
+                )}
               />
               <Select
                 label="เรตอายุที่แนะนำ"
@@ -633,7 +660,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                         (c) => c.id === newCatId,
                       );
                       if (cat && cat.roles.length > 0) {
-                        setActiveCrewTab(cat.roles[0].id as CrewTabId);
+                        setActiveCrewTab(cat.roles[0].id);
                       }
                     }}
                     className="w-full bg-zinc-900 border border-zinc-850 focus:border-brand rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer appearance-none"
@@ -655,7 +682,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   <button
                     key={role.id}
                     type="button"
-                    onClick={() => setActiveCrewTab(role.id as CrewTabId)}
+                    onClick={() => setActiveCrewTab(role.id)}
                     className={`px-4 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
                       activeCrewTab === role.id
                         ? "bg-brand/10 border-brand text-brand font-bold"

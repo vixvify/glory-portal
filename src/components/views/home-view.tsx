@@ -1,6 +1,5 @@
 import { Movie, Category } from "@/core/domain/movie";
 import { CrewMember } from "@/core/domain/crew";
-import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 import MovieRow from "@/components/movie/rows/movie-row";
 import MovieRowPortrait from "@/components/movie/rows/movie-row-portrait";
 import MovieRankRow from "@/components/movie/rows/movie-rank-row";
@@ -97,7 +96,7 @@ export default function HomeView({
         {categories.map((category) => (
           <MovieRow
             key={`${category.id}-views`}
-            title={`${CATEGORY_TITLE_MAPPING[category.name]}`}
+            title={category.labelTh || category.name}
             movies={categoryMoviesMap[category.id] || []}
             onPlayClick={handlePlayMovie}
             favorites={favorites}

@@ -22,6 +22,7 @@ export const ratingSchema = z
 export const masterDataSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
+  labelTh: z.string().optional().nullable(),
   createdAt: z.union([z.string(), z.date()]).optional(),
 });
 
@@ -46,7 +47,7 @@ export const movieSchema = z.object({
   id: z.string(),
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  category: masterDataSchema,
+  categories: z.array(masterDataSchema),
   thumbnail: z.unknown(),
   youtubeUrl: z.string().url("Must be a valid URL"),
   trailerUrl: z
@@ -94,7 +95,7 @@ export const movieCrewInputItemWithRoleSchema = z.object({
 export const createMovieSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  categoryId: z.string().uuid("Category is required"),
+  categoryIds: z.array(z.string().uuid()).min(1, "At least one category is required"),
   thumbnail: z.unknown().refine((val) => val !== null, "Thumbnail is required"),
   youtubeUrl: z.string().url("Must be a valid URL"),
   trailerUrl: z
@@ -122,7 +123,7 @@ export const createMovieSchema = z.object({
 export const updateMovieSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  categoryId: z.string().uuid("Category is required"),
+  categoryIds: z.array(z.string().uuid()).min(1, "At least one category is required"),
   thumbnail: z
     .unknown()
     .refine(

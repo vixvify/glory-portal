@@ -8,7 +8,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { Button } from "@/components/ui/button";
-import { CATEGORY_TITLE_MAPPING } from "@/core/constants/categories";
 import { useAppStore } from "@/store/use-store";
 import {
   useCategoriesQuery,
@@ -165,7 +164,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Right side: Search + User Actions */}
       <div className="flex items-center gap-4 md:gap-5 flex-shrink-0">
         <div
           className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
@@ -214,9 +212,19 @@ export default function Navbar() {
               className="flex items-center gap-1.5 cursor-pointer group"
             >
               <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-black font-bold text-sm shadow-sm border border-brand/40">
-                {(currentUser.name || currentUser.email || "U")
-                  .charAt(0)
-                  .toUpperCase()}
+                {currentUser.photoUrl ? (
+                  <Image
+                    src={currentUser.photoUrl}
+                    alt={currentUser.name || currentUser.email || "U"}
+                    width={32}
+                    height={32}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  (currentUser.name || currentUser.email || "U")
+                    .charAt(0)
+                    .toUpperCase()
+                )}
               </div>
             </button>
 
@@ -316,7 +324,7 @@ export default function Navbar() {
                     onClick={() => handleNavClick(cat.name)}
                     className="w-full text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand"
                   >
-                    {CATEGORY_TITLE_MAPPING[cat.name] || cat.name}
+                    {cat.labelTh || cat.name}
                   </button>
                 ))}
               </>
