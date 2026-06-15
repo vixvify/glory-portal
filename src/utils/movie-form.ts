@@ -1,4 +1,5 @@
-import { Category, CreateMovie, Movie, UpdateMovie } from "@/core/domain/movie";
+import { CreateMovie, Movie, UpdateMovie } from "@/core/domain/movie";
+import { Category } from "@/core/domain/master-data";
 import { CrewRole, CrewOption, CrewMember } from "@/core/domain/crew";
 import {
   AGE_RATING_OPTIONS,

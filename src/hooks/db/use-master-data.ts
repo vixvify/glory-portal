@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { masterDataService } from "@/infra/container";
-import { Category } from "@/core/domain/movie";
+import { Category } from "@/core/domain/master-data";
 import { CrewRole } from "@/core/domain/crew";
 
 export function useCategoriesQuery() {
