@@ -14,6 +14,10 @@ import { useDebounce } from "@/hooks/system/use-debounce";
 import HomeView from "@/components/views/home-view";
 import SearchView from "@/components/views/search-view";
 
+const shuffleArray = <T,>(array: T[]): T[] => {
+  return [...array].sort(() => Math.random() - 0.5);
+};
+
 interface Props {
   recommendedMovies: Movie[];
   popularMovies: Movie[];
@@ -116,7 +120,7 @@ export default function HomePage(props: Props) {
       (m) => m.btsVideos && m.btsVideos.length > 0,
     );
 
-    const shuffledMovies = [...moviesWithBts].sort(() => Math.random() - 0.5);
+    const shuffledMovies = shuffleArray(moviesWithBts);
 
     shuffledMovies.forEach((movie) => {
       const btsClips = movie.btsVideos || [];
@@ -129,7 +133,7 @@ export default function HomePage(props: Props) {
           } else if (urlObj.hostname.includes("youtu.be")) {
             videoId = urlObj.pathname.slice(1);
           }
-        } catch (e) {}
+        } catch {}
         
         const thumbnailUrl = videoId 
           ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
