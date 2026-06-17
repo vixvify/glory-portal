@@ -14,10 +14,6 @@ import { useDebounce } from "@/hooks/system/use-debounce";
 import HomeView from "@/components/views/home-view";
 import SearchView from "@/components/views/search-view";
 
-const shuffleArray = <T,>(array: T[]): T[] => {
-  return [...array].sort(() => Math.random() - 0.5);
-};
-
 interface Props {
   recommendedMovies: Movie[];
   popularMovies: Movie[];
@@ -71,6 +67,8 @@ export default function HomePage(props: Props) {
   const { data: fetchedMovies = [], isLoading: isMoviesLoading } =
     useMoviesQuery(movieParams, { enabled: !!activeSearchQuery.trim() });
 
+  const { data: recentMovies = [] } = useMoviesQuery({ sortby: "createdAt", sort: "desc" });
+
   const toggleFavoriteMutation = useToggleFavoriteMutation();
 
   const handleToggleFavorite = useCallback(
@@ -100,29 +98,13 @@ export default function HomePage(props: Props) {
     [currentUser, favorites, toggleFavoriteMutation, showToast, router],
   );
 
-  const allMovies = useMemo(() => {
-    const map = new Map<string, Movie>();
-    const addMovies = (movies: Movie[] = []) => {
-      movies.forEach(m => map.set(m.id, m));
-    };
-    addMovies(recommendedMovies);
-    addMovies(popularMovies);
-    addMovies(awardsMovies);
-    addMovies(moviesByRating);
-    addMovies(portraitMovies);
-    Object.values(categoryMoviesMap || {}).forEach(addMovies);
-    return Array.from(map.values());
-  }, [recommendedMovies, popularMovies, awardsMovies, moviesByRating, portraitMovies, categoryMoviesMap]);
-
   const btsVideos = useMemo(() => {
     const items: BtsVideoItem[] = [];
-    const moviesWithBts = allMovies.filter(
+    const moviesWithBts = recentMovies.filter(
       (m) => m.btsVideos && m.btsVideos.length > 0,
     );
 
-    const shuffledMovies = shuffleArray(moviesWithBts);
-
-    shuffledMovies.forEach((movie) => {
+    moviesWithBts.forEach((movie) => {
       const btsClips = movie.btsVideos || [];
       btsClips.forEach((videoUrl, index) => {
         let videoId = "";
@@ -153,7 +135,7 @@ export default function HomePage(props: Props) {
     });
 
     return items;
-  }, [allMovies]);
+  }, [recentMovies]);
 
   const isSearching =
     searchQuery.trim() !== activeSearchQuery.trim() || isMoviesLoading;
