@@ -28,6 +28,14 @@ interface Props {
   portraitMovies: Movie[];
 }
 
+export interface BtsVideoItem {
+  id: string;
+  movie: Movie;
+  videoUrl: string;
+  title: string;
+  thumbnailUrl: string;
+}
+
 export default function HomePage(props: Props) {
   const {
     recommendedMovies,
@@ -88,6 +96,61 @@ export default function HomePage(props: Props) {
     [currentUser, favorites, toggleFavoriteMutation, showToast, router],
   );
 
+  const allMovies = useMemo(() => {
+    const map = new Map<string, Movie>();
+    const addMovies = (movies: Movie[] = []) => {
+      movies.forEach(m => map.set(m.id, m));
+    };
+    addMovies(recommendedMovies);
+    addMovies(popularMovies);
+    addMovies(awardsMovies);
+    addMovies(moviesByRating);
+    addMovies(portraitMovies);
+    Object.values(categoryMoviesMap || {}).forEach(addMovies);
+    return Array.from(map.values());
+  }, [recommendedMovies, popularMovies, awardsMovies, moviesByRating, portraitMovies, categoryMoviesMap]);
+
+  const btsVideos = useMemo(() => {
+    const items: BtsVideoItem[] = [];
+    const moviesWithBts = allMovies.filter(
+      (m) => m.btsVideos && m.btsVideos.length > 0,
+    );
+
+    const shuffledMovies = [...moviesWithBts].sort(() => Math.random() - 0.5);
+
+    shuffledMovies.forEach((movie) => {
+      const btsClips = movie.btsVideos || [];
+      btsClips.forEach((videoUrl, index) => {
+        let videoId = "";
+        try {
+          const urlObj = new URL(videoUrl);
+          if (urlObj.hostname.includes("youtube.com")) {
+            videoId = urlObj.searchParams.get("v") || "";
+          } else if (urlObj.hostname.includes("youtu.be")) {
+            videoId = urlObj.pathname.slice(1);
+          }
+        } catch (e) {}
+        
+        const thumbnailUrl = videoId 
+          ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+          : "";
+
+        const titleSuffix = btsClips.length > 1 ? ` (พาร์ท ${index + 1})` : "";
+        const title = `เบื้องหลัง: ${movie.title}${titleSuffix}`;
+
+        items.push({
+          id: `${movie.id}-${index}`,
+          movie,
+          videoUrl,
+          title,
+          thumbnailUrl,
+        });
+      });
+    });
+
+    return items;
+  }, [allMovies]);
+
   const isSearching =
     searchQuery.trim() !== activeSearchQuery.trim() || isMoviesLoading;
 
@@ -108,6 +171,7 @@ export default function HomePage(props: Props) {
           handlePlayMovie={handlePlayMovie}
           handleToggleFavorite={handleToggleFavorite}
           portraitMovies={portraitMovies}
+          btsVideos={btsVideos}
         />
       ) : (
         <SearchView
