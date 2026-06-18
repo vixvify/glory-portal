@@ -15,6 +15,7 @@ import HomeView from "@/components/views/home-view";
 import SearchView from "@/components/views/search-view";
 
 interface Props {
+  recentMovies: Movie[];
   recommendedMovies: Movie[];
   popularMovies: Movie[];
   awardsMovies: Movie[];
@@ -28,8 +29,17 @@ interface Props {
   portraitMovies: Movie[];
 }
 
+export interface BtsVideoItem {
+  id: string;
+  movie: Movie;
+  videoUrl: string;
+  title: string;
+  thumbnailUrl: string;
+}
+
 export default function HomePage(props: Props) {
   const {
+    recentMovies,
     recommendedMovies,
     popularMovies,
     awardsMovies,
@@ -88,6 +98,45 @@ export default function HomePage(props: Props) {
     [currentUser, favorites, toggleFavoriteMutation, showToast, router],
   );
 
+  const btsVideos = useMemo(() => {
+    const items: BtsVideoItem[] = [];
+    const moviesWithBts = recentMovies.filter(
+      (m) => m.btsVideos && m.btsVideos.length > 0,
+    );
+
+    moviesWithBts.forEach((movie) => {
+      const btsClips = movie.btsVideos || [];
+      btsClips.forEach((videoUrl, index) => {
+        let videoId = "";
+        try {
+          const urlObj = new URL(videoUrl);
+          if (urlObj.hostname.includes("youtube.com")) {
+            videoId = urlObj.searchParams.get("v") || "";
+          } else if (urlObj.hostname.includes("youtu.be")) {
+            videoId = urlObj.pathname.slice(1);
+          }
+        } catch {}
+
+        const thumbnailUrl = videoId
+          ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+          : "";
+
+        const titleSuffix = btsClips.length > 1 ? ` (พาร์ท ${index + 1})` : "";
+        const title = `เบื้องหลัง: ${movie.title}${titleSuffix}`;
+
+        items.push({
+          id: `${movie.id}-${index}`,
+          movie,
+          videoUrl,
+          title,
+          thumbnailUrl,
+        });
+      });
+    });
+
+    return items;
+  }, [recentMovies]);
+
   const isSearching =
     searchQuery.trim() !== activeSearchQuery.trim() || isMoviesLoading;
 
@@ -108,6 +157,7 @@ export default function HomePage(props: Props) {
           handlePlayMovie={handlePlayMovie}
           handleToggleFavorite={handleToggleFavorite}
           portraitMovies={portraitMovies}
+          btsVideos={btsVideos}
         />
       ) : (
         <SearchView

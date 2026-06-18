@@ -4,9 +4,8 @@ import { useQueries } from "@tanstack/react-query";
 import { movieService } from "@/infra/container";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
 import { useFavoritesQuery } from "@/hooks/db/use-favorites";
-import { useCategoriesQuery } from "@/hooks/db/use-master-data";
+import { useCategoriesQuery, useMostActiveUniversityQuery } from "@/hooks/db/use-master-data";
 import { useCrewMembersQuery } from "@/hooks/db/use-crew-members";
-import { useAdminStatsQuery } from "@/hooks/db/use-admin";
 import { useMovieWithAwardQuery } from "@/hooks/db/use-movies";
 import { useAppStore } from "@/store/use-store";
 import HomePage from "./home/home";
@@ -14,6 +13,12 @@ import Loading from "./loading";
 
 export default function Page() {
   const { currentUser } = useAppStore();
+
+  const { data: recentMovies = [], isLoading: isRecentLoading } =
+    useMoviesQuery({
+      sortby: "createdAt",
+      sort: "desc",
+    });
 
   const { data: recommendedMovies = [], isLoading: isRecLoading } =
     useMoviesQuery({
@@ -51,16 +56,16 @@ export default function Page() {
   const { data: serverFavorites = [], isLoading: isFavsLoading } =
     useFavoritesQuery(!!currentUser);
 
-  const { data: adminStats, isLoading: isStatsLoading } = useAdminStatsQuery();
+  const { data: mostActiveUniversity, isLoading: isStatsLoading } = useMostActiveUniversityQuery();
 
   const { data: movieByUniversity = [], isLoading: isMovieUniLoading } =
     useMoviesQuery({
-      search: adminStats?.mostActiveUniversity,
+      search: mostActiveUniversity || undefined,
       searchby: "university",
       page: 1,
       pagesize: 10,
       aspectRatio: "landscape",
-    });
+    }, { enabled: !!mostActiveUniversity });
 
   const { data: moviesByRating = [], isLoading: isMovieRatingLoading } =
     useMoviesQuery({
@@ -105,9 +110,10 @@ export default function Page() {
     isActorsLoading ||
     isStatsLoading ||
     isPortraitLoading ||
-    isMovieUniLoading ||
+    (!!mostActiveUniversity && isMovieUniLoading) ||
     isMovieRatingLoading ||
     isMovieAwardLoading ||
+    isRecentLoading ||
     (!!currentUser && isFavsLoading) ||
     categoryMovie.some((q) => q.isLoading);
 
@@ -124,6 +130,7 @@ export default function Page() {
 
   return (
     <HomePage
+      recentMovies={recentMovies}
       recommendedMovies={recommendedMovies}
       popularMovies={popularMovies}
       awardsMovies={moviesWithAward}

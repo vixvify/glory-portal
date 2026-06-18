@@ -6,6 +6,10 @@ import MovieRowPortrait from "@/components/movie/rows/movie-row-portrait";
 import MovieRankRow from "@/components/movie/rows/movie-rank-row";
 import CrewRow from "@/components/crew/crew-row";
 import MovieHero from "@/components/movie/heros/movie-hero";
+import MovieBtsRow from "@/components/movie/rows/movie-bts-row";
+import PlayerModal from "@/components/modal/player-modal";
+import { useState, useCallback } from "react";
+import { BtsVideoItem } from "@/app/home/home";
 
 interface HomeViewProps {
   recommendedMovies: Movie[];
@@ -19,6 +23,7 @@ interface HomeViewProps {
   categoryMoviesMap: Record<string, Movie[]>;
   favorites: Movie[];
   portraitMovies: Movie[];
+  btsVideos?: BtsVideoItem[];
   handlePlayMovie: (movie: Movie) => void;
   handleToggleFavorite: (movieId: string) => void;
 }
@@ -35,10 +40,16 @@ export default function HomeView({
   moviesByRating,
   favorites,
   portraitMovies,
+  btsVideos = [],
   handlePlayMovie,
   handleToggleFavorite,
 }: HomeViewProps) {
   const universityName = universityMovies[0]?.university;
+  const [selectedBtsVideo, setSelectedBtsVideo] = useState<string | null>(null);
+
+  const handlePlayBtsVideo = useCallback((videoUrl: string) => {
+    setSelectedBtsVideo(videoUrl);
+  }, []);
 
   return (
     <main className="flex-1 flex flex-col">
@@ -105,6 +116,14 @@ export default function HomeView({
           />
         ))}
 
+        {btsVideos.length > 0 && (
+          <MovieBtsRow
+            title="เบื้องหลังการสร้าง"
+            btsVideos={btsVideos}
+            onPlayClick={handlePlayBtsVideo}
+          />
+        )}
+
         <MovieRowPortrait
           title="ภาพยนตร์แนวตั้ง"
           movies={portraitMovies}
@@ -117,6 +136,13 @@ export default function HomeView({
 
         {actorList.length > 0 && <CrewRow title="นักแสดง" crew={actorList} />}
       </div>
+
+      <PlayerModal
+        isOpen={!!selectedBtsVideo}
+        onClose={() => setSelectedBtsVideo(null)}
+        youtubeUrl={selectedBtsVideo || ""}
+        movieTitle="เบื้องหลังการสร้าง"
+      />
     </main>
   );
 }
