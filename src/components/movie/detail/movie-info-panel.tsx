@@ -52,7 +52,7 @@ export default function MovieInfoPanel({ movie }: Props) {
           ? "ภาพสี"
           : movie.colorType === "black_and_white"
             ? "ขาวดำ"
-            : movie.colorType === "color_and_black_and_white"
+            : movie.colorType === "color_and_bw"
               ? "ภาพสีและขาวดำ"
               : movie.colorType,
     },

@@ -1,7 +1,7 @@
 export const COLOR_OPTIONS = [
   { value: "color", label: "ภาพสี" },
   { value: "black_and_white", label: "ขาวดำ" },
-  { value: "color_and_black_and_white", label: "ภาพสีและขาวดำ" },
+  { value: "color_and_bw", label: "ภาพสีและขาวดำ" },
 ];
 
 export const ASPECT_RATIO_OPTIONS = [
@@ -35,4 +35,3 @@ export interface CrewCategory {
 export const AGE_RATING_OPTIONS = ["G", "PG", "PG-13", "NC-17", "R"];
 
 export const LANGUAGE_OPTIONS = ["ไทย", "อังกฤษ", "เกาหลี", "ญี่ปุ่น", "จีน"];
-
