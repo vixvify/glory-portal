@@ -15,6 +15,7 @@ import HomeView from "@/components/views/home-view";
 import SearchView from "@/components/views/search-view";
 
 interface Props {
+  recentMovies: Movie[];
   recommendedMovies: Movie[];
   popularMovies: Movie[];
   awardsMovies: Movie[];
@@ -38,6 +39,7 @@ export interface BtsVideoItem {
 
 export default function HomePage(props: Props) {
   const {
+    recentMovies,
     recommendedMovies,
     popularMovies,
     awardsMovies,
@@ -66,8 +68,6 @@ export default function HomePage(props: Props) {
 
   const { data: fetchedMovies = [], isLoading: isMoviesLoading } =
     useMoviesQuery(movieParams, { enabled: !!activeSearchQuery.trim() });
-
-  const { data: recentMovies = [] } = useMoviesQuery({ sortby: "createdAt", sort: "desc" });
 
   const toggleFavoriteMutation = useToggleFavoriteMutation();
 
@@ -116,8 +116,8 @@ export default function HomePage(props: Props) {
             videoId = urlObj.pathname.slice(1);
           }
         } catch {}
-        
-        const thumbnailUrl = videoId 
+
+        const thumbnailUrl = videoId
           ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
           : "";
 

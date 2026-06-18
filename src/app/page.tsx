@@ -15,6 +15,12 @@ import Loading from "./loading";
 export default function Page() {
   const { currentUser } = useAppStore();
 
+  const { data: recentMovies = [], isLoading: isRecentLoading } =
+    useMoviesQuery({
+      sortby: "createdAt",
+      sort: "desc",
+    });
+
   const { data: recommendedMovies = [], isLoading: isRecLoading } =
     useMoviesQuery({
       sort: "desc",
@@ -108,6 +114,7 @@ export default function Page() {
     isMovieUniLoading ||
     isMovieRatingLoading ||
     isMovieAwardLoading ||
+    isRecentLoading ||
     (!!currentUser && isFavsLoading) ||
     categoryMovie.some((q) => q.isLoading);
 
@@ -124,6 +131,7 @@ export default function Page() {
 
   return (
     <HomePage
+      recentMovies={recentMovies}
       recommendedMovies={recommendedMovies}
       popularMovies={popularMovies}
       awardsMovies={moviesWithAward}
