@@ -24,3 +24,10 @@ export function useCrewRolesQuery() {
   });
 }
 
+export function useMostActiveUniversityQuery() {
+  return useQuery<string, Error>({
+    queryKey: ["most-active-university"],
+    queryFn: () => masterDataService.getMostActiveUniversity(),
+  });
+}
+

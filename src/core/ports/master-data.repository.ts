@@ -6,5 +6,6 @@ export interface MasterDataRepository {
   getCategories(): Promise<ApiResponse<Category[]>>;
   getUniversities(): Promise<ApiResponse<string[]>>;
   getCrewRoles(): Promise<ApiResponse<CrewRole[]>>;
+  getMostActiveUniversity(): Promise<ApiResponse<string>>;
 }
 

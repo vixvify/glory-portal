@@ -2,25 +2,12 @@
 
 import Link from "next/link";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import CategoryIcon from "@mui/icons-material/Category";
 import MovieIcon from "@mui/icons-material/Movie";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import PeopleIcon from "@mui/icons-material/People";
 import AddIcon from "@mui/icons-material/Add";
 import SettingsIcon from "@mui/icons-material/Settings";
-import Loading from "@/app/loading";
-import { StatsCard } from "@/components/ui/stats-card";
-import { useAdminStatsQuery } from "@/hooks/db/use-admin";
 
 export default function AdminPage() {
-  const { data: stats, isLoading: isStatsLoading } = useAdminStatsQuery();
-
-  const isInitialLoading = isStatsLoading;
-
-  if (isInitialLoading) {
-    return <Loading />;
-  }
-
   return (
     <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-brand selection:text-black pb-20">
       <main className="max-w-7xl mx-auto w-full px-6 md:px-16 pt-28 space-y-10 animate-fade-in">
@@ -41,32 +28,6 @@ export default function AdminPage() {
           <p className="text-sm text-zinc-400 font-light">
             แดชบอร์ดจัดการข้อมูลภาพยนตร์สั้นและทีมงานของ Thai-Shortflix
           </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          <StatsCard
-            title="จำนวนเรื่องทั้งหมด"
-            value={stats?.totalMovies ?? 0}
-            icon={<MovieIcon className="text-2xl" />}
-          />
-          <StatsCard
-            title="หมวดหมู่ภาพยนตร์"
-            value={stats?.totalCategories ?? 0}
-            icon={<CategoryIcon className="text-2xl" />}
-            iconClassName="bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-          />
-          <StatsCard
-            title="ยอดเข้าชมรวม"
-            value={(stats?.totalViews ?? 0).toLocaleString()}
-            icon={<VisibilityIcon className="text-2xl" />}
-            iconClassName="bg-cyan-500/10 border-cyan-500/20 text-cyan-400"
-          />
-          <StatsCard
-            title="ทีมงานและนักแสดง"
-            value={stats?.totalCrew ?? 0}
-            icon={<PeopleIcon className="text-2xl" />}
-            iconClassName="bg-violet-500/10 border-violet-500/20 text-violet-400"
-          />
         </div>
 
         <div className="space-y-4 pt-6 border-t border-zinc-900">
