@@ -43,4 +43,17 @@ export class MasterDataService {
       throw error;
     }
   }
+
+  async getMostActiveUniversity(): Promise<string> {
+    try {
+      const response = await this.masterDataRepository.getMostActiveUniversity();
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      return response.data;
+    } catch (error) {
+      console.error("Error in getMostActiveUniversity:", error);
+      throw error;
+    }
+  }
 }
