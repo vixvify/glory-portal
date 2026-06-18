@@ -1,4 +1,4 @@
-import { Category } from "../domain/movie";
+import { Category } from "../domain/master-data";
 import { MasterDataRepository } from "../ports/master-data.repository";
 import { CrewRole } from "../domain/crew";
 

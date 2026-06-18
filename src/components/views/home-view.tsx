@@ -1,4 +1,5 @@
-import { Movie, Category } from "@/core/domain/movie";
+import { Movie } from "@/core/domain/movie";
+import { Category } from "@/core/domain/master-data";
 import { CrewMember } from "@/core/domain/crew";
 import MovieRow from "@/components/movie/rows/movie-row";
 import MovieRowPortrait from "@/components/movie/rows/movie-row-portrait";

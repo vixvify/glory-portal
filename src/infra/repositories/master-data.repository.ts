@@ -1,6 +1,6 @@
 import { ApiResponse } from "../interface/response";
 import { MasterDataRepository } from "@/core/ports/master-data.repository";
-import { Category } from "@/core/domain/movie";
+import { Category } from "@/core/domain/master-data";
 import { CrewRole } from "@/core/domain/crew";
 import httpClient from "@/lib/http";
 

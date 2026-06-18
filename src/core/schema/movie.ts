@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { masterDataSchema } from "./master-data";
+import { crewRoleSchema } from "./crew";
 
 export const ratingSchema = z
   .object({
@@ -18,19 +20,6 @@ export const ratingSchema = z
       .optional(),
   })
   .partial();
-
-export const masterDataSchema = z.object({
-  id: z.string().uuid(),
-  name: z.string(),
-  labelTh: z.string().optional().nullable(),
-  createdAt: z.union([z.string(), z.date()]).optional(),
-});
-
-export const crewRoleSchema = z.object({
-  id: z.string().uuid(),
-  name: z.string(),
-  createdAt: z.union([z.string(), z.date()]).optional(),
-});
 
 export const movieCrewSchema = z.object({
   id: z.string(),

@@ -20,3 +20,10 @@ export const updateCrewMemberSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address").optional().nullable().or(z.literal("")),
 });
+
+export const crewRoleSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  createdAt: z.union([z.string(), z.date()]).optional(),
+});
+
