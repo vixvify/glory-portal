@@ -48,6 +48,14 @@ export interface Movie {
   creator?: User | null;
 }
 
+export interface BtsVideoItem {
+  id: string;
+  movie: Movie;
+  videoUrl: string;
+  title: string;
+  thumbnailUrl: string;
+}
+
 export interface MovieCrewInputItem {
   crewMemberId?: string | null;
   name?: string | null;

@@ -93,6 +93,18 @@ export class MovieService {
       throw error;
     }
   }
+  async getMoviesWithBts(): Promise<Movie[]> {
+    try {
+      const response = await this.movieRepository.getMovieWithBts();
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      return response.data;
+    } catch (error) {
+      console.error("Error in getMoviesWithBts:", error);
+      throw error;
+    }
+  }
   async createMovie(movie: CreateMovie): Promise<Movie> {
     try {
       const validated = parseSchema(createMovieSchema, movie);

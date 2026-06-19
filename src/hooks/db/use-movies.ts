@@ -50,6 +50,14 @@ export function useMovieWithAwardQuery(options?: { enabled?: boolean }) {
   });
 }
 
+export function useMovieWithBtsQuery(options?: { enabled?: boolean }) {
+  return useQuery<Movie[], Error>({
+    queryKey: ["movies", "with-bts"],
+    queryFn: () => movieService.getMoviesWithBts(),
+    ...options,
+  });
+}
+
 export function useCreateMovieMutation() {
   const queryClient = useQueryClient();
   return useMutation<Movie, Error, CreateMovie>({
