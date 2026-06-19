@@ -47,14 +47,13 @@ export default function HomePage(props: Props) {
     categoryMoviesMap,
     portraitMovies,
   } = props;
+
   const router = useRouter();
   const { currentUser, showToast, searchQuery } = useAppStore();
-
-  const { data: favorites = [] } = useFavoritesQuery(!!currentUser);
-
   const { playMovie: handlePlayMovie } = useMoviePlayer();
-
+  const { data: favorites = [] } = useFavoritesQuery(!!currentUser);
   const activeSearchQuery = useDebounce(searchQuery, 200);
+  const toggleFavoriteMutation = useToggleFavoriteMutation();
 
   const movieParams = useMemo(() => {
     if (activeSearchQuery.trim()) {
@@ -65,8 +64,6 @@ export default function HomePage(props: Props) {
 
   const { data: fetchedMovies = [], isLoading: isMoviesLoading } =
     useMoviesQuery(movieParams, { enabled: !!activeSearchQuery.trim() });
-
-  const toggleFavoriteMutation = useToggleFavoriteMutation();
 
   const handleToggleFavorite = useCallback(
     (movieId: string) => {
