@@ -1,136 +1,90 @@
-"use client";
-
-import { useQueries } from "@tanstack/react-query";
-import { movieService } from "@/infra/container";
-import { useMoviesQuery } from "@/hooks/db/use-movies";
-import { useFavoritesQuery } from "@/hooks/db/use-favorites";
-import { useCategoriesQuery, useMostActiveUniversityQuery } from "@/hooks/db/use-master-data";
-import { useCrewMembersQuery } from "@/hooks/db/use-crew-members";
-import { useMovieWithAwardQuery } from "@/hooks/db/use-movies";
-import { useAppStore } from "@/store/use-store";
+import {
+  movieService,
+  masterDataService,
+  crewMemberService,
+} from "@/infra/container";
+import { mapMoviesToBtsVideos } from "@/utils/movie-bts";
 import HomePage from "./home/home";
-import Loading from "./loading";
 
-export default function Page() {
-  const { currentUser } = useAppStore();
-
-  const { data: recentMovies = [], isLoading: isRecentLoading } =
-    useMoviesQuery({
-      sortby: "createdAt",
-      sort: "desc",
-    });
-
-  const { data: recommendedMovies = [], isLoading: isRecLoading } =
-    useMoviesQuery({
+export default async function Page() {
+  const [
+    recommendedMovies,
+    popularMovies,
+    categories,
+    staffList,
+    actorList,
+    portraitMovies,
+    mostActiveUniversity,
+    moviesByRating,
+    moviesWithAward,
+    moviesWithBts,
+  ] = await Promise.all([
+    movieService.getMovies({
       sort: "desc",
       sortby: "matchRate",
       page: 1,
       pagesize: 5,
       aspectRatio: "landscape",
-    });
-
-  const { data: popularMovies = [], isLoading: isPopLoading } = useMoviesQuery({
-    sort: "desc",
-    sortby: "views",
-    page: 1,
-    pagesize: 10,
-    aspectRatio: "landscape",
-  });
-
-  const { data: categories = [], isLoading: isCatLoading } =
-    useCategoriesQuery();
-
-  const { data: staffList = [], isLoading: isStaffsLoading } =
-    useCrewMembersQuery();
-
-  const { data: actorList = [], isLoading: isActorsLoading } =
-    useCrewMembersQuery({ search: "cast", searchby: "role" });
-
-  const { data: portraitMovies = [], isLoading: isPortraitLoading } =
-    useMoviesQuery({
-      page: 1,
-      pagesize: 10,
-      aspectRatio: "portrait",
-    });
-
-  const { data: serverFavorites = [], isLoading: isFavsLoading } =
-    useFavoritesQuery(!!currentUser);
-
-  const { data: mostActiveUniversity, isLoading: isStatsLoading } = useMostActiveUniversityQuery();
-
-  const { data: movieByUniversity = [], isLoading: isMovieUniLoading } =
-    useMoviesQuery({
-      search: mostActiveUniversity || undefined,
-      searchby: "university",
+    }),
+    movieService.getMovies({
+      sort: "desc",
+      sortby: "views",
       page: 1,
       pagesize: 10,
       aspectRatio: "landscape",
-    }, { enabled: !!mostActiveUniversity });
-
-  const { data: moviesByRating = [], isLoading: isMovieRatingLoading } =
-    useMoviesQuery({
+    }),
+    masterDataService.getCategories(),
+    crewMemberService.getCrewMembers(),
+    crewMemberService.getCrewMembers({ search: "cast", searchby: "role" }),
+    movieService.getMovies({
+      page: 1,
+      pagesize: 10,
+      aspectRatio: "portrait",
+    }),
+    masterDataService.getMostActiveUniversity(),
+    movieService.getMovies({
       sort: "desc",
       sortby: "averageRating",
       page: 1,
       pagesize: 10,
       aspectRatio: "landscape",
+    }),
+    movieService.getMoviesWithAward(),
+    movieService.getMoviesWithBts(),
+  ]);
+
+  const movieByUniversityPromise = mostActiveUniversity
+    ? movieService.getMovies({
+        search: mostActiveUniversity,
+        searchby: "university",
+        page: 1,
+        pagesize: 10,
+        aspectRatio: "landscape",
+      })
+    : Promise.resolve([]);
+
+  const categoryMoviePromises = categories.map(async (category) => {
+    const movies = await movieService.getMovies({
+      search: category.name,
+      searchby: "category",
+      page: 1,
+      pagesize: 10,
+      aspectRatio: "landscape",
     });
-
-  const { data: moviesWithAward = [], isLoading: isMovieAwardLoading } =
-    useMovieWithAwardQuery();
-
-  const categoryMovie = useQueries({
-    queries: categories.map((category) => ({
-      queryKey: [
-        "movies",
-        {
-          search: category.name,
-          searchby: "category",
-          page: 1,
-          pagesize: 10,
-          aspectRatio: "landscape",
-        },
-      ],
-      queryFn: () =>
-        movieService.getMovies({
-          search: category.name,
-          searchby: "category",
-          page: 1,
-          pagesize: 10,
-          aspectRatio: "landscape",
-        }),
-    })),
+    return [category.id, movies] as const;
   });
 
-  const isCoreLoading =
-    isRecLoading ||
-    isPopLoading ||
-    isCatLoading ||
-    isStaffsLoading ||
-    isActorsLoading ||
-    isStatsLoading ||
-    isPortraitLoading ||
-    (!!mostActiveUniversity && isMovieUniLoading) ||
-    isMovieRatingLoading ||
-    isMovieAwardLoading ||
-    isRecentLoading ||
-    (!!currentUser && isFavsLoading) ||
-    categoryMovie.some((q) => q.isLoading);
+  const [movieByUniversity, ...categoryMoviesEntries] = await Promise.all([
+    movieByUniversityPromise,
+    ...categoryMoviePromises,
+  ]);
 
-  if (isCoreLoading) {
-    return <Loading />;
-  }
-
-  const categoryMoviesMap = Object.fromEntries(
-    categories.map((category, index) => [
-      category.id,
-      categoryMovie[index]?.data || [],
-    ]),
-  );
+  const categoryMoviesMap = Object.fromEntries(categoryMoviesEntries);
+  const btsVideos = mapMoviesToBtsVideos(moviesWithBts);
 
   return (
     <HomePage
-      recentMovies={recentMovies}
+      btsVideos={btsVideos}
       recommendedMovies={recommendedMovies}
       popularMovies={popularMovies}
       awardsMovies={moviesWithAward}
@@ -141,7 +95,6 @@ export default function Page() {
       universityMovies={movieByUniversity}
       moviesByRating={moviesByRating}
       categoryMoviesMap={categoryMoviesMap}
-      favorites={serverFavorites}
     />
   );
 }

@@ -36,6 +36,11 @@ export class MovieRepositoryImpl implements MovieRepository {
     return response;
   }
 
+  async getMovieWithBts(): Promise<ApiResponse<Movie[]>> {
+    const response = await httpClient.get<Movie[]>(`/movie/movies-with-bts`);
+    return response;
+  }
+
   async getMoviesByUniversity(
     university: string,
   ): Promise<ApiResponse<Movie[]>> {

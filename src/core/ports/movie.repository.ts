@@ -9,6 +9,7 @@ export interface MovieRepository {
   getMoviesByCategory(category: string): Promise<ApiResponse<Movie[]>>;
   getMoviesByUniversity(university: string): Promise<ApiResponse<Movie[]>>;
   getMovieWithAward(): Promise<ApiResponse<Movie[]>>;
+  getMovieWithBts(): Promise<ApiResponse<Movie[]>>;
   createMovie(formData: FormData): Promise<ApiResponse<Movie>>;
   updateMovie(id: string, formData: FormData): Promise<ApiResponse<Movie>>;
   deleteMovie(id: string): Promise<ApiResponse<void>>;
