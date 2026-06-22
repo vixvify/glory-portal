@@ -6,6 +6,8 @@ import {
 import { mapMoviesToBtsVideos } from "@/utils/movie-bts";
 import HomePage from "./home/home";
 
+export const dynamic = "force-dynamic";
+
 export default async function Page() {
   const [
     recommendedMovies,
