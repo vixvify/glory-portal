@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -35,49 +35,138 @@ export default function MovieDetailHero({
 
   const [videoLoaded, setVideoLoaded] = useState(false);
 
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
   useEffect(() => {
     if (!backgroundEmbedUrl) return;
-    const timer = setTimeout(() => setVideoLoaded(true), 1500);
-    return () => clearTimeout(timer);
+
+    let timer: NodeJS.Timeout;
+    let initInterval: NodeJS.Timeout;
+    let hasPlayed = false;
+    let lastReturnTime = 0;
+
+    // 1. Listen for PLAYING from YouTube
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== "https://www.youtube.com") return;
+
+      // Stop pinging once we get ANY response from YouTube
+      clearInterval(initInterval);
+
+      try {
+        const data = typeof event.data === "string"
+          ? JSON.parse(event.data)
+          : event.data;
+
+        if (data?.event === "onStateChange" && data?.info === 1 && !hasPlayed) {
+          hasPlayed = true;
+          timer = setTimeout(() => setVideoLoaded(true), 3800);
+        }
+        
+        // Also catch if it's already playing via infoDelivery
+        if (data?.event === "infoDelivery" && data?.info?.playerState === 1 && !hasPlayed) {
+          hasPlayed = true;
+          timer = setTimeout(() => setVideoLoaded(true), 3800);
+        }
+      } catch { /* ignore */ }
+    };
+
+    // 2. Ask iframe to send events
+    const listenToIframe = () => {
+      iframeRef.current?.contentWindow?.postMessage(
+        JSON.stringify({ event: "listening" }),
+        "https://www.youtube.com"
+      );
+    };
+
+    // 3. Force video play
+    const forcePlay = () => {
+      iframeRef.current?.contentWindow?.postMessage(
+        JSON.stringify({ event: "command", func: "playVideo", args: [] }),
+        "https://www.youtube.com"
+      );
+    };
+
+    // 4. Handle Leaving (Hide)
+    const handleLeave = () => {
+      setVideoLoaded(false);
+      hasPlayed = false;
+      clearTimeout(timer);
+    };
+
+    // 5. Handle Returning (Show)
+    const handleReturn = () => {
+      // Debounce: Prevent rapid multiple calls (e.g. visibility + focus firing together)
+      const now = Date.now();
+      if (now - lastReturnTime < 1000) return;
+      lastReturnTime = now;
+
+      forcePlay();
+      setTimeout(listenToIframe, 500);
+    };
+
+    // 6. Event Listeners
+    const handleVisibilityChange = () => {
+      if (document.hidden) handleLeave();
+      else handleReturn();
+    };
+
+    const handleWindowBlur = () => handleLeave();
+    const handleWindowFocus = () => handleReturn();
+
+    // 7. Initialization
+    window.addEventListener("message", handleMessage);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("blur", handleWindowBlur);
+    window.addEventListener("focus", handleWindowFocus);
+    
+    // Ping iframe every 500ms until we get a response
+    initInterval = setInterval(listenToIframe, 500);
+
+    // 8. Cleanup
+    return () => {
+      clearTimeout(timer);
+      clearInterval(initInterval);
+      window.removeEventListener("message", handleMessage);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", handleWindowBlur);
+      window.removeEventListener("focus", handleWindowFocus);
+    };
   }, [backgroundEmbedUrl]);
 
   const isPortrait = movie.aspectRatio === "portrait" || movie.aspectRatio === "portait";
 
   return (
     <div className="relative rounded-lg overflow-hidden shadow-2xl glass-panel">
-      <div className={`relative w-full bg-black/45 overflow-hidden ${
-        isPortrait
+      <div className={`relative w-full bg-black/45 overflow-hidden ${isPortrait
           ? "min-h-[450px] md:h-[520px] flex flex-col md:flex-row items-center md:items-end justify-center md:justify-start p-8 md:p-12 gap-8"
           : "h-[420px] md:h-[520px]"
-      }`}>
-        <div
-          className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 z-0 ${
-            isPortrait ? "hidden" : ""
-          }`}
-          style={{
-            backgroundImage: `url(${movie.thumbnail})`,
-            ...(!isPortrait ? {
-              opacity: videoLoaded ? 0 : 0.8,
-              visibility: videoLoaded ? "hidden" : "visible",
-            } : {})
-          }}
-        />
-
+        }`}>
         {!isPortrait && backgroundEmbedUrl && (
           <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
             <iframe
-              src={backgroundEmbedUrl}
+              ref={iframeRef}
+              src={`${backgroundEmbedUrl}&origin=${typeof window !== "undefined" ? window.location.origin : ""}`}
               title="Trailer Background"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              className={`absolute top-1/2 left-1/2 w-[100vw] h-[56.25vw] min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 pointer-events-none scale-[1.35] transition-opacity duration-1000 ${
-                videoLoaded ? "opacity-45" : "opacity-0"
-               }`}
+              className="absolute top-1/2 left-1/2 w-[100vw] h-[56.25vw] min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 pointer-events-none scale-[1.35] opacity-45"
               style={{ pointerEvents: "none" }}
               tabIndex={-1}
             />
           </div>
         )}
+
+        <div
+          className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 z-0 ${isPortrait ? "hidden" : ""
+            }`}
+          style={{
+            backgroundImage: `url(${movie.thumbnail})`,
+            ...(!isPortrait ? {
+              opacity: videoLoaded ? 0 : 1,
+              visibility: videoLoaded ? "hidden" : "visible",
+            } : {})
+          }}
+        />
 
         <div className="absolute inset-0 bg-transparent pointer-events-auto z-10" />
 

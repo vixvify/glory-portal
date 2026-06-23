@@ -42,7 +42,7 @@ src/
 ---
 
 # Rules
-
+-**analyst and planning before do anything. after fix code always test by open link webside for check error audit**
 - Use strict TypeScript
 - Never use any
 - Use functional components only
