@@ -194,6 +194,7 @@ export function buildMovieFormPayload({
 
   return {
     ...data,
+    categoryIds: Array.from(new Set((data.categoryIds || []).filter(Boolean))),
     thumbnail: data.thumbnail || editingMovie?.thumbnail,
     duration: Number(data.duration),
     btsVideo: activeVideos,

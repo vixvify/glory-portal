@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useDeferredValue } from "react";
 import Image from "next/image";
 import YoutubePreview from "@/components/preview/youtube";
 import { useForm, Controller, useWatch, useFieldArray } from "react-hook-form";
@@ -129,6 +129,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     filteredCategories[0]?.id || "",
   );
   const [crewRoleSearch, setCrewRoleSearch] = useState("");
+  const deferredCrewRoleSearch = useDeferredValue(crewRoleSearch);
   const activeCategoryRoles = useMemo(() => 
     filteredCategories.find(c => c.id === activeCrewCategory)?.roles || [],
   [filteredCategories, activeCrewCategory]);
@@ -225,6 +226,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                         name="thumbnail"
                         control={control}
                         defaultValue={null}
+                        rules={{ required: !editingMovie ? "กรุณาอัปโหลดรูปปกภาพยนตร์" : false }}
                         render={({ field }) => (
                           <input
                             type="file"
@@ -262,6 +264,9 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                           <CloseIcon className="w-3 h-3" />
                         </button>
                       </div>
+                    )}
+                    {errors.thumbnail && (
+                      <p className="text-red-500 text-xs mt-1">{errors.thumbnail.message as string}</p>
                     )}
                   </div>
 
@@ -516,8 +521,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                           }}
                           className={`px-4 py-1.5 text-sm rounded-full border transition-all ${
                             affiliationType === type
-                              ? "bg-brand border-brand text-black font-semibold"
-                              : "bg-transparent border-zinc-600 text-zinc-400 hover:border-zinc-400 hover:text-zinc-200"
+                              ? "bg-brand border-brand text-white font-semibold"
+                              : "bg-transparent border-zinc-600 text-zinc-400 hover:border-zinc-400 hover:text-white"
                           }`}
                         >
                           {label}
@@ -686,24 +691,37 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 </div>
 
                 <div className="space-y-6 mt-4">
-                  {activeCategoryRoles
-                    .filter((role) => role.label.toLowerCase().includes(crewRoleSearch.toLowerCase()))
-                    .map(role => {
-                    const fieldsForRole = fields.map((f, i) => ({ ...f, index: i })).filter((f) => f.role === role.id);
-                    return (
-                      <CrewSection
-                        key={role.id}
-                        label={role.label}
-                        fields={fieldsForRole}
-                        onAdd={() => append({ role: role.id, crewMemberId: null, name: "", email: "" })}
-                        onRemove={remove}
-                        onUpdate={handleUpdateCrew}
-                        placeholder={`พิมพ์ชื่อ หรือเลือก${role.label}...`}
-                        addButtonLabel={`เพิ่มตำแหน่ง`}
-                        crewOptions={crewOptions}
-                      />
+                  {(() => {
+                    const filteredRoles = activeCategoryRoles.filter((role) =>
+                      role.label.toLowerCase().includes(deferredCrewRoleSearch.toLowerCase())
                     );
-                  })}
+
+                    if (filteredRoles.length === 0) {
+                      return (
+                        <div className="py-12 flex flex-col items-center justify-center border border-dashed border-[#3A3A3A] rounded-[16px] bg-black/20">
+                          <p className="text-sm font-medium text-zinc-400">ไม่พบตำแหน่ง "{deferredCrewRoleSearch}"</p>
+                          <p className="text-xs text-zinc-500 mt-1">ลองพิมพ์คำค้นหาด้วยคีย์เวิร์ดอื่นดูอีกครั้ง</p>
+                        </div>
+                      );
+                    }
+
+                    return filteredRoles.map(role => {
+                      const fieldsForRole = fields.map((f, i) => ({ ...f, index: i })).filter((f) => f.role === role.id);
+                      return (
+                        <CrewSection
+                          key={role.id}
+                          label={role.label}
+                          fields={fieldsForRole}
+                          onAdd={() => append({ role: role.id, crewMemberId: null, name: "", email: "" })}
+                          onRemove={remove}
+                          onUpdate={handleUpdateCrew}
+                          placeholder={`พิมพ์ชื่อ หรือเลือก${role.label}...`}
+                          addButtonLabel={`เพิ่มตำแหน่ง`}
+                          crewOptions={crewOptions}
+                        />
+                      );
+                    });
+                  })()}
                 </div>
               </div>
 
@@ -728,11 +746,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             >
               ยกเลิก
             </Button>
-            {editingMovie && (
-              <button type="button" className="text-red-500 hover:text-red-400 mt-2">
-                <CloseIcon className="w-5 h-5" />
-              </button>
-            )}
           </div>
         </form>
       </main>
