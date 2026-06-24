@@ -10,8 +10,17 @@ export const ASPECT_RATIO_OPTIONS = [
 ];
 
 export const CONTENT_WARNING_OPTIONS = [
-  { value: "profanity", label: "มีคำหยาบคาย" },
-  { value: "drugs", label: "มียาเสพติด/สิ่งมึนเมา" },
+  { value: "violence", label: "ความรุนแรง" },
+  { value: "gore", label: "เลือด/บาดแผล" },
+  { value: "profanity", label: "คำหยาบ" },
+  { value: "sexualContent", label: "เนื้อหาทางเพศ" },
+  { value: "nudity", label: "เปลือยกาย" },
+  { value: "smoking", label: "สูบบุหรี่" },
+  { value: "alcohol", label: "ดื่มแอลกอฮอล์" },
+  { value: "drugs", label: "สารเสพติด" },
+  { value: "mentalHealth", label: "สุขภาพจิต/การฆ่าตัวตาย" },
+  { value: "flashingLights", label: "แสงกระพริบ" },
+  { value: "other", label: "อื่น ๆ (ระบุ)" },
 ];
 
 export const DROPDOWN_PLACEHOLDERS = {

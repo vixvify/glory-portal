@@ -1,17 +1,19 @@
 "use client";
 
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
+import YoutubePreview from "@/components/preview/youtube";
 import { useForm, Controller, useWatch, useFieldArray } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import CloseIcon from "@mui/icons-material/Close";
-import AddIcon from "@mui/icons-material/Add";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 import MovieIcon from "@mui/icons-material/Movie";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CreatableSearchSelect } from "@/components/ui/search-select";
 import { Select } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { SearchSelect } from "@/components/ui/search-select";
+import { TagInput } from "@/components/ui/tag-input";
 import { LOCALIZATION } from "@/core/constants/localization";
 import { useAppStore } from "@/store/use-store";
 import {
@@ -25,43 +27,55 @@ import {
   useCreateMovieMutation,
   useUpdateMovieMutation,
 } from "@/hooks/db/use-movies";
-import YoutubePreview from "@/components/preview/youtube";
 import { CrewSection } from "@/components/crew/crew-section";
 import { MovieFormInputs, MovieFormProps } from "@/core/domain/movie";
 import {
   buildMovieFormPayload,
-  getInitialAffiliationType,
   getMovieFormDefaultValues,
   getSelectedContentWarnings,
   toCreateMoviePayload,
   toUpdateMoviePayload,
   getFilteredCategories,
   getCrewOptions,
+  getInitialAffiliationType,
 } from "@/utils/movie-form";
+import { AffiliationType } from "@/core/domain/movie";
 import { useDynamicStringList } from "@/hooks/system/use-dynamic-string-list";
+import { useAwardsList } from "@/hooks/system/use-awards-list";
 import { useMovieCoverPreview } from "@/hooks/system/use-movie-cover-preview";
+
+const AFFILIATION_TABS = [
+  { type: "university" as AffiliationType, label: "มหาวิทยาลัย" },
+  { type: "school" as AffiliationType, label: "โรงเรียน" },
+  { type: "studio" as AffiliationType, label: "สตูดิโอ/อิสระ" },
+] as const;
+
+const LANGUAGE_SELECT_OPTIONS = LANGUAGE_OPTIONS.map((l) => ({ value: l, label: l }));
+const AGE_RATING_SELECT_OPTIONS = AGE_RATING_OPTIONS.map((r) => ({ value: r, label: r }));
 
 export const MovieForm: React.FC<MovieFormProps> = ({
   editingMovie = null,
   categories,
   universities,
+  schools,
+  studios,
   crewRoles,
   availableCrew,
 }) => {
   const router = useRouter();
   const { showToast } = useAppStore();
-  const createMovieMutation = useCreateMovieMutation();
+      const createMovieMutation = useCreateMovieMutation();
   const updateMovieMutation = useUpdateMovieMutation();
-  const [isSavingLocal, setIsSavingLocal] = useState(false);
+  const isSaving = createMovieMutation.isPending || updateMovieMutation.isPending;
 
-  const filteredCategories = useMemo(
-    () => getFilteredCategories(crewRoles),
-    [crewRoles],
-  );
-  const crewOptions = useMemo(
-    () => getCrewOptions(availableCrew),
-    [availableCrew],
-  );
+  const filteredCategories = getFilteredCategories(crewRoles);
+  const crewOptions = getCrewOptions(availableCrew);
+
+  const affiliationConfigs = {
+    university: { name: "university" as const, options: universities.map(u => ({ id: u, name: u })), placeholder: "พิมพ์ชื่อ หรือเลือกมหาวิทยาลัย...", prefix: "เพิ่มมหาวิทยาลัย" },
+    school: { name: "school" as const, options: schools.map(s => ({ id: s, name: s })), placeholder: "พิมพ์ชื่อ หรือเลือกโรงเรียน...", prefix: "เพิ่มโรงเรียน" },
+    studio: { name: "studio" as const, options: studios.map(s => ({ id: s, name: s })), placeholder: "พิมพ์ชื่อสตูดิโอ หรือทีมอิสระ...", prefix: "เพิ่มสตูดิโอ" },
+  };
 
   const {
     register,
@@ -70,130 +84,78 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     control,
     formState: { errors },
   } = useForm<MovieFormInputs>({
-    defaultValues: useMemo(
-      () => getMovieFormDefaultValues(editingMovie, categories, crewRoles),
-      [editingMovie, categories, crewRoles]
-    ),
+    defaultValues: getMovieFormDefaultValues(editingMovie, categories, crewRoles),
   });
 
   const watchedYoutubeUrl = useWatch({ control, name: "youtubeUrl" });
-  const watchedTrailerUrl = useWatch({ control, name: "trailerUrl" });
-  const watchedProfanity = useWatch({ control, name: "hasProfanity" }) ?? false;
-  const watchedDrugs = useWatch({ control, name: "hasDrugs" }) ?? false;
+  const watchedWarnings = useWatch({
+    control,
+    name: [
+      "hasViolence", "hasGore", "hasProfanity", "hasSexualContent", 
+      "hasNudity", "hasSmoking", "hasAlcohol", "hasDrugs", 
+      "hasMentalHealth", "hasFlashingLights", "hasOtherWarning"
+    ]
+  });
 
-  const selectedWarnings = useMemo(
-    () => getSelectedContentWarnings(watchedProfanity, watchedDrugs),
-    [watchedProfanity, watchedDrugs],
-  );
+  const selectedWarnings = getSelectedContentWarnings({
+    hasViolence: watchedWarnings[0],
+    hasGore: watchedWarnings[1],
+    hasProfanity: watchedWarnings[2],
+    hasSexualContent: watchedWarnings[3],
+    hasNudity: watchedWarnings[4],
+    hasSmoking: watchedWarnings[5],
+    hasAlcohol: watchedWarnings[6],
+    hasDrugs: watchedWarnings[7],
+    hasMentalHealth: watchedWarnings[8],
+    hasFlashingLights: watchedWarnings[9],
+    hasOtherWarning: watchedWarnings[10],
+  });
 
-  const {
-    selectedFileName,
-    previewUrl: movieCoverPreview,
+  const { previewUrl: movieCoverPreview,
     resetPreview: resetMovieCoverPreview,
     setFilePreview: setMovieCoverPreview,
   } = useMovieCoverPreview(editingMovie);
 
+  const trailerUrls = useDynamicStringList(editingMovie?.trailerUrls || []);
   const btsVideos = useDynamicStringList(editingMovie?.btsVideos);
-  const awards = useDynamicStringList(editingMovie?.awards);
-  const [affiliationType, setAffiliationType] = useState(() =>
-    getInitialAffiliationType(editingMovie),
+  const awards = useAwardsList(editingMovie?.awards);
+
+  const [affiliationType, setAffiliationType] = useState<AffiliationType>(
+    () => getInitialAffiliationType(editingMovie),
   );
 
   const [activeCrewCategory, setActiveCrewCategory] = useState<string>(
     filteredCategories[0]?.id || "",
   );
-  const activeCategoryRoles = useMemo(() => {
-    const currentCategory = filteredCategories.find(
-      (c) => c.id === activeCrewCategory,
-    );
-    return currentCategory?.roles || [];
-  }, [filteredCategories, activeCrewCategory]);
+  const activeCategoryRoles = filteredCategories.find(c => c.id === activeCrewCategory)?.roles || [];
 
-  const flatCrewRoles = useMemo(() => {
-    return crewRoles.map((role) => ({
-      id: role.name.toLowerCase(),
-      code: role.name,
-      label: role.labelTh || role.name,
-    }));
-  }, [crewRoles]);
 
-  const [activeCrewTab, setActiveCrewTab] = useState<string>(() => {
-    const firstCat = filteredCategories[0];
-    return firstCat?.roles[0]?.id || "director";
-  });
-
-  const activeRoleDef = useMemo(
-    () => flatCrewRoles.find((role) => role.id === activeCrewTab),
-    [flatCrewRoles, activeCrewTab],
-  );
-
-  const activeCrewConfig = useMemo(() => {
-    if (!activeRoleDef) return null;
-    return {
-      id: activeRoleDef.id,
-      label: activeRoleDef.label,
-      placeholder: `พิมพ์ชื่อ หรือเลือก${activeRoleDef.label}...`,
-      addLabel: `เพิ่มรายชื่อ${activeRoleDef.label}`,
-    };
-  }, [activeRoleDef]);
 
   const { fields, append, remove, update } = useFieldArray({
     control,
     name: "crew",
   });
 
-  const activeFields = useMemo(() => {
-    if (!activeRoleDef) return [];
-    return fields
-      .map((field, idx) => ({ ...field, index: idx }))
-      .filter(
-        (field) =>
-          field.role.toUpperCase() === activeRoleDef.code.toUpperCase(),
-      );
-  }, [fields, activeRoleDef]);
 
-  const handleAddCrew = useCallback(() => {
-    if (!activeRoleDef) return;
-    append({
-      role: activeRoleDef.code,
-      crewMemberId: null,
-      name: "",
-      email: "",
+
+  const handleUpdateCrew = (index: number, val: { id: string | null; name: string; email: string }) => {
+    update(index, {
+      role: fields[index].role,
+      crewMemberId: val.id,
+      name: val.name,
+      email: val.email,
     });
-  }, [activeRoleDef, append]);
-
-  const handleRemoveCrew = useCallback(
-    (index: number) => {
-      remove(index);
-    },
-    [remove],
-  );
-
-  const handleUpdateCrew = useCallback(
-    (
-      index: number,
-      val: { id: string | null; name: string; email: string },
-    ) => {
-      if (!activeRoleDef) return;
-      update(index, {
-        role: activeRoleDef.code,
-        crewMemberId: val.id,
-        name: val.name,
-        email: val.email,
-      });
-    },
-    [activeRoleDef, update],
-  );
+  };
 
   const onSubmitForm = async (data: MovieFormInputs) => {
     try {
-      setIsSavingLocal(true);
       const rawPayload = buildMovieFormPayload({
         data,
         editingMovie,
         affiliationType,
         btsVideos: btsVideos.items,
-        awards: awards.items,
+        awards: awards.getPayload(),
+        trailerUrls: trailerUrls.items,
       });
 
       if (editingMovie) {
@@ -212,18 +174,16 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         err instanceof Error ? err.message : LOCALIZATION.ERRORS.SAVE_MOVIE;
       showToast(errMsg, "error");
       console.error(err);
-    } finally {
-      setIsSavingLocal(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-brand selection:text-black pb-20">
-      <main className="max-w-4xl mx-auto w-full px-6 md:px-16 pt-28 space-y-8 animate-fade-in">
+      <main className="max-w-6xl mx-auto w-full px-6 md:px-16 pt-28 space-y-8 animate-fade-in">
         <div className="space-y-2">
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-wide bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent flex items-center gap-2">
             <MovieIcon className="text-brand" />{" "}
-            {editingMovie ? "แก้ไขข้อมูล" : "อัพโหลด"}
+            {editingMovie ? "แก้ไขข้อมูล" : "อัปโหลด"}
           </h1>
           <p className="text-xs text-zinc-400 font-light">
             กรอกข้อมูลรายละเอียดของภาพยนตร์สั้น ลิงก์ตัวอย่าง อัปโหลดใบปิด
@@ -231,510 +191,532 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-8">
-          <div className="rounded-lg p-6 md:p-8 shadow-xl space-y-6">
-            <div className="flex items-center gap-2 border-b border-zinc-800/40 pb-4">
-              <span className="w-1.5 h-6 bg-brand rounded-full" />
-              <h2 className="text-lg font-bold text-white">
-                ข้อมูลทั่วไปของภาพยนตร์
-              </h2>
-            </div>
-
-            <div className="space-y-2">
-              <Input
-                label="ลิงก์ภาพยนตร์"
-                placeholder="กรอกลิงก์ภาพยนตร์"
-                error={errors.youtubeUrl?.message}
-                {...register("youtubeUrl", {
-                  required: "กรุณากรอกลิงก์ภาพยนตร์",
-                })}
-              />
-              <YoutubePreview url={watchedYoutubeUrl} />
-            </div>
-
-            <Input
-              label="ชื่อเรื่อง"
-              placeholder="กรอกชื่อภาพยนตร์"
-              error={errors.title?.message}
-              {...register("title", {
-                required: "กรุณากรอกชื่อเรื่อง",
-              })}
-            />
-
-            <div className="space-y-1 w-full text-left">
-              <label className="text-xs text-zinc-400 font-medium block">
-                เรื่องย่อขนาดสั้น (ไม่เกิน 200 คำ)
-              </label>
-              <textarea
-                rows={5}
-                placeholder="กรอกรายละเอียดเรื่องย่อภาพยนตร์"
-                {...register("description", {
-                  required: "กรุณากรอกเรื่องย่อภาพยนตร์",
-                })}
-                className={`w-full bg-zinc-900 border ${
-                  errors.description
-                    ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
-                    : "border-zinc-800 focus:border-brand"
-                } rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none transition-colors placeholder-zinc-650 font-light resize-none`}
-              />
-              {errors.description && (
-                <span className="text-[10px] text-red-500 block pl-1 font-semibold">
-                  {errors.description.message}
-                </span>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <Controller
-                name="categoryIds"
-                control={control}
-                rules={{
-                  required: "กรุณาเลือกหมวดหมู่ภาพยนตร์อย่างน้อยหนึ่งประเภท",
-                  validate: (value) => (value && value.length > 0) || "กรุณาเลือกหมวดหมู่ภาพยนตร์อย่างน้อยหนึ่งประเภท"
-                }}
-                render={({ field }) => (
-                  <MultiSelect
-                    label="หมวดหมู่"
-                    error={errors.categoryIds?.message}
-                    options={categories.map((cat) => ({
-                      value: cat.id,
-                      label: cat.labelTh || cat.name,
-                    }))}
-                    selectedValues={field.value || []}
-                    onChange={field.onChange}
-                    placeholder="เลือกหมวดหมู่..."
-                  />
-                )}
-              />
-              <Select
-                label="เรตอายุที่แนะนำ"
-                error={errors.ageRating?.message}
-                {...register("ageRating", { required: "กรุณาเลือกเรตอายุ" })}
-                options={AGE_RATING_OPTIONS.map((rating) => ({
-                  value: rating,
-                  label: rating,
-                }))}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <Select
-                label="ภาษา"
-                error={errors.language?.message}
-                {...register("language")}
-                options={LANGUAGE_OPTIONS.map((language) => ({
-                  value: language,
-                  label: language,
-                }))}
-              />
-              <Select
-                label="โทนสีภาพยนตร์"
-                error={errors.colorType?.message}
-                {...register("colorType", {
-                  required: "กรุณาเลือกโทนสีภาพยนตร์",
-                })}
-                options={COLOR_OPTIONS}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <Input
-                label="วันที่เผยแพร่"
-                type="date"
-                error={errors.releaseDate?.message}
-                {...register("releaseDate", {
-                  required: "กรุณาเลือกวันที่เผยแพร่",
-                })}
-              />
-              <Select
-                label="อัตราส่วนภาพ"
-                error={errors.aspectRatio?.message}
-                {...register("aspectRatio", {
-                  required: "กรุณาเลือกอัตราส่วนภาพ",
-                })}
-                options={ASPECT_RATIO_OPTIONS}
-              />
-              <Input
-                label="ความยาวภาพยนตร์ (นาที)"
-                placeholder="กรอกความยาวภาพยนตร์"
-                error={errors.duration?.message}
-                {...register("duration", {
-                  valueAsNumber: true,
-                  required: "กรุณากรอกความยาวภาพยนตร์",
-                })}
-              />
-            </div>
-
-            <div className="space-y-4 pt-2 border-t border-zinc-800/40">
-              <div className="space-y-2">
-                <label className="text-xs text-zinc-400 font-medium block">
-                  ส่งผลงานในนาม
-                </label>
-                <div className="flex gap-2 bg-zinc-900/50 p-1.5 rounded-lg w-fit border border-zinc-800/60">
-                  {(["university", "school", "studio"] as const).map((type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => setAffiliationType(type)}
-                      className={`px-4 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer border-0 ${
-                        affiliationType === type
-                          ? "bg-brand text-zinc-950 font-bold shadow-md"
-                          : "text-zinc-450 hover:text-white hover:bg-zinc-850/50"
-                      }`}
-                    >
-                      {type === "university"
-                        ? "มหาวิทยาลัย"
-                        : type === "school"
-                          ? "โรงเรียน"
-                          : "สตูดิโอ / ค่ายอิสระ"}
-                    </button>
-                  ))}
+                <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_450px] gap-8 items-start">
+            
+            {/* === LEFT COLUMN === */}
+            <div className="space-y-8 w-full min-w-0">
+              
+              {/* อัปโหลด */}
+              <div className="space-y-6">
+                <div className="pb-2">
+                  <h2 className="text-[18px] font-bold text-brand mb-4">อัปโหลด</h2>
                 </div>
-              </div>
-
-              {affiliationType === "university" && (
-                <div className="space-y-1 animate-fade-in relative z-20">
-                  <Controller
-                    name="university"
-                    control={control}
-                    render={({ field }) => (
-                      <SearchSelect
-                        label="มหาวิทยาลัย"
-                        placeholder="พิมพ์เพื่อค้นหา หรือเลือกมหาวิทยาลัย..."
-                        value={field.value || ""}
-                        onChange={field.onChange}
-                        error={errors.university?.message}
-                        options={universities.map((uni) => ({
-                          value: uni,
-                          label: uni,
-                        }))}
-                      />
-                    )}
-                  />
-                </div>
-              )}
-
-              {affiliationType === "school" && (
-                <div className="space-y-1 animate-fade-in relative z-20">
-                  <Input
-                    label="โรงเรียน"
-                    placeholder="กรอกชื่อโรงเรียนที่ผลิต"
-                    error={errors.school?.message}
-                    {...register("school", {
-                      required:
-                        affiliationType === "school"
-                          ? "กรุณากรอกชื่อโรงเรียน"
-                          : false,
-                    })}
-                  />
-                </div>
-              )}
-
-              {affiliationType === "studio" && (
-                <div className="animate-fade-in">
-                  <Input
-                    label="สตูดิโอ / สังกัด"
-                    placeholder="กรอกชื่อสังกัดหรือสตูดิโอที่ผลิต"
-                    error={errors.studio?.message}
-                    {...register("studio", {
-                      required:
-                        affiliationType === "studio"
-                          ? "กรุณากรอกชื่อสตูดิโอ"
-                          : false,
-                    })}
-                  />
-                </div>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 gap-6">
-              <MultiSelect
-                label="คำเตือนเนื้อหา"
-                options={CONTENT_WARNING_OPTIONS}
-                selectedValues={selectedWarnings}
-                onChange={(values) => {
-                  setValue("hasProfanity", values.includes("profanity"), {
-                    shouldDirty: true,
-                  });
-                  setValue("hasDrugs", values.includes("drugs"), {
-                    shouldDirty: true,
-                  });
-                }}
-                placeholder="ไม่มีคำเตือนเนื้อหา / เลือกคำเตือน..."
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 ">
-              <div className="space-y-1 w-full text-left">
-                <label className="text-xs text-zinc-400 font-medium block">
-                  ภาพปกภาพยนตร์
-                </label>
-                <div className="relative group/file">
-                  <Controller
-                    name="thumbnail"
-                    control={control}
-                    defaultValue={null}
-                    render={({ field }) => (
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0] ?? null;
-                          field.onChange(file);
-                          setMovieCoverPreview(file);
-                        }}
-                      />
-                    )}
-                  />
-                  <div
-                    className={`w-full bg-zinc-900 border ${
-                      errors.thumbnail
-                        ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
-                        : "border-zinc-800 group-hover/file:border-brand"
-                    } rounded-lg px-4 py-2.5 text-sm text-zinc-450 flex items-center justify-between transition-colors min-h-[42px] font-light`}
-                  >
-                    <span
-                      className={
-                        selectedFileName
-                          ? "text-white font-medium truncate max-w-[70%]"
-                          : "text-zinc-600"
-                      }
-                    >
-                      {selectedFileName || "อัปโหลดภาพปกภาพยนตร์..."}
-                    </span>
-                    <span className="px-3 py-1 bg-zinc-800 text-zinc-300 rounded-lg text-xs font-semibold group-hover/file:bg-brand group-hover/file:text-white transition-colors">
-                      เลือกไฟล์
-                    </span>
-                  </div>
-                </div>
-
-                {movieCoverPreview && (
-                  <div className="mt-3 relative rounded-xl overflow-hidden border border-zinc-800 bg-black/40 aspect-[16/9] w-full max-w-[280px] group/preview">
-                    <Image
-                      src={movieCoverPreview}
-                      alt="Cover Preview"
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setValue("thumbnail", null);
-                        resetMovieCoverPreview();
-                      }}
-                      className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500 hover:text-white text-zinc-400 rounded-full transition-colors cursor-pointer border-0 shadow-md opacity-0 group-hover/preview:opacity-100"
-                    >
-                      <CloseIcon className="text-[10px]" />
-                    </button>
-                  </div>
-                )}
-
-                {errors.thumbnail && (
-                  <span className="text-[10px] text-red-500 block pl-1 font-semibold">
-                    {errors.thumbnail.message}
-                  </span>
-                )}
-                {editingMovie && typeof editingMovie.thumbnail === "string" && (
-                  <p className="text-[10px] text-zinc-550 pl-1 leading-relaxed">
-                    รูปปัจจุบัน:{" "}
-                    <span className="text-brand font-medium truncate max-w-[200px] inline-block align-bottom">
-                      {editingMovie.thumbnail.split("/").pop()}
-                    </span>{" "}
-                    (เว้นว่างไว้หากต้องการใช้รูปเดิม)
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Input
-                  label="ลิงก์ตัวอย่างภาพยนตร์"
-                  placeholder="กรอกลิงก์ตัวอย่างภาพยนตร์"
-                  error={errors.trailerUrl?.message}
-                  {...register("trailerUrl")}
-                />
-                <YoutubePreview url={watchedTrailerUrl} />
-              </div>
-
-              <div className="space-y-1 w-full text-left pt-4">
-                <label className="text-xs text-zinc-400 font-medium block">
-                  ลิงก์วิดีโอเบื้องหลัง
-                </label>
+                
                 <div className="space-y-4">
-                  {btsVideos.items.map((videoUrl, idx) => (
-                    <div key={idx} className="space-y-2">
-                      <div className="flex gap-2 items-center">
-                        <Input
-                          type="text"
-                          placeholder="กรอกลิงก์วิดีโอเบื้องหลัง"
-                          value={videoUrl}
-                          onChange={(e) =>
-                            btsVideos.updateItem(idx, e.target.value)
-                          }
-                          className="flex-1"
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-zinc-100">เพิ่มลิงก์ภาพยนตร์</label>
+                    <Input
+                      placeholder="https://www.youtube.com/watch?v=..."
+                      error={errors.youtubeUrl?.message}
+                      {...register("youtubeUrl", {
+                        required: "กรุณากรอกลิงก์ภาพยนตร์",
+                      })}
+                      className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white placeholder:text-zinc-500"
+                    />
+                    <div className="w-full mt-2"><YoutubePreview url={watchedYoutubeUrl} /></div>
+                    
+                    <label className="cursor-pointer block mt-2">
+                      <Controller
+                        name="thumbnail"
+                        control={control}
+                        defaultValue={null}
+                        render={({ field }) => (
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0] ?? null;
+                              field.onChange(file);
+                              setMovieCoverPreview(file);
+                            }}
+                          />
+                        )}
+                      />
+                      <div className="w-full py-2.5 px-4 bg-[#333333] hover:bg-zinc-700 text-sm font-medium rounded-md text-white text-center transition-colors">
+                        + เพิ่มปกภาพยนตร์
+                      </div>
+                    </label>
+                    {movieCoverPreview && (
+                      <div className="mt-3 relative rounded-xl overflow-hidden border border-zinc-800 bg-black/40 aspect-[16/9] w-full max-w-[280px] group/preview">
+                        <Image
+                          src={movieCoverPreview}
+                          alt="Cover Preview"
+                          fill
+                          className="object-cover"
+                          unoptimized
                         />
-                        {btsVideos.items.length > 1 && (
-                          <Button
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setValue("thumbnail", null);
+                            resetMovieCoverPreview();
+                          }}
+                          className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500 hover:text-white text-zinc-400 rounded-full transition-colors cursor-pointer border-0 shadow-md opacity-0 group-hover/preview:opacity-100"
+                        >
+                          <CloseIcon className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2 pt-4">
+                    <label className="text-sm font-medium text-zinc-100">เพิ่มลิงก์ตัวอย่างภาพยนตร์</label>
+                    {trailerUrls.items.map((url, index) => (
+                      <div key={index} className="flex flex-col gap-2 mb-2">
+                        <div className="relative group">
+                          <Input
+                            value={url}
+                            onChange={(e) => trailerUrls.updateItem(index, e.target.value)}
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white placeholder:text-zinc-500 pr-10"
+                          />
+                          {index > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => trailerUrls.removeItem(index)}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all"
+                            >
+                              <DeleteOutlineIcon className="w-5 h-5" />
+                            </button>
+                          )}
+                        </div>
+                        <div className="w-full mt-2"><YoutubePreview url={url} /></div>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => trailerUrls.addItem()}
+                      className="w-full py-2.5 px-4 bg-[#333333] hover:bg-zinc-700 text-sm font-medium rounded-md text-white text-center transition-colors mt-2"
+                    >
+                      + เพิ่มตัวอย่างภาพยนตร์
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* อัปโหลดเบื้องหลัง */}
+              <div className="space-y-6">
+                <div className="pb-2">
+                  <h2 className="text-[18px] font-bold text-brand mb-4">อัปโหลดเบื้องหลัง</h2>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-zinc-100">เพิ่มลิงก์เบื้องหลังภาพยนตร์</label>
+                  {btsVideos.items.map((url, index) => (
+                    <div key={index} className="flex flex-col gap-2 mb-2">
+                      <div className="relative group">
+                        <Input
+                          value={url}
+                          onChange={(e) => btsVideos.updateItem(index, e.target.value)}
+                          placeholder="https://www.youtube.com/watch?v=..."
+                          className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white placeholder:text-zinc-500 pr-10"
+                        />
+                        {index > 0 && (
+                          <button
                             type="button"
-                            variant="secondary"
-                            onClick={() => btsVideos.removeItem(idx)}
-                            className="px-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg border border-red-500/20 transition-all h-[42px] flex items-center justify-center flex-shrink-0"
+                            onClick={() => btsVideos.removeItem(index)}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all"
                           >
-                            <CloseIcon className="text-sm" />
-                          </Button>
+                            <DeleteOutlineIcon className="w-5 h-5" />
+                          </button>
                         )}
                       </div>
-                      <YoutubePreview url={videoUrl} />
+                      <div className="w-full mt-2"><YoutubePreview url={url} /></div>
                     </div>
                   ))}
-                  <Button
+                  <button
                     type="button"
-                    variant="secondary"
-                    onClick={btsVideos.addItem}
-                    className="py-2 px-4 text-xs w-fit flex items-center gap-1.5 rounded-md bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 transition-colors"
+                    onClick={() => btsVideos.addItem()}
+                    className="w-full py-2.5 px-4 bg-[#333333] hover:bg-zinc-700 text-sm font-medium rounded-md text-white text-center transition-colors mt-2"
                   >
-                    <AddIcon className="text-sm" />{" "}
-                    เพิ่มลิงก์วิดีโอเบื้องหลังอื่น
-                  </Button>
+                    + เพิ่มเบื้องหลังภาพยนตร์
+                  </button>
                 </div>
               </div>
 
-              <div className="space-y-1 w-full text-left pt-4">
-                <label className="text-xs text-zinc-400 font-medium block">
-                  รางวัลที่ได้รับ
-                </label>
-                <div className="space-y-4">
-                  {awards.items.map((awardName, idx) => (
-                    <div key={idx} className="flex gap-2 items-center">
-                      <Input
-                        type="text"
-                        placeholder="กรอกชื่อรางวัลที่ได้รับ (ถ้ามี)"
-                        value={awardName}
-                        onChange={(e) => awards.updateItem(idx, e.target.value)}
-                        className="flex-1"
-                      />
-                      {awards.items.length > 1 && (
-                        <Button
+              {/* รางวัล */}
+              <div className="space-y-6">
+                <div className="pb-2">
+                  <h2 className="text-[18px] font-bold text-brand">รางวัล</h2>
+                </div>
+                <div className="space-y-4 w-full text-left pt-4">
+                  {awards.projects.map((project, pIndex) => (
+                    <div key={pIndex} className="bg-white/5 backdrop-blur-md border border-[#757575] shadow-lg rounded-xl p-5 relative">
+                      {pIndex > 0 && (
+                        <button
                           type="button"
-                          variant="secondary"
-                          onClick={() => awards.removeItem(idx)}
-                          className="px-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg border border-red-500/20 transition-all h-[42px] flex items-center justify-center flex-shrink-0"
+                          onClick={() => awards.removeProject(pIndex)}
+                          className="absolute top-4 right-4 text-zinc-500 hover:text-red-500"
                         >
-                          <CloseIcon className="text-sm" />
-                        </Button>
+                          <CloseIcon className="w-4 h-4" />
+                        </button>
                       )}
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <label className="text-sm font-medium text-zinc-100 block mb-2">ชื่อโครงการ</label>
+                          <Input
+                            type="text"
+                            value={project.project}
+                            onChange={(e) => awards.updateProjectName(pIndex, e.target.value)}
+                            className="!bg-white/5 backdrop-blur-md border !border-white/20 text-white placeholder:text-zinc-400 shadow-inner"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="text-sm font-medium text-zinc-100 block mb-2">ชื่อรายการ</label>
+                          <div className="space-y-2">
+                            {project.items.map((item, iIndex) => (
+                              <div key={iIndex} className="relative group">
+                                <Input
+                                  type="text"
+                                  value={item}
+                                  onChange={(e) => awards.updateItemName(pIndex, iIndex, e.target.value)}
+                                  className="!bg-white/5 backdrop-blur-md border !border-white/20 text-white placeholder:text-zinc-400 pr-10 shadow-inner"
+                                />
+                                {iIndex > 0 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => awards.removeItem(pIndex, iIndex)}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all"
+                                  >
+                                    <DeleteOutlineIcon className="w-5 h-5" />
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => awards.addItem(pIndex)}
+                          className="py-2 px-4 bg-[#333333] hover:bg-zinc-700 text-sm font-medium rounded-md text-white text-center transition-colors w-fit"
+                        >
+                          + เพิ่มรายการ
+                        </button>
+                      </div>
                     </div>
                   ))}
-                  <Button
+                  
+                  <button
                     type="button"
-                    variant="secondary"
-                    onClick={awards.addItem}
-                    className="py-2 px-4 text-xs w-fit flex items-center gap-1.5 rounded-md bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 transition-colors"
+                    onClick={awards.addProject}
+                    className="w-full py-2.5 px-4 bg-[#333333] hover:bg-zinc-700 text-sm font-medium rounded-md text-white text-center transition-colors"
                   >
-                    <AddIcon className="text-sm" /> เพิ่มรางวัลอื่น
-                  </Button>
+                    + เพิ่มโครงการ
+                  </button>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="rounded-lg p-6 md:p-8 shadow-xl  space-y-6">
-            <div className="flex items-center gap-2 border-b border-zinc-800/40 pb-4">
-              <span className="w-1.5 h-6 bg-brand rounded-full" />
-              <h2 className="text-lg font-bold text-white">ทีมงาน</h2>
-            </div>
+            {/* === RIGHT COLUMN === */}
+            <div className="space-y-8 w-full min-w-0">
+              
+              {/* ข้อมูลทั่วไป */}
+              <div className="space-y-6">
+                <div className="pb-2">
+                  <h2 className="text-[18px] font-bold text-brand mb-4">ข้อมูลทั่วไป</h2>
+                </div>
+                
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-zinc-100">ชื่อเรื่อง</label>
+                    <Input
+                      placeholder=""
+                      error={errors.title?.message}
+                      {...register("title", { required: "กรุณากรอกชื่อเรื่อง" })}
+                      className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white"
+                    />
+                  </div>
 
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <label className="text-xs text-zinc-400 font-medium">
-                  หมวดหมู่ทีมงาน
-                </label>
-                <div className="relative">
-                  <select
-                    value={activeCrewCategory}
-                    onChange={(e) => {
-                      const newCatId = e.target.value;
-                      setActiveCrewCategory(newCatId);
-                      const cat = filteredCategories.find(
-                        (c) => c.id === newCatId,
-                      );
-                      if (cat && cat.roles.length > 0) {
-                        setActiveCrewTab(cat.roles[0].id);
-                      }
-                    }}
-                    className="w-full bg-zinc-900 border border-zinc-850 focus:border-brand rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer appearance-none"
-                  >
-                    {filteredCategories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.label}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-zinc-400">
-                    ▼
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-zinc-100">คำโปรย (ไม่เกิน 100 คำ)</label>
+                    <textarea
+                      rows={4}
+                      placeholder=""
+                      {...register("description", { required: "กรุณากรอกคำโปรย" })}
+                      className="w-full bg-[#0D0D0D] border border-[#3A3A3A] rounded-md px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand resize-none"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <Controller
+                      name="categoryIds"
+                      control={control}
+                      render={({ field }) => (
+                        <>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-zinc-100">หมวดหมู่</label>
+                            <Select
+                              options={categories.map(c => ({ value: c.id, label: c.labelTh || c.name }))}
+                              value={field.value?.[0] || ""}
+                              onChange={(e) => {
+                                const newVals = [...(field.value || [])];
+                                newVals[0] = e.target.value;
+                                field.onChange(newVals);
+                              }}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-zinc-100">หมวดหมู่รอง</label>
+                            <Select
+                              options={categories.map(c => ({ value: c.id, label: c.labelTh || c.name }))}
+                              value={field.value?.[1] || ""}
+                              onChange={(e) => {
+                                const newVals = [...(field.value || [])];
+                                newVals[1] = e.target.value;
+                                field.onChange(newVals);
+                              }}
+                            />
+                          </div>
+                        </>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-zinc-100">วัน/เดือน/ปี ที่สร้างเสร็จ</label>
+                      <Input
+                        type="date"
+                        {...register("releaseDate")}
+                        className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white w-full"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-zinc-100">ความยาว (นาที)</label>
+                      <Input
+                        type="number"
+                        placeholder="120"
+                        {...register("duration")}
+                        className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium text-zinc-100">สถาบัน/สังกัด</label>
+                    {/* Tab selector */}
+                    <div className="flex gap-2">
+                      {AFFILIATION_TABS.map(({ type, label }) => (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => {
+                            setAffiliationType(type);
+                            setValue("university", "");
+                            setValue("school", "");
+                            setValue("studio", "");
+                          }}
+                          className={`px-4 py-1.5 text-sm rounded-full border transition-all ${
+                            affiliationType === type
+                              ? "bg-brand border-brand text-black font-semibold"
+                              : "bg-transparent border-zinc-600 text-zinc-400 hover:border-zinc-400 hover:text-zinc-200"
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    {/* Dynamic input */}
+                    <Controller
+                      key={affiliationConfigs[affiliationType].name}
+                      name={affiliationConfigs[affiliationType].name}
+                      control={control}
+                      render={({ field }) => (
+                        <CreatableSearchSelect
+                          value={{ id: field.value || "", name: field.value || "" }}
+                          onChange={(val) => field.onChange(val.name)}
+                          options={affiliationConfigs[affiliationType].options}
+                          placeholder={affiliationConfigs[affiliationType].placeholder}
+                          hideIcon={true}
+                          addLabelPrefix={affiliationConfigs[affiliationType].prefix}
+                        />
+                      )}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-zinc-100">แท็ก</label>
+                    <Controller
+                      name="tags"
+                      control={control}
+                      defaultValue={[]}
+                      render={({ field }) => (
+                        <TagInput
+                          value={field.value ?? []}
+                          onChange={field.onChange}
+                          placeholder="ลักษณะเด่นของภาพยนตร์ เพื่อให้ผู้ชมค้นหาได้ง่ายขึ้น..."
+                        />
+                      )}
+                    />
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2 border-b border-zinc-800/40 pb-4 pt-2">
-                {activeCategoryRoles.map((role) => (
-                  <button
-                    key={role.id}
-                    type="button"
-                    onClick={() => setActiveCrewTab(role.id)}
-                    className={`px-4 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
-                      activeCrewTab === role.id
-                        ? "bg-brand/10 border-brand text-brand font-bold"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-850"
-                    }`}
-                  >
-                    {role.label}
-                  </button>
-                ))}
-              </div>
+              {/* ข้อมูลการนำเสนอ */}
+              <div className="space-y-6">
+                <div className="pb-2">
+                  <h2 className="text-[18px] font-bold text-brand mb-4">ข้อมูลการนำเสนอ</h2>
+                </div>
+                
+                <div className="space-y-6">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-zinc-100">ภาษา</label>
+                      <Select
+                        options={LANGUAGE_SELECT_OPTIONS}
+                        {...register("language")}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-zinc-100">คำบรรยาย</label>
+                      <Select
+                        options={LANGUAGE_SELECT_OPTIONS}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-zinc-100">สี</label>
+                      <Select
+                        options={COLOR_OPTIONS}
+                        {...register("colorType")}
+                      />
+                    </div>
+                  </div>
 
-              <div className="bg-zinc-900/10 border border-zinc-800/40 rounded-lg p-5 md:p-6 min-h-[200px]">
-                {activeCrewConfig && (
-                  <CrewSection
-                    key={activeCrewConfig.id}
-                    label={activeCrewConfig.label}
-                    fields={activeFields}
-                    onAdd={handleAddCrew}
-                    onRemove={handleRemoveCrew}
-                    onUpdate={handleUpdateCrew}
-                    placeholder={activeCrewConfig.placeholder}
-                    addButtonLabel={activeCrewConfig.addLabel}
-                    crewOptions={crewOptions}
-                  />
-                )}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-zinc-100">อัตราส่วนภาพ</label>
+                      <Select
+                        options={ASPECT_RATIO_OPTIONS}
+                        {...register("aspectRatio")}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-zinc-100">เรตภาพยนตร์</label>
+                      <Select
+                        options={AGE_RATING_SELECT_OPTIONS}
+                        {...register("ageRating")}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-zinc-100">คำเตือนเนื้อหา</label>
+                    <MultiSelect
+                      options={CONTENT_WARNING_OPTIONS}
+                      selectedValues={selectedWarnings}
+                      onChange={(values) => {
+                        setValue("hasViolence", values.includes("violence"), { shouldDirty: true });
+                        setValue("hasGore", values.includes("gore"), { shouldDirty: true });
+                        setValue("hasProfanity", values.includes("profanity"), { shouldDirty: true });
+                        setValue("hasSexualContent", values.includes("sexualContent"), { shouldDirty: true });
+                        setValue("hasNudity", values.includes("nudity"), { shouldDirty: true });
+                        setValue("hasSmoking", values.includes("smoking"), { shouldDirty: true });
+                        setValue("hasAlcohol", values.includes("alcohol"), { shouldDirty: true });
+                        setValue("hasDrugs", values.includes("drugs"), { shouldDirty: true });
+                        setValue("hasMentalHealth", values.includes("mentalHealth"), { shouldDirty: true });
+                        setValue("hasFlashingLights", values.includes("flashingLights"), { shouldDirty: true });
+                        setValue("hasOtherWarning", values.includes("other"), { shouldDirty: true });
+                      }}
+                      placeholder="ไม่มีคำเตือนเนื้อหา / เลือกคำเตือน..."
+                    />
+                    
+                    {watchedWarnings[10] && (
+                      <div className="pt-2 animate-fade-in">
+                        <Input
+                          placeholder="ระบุคำเตือนเนื้อหาอื่นๆ..."
+                          {...register("otherContentWarning")}
+                          className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="pt-6 border-t border-zinc-800/40 flex items-center gap-4">
+            {/* ข้อมูลทีมงาน (Centered) */}
+            <div className="w-full max-w-[760px] mx-auto mt-12">
+
+
+              {/* ข้อมูลทีมงาน */}
+              <div className="space-y-6">
+                <div className="pb-2">
+                  <h2 className="text-[18px] font-bold text-brand mb-4">ข้อมูลทีมงาน</h2>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                  {filteredCategories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setActiveCrewCategory(cat.id)}
+                      className={`px-4 min-h-[44px] flex flex-col items-center justify-center text-center text-sm font-medium rounded-xl border transition-all cursor-pointer shadow-sm ${
+                        activeCrewCategory === cat.id
+                          ? "bg-[#B8860B] border-[#B8860B] text-white shadow-md"
+                          : "bg-[#18181B] border-[#3F3F46] text-white hover:bg-[#27272A] hover:border-[#52525B]"
+                      }`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="space-y-6 mt-4">
+                  {activeCategoryRoles.map(role => {
+                    const fieldsForRole = fields.map((f, i) => ({ ...f, index: i })).filter((f) => f.role === role.id);
+                    return (
+                      <CrewSection
+                        key={role.id}
+                        label={role.label}
+                        fields={fieldsForRole}
+                        onAdd={() => append({ role: role.id, crewMemberId: null, name: "", email: "" })}
+                        onRemove={remove}
+                        onUpdate={handleUpdateCrew}
+                        placeholder={`พิมพ์ชื่อ หรือเลือก${role.label}...`}
+                        addButtonLabel={`เพิ่มตำแหน่ง`}
+                        crewOptions={crewOptions}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+
+          
+            </div>
+
+          <div className="pt-12 flex flex-col items-center justify-center gap-3 mt-8">
+            <Button
+              type="submit"
+              isLoading={isSaving}
+              disabled={isSaving}
+              className="py-2.5 px-12 text-sm font-bold rounded-full w-48 bg-brand text-black hover:bg-brand/90"
+            >
+              เสร็จสิ้น
+            </Button>
             <Button
               type="button"
               variant="secondary"
               onClick={() => router.push("/")}
-              disabled={isSavingLocal}
-              className="flex-1 py-3 text-sm font-semibold rounded-md"
+              disabled={isSaving}
+              className="py-2.5 px-12 text-sm font-bold rounded-full w-48 bg-[#333333] text-white hover:bg-zinc-700 border-none"
             >
               ยกเลิก
             </Button>
-            <Button
-              type="submit"
-              isLoading={isSavingLocal}
-              disabled={isSavingLocal}
-              className="flex-1 py-3 text-sm font-semibold rounded-md"
-            >
-              {editingMovie ? "บันทึกข้อมูลภาพยนตร์" : "เพิ่มภาพยนตร์ใหม่"}
-            </Button>
+            {editingMovie && (
+              <button type="button" className="text-red-500 hover:text-red-400 mt-2">
+                <CloseIcon className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </form>
       </main>
 
-      {isSavingLocal && (
+      {isSaving && (
         <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/70 backdrop-blur-md animate-fade-in">
           <div className="flex flex-col items-center space-y-4">
             <div className="relative w-20 h-20">

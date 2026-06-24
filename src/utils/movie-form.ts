@@ -21,16 +21,12 @@ type MovieFormPayloadOptions = {
   affiliationType: AffiliationType;
   btsVideos: string[];
   awards: string[];
+  trailerUrls: string[];
 };
 
 export function formatInputDate(date?: string | Date): string {
-  if (!date) {
-    return "";
-  }
-
-  return typeof date === "string"
-    ? date.split("T")[0]
-    : date.toISOString().split("T")[0];
+  if (!date) return "";
+  return (typeof date === "string" ? new Date(date) : date).toISOString().split("T")[0];
 }
 
 export function getInitialCrewFormValues(
@@ -46,7 +42,7 @@ export function getInitialCrewFormValues(
             c.role.toLowerCase() === role.id.toLowerCase(),
         )
         .map((c) => ({
-          role: role.name,
+          role: role.name.toLowerCase(),
           crewMemberId: c.crewMember?.id || null,
           name: c.crewMember?.name || "",
           email: c.crewMember?.email || "",
@@ -57,7 +53,7 @@ export function getInitialCrewFormValues(
     }
     return [
       {
-        role: role.name,
+        role: role.name.toLowerCase(),
         crewMemberId: null,
         name: "",
         email: "",
@@ -76,7 +72,7 @@ export function getMovieFormDefaultValues(
       ...editingMovie,
       categoryIds: editingMovie.categories.map((c) => c.id),
       thumbnail: null,
-      trailerUrl: editingMovie.trailerUrl || "",
+      trailerUrls: editingMovie.trailerUrls || [],
       aspectRatio: editingMovie.aspectRatio || "landscape",
       ageRating: editingMovie.ageRating || "",
       university: editingMovie.university || "",
@@ -84,6 +80,16 @@ export function getMovieFormDefaultValues(
       language: editingMovie.language || "",
       hasProfanity: editingMovie.hasProfanity ?? false,
       hasDrugs: editingMovie.hasDrugs ?? false,
+      hasViolence: editingMovie.hasViolence ?? false,
+      hasGore: editingMovie.hasGore ?? false,
+      hasSexualContent: editingMovie.hasSexualContent ?? false,
+      hasNudity: editingMovie.hasNudity ?? false,
+      hasSmoking: editingMovie.hasSmoking ?? false,
+      hasAlcohol: editingMovie.hasAlcohol ?? false,
+      hasMentalHealth: editingMovie.hasMentalHealth ?? false,
+      hasFlashingLights: editingMovie.hasFlashingLights ?? false,
+      hasOtherWarning: editingMovie.hasOtherWarning ?? false,
+      otherContentWarning: editingMovie.otherContentWarning || "",
       colorType: editingMovie.colorType || "color",
       studio: editingMovie.studio || "",
       btsVideo: editingMovie.btsVideos || [],
@@ -99,7 +105,7 @@ export function getMovieFormDefaultValues(
     categoryIds: categories[0] ? [categories[0].id] : [],
     thumbnail: null,
     youtubeUrl: "",
-    trailerUrl: "",
+    trailerUrls: [],
     releaseDate: new Date().toISOString().split("T")[0],
     aspectRatio: "landscape",
     ageRating: AGE_RATING_OPTIONS[0] || "",
@@ -109,6 +115,16 @@ export function getMovieFormDefaultValues(
     language: LANGUAGE_OPTIONS[0],
     hasProfanity: false,
     hasDrugs: false,
+    hasViolence: false,
+    hasGore: false,
+    hasSexualContent: false,
+    hasNudity: false,
+    hasSmoking: false,
+    hasAlcohol: false,
+    hasMentalHealth: false,
+    hasFlashingLights: false,
+    hasOtherWarning: false,
+    otherContentWarning: "",
     colorType: "color",
     studio: "",
     btsVideo: [],
@@ -131,13 +147,23 @@ export function getInitialAffiliationType(
   return "university";
 }
 
+
+
 export function getSelectedContentWarnings(
-  hasProfanity: boolean,
-  hasDrugs: boolean,
+  data: Partial<MovieFormInputs>
 ): string[] {
   return [
-    ...(hasProfanity ? ["profanity"] : []),
-    ...(hasDrugs ? ["drugs"] : []),
+    ...(data.hasViolence ? ["violence"] : []),
+    ...(data.hasGore ? ["gore"] : []),
+    ...(data.hasProfanity ? ["profanity"] : []),
+    ...(data.hasSexualContent ? ["sexualContent"] : []),
+    ...(data.hasNudity ? ["nudity"] : []),
+    ...(data.hasSmoking ? ["smoking"] : []),
+    ...(data.hasAlcohol ? ["alcohol"] : []),
+    ...(data.hasDrugs ? ["drugs"] : []),
+    ...(data.hasMentalHealth ? ["mentalHealth"] : []),
+    ...(data.hasFlashingLights ? ["flashingLights"] : []),
+    ...(data.hasOtherWarning ? ["other"] : []),
   ];
 }
 
@@ -151,8 +177,10 @@ export function buildMovieFormPayload({
   affiliationType,
   btsVideos,
   awards,
+  trailerUrls,
 }: MovieFormPayloadOptions) {
   const activeVideos = btsVideos.map((video) => video.trim()).filter(Boolean);
+  const activeTrailers = trailerUrls.map((url) => url.trim()).filter(Boolean);
   const activeAwards = awards.map((award) => award.trim()).filter(Boolean);
 
   const filteredCrew = (data.crew || [])
@@ -169,12 +197,14 @@ export function buildMovieFormPayload({
     thumbnail: data.thumbnail || editingMovie?.thumbnail,
     duration: Number(data.duration),
     btsVideo: activeVideos,
+    trailerUrls: activeTrailers,
     awards: activeAwards,
     university:
       affiliationType === "university" ? data.university || null : null,
     school: affiliationType === "school" ? data.school || null : null,
     studio: affiliationType === "studio" ? data.studio || null : null,
     crew: filteredCrew,
+    otherContentWarning: data.hasOtherWarning ? data.otherContentWarning || "" : "",
   };
 }
 
@@ -184,6 +214,7 @@ export function toCreateMoviePayload(rawPayload: unknown): CreateMovie {
   return {
     ...validated,
     awards: validated.awards ?? undefined,
+    trailerUrls: validated.trailerUrls ?? undefined,
     thumbnail: validated.thumbnail as File,
   };
 }
@@ -198,6 +229,7 @@ export function toUpdateMoviePayload(
     ...validated,
     id: editingMovie.id,
     awards: validated.awards ?? undefined,
+    trailerUrls: validated.trailerUrls ?? undefined,
     thumbnail:
       validated.thumbnail instanceof File ||
       typeof validated.thumbnail === "string"
@@ -207,68 +239,28 @@ export function toUpdateMoviePayload(
 }
 
 export function getFilteredCategories(crewRoles: CrewRole[]): CrewCategory[] {
-  const categoriesMap = new Map<
-    string,
-    { label: string; roles: CrewRoleDefinition[] }
-  >();
-
+  const categoriesMap = new Map<string, { label: string; roles: CrewRoleDefinition[] }>();
   const categoryOrder = [
-    "production_management",
-    "directing",
-    "screenplay",
-    "camera",
-    "lighting",
-    "grip",
-    "sound",
-    "art",
-    "costume",
-    "makeup",
-    "cast",
-    "vfx",
-    "post_production",
+    "production_management", "directing", "screenplay", "camera", "lighting", "grip", "sound",
+    "art", "costume", "makeup", "cast", "vfx", "post_production",
   ];
 
   for (const role of crewRoles) {
     const catId = role.category || "other";
-    const catLabel = role.categoryLabelTh || role.category || "อื่นๆ";
-
     if (!categoriesMap.has(catId)) {
-      categoriesMap.set(catId, {
-        label: catLabel,
-        roles: [],
-      });
+      categoriesMap.set(catId, { label: role.categoryLabelTh || role.category || "อื่นๆ", roles: [] });
     }
-
     categoriesMap.get(catId)!.roles.push({
       id: role.name.toLowerCase(),
       code: role.name,
-      label: role.labelTh || role.name,
+      label: role.labelTh ? `${role.labelTh} (${role.name})` : role.name,
     });
   }
 
-  const result: CrewCategory[] = [];
-  for (const catId of categoryOrder) {
-    const cat = categoriesMap.get(catId);
-    if (cat && cat.roles.length > 0) {
-      result.push({
-        id: catId,
-        label: cat.label,
-        roles: cat.roles,
-      });
-    }
-  }
-
-  for (const [catId, cat] of categoriesMap.entries()) {
-    if (!categoryOrder.includes(catId) && cat.roles.length > 0) {
-      result.push({
-        id: catId,
-        label: cat.label,
-        roles: cat.roles,
-      });
-    }
-  }
-
-  return result;
+  const allIds = [...categoryOrder, ...Array.from(categoriesMap.keys()).filter(id => !categoryOrder.includes(id))];
+  return allIds
+    .map(id => ({ id, ...categoriesMap.get(id)! }))
+    .filter(cat => cat.roles && cat.roles.length > 0);
 }
 
 export function getCrewOptions(availableCrew: CrewMember[]): CrewOption[] {

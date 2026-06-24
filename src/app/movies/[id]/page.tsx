@@ -172,11 +172,11 @@ export default function MovieDetails() {
         </div>
       </div>
 
-      {isPlayingTrailer && movie.trailerUrl && (
+      {isPlayingTrailer && movie.trailerUrls?.[0] && (
         <PlayerModal
           isOpen={isPlayingTrailer}
           onClose={() => setIsPlayingTrailer(false)}
-          youtubeUrl={movie.trailerUrl}
+          youtubeUrl={movie.trailerUrls?.[0]}
           movieTitle={`${movie.title} (ตัวอย่างภาพยนตร์)`}
         />
       )}

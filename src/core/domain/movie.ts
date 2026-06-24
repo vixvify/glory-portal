@@ -1,7 +1,7 @@
 import { Rating } from "./rating";
 import { User } from "./user";
 import { CrewRole, CrewMember } from "./crew";
-import { Category, AgeRating, Language } from "./master-data";
+import { Category } from "./master-data";
 
 export interface MovieCrew {
   id: string;
@@ -23,7 +23,7 @@ export interface Movie {
   categories: Category[];
   thumbnail: string;
   youtubeUrl: string;
-  trailerUrl?: string | null;
+  trailerUrls?: string[];
   views: number;
   ratings: Rating[];
   releaseDate: string | Date;
@@ -38,6 +38,16 @@ export interface Movie {
   awards: string[];
   hasProfanity: boolean;
   hasDrugs: boolean;
+  hasViolence?: boolean;
+  hasGore?: boolean;
+  hasSexualContent?: boolean;
+  hasNudity?: boolean;
+  hasSmoking?: boolean;
+  hasAlcohol?: boolean;
+  hasMentalHealth?: boolean;
+  hasFlashingLights?: boolean;
+  hasOtherWarning?: boolean;
+  otherContentWarning?: string | null;
   colorType: string;
   studio?: string | null;
   crew: MovieCrew[];
@@ -72,7 +82,7 @@ export interface CreateMovie {
   categoryIds: string[];
   thumbnail: File | null;
   youtubeUrl: string;
-  trailerUrl?: string | null;
+  trailerUrls?: string[];
   releaseDate: string;
   matchRate?: number;
   aspectRatio: string;
@@ -85,9 +95,20 @@ export interface CreateMovie {
   btsVideo?: string[] | null;
   hasProfanity?: boolean;
   hasDrugs?: boolean;
+  hasViolence?: boolean;
+  hasGore?: boolean;
+  hasSexualContent?: boolean;
+  hasNudity?: boolean;
+  hasSmoking?: boolean;
+  hasAlcohol?: boolean;
+  hasMentalHealth?: boolean;
+  hasFlashingLights?: boolean;
+  hasOtherWarning?: boolean;
+  otherContentWarning?: string | null;
   colorType: string;
   studio?: string | null;
   awards?: string[];
+  tags?: string[];
 }
 
 export interface UpdateMovie {
@@ -97,7 +118,7 @@ export interface UpdateMovie {
   categoryIds: string[];
   thumbnail: File | string;
   youtubeUrl: string;
-  trailerUrl?: string | null;
+  trailerUrls?: string[];
   releaseDate: string;
   matchRate?: number;
   aspectRatio: string;
@@ -113,6 +134,7 @@ export interface UpdateMovie {
   colorType: string;
   studio?: string | null;
   awards?: string[];
+  tags?: string[];
 }
 
 export interface MovieFilterParams {
@@ -129,6 +151,8 @@ export interface MovieFormProps {
   editingMovie?: Movie | null;
   categories: Category[];
   universities: string[];
+  schools: string[];
+  studios: string[];
   crewRoles: CrewRole[];
   availableCrew: CrewMember[];
 }
@@ -141,7 +165,7 @@ export type MovieFormInputs = {
   categoryIds: string[];
   thumbnail?: File | null;
   youtubeUrl: string;
-  trailerUrl?: string;
+  trailerUrls?: string[];
   releaseDate: string;
   aspectRatio: string;
   ageRating: string;
@@ -151,9 +175,20 @@ export type MovieFormInputs = {
   language?: string;
   hasProfanity: boolean;
   hasDrugs: boolean;
+  hasViolence: boolean;
+  hasGore: boolean;
+  hasSexualContent: boolean;
+  hasNudity: boolean;
+  hasSmoking: boolean;
+  hasAlcohol: boolean;
+  hasMentalHealth: boolean;
+  hasFlashingLights: boolean;
+  hasOtherWarning: boolean;
+  otherContentWarning: string;
   colorType: string;
   studio?: string;
   crew?: MovieCrewInputItemWithRole[];
   btsVideo?: string[];
   awards?: string[];
+  tags?: string[];
 };

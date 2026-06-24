@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import AddIcon from "@mui/icons-material/Add";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { Input } from "./input";
 
 interface SelectOption {
@@ -19,6 +20,8 @@ interface CreatableSearchSelectProps {
   options: SelectOption[];
   placeholder?: string;
   className?: string;
+  hideIcon?: boolean;
+  addLabelPrefix?: string;
 }
 
 export function CreatableSearchSelect({
@@ -27,10 +30,18 @@ export function CreatableSearchSelect({
   options,
   placeholder = "พิมพ์ชื่อ หรือเลือก...",
   className = "",
+  hideIcon = false,
+  addLabelPrefix = "เพิ่มทีมงานและนักแสดง",
 }: CreatableSearchSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState(value.name);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const [prevValueName, setPrevValueName] = useState(value.name);
+  if (value.name !== prevValueName) {
+    setPrevValueName(value.name);
+    setSearchTerm(value.name);
+  }
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -85,7 +96,7 @@ export function CreatableSearchSelect({
         onChange={handleInputChange}
         onFocus={handleFocus}
         placeholder={placeholder}
-        icon={(() => {
+        icon={hideIcon ? undefined : (() => {
           const matchedOpt = options.find((o) => o.id === value.id);
           const pUrl = matchedOpt?.photoUrl || value.photoUrl;
           if (pUrl) {
@@ -100,8 +111,13 @@ export function CreatableSearchSelect({
               />
             );
           }
-          return <AccountCircleIcon className="text-sm" />;
+          return <AccountCircleIcon className="text-brand text-lg" />;
         })()}
+        suffix={
+          !isOpen && searchTerm.trim() !== "" ? (
+            <CheckCircleIcon className="text-brand text-lg animate-fade-in" />
+          ) : undefined
+        }
       />
 
       {isOpen && (
@@ -125,9 +141,9 @@ export function CreatableSearchSelect({
                         className="w-6 h-6 rounded-full object-cover border border-zinc-800 flex-shrink-0"
                         unoptimized
                       />
-                    ) : (
+                    ) : hideIcon ? null : (
                       <div className="w-6 h-6 rounded-full bg-brand/10 border border-brand/20 flex items-center justify-center text-brand flex-shrink-0">
-                        <AccountCircleIcon className="text-[14px]" />
+                        <AccountCircleIcon className="text-brand text-lg" />
                       </div>
                     )}
                     <span className="truncate">{opt.name}</span>
@@ -140,16 +156,27 @@ export function CreatableSearchSelect({
             </div>
           ) : (
             <div className="p-4 text-center">
-              <p className="text-xs text-zinc-500 mb-1">ไม่พบรายชื่อในระบบ</p>
+              <p className="text-xs text-zinc-500 mb-2">ไม่พบรายชื่อในระบบ</p>
               {searchTerm.trim() && (
-                <button
-                  type="button"
-                  onClick={() => setIsOpen(false)}
-                  className="text-xs text-brand hover:underline font-semibold flex items-center justify-center gap-1 mx-auto cursor-pointer"
-                >
-                  <AddIcon className="text-xs" />
-                  เพิ่มทีมงานและนักแสดง: &quot;{searchTerm}&quot;
-                </button>
+                hideIcon ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(false)}
+                    className="text-xs text-brand hover:underline font-semibold flex items-center justify-center gap-1 mx-auto cursor-pointer"
+                  >
+                    <AddIcon className="text-xs" />
+                    {addLabelPrefix}: &quot;{searchTerm}&quot;
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(false)}
+                    className="text-xs text-brand hover:underline font-semibold flex items-center justify-center gap-1 mx-auto cursor-pointer"
+                  >
+                    <AddIcon className="text-xs" />
+                    {addLabelPrefix}: &quot;{searchTerm}&quot;
+                  </button>
+                )
               )}
             </div>
           )}
@@ -165,6 +192,7 @@ interface SearchSelectOption {
 }
 
 interface SearchSelectProps {
+  creatable?: boolean;
   label?: string;
   value: string;
   onChange: (val: string) => void;
@@ -176,6 +204,7 @@ interface SearchSelectProps {
 
 export function SearchSelect({
   label,
+  creatable = false,
   value,
   onChange,
   options,
@@ -268,8 +297,21 @@ export function SearchSelect({
                     {opt.label}
                   </button>
                 ))
-              ) : (
+              ) : !creatable ? (
                 <p className="p-3 text-center text-xs text-zinc-500">ไม่พบผลลัพธ์</p>
+              ) : null}
+
+              {creatable && searchTerm.trim() && !options.find((opt) => opt.label.toLowerCase() === searchTerm.trim().toLowerCase()) && (
+                <div className="mt-1 pt-1 border-t border-zinc-800/50">
+                  <button
+                    type="button"
+                    onClick={() => handleSelectOption(searchTerm.trim())}
+                    className="w-full text-left px-3 py-2 text-xs rounded-lg bg-brand/10 text-brand font-medium hover:bg-brand hover:text-black transition-colors flex items-center gap-2 cursor-pointer"
+                  >
+                    <AddIcon className="text-xs" />
+                    เพิ่ม: &quot;{searchTerm}&quot;
+                  </button>
+                </div>
               )}
             </div>
           </div>

@@ -17,6 +17,20 @@ export function useUniversitiesQuery() {
   });
 }
 
+export function useSchoolsQuery() {
+  return useQuery<string[], Error>({
+    queryKey: ["schools"],
+    queryFn: () => masterDataService.getSchools(),
+  });
+}
+
+export function useStudiosQuery() {
+  return useQuery<string[], Error>({
+    queryKey: ["studios"],
+    queryFn: () => masterDataService.getStudios(),
+  });
+}
+
 export function useCrewRolesQuery() {
   return useQuery<CrewRole[], Error>({
     queryKey: ["crew-roles"],

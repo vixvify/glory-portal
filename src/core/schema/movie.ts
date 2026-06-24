@@ -39,12 +39,7 @@ export const movieSchema = z.object({
   categories: z.array(masterDataSchema),
   thumbnail: z.unknown(),
   youtubeUrl: z.string().url("Must be a valid URL"),
-  trailerUrl: z
-    .string()
-    .url("Must be a valid URL")
-    .optional()
-    .or(z.literal(""))
-    .nullable(),
+  trailerUrls: z.array(z.string().url("Must be a valid URL")).optional().nullable(),
   views: z.number().nonnegative().optional(),
   ratings: z.array(ratingSchema).optional(),
   releaseDate: z.union([z.string(), z.date()]),
@@ -57,6 +52,16 @@ export const movieSchema = z.object({
   language: z.string().optional().nullable(),
   hasProfanity: z.boolean().optional(),
   hasDrugs: z.boolean().optional(),
+  hasViolence: z.boolean().optional(),
+  hasGore: z.boolean().optional(),
+  hasSexualContent: z.boolean().optional(),
+  hasNudity: z.boolean().optional(),
+  hasSmoking: z.boolean().optional(),
+  hasAlcohol: z.boolean().optional(),
+  hasMentalHealth: z.boolean().optional(),
+  hasFlashingLights: z.boolean().optional(),
+  hasOtherWarning: z.boolean().optional(),
+  otherContentWarning: z.string().optional().nullable(),
   colorType: z.string().min(1, "Color type is required"),
   studio: z.string().optional().nullable(),
   crew: z.array(movieCrewSchema).optional(),
@@ -87,12 +92,7 @@ export const createMovieSchema = z.object({
   categoryIds: z.array(z.string().uuid()).min(1, "At least one category is required"),
   thumbnail: z.unknown().refine((val) => val !== null, "Thumbnail is required"),
   youtubeUrl: z.string().url("Must be a valid URL"),
-  trailerUrl: z
-    .string()
-    .url("Must be a valid URL")
-    .optional()
-    .or(z.literal(""))
-    .nullable(),
+  trailerUrls: z.array(z.string().url("Must be a valid URL")).optional().nullable(),
   releaseDate: z.string().min(1, "Release date is required"),
   aspectRatio: z.string().min(1, "Aspect ratio is required"),
   ageRating: z.string().min(1, "Age rating is required"),
@@ -104,6 +104,16 @@ export const createMovieSchema = z.object({
   btsVideo: z.array(z.string()).optional().nullable(),
   hasProfanity: z.boolean().optional(),
   hasDrugs: z.boolean().optional(),
+  hasViolence: z.boolean().optional(),
+  hasGore: z.boolean().optional(),
+  hasSexualContent: z.boolean().optional(),
+  hasNudity: z.boolean().optional(),
+  hasSmoking: z.boolean().optional(),
+  hasAlcohol: z.boolean().optional(),
+  hasMentalHealth: z.boolean().optional(),
+  hasFlashingLights: z.boolean().optional(),
+  hasOtherWarning: z.boolean().optional(),
+  otherContentWarning: z.string().optional().nullable(),
   colorType: z.string().min(1, "Color type is required"),
   studio: z.string().optional().nullable(),
   awards: z.array(z.string()).optional().nullable(),
@@ -120,12 +130,7 @@ export const updateMovieSchema = z.object({
       "Thumbnail is required",
     ),
   youtubeUrl: z.string().url("Must be a valid URL"),
-  trailerUrl: z
-    .string()
-    .url("Must be a valid URL")
-    .optional()
-    .or(z.literal(""))
-    .nullable(),
+  trailerUrls: z.array(z.string().url("Must be a valid URL")).optional().nullable(),
   releaseDate: z.string().min(1, "Release date is required"),
   aspectRatio: z.string().min(1, "Aspect ratio is required"),
   ageRating: z.string().min(1, "Age rating is required"),
@@ -137,6 +142,16 @@ export const updateMovieSchema = z.object({
   btsVideo: z.array(z.string()).optional().nullable(),
   hasProfanity: z.boolean().optional(),
   hasDrugs: z.boolean().optional(),
+  hasViolence: z.boolean().optional(),
+  hasGore: z.boolean().optional(),
+  hasSexualContent: z.boolean().optional(),
+  hasNudity: z.boolean().optional(),
+  hasSmoking: z.boolean().optional(),
+  hasAlcohol: z.boolean().optional(),
+  hasMentalHealth: z.boolean().optional(),
+  hasFlashingLights: z.boolean().optional(),
+  hasOtherWarning: z.boolean().optional(),
+  otherContentWarning: z.string().optional().nullable(),
   colorType: z.string().min(1, "Color type is required"),
   studio: z.string().optional().nullable(),
   awards: z.array(z.string()).optional().nullable(),
