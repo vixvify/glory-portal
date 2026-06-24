@@ -131,6 +131,16 @@ export interface UpdateMovie {
   btsVideo?: string[] | null;
   hasProfanity?: boolean;
   hasDrugs?: boolean;
+  hasViolence?: boolean;
+  hasGore?: boolean;
+  hasSexualContent?: boolean;
+  hasNudity?: boolean;
+  hasSmoking?: boolean;
+  hasAlcohol?: boolean;
+  hasMentalHealth?: boolean;
+  hasFlashingLights?: boolean;
+  hasOtherWarning?: boolean;
+  otherContentWarning?: string | null;
   colorType: string;
   studio?: string | null;
   awards?: string[];

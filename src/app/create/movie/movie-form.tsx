@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Image from "next/image";
 import YoutubePreview from "@/components/preview/youtube";
 import { useForm, Controller, useWatch, useFieldArray } from "react-hook-form";
@@ -68,14 +68,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
   const updateMovieMutation = useUpdateMovieMutation();
   const isSaving = createMovieMutation.isPending || updateMovieMutation.isPending;
 
-  const filteredCategories = getFilteredCategories(crewRoles);
-  const crewOptions = getCrewOptions(availableCrew);
+  const filteredCategories = useMemo(() => getFilteredCategories(crewRoles), [crewRoles]);
+  const crewOptions = useMemo(() => getCrewOptions(availableCrew), [availableCrew]);
 
-  const affiliationConfigs = {
+  const affiliationConfigs = useMemo(() => ({
     university: { name: "university" as const, options: universities.map(u => ({ id: u, name: u })), placeholder: "พิมพ์ชื่อ หรือเลือกมหาวิทยาลัย...", prefix: "เพิ่มมหาวิทยาลัย" },
     school: { name: "school" as const, options: schools.map(s => ({ id: s, name: s })), placeholder: "พิมพ์ชื่อ หรือเลือกโรงเรียน...", prefix: "เพิ่มโรงเรียน" },
     studio: { name: "studio" as const, options: studios.map(s => ({ id: s, name: s })), placeholder: "พิมพ์ชื่อสตูดิโอ หรือทีมอิสระ...", prefix: "เพิ่มสตูดิโอ" },
-  };
+  }), [universities, schools, studios]);
 
   const {
     register,
@@ -127,7 +127,9 @@ export const MovieForm: React.FC<MovieFormProps> = ({
   const [activeCrewCategory, setActiveCrewCategory] = useState<string>(
     filteredCategories[0]?.id || "",
   );
-  const activeCategoryRoles = filteredCategories.find(c => c.id === activeCrewCategory)?.roles || [];
+  const activeCategoryRoles = useMemo(() => 
+    filteredCategories.find(c => c.id === activeCrewCategory)?.roles || [],
+  [filteredCategories, activeCrewCategory]);
 
 
 

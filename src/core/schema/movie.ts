@@ -117,6 +117,7 @@ export const createMovieSchema = z.object({
   colorType: z.string().min(1, "Color type is required"),
   studio: z.string().optional().nullable(),
   awards: z.array(z.string()).optional().nullable(),
+  tags: z.array(z.string()).optional().nullable(),
 });
 
 export const updateMovieSchema = z.object({
@@ -155,6 +156,7 @@ export const updateMovieSchema = z.object({
   colorType: z.string().min(1, "Color type is required"),
   studio: z.string().optional().nullable(),
   awards: z.array(z.string()).optional().nullable(),
+  tags: z.array(z.string()).optional().nullable(),
 });
 
 export const movieIdSchema = z.string().min(1, "Movie ID is required");
