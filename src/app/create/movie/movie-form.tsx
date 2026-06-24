@@ -651,13 +651,22 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   <h2 className="text-[18px] font-bold text-brand mb-4">ข้อมูลทีมงาน</h2>
                 </div>
 
-                <div className="w-full md:w-1/2">
-                  <label className="text-sm font-medium text-zinc-100 block mb-2">เลือกฝ่ายการทำงาน</label>
-                  <Select
-                    options={filteredCategories.map(cat => ({ value: cat.id, label: cat.label }))}
-                    value={activeCrewCategory}
-                    onChange={(e) => setActiveCrewCategory(e.target.value)}
-                  />
+                <label className="text-sm font-medium text-zinc-100 block mb-2">เลือกฝ่ายการทำงาน</label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                  {filteredCategories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setActiveCrewCategory(cat.id)}
+                      className={`px-4 min-h-[44px] flex flex-col items-center justify-center text-center text-sm font-medium rounded-xl border transition-all cursor-pointer shadow-sm ${
+                        activeCrewCategory === cat.id
+                          ? "bg-[#B8860B] border-[#B8860B] text-white shadow-md"
+                          : "bg-[#18181B] border-[#3F3F46] text-white hover:bg-[#27272A] hover:border-[#52525B]"
+                      }`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
                 </div>
 
                 <div className="space-y-6 mt-4">
