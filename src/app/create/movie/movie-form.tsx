@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 import MovieIcon from "@mui/icons-material/Movie";
+import SearchIcon from "@mui/icons-material/Search";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CreatableSearchSelect } from "@/components/ui/search-select";
@@ -127,6 +128,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
   const [activeCrewCategory, setActiveCrewCategory] = useState<string>(
     filteredCategories[0]?.id || "",
   );
+  const [crewRoleSearch, setCrewRoleSearch] = useState("");
   const activeCategoryRoles = useMemo(() => 
     filteredCategories.find(c => c.id === activeCrewCategory)?.roles || [],
   [filteredCategories, activeCrewCategory]);
@@ -657,7 +659,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     <button
                       key={cat.id}
                       type="button"
-                      onClick={() => setActiveCrewCategory(cat.id)}
+                      onClick={() => {
+                        setActiveCrewCategory(cat.id);
+                        setCrewRoleSearch("");
+                      }}
                       className={`px-4 min-h-[44px] flex flex-col items-center justify-center text-center text-sm font-medium rounded-xl border transition-all cursor-pointer shadow-sm ${
                         activeCrewCategory === cat.id
                           ? "bg-[#B8860B] border-[#B8860B] text-white shadow-md"
@@ -669,8 +674,21 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   ))}
                 </div>
 
+                <div className="relative mt-4">
+                  <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#B8860B] pointer-events-none" />
+                  <input
+                    type="text"
+                    placeholder="ค้นหาตำแหน่ง..."
+                    value={crewRoleSearch}
+                    onChange={(e) => setCrewRoleSearch(e.target.value)}
+                    className="w-full bg-[#0D0D0D] border border-[#3A3A3A] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-500"
+                  />
+                </div>
+
                 <div className="space-y-6 mt-4">
-                  {activeCategoryRoles.map(role => {
+                  {activeCategoryRoles
+                    .filter((role) => role.label.toLowerCase().includes(crewRoleSearch.toLowerCase()))
+                    .map(role => {
                     const fieldsForRole = fields.map((f, i) => ({ ...f, index: i })).filter((f) => f.role === role.id);
                     return (
                       <CrewSection
