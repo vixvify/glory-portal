@@ -194,10 +194,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_450px] gap-8 items-start">
             
-            {/* === LEFT COLUMN === */}
+            
             <div className="space-y-8 w-full min-w-0">
               
-              {/* อัปโหลด */}
+              
               <div className="space-y-6">
                 <div className="pb-2">
                   <h2 className="text-[18px] font-bold text-brand mb-4">อัปโหลด</h2>
@@ -296,7 +296,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 </div>
               </div>
 
-              {/* อัปโหลดเบื้องหลัง */}
+              
               <div className="space-y-6">
                 <div className="pb-2">
                   <h2 className="text-[18px] font-bold text-brand mb-4">อัปโหลดเบื้องหลัง</h2>
@@ -335,7 +335,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 </div>
               </div>
 
-              {/* รางวัล */}
+              
               <div className="space-y-6">
                 <div className="pb-2">
                   <h2 className="text-[18px] font-bold text-brand">รางวัล</h2>
@@ -411,10 +411,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               </div>
             </div>
 
-            {/* === RIGHT COLUMN === */}
+            
             <div className="space-y-8 w-full min-w-0">
               
-              {/* ข้อมูลทั่วไป */}
+              
               <div className="space-y-6">
                 <div className="pb-2">
                   <h2 className="text-[18px] font-bold text-brand mb-4">ข้อมูลทั่วไป</h2>
@@ -498,7 +498,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
                   <div className="space-y-3">
                     <label className="text-sm font-medium text-zinc-100">สถาบัน/สังกัด</label>
-                    {/* Tab selector */}
+                    
                     <div className="flex gap-2">
                       {AFFILIATION_TABS.map(({ type, label }) => (
                         <button
@@ -520,7 +520,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                         </button>
                       ))}
                     </div>
-                    {/* Dynamic input */}
+                    
                     <Controller
                       key={affiliationConfigs[affiliationType].name}
                       name={affiliationConfigs[affiliationType].name}
@@ -556,7 +556,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 </div>
               </div>
 
-              {/* ข้อมูลการนำเสนอ */}
+              
               <div className="space-y-6">
                 <div className="pb-2">
                   <h2 className="text-[18px] font-bold text-brand mb-4">ข้อมูลการนำเสนอ</h2>
@@ -639,11 +639,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             </div>
           </div>
 
-            {/* ข้อมูลทีมงาน (Centered) */}
+            
             <div className="w-full max-w-[760px] mx-auto mt-12">
 
 
-              {/* ข้อมูลทีมงาน */}
+              
               <div className="space-y-6">
                 <div className="pb-2">
                   <h2 className="text-[18px] font-bold text-brand mb-4">ข้อมูลทีมงาน</h2>
