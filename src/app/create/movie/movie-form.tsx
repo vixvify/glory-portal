@@ -207,7 +207,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-100">เพิ่มลิงก์ภาพยนตร์</label>
+                    <label className="text-sm font-medium text-zinc-100 block mb-2">เพิ่มลิงก์ภาพยนตร์</label>
                     <Input
                       placeholder="https://www.youtube.com/watch?v=..."
                       error={errors.youtubeUrl?.message}
@@ -264,7 +264,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   </div>
 
                   <div className="space-y-2 pt-4">
-                    <label className="text-sm font-medium text-zinc-100">เพิ่มลิงก์ตัวอย่างภาพยนตร์</label>
+                    <label className="text-sm font-medium text-zinc-100 block mb-2">เพิ่มลิงก์ตัวอย่างภาพยนตร์</label>
                     {trailerUrls.items.map((url, index) => (
                       <div key={index} className="flex flex-col gap-2 mb-2">
                         <div className="relative group">
@@ -304,7 +304,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   <h2 className="text-[18px] font-bold text-brand mb-4">อัปโหลดเบื้องหลัง</h2>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-zinc-100">เพิ่มลิงก์เบื้องหลังภาพยนตร์</label>
+                  <label className="text-sm font-medium text-zinc-100 block mb-2">เพิ่มลิงก์เบื้องหลังภาพยนตร์</label>
                   {btsVideos.items.map((url, index) => (
                     <div key={index} className="flex flex-col gap-2 mb-2">
                       <div className="relative group">
@@ -424,7 +424,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-100">ชื่อเรื่อง</label>
+                    <label className="text-sm font-medium text-zinc-100 block mb-2">ชื่อเรื่อง</label>
                     <Input
                       placeholder=""
                       error={errors.title?.message}
@@ -434,7 +434,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-100">คำโปรย (ไม่เกิน 100 คำ)</label>
+                    <label className="text-sm font-medium text-zinc-100 block mb-2">คำโปรย (ไม่เกิน 100 คำ)</label>
                     <textarea
                       rows={4}
                       placeholder=""
@@ -450,7 +450,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       render={({ field }) => (
                         <>
                           <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-100">หมวดหมู่</label>
+                            <label className="text-sm font-medium text-zinc-100 block mb-2">หมวดหมู่</label>
                             <Select
                               options={categories.map(c => ({ value: c.id, label: c.labelTh || c.name }))}
                               value={field.value?.[0] || ""}
@@ -462,7 +462,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                             />
                           </div>
                           <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-100">หมวดหมู่รอง</label>
+                            <label className="text-sm font-medium text-zinc-100 block mb-2">หมวดหมู่รอง</label>
                             <Select
                               options={categories.map(c => ({ value: c.id, label: c.labelTh || c.name }))}
                               value={field.value?.[1] || ""}
@@ -480,7 +480,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-100">วัน/เดือน/ปี ที่สร้างเสร็จ</label>
+                      <label className="text-sm font-medium text-zinc-100 block mb-2">วัน/เดือน/ปี ที่สร้างเสร็จ</label>
                       <Input
                         type="date"
                         {...register("releaseDate")}
@@ -488,7 +488,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-100">ความยาว (นาที)</label>
+                      <label className="text-sm font-medium text-zinc-100 block mb-2">ความยาว (นาที)</label>
                       <Input
                         type="number"
                         placeholder="120"
@@ -499,7 +499,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   </div>
 
                   <div className="space-y-3">
-                    <label className="text-sm font-medium text-zinc-100">สถาบัน/สังกัด</label>
+                    <label className="text-sm font-medium text-zinc-100 pb-2 block">สถาบัน/สังกัด</label>
                     
                     <div className="flex gap-2">
                       {AFFILIATION_TABS.map(({ type, label }) => (
@@ -541,7 +541,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-100">แท็ก</label>
+                    <label className="text-sm font-medium text-zinc-100 block mb-2">แท็ก</label>
                     <Controller
                       name="tags"
                       control={control}
@@ -567,20 +567,20 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 <div className="space-y-6">
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-100">ภาษา</label>
+                      <label className="text-sm font-medium text-zinc-100 block mb-2">ภาษา</label>
                       <Select
                         options={LANGUAGE_SELECT_OPTIONS}
                         {...register("language")}
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-100">คำบรรยาย</label>
+                      <label className="text-sm font-medium text-zinc-100 block mb-2">คำบรรยาย</label>
                       <Select
                         options={LANGUAGE_SELECT_OPTIONS}
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-100">สี</label>
+                      <label className="text-sm font-medium text-zinc-100 block mb-2">สี</label>
                       <Select
                         options={COLOR_OPTIONS}
                         {...register("colorType")}
@@ -590,14 +590,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-100">อัตราส่วนภาพ</label>
+                      <label className="text-sm font-medium text-zinc-100 block mb-2">อัตราส่วนภาพ</label>
                       <Select
                         options={ASPECT_RATIO_OPTIONS}
                         {...register("aspectRatio")}
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-zinc-100">เรตภาพยนตร์</label>
+                      <label className="text-sm font-medium text-zinc-100 block mb-2">เรตภาพยนตร์</label>
                       <Select
                         options={AGE_RATING_SELECT_OPTIONS}
                         {...register("ageRating")}
@@ -606,7 +606,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-100">คำเตือนเนื้อหา</label>
+                    <label className="text-sm font-medium text-zinc-100 block mb-2">คำเตือนเนื้อหา</label>
                     <MultiSelect
                       options={CONTENT_WARNING_OPTIONS}
                       selectedValues={selectedWarnings}
@@ -651,21 +651,13 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   <h2 className="text-[18px] font-bold text-brand mb-4">ข้อมูลทีมงาน</h2>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                  {filteredCategories.map((cat) => (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => setActiveCrewCategory(cat.id)}
-                      className={`px-4 min-h-[44px] flex flex-col items-center justify-center text-center text-sm font-medium rounded-xl border transition-all cursor-pointer shadow-sm ${
-                        activeCrewCategory === cat.id
-                          ? "bg-[#B8860B] border-[#B8860B] text-white shadow-md"
-                          : "bg-[#18181B] border-[#3F3F46] text-white hover:bg-[#27272A] hover:border-[#52525B]"
-                      }`}
-                    >
-                      {cat.label}
-                    </button>
-                  ))}
+                <div className="w-full md:w-1/2">
+                  <label className="text-sm font-medium text-zinc-100 block mb-2">เลือกฝ่ายการทำงาน</label>
+                  <Select
+                    options={filteredCategories.map(cat => ({ value: cat.id, label: cat.label }))}
+                    value={activeCrewCategory}
+                    onChange={(e) => setActiveCrewCategory(e.target.value)}
+                  />
                 </div>
 
                 <div className="space-y-6 mt-4">

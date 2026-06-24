@@ -232,18 +232,36 @@ export function toUpdateMoviePayload(
     trailerUrls: validated.trailerUrls ?? undefined,
     thumbnail:
       validated.thumbnail instanceof File ||
-      typeof validated.thumbnail === "string"
+        typeof validated.thumbnail === "string"
         ? validated.thumbnail
         : editingMovie.thumbnail,
   };
 }
 
 export function getFilteredCategories(crewRoles: CrewRole[]): CrewCategory[] {
-  const categoriesMap = new Map<string, { label: string; roles: CrewRoleDefinition[] }>();
-  const categoryOrder = [
-    "production_management", "directing", "screenplay", "camera", "lighting", "grip", "sound",
-    "art", "costume", "makeup", "cast", "vfx", "post_production",
+  const categoryConfig = [
+    { id: "production_management", label: "ฝ่ายบริหาร" },
+    { id: "directing", label: "ฝ่ายกำกับ" },
+    { id: "screenplay", label: "ฝ่ายบท" },
+    { id: "camera", label: "ฝ่ายถ่ายภาพ" },
+    { id: "lighting", label: "ฝ่ายแสง" },
+    { id: "grip", label: "ฝ่ายขนย้าย/ติดตั้งอุปกรณ์" },
+    { id: "sound", label: "ฝ่ายเสียง" },
+    { id: "art", label: "ฝ่ายศิลป์" },
+    { id: "costume", label: "ฝ่ายเครื่องแต่งกาย" },
+    { id: "makeup", label: "ฝ่ายแต่งหน้า/ทำผม" },
+    { id: "cast", label: "ฝ่ายแสดง" },
+    { id: "location", label: "ฝ่ายสถานที่ถ่ายทำ" },
+    { id: "support", label: "ฝ่ายจัดการผลิต/สนับสนุน" },
+    { id: "vfx", label: "ฝ่ายเอฟเฟกต์พิเศษในกองถ่าย" },
+    { id: "post_production", label: "ฝ่ายหลังการผลิต" },
   ];
+
+  const categoriesMap = new Map<string, { label: string; roles: CrewRoleDefinition[] }>();
+
+  categoryConfig.forEach(config => {
+    categoriesMap.set(config.id, { label: config.label, roles: [] });
+  });
 
   for (const role of crewRoles) {
     const catId = role.category || "other";
@@ -257,9 +275,8 @@ export function getFilteredCategories(crewRoles: CrewRole[]): CrewCategory[] {
     });
   }
 
-  const allIds = [...categoryOrder, ...Array.from(categoriesMap.keys()).filter(id => !categoryOrder.includes(id))];
-  return allIds
-    .map(id => ({ id, ...categoriesMap.get(id)! }))
+  return Array.from(categoriesMap.entries())
+    .map(([id, data]) => ({ id, ...data }))
     .filter(cat => cat.roles && cat.roles.length > 0);
 }
 
