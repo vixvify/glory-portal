@@ -1,69 +1,79 @@
 import { useCallback, useState } from "react";
 
+export type AwardItem = { id: string; value: string };
 export type AwardProject = {
+  id: string;
   project: string;
-  items: string[];
+  items: AwardItem[];
 };
+
+const createId = () => Math.random().toString(36).substring(2, 9);
+const createAwardItem = (value: string): AwardItem => ({ id: createId(), value });
+const createProject = (project: string, items: string[]): AwardProject => ({
+  id: createId(),
+  project,
+  items: items.map(createAwardItem),
+});
 
 export function useAwardsList(initialValues?: string[]) {
   const [projects, setProjects] = useState<AwardProject[]>(() => {
     if (!initialValues || initialValues.length === 0) {
-      return [{ project: "", items: [""] }];
+      return [createProject("", [""])];
     }
     return initialValues.map((val) => {
       try {
         const parsed = JSON.parse(val);
-        return {
-          project: parsed.project || "",
-          items: Array.isArray(parsed.items) && parsed.items.length > 0 ? parsed.items : [""],
-        };
+        return createProject(
+          parsed.project || "",
+          Array.isArray(parsed.items) && parsed.items.length > 0 ? parsed.items : [""]
+        );
       } catch {
-        return { project: val, items: [""] };
+        return createProject(val, [""]);
       }
     });
   });
 
   const addProject = useCallback(() => {
-    setProjects((prev) => [...prev, { project: "", items: [""] }]);
+    setProjects((prev) => [...prev, createProject("", [""])]);
   }, []);
 
-  const removeProject = useCallback((index: number) => {
-    setProjects((prev) => prev.filter((_, i) => i !== index));
+  const removeProject = useCallback((projectId: string) => {
+    setProjects((prev) => prev.filter((p) => p.id !== projectId));
   }, []);
 
-  const updateProjectName = useCallback((index: number, name: string) => {
+  const updateProjectName = useCallback((projectId: string, name: string) => {
     setProjects((prev) =>
-      prev.map((p, i) => (i === index ? { ...p, project: name } : p))
+      prev.map((p) => (p.id === projectId ? { ...p, project: name } : p))
     );
   }, []);
 
-  const addItem = useCallback((projectIndex: number) => {
+  const addItem = useCallback((projectId: string) => {
     setProjects((prev) =>
-      prev.map((p, i) =>
-        i === projectIndex ? { ...p, items: [...p.items, ""] } : p
+      prev.map((p) =>
+        p.id === projectId ? { ...p, items: [...p.items, createAwardItem("")] } : p
       )
     );
   }, []);
 
-  const removeItem = useCallback((projectIndex: number, itemIndex: number) => {
+  const removeItem = useCallback((projectId: string, itemId: string) => {
     setProjects((prev) =>
-      prev.map((p, i) =>
-        i === projectIndex
-          ? { ...p, items: p.items.filter((_, j) => j !== itemIndex) }
+      prev.map((p) =>
+        p.id === projectId
+          ? { ...p, items: p.items.filter((item) => item.id !== itemId) }
           : p
       )
     );
   }, []);
 
   const updateItemName = useCallback(
-    (projectIndex: number, itemIndex: number, value: string) => {
+    (projectId: string, itemId: string, value: string) => {
       setProjects((prev) =>
-        prev.map((p, i) =>
-          i === projectIndex
+        prev.map((p) =>
+          p.id === projectId
             ? {
                 ...p,
-                items: p.items.map((item, j) =>
-                  j === itemIndex ? value : item
+                items: p.items.map((item) =>
+                  item.id === itemId ? { ...item, value } : item
                 ),
               }
             : p
@@ -75,11 +85,11 @@ export function useAwardsList(initialValues?: string[]) {
 
   const getPayload = useCallback(() => {
     return projects
-      .filter((p) => p.project.trim() !== "" || p.items.some((item) => item.trim() !== ""))
+      .filter((p) => p.project.trim() !== "" || p.items.some((item) => item.value.trim() !== ""))
       .map((p) =>
         JSON.stringify({
           project: p.project,
-          items: p.items.filter((item) => item.trim() !== ""),
+          items: p.items.map((i) => i.value).filter((val) => val.trim() !== ""),
         })
       );
   }, [projects]);

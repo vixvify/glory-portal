@@ -158,9 +158,9 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         data,
         editingMovie,
         affiliationType,
-        btsVideos: btsVideos.items,
+        btsVideos: btsVideos.getValues(),
         awards: awards.getPayload(),
-        trailerUrls: trailerUrls.items,
+        trailerUrls: trailerUrls.getValues(),
       });
 
       if (editingMovie) {
@@ -272,26 +272,26 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
                   <div className="space-y-2 pt-4">
                     <label className="text-sm font-medium text-zinc-100 block mb-2">เพิ่มลิงก์ตัวอย่างภาพยนตร์</label>
-                    {trailerUrls.items.map((url, index) => (
-                      <div key={index} className="flex flex-col gap-2 mb-2">
+                    {trailerUrls.items.map((item, index) => (
+                      <div key={item.id} className="flex flex-col gap-2 mb-2">
                         <div className="relative group">
                           <Input
-                            value={url}
-                            onChange={(e) => trailerUrls.updateItem(index, e.target.value)}
+                            value={item.value}
+                            onChange={(e) => trailerUrls.updateItem(item.id, e.target.value)}
                             placeholder="https://www.youtube.com/watch?v=..."
                             className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white placeholder:text-zinc-500 pr-10"
                           />
                           {index > 0 && (
                             <button
                               type="button"
-                              onClick={() => trailerUrls.removeItem(index)}
+                              onClick={() => trailerUrls.removeItem(item.id)}
                               className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all"
                             >
                               <DeleteOutlineIcon className="w-5 h-5" />
                             </button>
                           )}
                         </div>
-                        <div className="w-full mt-2"><YoutubePreview url={url} /></div>
+                        <div className="w-full mt-2"><YoutubePreview url={item.value} /></div>
                       </div>
                     ))}
                     <button
@@ -312,26 +312,26 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-zinc-100 block mb-2">เพิ่มลิงก์เบื้องหลังภาพยนตร์</label>
-                  {btsVideos.items.map((url, index) => (
-                    <div key={index} className="flex flex-col gap-2 mb-2">
+                  {btsVideos.items.map((item, index) => (
+                    <div key={item.id} className="flex flex-col gap-2 mb-2">
                       <div className="relative group">
                         <Input
-                          value={url}
-                          onChange={(e) => btsVideos.updateItem(index, e.target.value)}
+                          value={item.value}
+                          onChange={(e) => btsVideos.updateItem(item.id, e.target.value)}
                           placeholder="https://www.youtube.com/watch?v=..."
                           className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white placeholder:text-zinc-500 pr-10"
                         />
                         {index > 0 && (
                           <button
                             type="button"
-                            onClick={() => btsVideos.removeItem(index)}
+                            onClick={() => btsVideos.removeItem(item.id)}
                             className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all"
                           >
                             <DeleteOutlineIcon className="w-5 h-5" />
                           </button>
                         )}
                       </div>
-                      <div className="w-full mt-2"><YoutubePreview url={url} /></div>
+                      <div className="w-full mt-2"><YoutubePreview url={item.value} /></div>
                     </div>
                   ))}
                   <button
@@ -351,11 +351,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 </div>
                 <div className="space-y-4 w-full text-left pt-4">
                   {awards.projects.map((project, pIndex) => (
-                    <div key={pIndex} className="bg-white/5 backdrop-blur-md border border-[#757575] shadow-lg rounded-xl p-5 relative">
+                    <div key={project.id} className="bg-white/5 backdrop-blur-md border border-[#757575] shadow-lg rounded-xl p-5 relative">
                       {pIndex > 0 && (
                         <button
                           type="button"
-                          onClick={() => awards.removeProject(pIndex)}
+                          onClick={() => awards.removeProject(project.id)}
                           className="absolute top-4 right-4 text-zinc-500 hover:text-red-500"
                         >
                           <CloseIcon className="w-4 h-4" />
@@ -368,7 +368,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                           <Input
                             type="text"
                             value={project.project}
-                            onChange={(e) => awards.updateProjectName(pIndex, e.target.value)}
+                            onChange={(e) => awards.updateProjectName(project.id, e.target.value)}
                             className="!bg-white/5 backdrop-blur-md border !border-white/20 text-white placeholder:text-zinc-400 shadow-inner"
                           />
                         </div>
@@ -377,17 +377,17 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                           <label className="text-sm font-medium text-zinc-100 block mb-2">ชื่อรายการ</label>
                           <div className="space-y-2">
                             {project.items.map((item, iIndex) => (
-                              <div key={iIndex} className="relative group">
+                              <div key={item.id} className="relative group">
                                 <Input
                                   type="text"
-                                  value={item}
-                                  onChange={(e) => awards.updateItemName(pIndex, iIndex, e.target.value)}
+                                  value={item.value}
+                                  onChange={(e) => awards.updateItemName(project.id, item.id, e.target.value)}
                                   className="!bg-white/5 backdrop-blur-md border !border-white/20 text-white placeholder:text-zinc-400 pr-10 shadow-inner"
                                 />
                                 {iIndex > 0 && (
                                   <button
                                     type="button"
-                                    onClick={() => awards.removeItem(pIndex, iIndex)}
+                                    onClick={() => awards.removeItem(project.id, item.id)}
                                     className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all"
                                   >
                                     <DeleteOutlineIcon className="w-5 h-5" />
@@ -400,7 +400,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
                         <button
                           type="button"
-                          onClick={() => awards.addItem(pIndex)}
+                          onClick={() => awards.addItem(project.id)}
                           className="py-2 px-4 bg-[#333333] hover:bg-zinc-700 text-sm font-medium rounded-md text-white text-center transition-colors w-fit"
                         >
                           + เพิ่มรายการ
