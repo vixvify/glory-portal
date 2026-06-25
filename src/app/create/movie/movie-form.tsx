@@ -65,7 +65,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 }) => {
   const router = useRouter();
   const { showToast } = useAppStore();
-      const createMovieMutation = useCreateMovieMutation();
+  const createMovieMutation = useCreateMovieMutation();
   const updateMovieMutation = useUpdateMovieMutation();
   const isSaving = createMovieMutation.isPending || updateMovieMutation.isPending;
 
@@ -138,14 +138,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     filteredCategories.find(c => c.id === activeCrewCategory)?.roles || [],
   [filteredCategories, activeCrewCategory]);
 
-
-
   const { fields, append, remove, update } = useFieldArray({
     control,
     name: "crew",
   });
-
-
 
   const handleUpdateCrew = (index: number, val: { id: string | null; name: string; email: string }) => {
     update(index, {
@@ -660,11 +656,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             </div>
           </div>
 
-            
-            <div className="w-full max-w-[760px] mx-auto mt-12">
-
-
-              
+          <div className="w-full max-w-[760px] mx-auto mt-12">
               <div className="space-y-6">
                 <div className="pb-2">
                   <h2 className="text-[18px] font-bold text-brand mb-4">ข้อมูลทีมงาน</h2>
@@ -743,8 +735,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   })()}
                 </div>
               </div>
-
-          
             </div>
 
           <div className="pt-12 flex flex-col items-center justify-center gap-3 mt-8">
