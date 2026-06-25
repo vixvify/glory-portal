@@ -710,7 +710,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       }
                       return (
                         <div className="py-12 flex flex-col items-center justify-center border border-dashed border-[#3A3A3A] rounded-[16px] bg-black/20">
-                          <p className="text-sm font-medium text-zinc-400">ไม่พบตำแหน่ง "{deferredCrewRoleSearch}"</p>
+                          <p className="text-sm font-medium text-zinc-400">ไม่พบตำแหน่ง &quot;{deferredCrewRoleSearch}&quot;</p>
                           <p className="text-xs text-zinc-500 mt-1">ลองพิมพ์คำค้นหาด้วยคีย์เวิร์ดอื่นดูอีกครั้ง</p>
                         </div>
                       );
