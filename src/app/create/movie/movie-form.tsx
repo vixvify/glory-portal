@@ -89,7 +89,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
   });
 
   const watchedYoutubeUrl = useWatch({ control, name: "youtubeUrl" });
-  const watchedWarnings = useWatch({
+  const [
+    hasViolence, hasGore, hasProfanity, hasSexualContent, 
+    hasNudity, hasSmoking, hasAlcohol, hasDrugs, 
+    hasMentalHealth, hasFlashingLights, hasOtherWarning
+  ] = useWatch({
     control,
     name: [
       "hasViolence", "hasGore", "hasProfanity", "hasSexualContent", 
@@ -99,17 +103,17 @@ export const MovieForm: React.FC<MovieFormProps> = ({
   });
 
   const selectedWarnings = getSelectedContentWarnings({
-    hasViolence: watchedWarnings[0],
-    hasGore: watchedWarnings[1],
-    hasProfanity: watchedWarnings[2],
-    hasSexualContent: watchedWarnings[3],
-    hasNudity: watchedWarnings[4],
-    hasSmoking: watchedWarnings[5],
-    hasAlcohol: watchedWarnings[6],
-    hasDrugs: watchedWarnings[7],
-    hasMentalHealth: watchedWarnings[8],
-    hasFlashingLights: watchedWarnings[9],
-    hasOtherWarning: watchedWarnings[10],
+    hasViolence,
+    hasGore,
+    hasProfanity,
+    hasSexualContent,
+    hasNudity,
+    hasSmoking,
+    hasAlcohol,
+    hasDrugs,
+    hasMentalHealth,
+    hasFlashingLights,
+    hasOtherWarning,
   });
 
   const { previewUrl: movieCoverPreview,
@@ -196,7 +200,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           </p>
         </div>
 
-                <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-8">
+        <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_450px] gap-8 items-start">
             
             
@@ -621,22 +625,27 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       options={CONTENT_WARNING_OPTIONS}
                       selectedValues={selectedWarnings}
                       onChange={(values) => {
-                        setValue("hasViolence", values.includes("violence"), { shouldDirty: true });
-                        setValue("hasGore", values.includes("gore"), { shouldDirty: true });
-                        setValue("hasProfanity", values.includes("profanity"), { shouldDirty: true });
-                        setValue("hasSexualContent", values.includes("sexualContent"), { shouldDirty: true });
-                        setValue("hasNudity", values.includes("nudity"), { shouldDirty: true });
-                        setValue("hasSmoking", values.includes("smoking"), { shouldDirty: true });
-                        setValue("hasAlcohol", values.includes("alcohol"), { shouldDirty: true });
-                        setValue("hasDrugs", values.includes("drugs"), { shouldDirty: true });
-                        setValue("hasMentalHealth", values.includes("mentalHealth"), { shouldDirty: true });
-                        setValue("hasFlashingLights", values.includes("flashingLights"), { shouldDirty: true });
-                        setValue("hasOtherWarning", values.includes("other"), { shouldDirty: true });
+                        const WARNING_MAP: Record<string, keyof MovieFormInputs> = {
+                          violence: "hasViolence",
+                          gore: "hasGore",
+                          profanity: "hasProfanity",
+                          sexualContent: "hasSexualContent",
+                          nudity: "hasNudity",
+                          smoking: "hasSmoking",
+                          alcohol: "hasAlcohol",
+                          drugs: "hasDrugs",
+                          mentalHealth: "hasMentalHealth",
+                          flashingLights: "hasFlashingLights",
+                          other: "hasOtherWarning"
+                        };
+                        Object.entries(WARNING_MAP).forEach(([key, field]) => {
+                          setValue(field, values.includes(key), { shouldDirty: true });
+                        });
                       }}
                       placeholder="ไม่มีคำเตือนเนื้อหา / เลือกคำเตือน..."
                     />
                     
-                    {watchedWarnings[10] && (
+                    {hasOtherWarning && (
                       <div className="pt-2 animate-fade-in">
                         <Input
                           placeholder="ระบุคำเตือนเนื้อหาอื่นๆ..."
