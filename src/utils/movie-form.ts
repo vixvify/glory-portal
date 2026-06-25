@@ -78,17 +78,7 @@ export function getMovieFormDefaultValues(
       university: editingMovie.university || "",
       school: editingMovie.school || "",
       language: editingMovie.language || "",
-      hasProfanity: editingMovie.hasProfanity ?? false,
-      hasDrugs: editingMovie.hasDrugs ?? false,
-      hasViolence: editingMovie.hasViolence ?? false,
-      hasGore: editingMovie.hasGore ?? false,
-      hasSexualContent: editingMovie.hasSexualContent ?? false,
-      hasNudity: editingMovie.hasNudity ?? false,
-      hasSmoking: editingMovie.hasSmoking ?? false,
-      hasAlcohol: editingMovie.hasAlcohol ?? false,
-      hasMentalHealth: editingMovie.hasMentalHealth ?? false,
-      hasFlashingLights: editingMovie.hasFlashingLights ?? false,
-      hasOtherWarning: editingMovie.hasOtherWarning ?? false,
+      contentWarnings: editingMovie.contentWarnings || [],
       otherContentWarning: editingMovie.otherContentWarning || "",
       colorType: editingMovie.colorType || "color",
       studio: editingMovie.studio || "",
@@ -113,17 +103,7 @@ export function getMovieFormDefaultValues(
     university: "",
     school: "",
     language: LANGUAGE_OPTIONS[0],
-    hasProfanity: false,
-    hasDrugs: false,
-    hasViolence: false,
-    hasGore: false,
-    hasSexualContent: false,
-    hasNudity: false,
-    hasSmoking: false,
-    hasAlcohol: false,
-    hasMentalHealth: false,
-    hasFlashingLights: false,
-    hasOtherWarning: false,
+    contentWarnings: [],
     otherContentWarning: "",
     colorType: "color",
     studio: "",
@@ -149,23 +129,7 @@ export function getInitialAffiliationType(
 
 
 
-export function getSelectedContentWarnings(
-  data: Partial<MovieFormInputs>
-): string[] {
-  return [
-    ...(data.hasViolence ? ["violence"] : []),
-    ...(data.hasGore ? ["gore"] : []),
-    ...(data.hasProfanity ? ["profanity"] : []),
-    ...(data.hasSexualContent ? ["sexualContent"] : []),
-    ...(data.hasNudity ? ["nudity"] : []),
-    ...(data.hasSmoking ? ["smoking"] : []),
-    ...(data.hasAlcohol ? ["alcohol"] : []),
-    ...(data.hasDrugs ? ["drugs"] : []),
-    ...(data.hasMentalHealth ? ["mentalHealth"] : []),
-    ...(data.hasFlashingLights ? ["flashingLights"] : []),
-    ...(data.hasOtherWarning ? ["other"] : []),
-  ];
-}
+
 
 export function getInitialStringList(values?: string[]): string[] {
   return values && values.length > 0 ? values : [""];
@@ -205,7 +169,8 @@ export function buildMovieFormPayload({
     school: affiliationType === "school" ? data.school || null : null,
     studio: affiliationType === "studio" ? data.studio || null : null,
     crew: filteredCrew,
-    otherContentWarning: data.hasOtherWarning ? data.otherContentWarning || "" : "",
+    contentWarnings: (data.contentWarnings || []).filter(w => w !== "OTHER"),
+    otherContentWarning: (data.contentWarnings || []).includes("OTHER") ? data.otherContentWarning || "" : "",
   };
 }
 
@@ -214,6 +179,7 @@ export function toCreateMoviePayload(rawPayload: unknown): CreateMovie {
 
   return {
     ...validated,
+    contentWarnings: validated.contentWarnings ?? undefined,
     awards: validated.awards ?? undefined,
     trailerUrls: validated.trailerUrls ?? undefined,
     tags: validated.tags ?? undefined,
@@ -230,6 +196,7 @@ export function toUpdateMoviePayload(
   return {
     ...validated,
     id: editingMovie.id,
+    contentWarnings: validated.contentWarnings ?? undefined,
     awards: validated.awards ?? undefined,
     trailerUrls: validated.trailerUrls ?? undefined,
     tags: validated.tags ?? undefined,

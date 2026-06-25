@@ -3,6 +3,19 @@ import { User } from "./user";
 import { CrewRole, CrewMember } from "./crew";
 import { Category } from "./master-data";
 
+export enum ContentWarning {
+  PROFANITY = 'PROFANITY',
+  DRUGS = 'DRUGS',
+  VIOLENCE = 'VIOLENCE',
+  GORE = 'GORE',
+  SEXUAL_CONTENT = 'SEXUAL_CONTENT',
+  NUDITY = 'NUDITY',
+  SMOKING = 'SMOKING',
+  ALCOHOL = 'ALCOHOL',
+  MENTAL_HEALTH = 'MENTAL_HEALTH',
+  FLASHING_LIGHTS = 'FLASHING_LIGHTS',
+}
+
 export interface MovieCrew {
   id: string;
   movieId: string;
@@ -36,17 +49,7 @@ export interface Movie {
   school?: string | null;
   language?: string | null;
   awards: string[];
-  hasProfanity: boolean;
-  hasDrugs: boolean;
-  hasViolence?: boolean;
-  hasGore?: boolean;
-  hasSexualContent?: boolean;
-  hasNudity?: boolean;
-  hasSmoking?: boolean;
-  hasAlcohol?: boolean;
-  hasMentalHealth?: boolean;
-  hasFlashingLights?: boolean;
-  hasOtherWarning?: boolean;
+  contentWarnings: ContentWarning[];
   otherContentWarning?: string | null;
   colorType: string;
   studio?: string | null;
@@ -93,17 +96,7 @@ export interface CreateMovie {
   language?: string | null;
   crew?: MovieCrewInputItemWithRole[] | null;
   btsVideo?: string[] | null;
-  hasProfanity?: boolean;
-  hasDrugs?: boolean;
-  hasViolence?: boolean;
-  hasGore?: boolean;
-  hasSexualContent?: boolean;
-  hasNudity?: boolean;
-  hasSmoking?: boolean;
-  hasAlcohol?: boolean;
-  hasMentalHealth?: boolean;
-  hasFlashingLights?: boolean;
-  hasOtherWarning?: boolean;
+  contentWarnings?: ContentWarning[];
   otherContentWarning?: string | null;
   colorType: string;
   studio?: string | null;
@@ -129,17 +122,7 @@ export interface UpdateMovie {
   language?: string | null;
   crew?: MovieCrewInputItemWithRole[] | null;
   btsVideo?: string[] | null;
-  hasProfanity?: boolean;
-  hasDrugs?: boolean;
-  hasViolence?: boolean;
-  hasGore?: boolean;
-  hasSexualContent?: boolean;
-  hasNudity?: boolean;
-  hasSmoking?: boolean;
-  hasAlcohol?: boolean;
-  hasMentalHealth?: boolean;
-  hasFlashingLights?: boolean;
-  hasOtherWarning?: boolean;
+  contentWarnings?: ContentWarning[];
   otherContentWarning?: string | null;
   colorType: string;
   studio?: string | null;
@@ -183,17 +166,7 @@ export type MovieFormInputs = {
   university?: string;
   school?: string;
   language?: string;
-  hasProfanity: boolean;
-  hasDrugs: boolean;
-  hasViolence: boolean;
-  hasGore: boolean;
-  hasSexualContent: boolean;
-  hasNudity: boolean;
-  hasSmoking: boolean;
-  hasAlcohol: boolean;
-  hasMentalHealth: boolean;
-  hasFlashingLights: boolean;
-  hasOtherWarning: boolean;
+  contentWarnings: string[];
   otherContentWarning: string;
   colorType: string;
   studio?: string;

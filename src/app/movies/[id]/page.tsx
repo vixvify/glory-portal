@@ -19,6 +19,7 @@ import MovieRatingPanel from "@/components/movie/detail/movie-rating-panel";
 import MovieInfoPanel from "@/components/movie/detail/movie-info-panel";
 import MovieCrewRow from "@/components/movie/rows/movie-crew-row";
 import MovieBtsSection from "@/components/movie/detail/movie-bts-section";
+import { CONTENT_WARNING_OPTIONS } from "@/core/constants/movie-form";
 
 export default function MovieDetails() {
   const params = useParams<{ id: string }>();
@@ -128,22 +129,26 @@ export default function MovieDetails() {
               </p>
             </div>
 
-            {(movie.hasProfanity || movie.hasDrugs) && (
-              <div className="flex items-center gap-2 text-xs text-red-400/90 pt-1">
-                <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse flex-shrink-0" />
-                <span className="font-semibold flex-shrink-0">
-                  คำเตือนเนื้อหา:
-                </span>
-                <span className="text-zinc-400 font-normal">
-                  {[
-                    movie.hasProfanity && "มีคำหยาบคาย",
-                    movie.hasDrugs && "มียาเสพติด/สิ่งมึนเมา",
-                  ]
-                    .filter(Boolean)
-                    .join(", ")}
-                </span>
-              </div>
-            )}
+            {(() => {
+              const activeWarnings = (movie.contentWarnings || [])
+                .map(w => CONTENT_WARNING_OPTIONS.find(opt => opt.value === w)?.label)
+                .filter(Boolean);
+              if (movie.otherContentWarning) activeWarnings.push(movie.otherContentWarning);
+              
+              if (activeWarnings.length === 0) return null;
+              
+              return (
+                <div className="flex items-start gap-2 text-xs text-red-400/90 pt-1">
+                  <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse flex-shrink-0 mt-1.5" />
+                  <span className="font-semibold flex-shrink-0 mt-0.5">
+                    คำเตือนเนื้อหา:
+                  </span>
+                  <span className="text-zinc-400 font-normal leading-relaxed">
+                    {activeWarnings.join(", ")}
+                  </span>
+                </div>
+              );
+            })()}
 
             <MovieCrewRow crew={movie.crew ?? []} />
 

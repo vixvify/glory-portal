@@ -33,7 +33,6 @@ import { MovieFormInputs, MovieFormProps } from "@/core/domain/movie";
 import {
   buildMovieFormPayload,
   getMovieFormDefaultValues,
-  getSelectedContentWarnings,
   toCreateMoviePayload,
   toUpdateMoviePayload,
   getFilteredCategories,
@@ -89,32 +88,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
   });
 
   const watchedYoutubeUrl = useWatch({ control, name: "youtubeUrl" });
-  const [
-    hasViolence, hasGore, hasProfanity, hasSexualContent, 
-    hasNudity, hasSmoking, hasAlcohol, hasDrugs, 
-    hasMentalHealth, hasFlashingLights, hasOtherWarning
-  ] = useWatch({
+  const watchedContentWarnings = useWatch({
     control,
-    name: [
-      "hasViolence", "hasGore", "hasProfanity", "hasSexualContent", 
-      "hasNudity", "hasSmoking", "hasAlcohol", "hasDrugs", 
-      "hasMentalHealth", "hasFlashingLights", "hasOtherWarning"
-    ]
-  });
-
-  const selectedWarnings = getSelectedContentWarnings({
-    hasViolence,
-    hasGore,
-    hasProfanity,
-    hasSexualContent,
-    hasNudity,
-    hasSmoking,
-    hasAlcohol,
-    hasDrugs,
-    hasMentalHealth,
-    hasFlashingLights,
-    hasOtherWarning,
-  });
+    name: "contentWarnings",
+  }) || [];
 
   const { previewUrl: movieCoverPreview,
     resetPreview: resetMovieCoverPreview,
@@ -619,29 +596,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     <label className="text-sm font-medium text-zinc-100 block mb-2">คำเตือนเนื้อหา</label>
                     <MultiSelect
                       options={CONTENT_WARNING_OPTIONS}
-                      selectedValues={selectedWarnings}
+                      selectedValues={watchedContentWarnings}
                       onChange={(values) => {
-                        const WARNING_MAP: Record<string, keyof MovieFormInputs> = {
-                          violence: "hasViolence",
-                          gore: "hasGore",
-                          profanity: "hasProfanity",
-                          sexualContent: "hasSexualContent",
-                          nudity: "hasNudity",
-                          smoking: "hasSmoking",
-                          alcohol: "hasAlcohol",
-                          drugs: "hasDrugs",
-                          mentalHealth: "hasMentalHealth",
-                          flashingLights: "hasFlashingLights",
-                          other: "hasOtherWarning"
-                        };
-                        Object.entries(WARNING_MAP).forEach(([key, field]) => {
-                          setValue(field, values.includes(key), { shouldDirty: true });
-                        });
+                        setValue("contentWarnings", values, { shouldDirty: true });
                       }}
                       placeholder="ไม่มีคำเตือนเนื้อหา / เลือกคำเตือน..."
                     />
                     
-                    {hasOtherWarning && (
+                    {watchedContentWarnings.includes("OTHER") && (
                       <div className="pt-2 animate-fade-in">
                         <Input
                           placeholder="ระบุคำเตือนเนื้อหาอื่นๆ..."
