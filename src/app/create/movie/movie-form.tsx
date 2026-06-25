@@ -448,6 +448,9 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       {...register("description", { required: "กรุณากรอกคำโปรย" })}
                       className="w-full bg-[#0D0D0D] border border-[#3A3A3A] rounded-md px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand resize-none"
                     />
+                    {errors.description && (
+                      <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -697,6 +700,13 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     );
 
                     if (filteredRoles.length === 0) {
+                      if (activeCategoryRoles.length === 0) {
+                        return (
+                          <div className="py-12 flex flex-col items-center justify-center border border-dashed border-[#3A3A3A] rounded-[16px] bg-black/20">
+                            <p className="text-sm font-medium text-zinc-400">ยังไม่มีข้อมูลตำแหน่งงานในฝ่ายนี้</p>
+                          </div>
+                        );
+                      }
                       return (
                         <div className="py-12 flex flex-col items-center justify-center border border-dashed border-[#3A3A3A] rounded-[16px] bg-black/20">
                           <p className="text-sm font-medium text-zinc-400">ไม่พบตำแหน่ง "{deferredCrewRoleSearch}"</p>
