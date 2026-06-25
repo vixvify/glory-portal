@@ -216,6 +216,7 @@ export function toCreateMoviePayload(rawPayload: unknown): CreateMovie {
     ...validated,
     awards: validated.awards ?? undefined,
     trailerUrls: validated.trailerUrls ?? undefined,
+    tags: validated.tags ?? undefined,
     thumbnail: validated.thumbnail as File,
   };
 }
@@ -231,6 +232,7 @@ export function toUpdateMoviePayload(
     id: editingMovie.id,
     awards: validated.awards ?? undefined,
     trailerUrls: validated.trailerUrls ?? undefined,
+    tags: validated.tags ?? undefined,
     thumbnail:
       validated.thumbnail instanceof File ||
         typeof validated.thumbnail === "string"
