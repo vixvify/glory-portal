@@ -4,8 +4,6 @@ import Loading from "@/app/loading";
 import {
   useCategoriesQuery,
   useUniversitiesQuery,
-  useSchoolsQuery,
-  useStudiosQuery,
   useCrewRolesQuery,
 } from "@/hooks/db/use-master-data";
 import { useCrewMembersQuery } from "@/hooks/db/use-crew-members";
@@ -16,10 +14,7 @@ export default function CreateMoviePage() {
     useCategoriesQuery();
   const { data: universities = [], isLoading: isUniversitiesLoading } =
     useUniversitiesQuery();
-  const { data: schools = [], isLoading: isSchoolsLoading } =
-    useSchoolsQuery();
-  const { data: studios = [], isLoading: isStudiosLoading } =
-    useStudiosQuery();
+
   const { data: crewRoles = [], isLoading: isCrewRolesLoading } =
     useCrewRolesQuery();
   const { data: availableCrew = [], isLoading: isCrewLoading } =
@@ -28,8 +23,7 @@ export default function CreateMoviePage() {
   const isMasterLoading =
     isCategoriesLoading ||
     isUniversitiesLoading ||
-    isSchoolsLoading ||
-    isStudiosLoading ||
+
     isCrewRolesLoading ||
     isCrewLoading;
 
@@ -41,8 +35,7 @@ export default function CreateMoviePage() {
     <MovieForm
       categories={categories}
       universities={universities}
-      schools={schools}
-      studios={studios}
+
       crewRoles={crewRoles}
       availableCrew={availableCrew}
     />

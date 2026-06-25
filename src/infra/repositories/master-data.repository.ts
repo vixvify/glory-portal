@@ -15,15 +15,7 @@ export class MasterDataRepositoryImpl implements MasterDataRepository {
     return response;
   }
 
-  async getSchools(): Promise<ApiResponse<string[]>> {
-    const response = await httpClient.get<string[]>("/masterdata/schools");
-    return response;
-  }
 
-  async getStudios(): Promise<ApiResponse<string[]>> {
-    const response = await httpClient.get<string[]>("/masterdata/studios");
-    return response;
-  }
 
   async getCrewRoles(): Promise<ApiResponse<CrewRole[]>> {
     const response = await httpClient.get<CrewRole[]>("/masterdata/crew-roles");

@@ -31,31 +31,7 @@ export class MasterDataService {
     }
   }
 
-  async getSchools(): Promise<string[]> {
-    try {
-      const response = await this.masterDataRepository.getSchools();
-      if (response.error) {
-        throw new Error(response.error);
-      }
-      return response.data;
-    } catch (error) {
-      console.error("Error in getSchools:", error);
-      throw error;
-    }
-  }
 
-  async getStudios(): Promise<string[]> {
-    try {
-      const response = await this.masterDataRepository.getStudios();
-      if (response.error) {
-        throw new Error(response.error);
-      }
-      return response.data;
-    } catch (error) {
-      console.error("Error in getStudios:", error);
-      throw error;
-    }
-  }
 
   async getCrewRoles(): Promise<CrewRole[]> {
     try {

@@ -51,8 +51,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({
   editingMovie = null,
   categories,
   universities,
-  schools,
-  studios,
   crewRoles,
   availableCrew,
 }) => {
@@ -67,9 +65,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
   const affiliationConfigs = useMemo(() => ({
     university: { name: "university" as const, options: universities.map(u => ({ id: u, name: u })), placeholder: "พิมพ์ชื่อ หรือเลือกมหาวิทยาลัย...", prefix: "เพิ่มมหาวิทยาลัย" },
-    school: { name: "school" as const, options: schools.map(s => ({ id: s, name: s })), placeholder: "พิมพ์ชื่อ หรือเลือกโรงเรียน...", prefix: "เพิ่มโรงเรียน" },
-    studio: { name: "studio" as const, options: studios.map(s => ({ id: s, name: s })), placeholder: "พิมพ์ชื่อสตูดิโอ หรือทีมอิสระ...", prefix: "เพิ่มสตูดิโอ" },
-  }), [universities, schools, studios]);
+  }), [universities]);
 
   const {
     register,
@@ -504,21 +500,36 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       ))}
                     </div>
                     
-                    <Controller
-                      key={affiliationConfigs[affiliationType].name}
-                      name={affiliationConfigs[affiliationType].name}
-                      control={control}
-                      render={({ field }) => (
-                        <CreatableSearchSelect
-                          value={{ id: field.value || "", name: field.value || "" }}
-                          onChange={(val) => field.onChange(val.name)}
-                          options={affiliationConfigs[affiliationType].options}
-                          placeholder={affiliationConfigs[affiliationType].placeholder}
-                          hideIcon={true}
-                          addLabelPrefix={affiliationConfigs[affiliationType].prefix}
-                        />
-                      )}
-                    />
+                    {affiliationType === "university" ? (
+                      <Controller
+                        name="university"
+                        control={control}
+                        render={({ field }) => (
+                          <CreatableSearchSelect
+                            value={{ id: field.value || "", name: field.value || "" }}
+                            onChange={(val) => field.onChange(val.name)}
+                            options={affiliationConfigs.university.options}
+                            placeholder={affiliationConfigs.university.placeholder}
+                            hideIcon={true}
+                            addLabelPrefix={affiliationConfigs.university.prefix}
+                          />
+                        )}
+                      />
+                    ) : (
+                      <Controller
+                        name={affiliationType}
+                        control={control}
+                        render={({ field }) => (
+                          <Input
+                            type="text"
+                            value={field.value || ""}
+                            onChange={field.onChange}
+                            placeholder={affiliationType === "school" ? "พิมพ์ชื่อโรงเรียน..." : "พิมพ์ชื่อสตูดิโอ หรือทีมอิสระ..."}
+                            className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white w-full"
+                          />
+                        )}
+                      />
+                    )}
                   </div>
 
                   <div className="space-y-2">

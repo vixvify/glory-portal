@@ -144,8 +144,6 @@ export interface MovieFormProps {
   editingMovie?: Movie | null;
   categories: Category[];
   universities: string[];
-  schools: string[];
-  studios: string[];
   crewRoles: CrewRole[];
   availableCrew: CrewMember[];
 }
