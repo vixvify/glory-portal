@@ -21,8 +21,9 @@ import {
   COLOR_OPTIONS,
   ASPECT_RATIO_OPTIONS,
   CONTENT_WARNING_OPTIONS,
-  AGE_RATING_OPTIONS,
-  LANGUAGE_OPTIONS,
+  AFFILIATION_TABS,
+  LANGUAGE_SELECT_OPTIONS,
+  AGE_RATING_SELECT_OPTIONS,
 } from "@/core/constants/movie-form";
 import {
   useCreateMovieMutation,
@@ -44,14 +45,7 @@ import { useDynamicStringList } from "@/hooks/system/use-dynamic-string-list";
 import { useAwardsList } from "@/hooks/system/use-awards-list";
 import { useMovieCoverPreview } from "@/hooks/system/use-movie-cover-preview";
 
-const AFFILIATION_TABS = [
-  { type: "university" as AffiliationType, label: "มหาวิทยาลัย" },
-  { type: "school" as AffiliationType, label: "โรงเรียน" },
-  { type: "studio" as AffiliationType, label: "สตูดิโอ/อิสระ" },
-] as const;
 
-const LANGUAGE_SELECT_OPTIONS = LANGUAGE_OPTIONS.map((l) => ({ value: l, label: l }));
-const AGE_RATING_SELECT_OPTIONS = AGE_RATING_OPTIONS.map((r) => ({ value: r, label: r }));
 
 export const MovieForm: React.FC<MovieFormProps> = ({
   editingMovie = null,

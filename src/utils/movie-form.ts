@@ -6,6 +6,7 @@ import {
   LANGUAGE_OPTIONS,
   CrewCategory,
   CrewRoleDefinition,
+  CREW_CATEGORY_CONFIG,
 } from "@/core/constants/movie-form";
 import { createMovieSchema, updateMovieSchema } from "@/core/schema/movie";
 import { parseSchema } from "@/lib/validation";
@@ -209,27 +210,10 @@ export function toUpdateMoviePayload(
 }
 
 export function getFilteredCategories(crewRoles: CrewRole[]): CrewCategory[] {
-  const categoryConfig = [
-    { id: "production_management", label: "ฝ่ายบริหาร" },
-    { id: "directing", label: "ฝ่ายกำกับ" },
-    { id: "screenplay", label: "ฝ่ายบท" },
-    { id: "camera", label: "ฝ่ายถ่ายภาพ" },
-    { id: "lighting", label: "ฝ่ายแสง" },
-    { id: "grip", label: "ฝ่ายขนย้าย/ติดตั้งอุปกรณ์" },
-    { id: "sound", label: "ฝ่ายเสียง" },
-    { id: "art", label: "ฝ่ายศิลป์" },
-    { id: "costume", label: "ฝ่ายเครื่องแต่งกาย" },
-    { id: "makeup", label: "ฝ่ายแต่งหน้า/ทำผม" },
-    { id: "cast", label: "ฝ่ายแสดง" },
-    { id: "location", label: "ฝ่ายสถานที่ถ่ายทำ" },
-    { id: "support", label: "ฝ่ายจัดการผลิต/สนับสนุน" },
-    { id: "vfx", label: "ฝ่ายเอฟเฟกต์พิเศษในกองถ่าย" },
-    { id: "post_production", label: "ฝ่ายหลังการผลิต" },
-  ];
 
   const categoriesMap = new Map<string, { label: string; roles: CrewRoleDefinition[] }>();
 
-  categoryConfig.forEach(config => {
+  CREW_CATEGORY_CONFIG.forEach(config => {
     categoriesMap.set(config.id, { label: config.label, roles: [] });
   });
 
