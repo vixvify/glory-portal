@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useDeferredValue } from "react";
 import Image from "next/image";
 import YoutubePreview from "@/components/preview/youtube";
-import { useForm, Controller, useWatch, useFieldArray } from "react-hook-form";
+import { useForm, Controller, useWatch, useFieldArray, Control, UseFormRegister } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
@@ -44,7 +44,14 @@ import { AffiliationType } from "@/core/domain/movie";
 import { useDynamicStringList } from "@/hooks/system/use-dynamic-string-list";
 import { useMovieCoverPreview } from "@/hooks/system/use-movie-cover-preview";
 
-function AwardProjectSection({ control, pIndex, removeProject, register }: any) {
+interface AwardProjectSectionProps {
+  control: Control<MovieFormInputs>;
+  pIndex: number;
+  removeProject: () => void;
+  register: UseFormRegister<MovieFormInputs>;
+}
+
+function AwardProjectSection({ control, pIndex, removeProject, register }: AwardProjectSectionProps) {
   const { fields: itemFields, append: appendItem, remove: removeItem } = useFieldArray({
     control,
     name: `awards.${pIndex}.items`,
