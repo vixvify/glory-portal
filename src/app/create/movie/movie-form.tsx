@@ -11,7 +11,7 @@ import MovieIcon from "@mui/icons-material/Movie";
 import SearchIcon from "@mui/icons-material/Search";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CreatableSearchSelect } from "@/components/ui/search-select";
+import { CreatableSearchSelect, SearchSelect } from "@/components/ui/search-select";
 import { Select } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { TagInput } from "@/components/ui/tag-input";
@@ -96,14 +96,9 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     () => getInitialAffiliationType(editingMovie),
   );
 
-  const [activeCrewCategory, setActiveCrewCategory] = useState<string>(
-    filteredCategories[0]?.id || "",
-  );
+  const [selectedDept, setSelectedDept] = useState<string>("");
   const [crewRoleSearch, setCrewRoleSearch] = useState("");
   const deferredCrewRoleSearch = useDeferredValue(crewRoleSearch);
-  const activeCategoryRoles = useMemo(() => 
-    filteredCategories.find(c => c.id === activeCrewCategory)?.roles || [],
-  [filteredCategories, activeCrewCategory]);
 
   const { fields, append, remove, update } = useFieldArray({
     control,
@@ -629,76 +624,78 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   <h2 className="text-[18px] font-bold text-brand mb-4">ข้อมูลทีมงาน</h2>
                 </div>
 
-                <label className="text-sm font-medium text-zinc-100 block mb-2">เลือกฝ่ายการทำงาน</label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                  {filteredCategories.map((cat) => (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => {
-                        setActiveCrewCategory(cat.id);
-                        setCrewRoleSearch("");
-                      }}
-                      className={`px-4 min-h-[44px] flex flex-col items-center justify-center text-center text-sm font-medium rounded-xl border transition-all cursor-pointer shadow-sm ${
-                        activeCrewCategory === cat.id
-                          ? "bg-[#B8860B] border-[#B8860B] text-white shadow-md"
-                          : "bg-[#18181B] border-[#3F3F46] text-white hover:bg-[#27272A] hover:border-[#52525B]"
-                      }`}
-                    >
-                      {cat.label}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="relative mt-4">
-                  <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#B8860B] pointer-events-none" />
-                  <input
-                    type="text"
-                    placeholder="ค้นหาตำแหน่ง..."
-                    value={crewRoleSearch}
-                    onChange={(e) => setCrewRoleSearch(e.target.value)}
-                    className="w-full bg-[#0D0D0D] border border-[#3A3A3A] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-500"
+                <div className="space-y-4">
+                  <SearchSelect
+                    value={selectedDept}
+                    onChange={(val) => {
+                      setSelectedDept(val);
+                      setCrewRoleSearch("");
+                    }}
+                    options={filteredCategories.map(cat => ({ 
+                      value: cat.id, 
+                      label: cat.label,
+                      searchKeywords: cat.roles.map(r => r.label).join(" ")
+                    }))}
+                    placeholder="เลือกหรือค้นหาฝ่าย..."
+                    className="w-full"
                   />
+                  
+                  {selectedDept && (
+                    <div className="relative mt-2 animate-fade-in">
+                      <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#B8860B] pointer-events-none" />
+                      <input
+                        type="text"
+                        placeholder="ค้นหาตำแหน่งในฝ่าย..."
+                        value={crewRoleSearch}
+                        onChange={(e) => setCrewRoleSearch(e.target.value)}
+                        className="w-full bg-[#0D0D0D] border border-[#3A3A3A] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors"
+                      />
+                    </div>
+                  )}
                 </div>
 
-                <div className="space-y-6 mt-4">
+                <div className="space-y-8 mt-6">
                   {(() => {
-                    const filteredRoles = activeCategoryRoles.filter((role) =>
-                      role.label.toLowerCase().includes(deferredCrewRoleSearch.toLowerCase())
-                    );
+                    if (!selectedDept) return null;
+                    
+                    const searchLower = deferredCrewRoleSearch.toLowerCase().trim();
+                    const activeCat = filteredCategories.find(c => c.id === selectedDept);
+                    
+                    if (!activeCat) return null;
+                    
+                    const matchedRoles = activeCat.roles.filter(role => role.label.toLowerCase().includes(searchLower));
 
-                    if (filteredRoles.length === 0) {
-                      if (activeCategoryRoles.length === 0) {
-                        return (
-                          <div className="py-12 flex flex-col items-center justify-center border border-dashed border-[#3A3A3A] rounded-[16px] bg-black/20">
-                            <p className="text-sm font-medium text-zinc-400">ยังไม่มีข้อมูลตำแหน่งงานในฝ่ายนี้</p>
-                          </div>
-                        );
-                      }
+                    if (matchedRoles.length === 0) {
                       return (
-                        <div className="py-12 flex flex-col items-center justify-center border border-dashed border-[#3A3A3A] rounded-[16px] bg-black/20">
+                        <div className="py-12 flex flex-col items-center justify-center border border-dashed border-[#3A3A3A] rounded-[16px] bg-black/20 animate-fade-in">
                           <p className="text-sm font-medium text-zinc-400">ไม่พบตำแหน่ง &quot;{deferredCrewRoleSearch}&quot;</p>
                           <p className="text-xs text-zinc-500 mt-1">ลองพิมพ์คำค้นหาด้วยคีย์เวิร์ดอื่นดูอีกครั้ง</p>
                         </div>
                       );
                     }
 
-                    return filteredRoles.map(role => {
-                      const fieldsForRole = fields.map((f, i) => ({ ...f, index: i })).filter((f) => f.role === role.id);
-                      return (
-                        <CrewSection
-                          key={role.id}
-                          label={role.label}
-                          fields={fieldsForRole}
-                          onAdd={() => append({ role: role.id, crewMemberId: null, name: "", email: "" })}
-                          onRemove={remove}
-                          onUpdate={handleUpdateCrew}
-                          placeholder={`พิมพ์ชื่อ หรือเลือก${role.label}...`}
-                          addButtonLabel={`เพิ่มตำแหน่ง`}
-                          crewOptions={crewOptions}
-                        />
-                      );
-                    });
+                    return (
+                      <div className="space-y-4 animate-fade-in">
+                        <div className="space-y-4">
+                          {matchedRoles.map(role => {
+                            const fieldsForRole = fields.map((f, i) => ({ ...f, index: i })).filter((f) => f.role === role.id);
+                            return (
+                              <CrewSection
+                                key={role.id}
+                                label={role.label}
+                                fields={fieldsForRole}
+                                onAdd={() => append({ role: role.id, crewMemberId: null, name: "", email: "" })}
+                                onRemove={remove}
+                                onUpdate={handleUpdateCrew}
+                                placeholder={`พิมพ์ชื่อ หรือเลือก${role.label}...`}
+                                addButtonLabel={`เพิ่มตำแหน่ง`}
+                                crewOptions={crewOptions}
+                              />
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
                   })()}
                 </div>
               </div>

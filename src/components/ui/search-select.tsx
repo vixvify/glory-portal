@@ -189,6 +189,7 @@ export function CreatableSearchSelect({
 interface SearchSelectOption {
   value: string;
   label: string;
+  searchKeywords?: string;
 }
 
 interface SearchSelectProps {
@@ -234,9 +235,13 @@ export function SearchSelect({
   }, []);
 
   const filteredOptions = searchTerm.trim()
-    ? options.filter((opt) =>
-        opt.label.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
+    ? options.filter((opt) => {
+        const searchLower = searchTerm.toLowerCase();
+        return (
+          opt.label.toLowerCase().includes(searchLower) ||
+          (opt.searchKeywords && opt.searchKeywords.toLowerCase().includes(searchLower))
+        );
+      })
     : options;
 
   const handleSelectOption = (val: string) => {
