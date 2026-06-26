@@ -150,6 +150,15 @@ export interface MovieFormProps {
 
 export type AffiliationType = "university" | "school" | "studio";
 
+export interface MovieAwardInputItem {
+  value: string;
+}
+
+export interface MovieAwardInputProject {
+  project: string;
+  items: MovieAwardInputItem[];
+}
+
 export type MovieFormInputs = {
   title: string;
   description: string;
@@ -170,6 +179,7 @@ export type MovieFormInputs = {
   studio?: string;
   crew?: MovieCrewInputItemWithRole[];
   btsVideo?: string[];
-  awards?: string[];
+  awards?: MovieAwardInputProject[];
   tags?: string[];
 };
+

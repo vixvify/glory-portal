@@ -42,9 +42,71 @@ import {
 } from "@/utils/movie-form";
 import { AffiliationType } from "@/core/domain/movie";
 import { useDynamicStringList } from "@/hooks/system/use-dynamic-string-list";
-import { useAwardsList } from "@/hooks/system/use-awards-list";
 import { useMovieCoverPreview } from "@/hooks/system/use-movie-cover-preview";
 
+function AwardProjectSection({ control, pIndex, removeProject, register }: any) {
+  const { fields: itemFields, append: appendItem, remove: removeItem } = useFieldArray({
+    control,
+    name: `awards.${pIndex}.items`,
+  });
+
+  return (
+    <div className="bg-white/5 backdrop-blur-md border border-[#757575] shadow-lg rounded-xl p-5 relative">
+      {pIndex > 0 && (
+        <button
+          type="button"
+          onClick={removeProject}
+          className="absolute top-4 right-4 text-zinc-500 hover:text-red-500"
+        >
+          <CloseIcon className="w-4 h-4" />
+        </button>
+      )}
+      
+      <div className="space-y-4">
+        <div>
+          <label className="text-sm font-medium text-zinc-100 block mb-2">ชื่อโครงการ</label>
+          <Input
+            type="text"
+            {...register(`awards.${pIndex}.project` as const)}
+            className="!bg-white/5 backdrop-blur-md border !border-white/20 text-white placeholder:text-zinc-400 shadow-inner"
+          />
+        </div>
+        
+        <div>
+          <label className="text-sm font-medium text-zinc-100 block mb-2">ชื่อรายการ</label>
+          <div className="space-y-2">
+            {itemFields.map((item, iIndex) => (
+              <div key={item.id} className="relative group">
+                <Input
+                  type="text"
+                  {...register(`awards.${pIndex}.items.${iIndex}.value` as const)}
+                  className="!bg-white/5 backdrop-blur-md border !border-white/20 text-white placeholder:text-zinc-400 pr-10 shadow-inner"
+                />
+                {iIndex > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => removeItem(iIndex)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all"
+                  >
+                    <DeleteOutlineIcon className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => appendItem({ value: "" })}
+          className="py-2 px-4 bg-[#333333] hover:bg-zinc-700 text-sm font-medium rounded-md text-white text-center transition-colors w-fit"
+        >
+          + เพิ่มรายการ
+        </button>
+      </div>
+    </div>
+  );
+}
 
 
 export const MovieForm: React.FC<MovieFormProps> = ({
@@ -90,7 +152,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
   const trailerUrls = useDynamicStringList(editingMovie?.trailerUrls || []);
   const btsVideos = useDynamicStringList(editingMovie?.btsVideos);
-  const awards = useAwardsList(editingMovie?.awards);
+
+  const { fields: awardFields, append: appendAward, remove: removeAward } = useFieldArray({
+    control,
+    name: "awards",
+  });
 
   const [affiliationType, setAffiliationType] = useState<AffiliationType>(
     () => getInitialAffiliationType(editingMovie),
@@ -121,7 +187,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         editingMovie,
         affiliationType,
         btsVideos: btsVideos.getValues(),
-        awards: awards.getPayload(),
         trailerUrls: trailerUrls.getValues(),
       });
 
@@ -312,68 +377,19 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   <h2 className="text-[18px] font-bold text-brand">รางวัล</h2>
                 </div>
                 <div className="space-y-4 w-full text-left pt-4">
-                  {awards.projects.map((project, pIndex) => (
-                    <div key={project.id} className="bg-white/5 backdrop-blur-md border border-[#757575] shadow-lg rounded-xl p-5 relative">
-                      {pIndex > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => awards.removeProject(project.id)}
-                          className="absolute top-4 right-4 text-zinc-500 hover:text-red-500"
-                        >
-                          <CloseIcon className="w-4 h-4" />
-                        </button>
-                      )}
-                      
-                      <div className="space-y-4">
-                        <div>
-                          <label className="text-sm font-medium text-zinc-100 block mb-2">ชื่อโครงการ</label>
-                          <Input
-                            type="text"
-                            value={project.project}
-                            onChange={(e) => awards.updateProjectName(project.id, e.target.value)}
-                            className="!bg-white/5 backdrop-blur-md border !border-white/20 text-white placeholder:text-zinc-400 shadow-inner"
-                          />
-                        </div>
-                        
-                        <div>
-                          <label className="text-sm font-medium text-zinc-100 block mb-2">ชื่อรายการ</label>
-                          <div className="space-y-2">
-                            {project.items.map((item, iIndex) => (
-                              <div key={item.id} className="relative group">
-                                <Input
-                                  type="text"
-                                  value={item.value}
-                                  onChange={(e) => awards.updateItemName(project.id, item.id, e.target.value)}
-                                  className="!bg-white/5 backdrop-blur-md border !border-white/20 text-white placeholder:text-zinc-400 pr-10 shadow-inner"
-                                />
-                                {iIndex > 0 && (
-                                  <button
-                                    type="button"
-                                    onClick={() => awards.removeItem(project.id, item.id)}
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all"
-                                  >
-                                    <DeleteOutlineIcon className="w-5 h-5" />
-                                  </button>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => awards.addItem(project.id)}
-                          className="py-2 px-4 bg-[#333333] hover:bg-zinc-700 text-sm font-medium rounded-md text-white text-center transition-colors w-fit"
-                        >
-                          + เพิ่มรายการ
-                        </button>
-                      </div>
-                    </div>
+                  {awardFields.map((project, pIndex) => (
+                    <AwardProjectSection
+                      key={project.id}
+                      control={control}
+                      pIndex={pIndex}
+                      removeProject={() => removeAward(pIndex)}
+                      register={register}
+                    />
                   ))}
                   
                   <button
                     type="button"
-                    onClick={awards.addProject}
+                    onClick={() => appendAward({ project: "", items: [{ value: "" }] })}
                     className="w-full py-2.5 px-4 bg-[#333333] hover:bg-zinc-700 text-sm font-medium rounded-md text-white text-center transition-colors"
                   >
                     + เพิ่มโครงการ

@@ -21,7 +21,6 @@ type MovieFormPayloadOptions = {
   editingMovie: Movie | null;
   affiliationType: AffiliationType;
   btsVideos: string[];
-  awards: string[];
   trailerUrls: string[];
 };
 
@@ -84,7 +83,19 @@ export function getMovieFormDefaultValues(
       colorType: editingMovie.colorType || "color",
       studio: editingMovie.studio || "",
       btsVideo: editingMovie.btsVideos || [],
-      awards: editingMovie.awards || [],
+      awards: (editingMovie.awards || []).map((a) => {
+        try {
+          const parsed = JSON.parse(a);
+          return {
+            project: parsed.project || "",
+            items: Array.isArray(parsed.items) && parsed.items.length > 0 
+              ? parsed.items.map((i: string) => ({ value: i }))
+              : [{ value: "" }],
+          };
+        } catch {
+          return { project: a, items: [{ value: "" }] };
+        }
+      }),
       releaseDate: formatInputDate(editingMovie.releaseDate),
       crew: getInitialCrewFormValues(editingMovie, crewRoles),
     };
@@ -109,7 +120,7 @@ export function getMovieFormDefaultValues(
     colorType: "color",
     studio: "",
     btsVideo: [],
-    awards: [""],
+    awards: [{ project: "", items: [{ value: "" }] }],
     crew: getInitialCrewFormValues(null, crewRoles),
   };
 }
@@ -141,12 +152,21 @@ export function buildMovieFormPayload({
   editingMovie,
   affiliationType,
   btsVideos,
-  awards,
   trailerUrls,
 }: MovieFormPayloadOptions) {
   const activeVideos = btsVideos.map((video) => video.trim()).filter(Boolean);
   const activeTrailers = trailerUrls.map((url) => url.trim()).filter(Boolean);
-  const activeAwards = awards.map((award) => award.trim()).filter(Boolean);
+  const activeAwards = (data.awards || [])
+    .filter((a) => 
+      (a.project && a.project.trim() !== "") || 
+      (a.items && a.items.some((i) => i.value && i.value.trim() !== ""))
+    )
+    .map((a) => {
+      const items = (a.items || [])
+        .map((i) => (i.value || "").trim())
+        .filter(Boolean);
+      return JSON.stringify({ project: (a.project || "").trim(), items });
+    });
 
   const filteredCrew = (data.crew || [])
     .filter((item) => item.name && item.name.trim() !== "")
