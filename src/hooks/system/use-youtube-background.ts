@@ -22,11 +22,9 @@ export function useYouTubeBackground(trailerUrl: string | null | undefined) {
     let hasPlayed = false;
     let lastReturnTime = 0;
 
-    // 1. Listen for PLAYING from YouTube
     const handleMessage = (event: MessageEvent) => {
       if (event.origin !== "https://www.youtube.com") return;
 
-      // Stop pinging once we get ANY response from YouTube
       clearInterval(initInterval);
 
       try {
@@ -38,7 +36,6 @@ export function useYouTubeBackground(trailerUrl: string | null | undefined) {
           timer = setTimeout(() => setVideoLoaded(true), 3800);
         }
 
-        // Also catch if it's already playing via infoDelivery
         if (
           data?.event === "infoDelivery" &&
           data?.info?.playerState === 1 &&
@@ -52,7 +49,6 @@ export function useYouTubeBackground(trailerUrl: string | null | undefined) {
       }
     };
 
-    // 2. Ask iframe to send events
     const listenToIframe = () => {
       iframeRef.current?.contentWindow?.postMessage(
         JSON.stringify({ event: "listening" }),
@@ -60,7 +56,6 @@ export function useYouTubeBackground(trailerUrl: string | null | undefined) {
       );
     };
 
-    // 3. Force video play
     const forcePlay = () => {
       iframeRef.current?.contentWindow?.postMessage(
         JSON.stringify({ event: "command", func: "playVideo", args: [] }),
@@ -68,16 +63,13 @@ export function useYouTubeBackground(trailerUrl: string | null | undefined) {
       );
     };
 
-    // 4. Handle Leaving (Hide)
     const handleLeave = () => {
       setVideoLoaded(false);
       hasPlayed = false;
       clearTimeout(timer);
     };
 
-    // 5. Handle Returning (Show)
     const handleReturn = () => {
-      // Debounce: Prevent rapid multiple calls (e.g. visibility + focus firing together)
       const now = Date.now();
       if (now - lastReturnTime < 1000) return;
       lastReturnTime = now;
@@ -86,7 +78,6 @@ export function useYouTubeBackground(trailerUrl: string | null | undefined) {
       setTimeout(listenToIframe, 500);
     };
 
-    // 6. Event Listeners
     const handleVisibilityChange = () => {
       if (document.hidden) handleLeave();
       else handleReturn();
@@ -95,16 +86,13 @@ export function useYouTubeBackground(trailerUrl: string | null | undefined) {
     const handleWindowBlur = () => handleLeave();
     const handleWindowFocus = () => handleReturn();
 
-    // 7. Initialization
     window.addEventListener("message", handleMessage);
     document.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("blur", handleWindowBlur);
     window.addEventListener("focus", handleWindowFocus);
 
-    // Ping iframe every 500ms until we get a response
     initInterval = setInterval(listenToIframe, 500);
 
-    // 8. Cleanup
     return () => {
       clearTimeout(timer);
       clearInterval(initInterval);
