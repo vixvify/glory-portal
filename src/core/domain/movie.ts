@@ -1,7 +1,7 @@
 import { Rating } from "./rating";
 import { User } from "./user";
 import { CrewRole, CrewMember } from "./crew";
-import { Category, AgeRating, Language } from "./master-data";
+import { Category } from "./master-data";
 
 export interface MovieCrew {
   id: string;

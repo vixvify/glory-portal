@@ -41,6 +41,7 @@ export default function MovieDetailHero({
     if (!backgroundEmbedUrl) return;
 
     let timer: NodeJS.Timeout;
+    // eslint-disable-next-line prefer-const
     let initInterval: NodeJS.Timeout;
     let hasPlayed = false;
     let lastReturnTime = 0;
