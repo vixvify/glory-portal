@@ -168,8 +168,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               
               
               <div className="space-y-6">
-                <div className="pb-2">
-                  <h2 className="text-[18px] font-bold text-brand mb-4">อัปโหลด</h2>
+                <div>
+                  <h2 className="text-[18px] font-bold text-brand">อัปโหลด</h2>
                 </div>
                 
                 <div className="space-y-4">
@@ -230,7 +230,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       </div>
                     )}
                     {errors.thumbnail && (
-                      <p className="text-red-500 text-xs mt-1">{errors.thumbnail.message as string}</p>
+                      <p className="text-[11px] text-red-400 mt-1 pl-1 animate-fade-in">{errors.thumbnail.message as string}</p>
                     )}
                   </div>
 
@@ -271,8 +271,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
               
               <div className="space-y-6">
-                <div className="pb-2">
-                  <h2 className="text-[18px] font-bold text-brand mb-4">อัปโหลดเบื้องหลัง</h2>
+                <div>
+                  <h2 className="text-[18px] font-bold text-brand">อัปโหลดเบื้องหลัง</h2>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-zinc-100 block mb-2">เพิ่มลิงก์เบื้องหลังภาพยนตร์</label>
@@ -310,10 +310,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
               
               <div className="space-y-6">
-                <div className="pb-2">
+                <div>
                   <h2 className="text-[18px] font-bold text-brand">รางวัล</h2>
                 </div>
-                <div className="space-y-4 w-full text-left pt-4">
+                <div className="space-y-4 w-full text-left">
                   {awardFields.map((project, pIndex) => (
                     <AwardProjectSection
                       key={project.id}
@@ -340,8 +340,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               
               
               <div className="space-y-6">
-                <div className="pb-2">
-                  <h2 className="text-[18px] font-bold text-brand mb-4">ข้อมูลทั่วไป</h2>
+                <div>
+                  <h2 className="text-[18px] font-bold text-brand">ข้อมูลทั่วไป</h2>
                 </div>
                 
                 <div className="space-y-6">
@@ -351,7 +351,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       placeholder=""
                       error={errors.title?.message}
                       {...register("title", { required: "กรุณากรอกชื่อเรื่อง" })}
-                      className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white"
+                      className="!bg-[#0D0D0D] text-white"
                     />
                   </div>
 
@@ -361,10 +361,12 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       rows={4}
                       placeholder=""
                       {...register("description", { required: "กรุณากรอกคำโปรย" })}
-                      className="w-full bg-[#0D0D0D] border border-[#3A3A3A] rounded-md px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand resize-none"
+                      className={`w-full bg-[#0D0D0D] border rounded-md px-4 py-2.5 text-sm text-white focus:outline-none resize-none transition-colors ${
+                        errors.description ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500" : "border-[#3A3A3A] focus:border-brand"
+                      }`}
                     />
                     {errors.description && (
-                      <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>
+                      <p className="text-[11px] text-red-400 mt-1 pl-1 animate-fade-in">{errors.description.message}</p>
                     )}
                   </div>
 
@@ -500,8 +502,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
               
               <div className="space-y-6">
-                <div className="pb-2">
-                  <h2 className="text-[18px] font-bold text-brand mb-4">ข้อมูลการนำเสนอ</h2>
+                <div>
+                  <h2 className="text-[18px] font-bold text-brand">ข้อมูลการนำเสนอ</h2>
                 </div>
                 
                 <div className="space-y-6">
@@ -573,8 +575,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
           <div className="w-full max-w-[760px] mx-auto mt-12">
               <div className="space-y-6">
-                <div className="pb-2">
-                  <h2 className="text-[18px] font-bold text-brand mb-4">ข้อมูลทีมงาน</h2>
+                <div>
+                  <h2 className="text-[18px] font-bold text-brand">ข้อมูลทีมงาน</h2>
                 </div>
 
                 <div className="space-y-4">
@@ -589,7 +591,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       label: cat.label,
                       searchKeywords: cat.roles.map(r => r.label).join(" ")
                     }))}
-                    placeholder="เลือกหรือค้นหาฝ่าย..."
+                    placeholder="เลือกหรือค้นหาฝ่ายในการสร้างภาพยนตร์"
                     className="w-full"
                   />
                   
@@ -598,7 +600,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#B8860B] pointer-events-none" />
                       <input
                         type="text"
-                        placeholder="ค้นหาตำแหน่งในฝ่าย..."
+                        placeholder={`ค้นหาตำแหน่งใน${filteredCategories.find(c => c.id === selectedDept)?.label || "ฝ่าย"}`}
                         value={crewRoleSearch}
                         onChange={(e) => setCrewRoleSearch(e.target.value)}
                         className="w-full bg-[#0D0D0D] border border-[#3A3A3A] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors"
@@ -640,8 +642,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                                 onAdd={() => append({ role: role.id, crewMemberId: null, name: "", email: "" })}
                                 onRemove={remove}
                                 onUpdate={handleUpdateCrew}
-                                placeholder={`พิมพ์ชื่อ หรือเลือก${role.label}...`}
-                                addButtonLabel={`เพิ่มตำแหน่ง`}
+                                placeholder="ชื่อจริง - นามสกุล"
+                                addButtonLabel={`เพิ่มรายชื่อ`}
                                 crewOptions={crewOptions}
                               />
                             );
@@ -654,23 +656,23 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               </div>
             </div>
 
-          <div className="pt-12 flex flex-col items-center justify-center gap-3 mt-8">
+          <div className="mt-12 flex flex-row items-center justify-center gap-6">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => router.push("/")}
+              disabled={isSaving}
+              className="min-w-[140px] min-h-[48px] py-3 px-6 text-[15px] font-medium rounded-xl bg-transparent text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-300"
+            >
+              ยกเลิก
+            </Button>
             <Button
               type="submit"
               isLoading={isSaving}
               disabled={isSaving}
-              className="py-2.5 px-12 text-sm font-bold rounded-full w-48 bg-brand text-black hover:bg-brand/90"
+              className="min-w-[140px] min-h-[48px] py-3 px-6 text-[15px] font-bold rounded-xl bg-brand !text-white hover:brightness-105 hover:-translate-y-0.5 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)] transition-all duration-300"
             >
               เสร็จสิ้น
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => router.push("/")}
-              disabled={isSaving}
-              className="py-2.5 px-12 text-sm font-bold rounded-full w-48 bg-[#333333] text-white hover:bg-zinc-700 border-none"
-            >
-              ยกเลิก
             </Button>
           </div>
         </form>

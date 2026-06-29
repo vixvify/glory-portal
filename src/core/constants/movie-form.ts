@@ -68,8 +68,8 @@ export const CREW_CATEGORY_CONFIG = [
   { id: "costume", label: "ฝ่ายเครื่องแต่งกาย" },
   { id: "makeup", label: "ฝ่ายแต่งหน้า/ทำผม" },
   { id: "cast", label: "ฝ่ายแสดง" },
-  { id: "location", label: "ฝ่ายสถานที่ถ่ายทำ" },
-  { id: "support", label: "ฝ่ายจัดการผลิต/สนับสนุน" },
+  { id: "locations", label: "ฝ่ายสถานที่ถ่ายทำ" },
+  { id: "production_support", label: "ฝ่ายจัดการผลิต/สนับสนุน" },
   { id: "vfx", label: "ฝ่ายเอฟเฟกต์พิเศษในกองถ่าย" },
   { id: "post_production", label: "ฝ่ายหลังการผลิต" },
 ];

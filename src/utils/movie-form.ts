@@ -238,7 +238,7 @@ export function getFilteredCategories(crewRoles: CrewRole[]): CrewCategory[] {
   });
 
   for (const role of crewRoles) {
-    const catId = role.category || "other";
+    const catId = (role.category || "other").toLowerCase();
     if (!categoriesMap.has(catId)) {
       categoriesMap.set(catId, { label: role.categoryLabelTh || role.category || "อื่นๆ", roles: [] });
     }
