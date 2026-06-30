@@ -48,7 +48,8 @@ export interface Movie {
   university?: string | null;
   school?: string | null;
   language?: string | null;
-  awards: string[];
+  subtitle?: string | null;
+  awards: Award[];
   contentWarnings: ContentWarning[];
   otherContentWarning?: string | null;
   colorType: string;
@@ -94,13 +95,14 @@ export interface CreateMovie {
   university?: string | null;
   school?: string | null;
   language?: string | null;
+  subtitle?: string | null;
   crew?: MovieCrewInputItemWithRole[] | null;
   btsVideo?: string[] | null;
   contentWarnings?: ContentWarning[];
   otherContentWarning?: string | null;
   colorType: string;
   studio?: string | null;
-  awards?: string[];
+  awards?: Award[];
   tags?: string[];
 }
 
@@ -120,13 +122,14 @@ export interface UpdateMovie {
   university?: string | null;
   school?: string | null;
   language?: string | null;
+  subtitle?: string | null;
   crew?: MovieCrewInputItemWithRole[] | null;
   btsVideo?: string[] | null;
   contentWarnings?: ContentWarning[];
   otherContentWarning?: string | null;
   colorType: string;
   studio?: string | null;
-  awards?: string[];
+  awards?: Award[];
   tags?: string[];
 }
 
@@ -150,13 +153,14 @@ export interface MovieFormProps {
 
 export type AffiliationType = "university" | "school" | "studio";
 
-export interface MovieAwardInputItem {
-  value: string;
+export interface Award {
+  name: string;
+  awardList: string[];
 }
 
 export interface MovieAwardInputProject {
-  project: string;
-  items: MovieAwardInputItem[];
+  name: string;
+  awardList: { value: string }[];
 }
 
 export type MovieFormInputs = {
@@ -173,6 +177,7 @@ export type MovieFormInputs = {
   university?: string;
   school?: string;
   language?: string;
+  subtitle?: string;
   contentWarnings: string[];
   otherContentWarning: string;
   colorType: string;

@@ -15,7 +15,7 @@ export interface AwardProjectSectionProps {
 export function AwardProjectSection({ control, pIndex, removeProject, register }: AwardProjectSectionProps) {
   const { fields: itemFields, append: appendItem, remove: removeItem } = useFieldArray({
     control,
-    name: `awards.${pIndex}.items`,
+    name: `awards.${pIndex}.awardList`,
   });
 
   return (
@@ -35,7 +35,7 @@ export function AwardProjectSection({ control, pIndex, removeProject, register }
           <label className="text-sm font-medium text-zinc-100 block mb-2">ชื่อโครงการ</label>
           <Input
             type="text"
-            {...register(`awards.${pIndex}.project` as const)}
+            {...register(`awards.${pIndex}.name` as const)}
             className="!bg-white/5 backdrop-blur-md border !border-white/20 text-white placeholder:text-zinc-400 shadow-inner"
           />
         </div>
@@ -47,7 +47,7 @@ export function AwardProjectSection({ control, pIndex, removeProject, register }
               <div key={item.id} className="relative group">
                 <Input
                   type="text"
-                  {...register(`awards.${pIndex}.items.${iIndex}.value` as const)}
+                  {...register(`awards.${pIndex}.awardList.${iIndex}.value` as const)}
                   className="!bg-white/5 backdrop-blur-md border !border-white/20 text-white placeholder:text-zinc-400 pr-10 shadow-inner"
                 />
                 {iIndex > 0 && (

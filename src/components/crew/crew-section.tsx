@@ -73,7 +73,7 @@ export const CrewSection: React.FC<CrewSectionProps> = ({
           </div>
           <Input
             type="email"
-            placeholder="กรอกอีเมล"
+            placeholder="example@gmail.com"
             value={item.email || ""}
             readOnly={!!item.crewMemberId}
             onChange={(e) => {
@@ -84,7 +84,7 @@ export const CrewSection: React.FC<CrewSectionProps> = ({
               });
             }}
             className="read-only:opacity-60 read-only:cursor-not-allowed !bg-[#0D0D0D] !rounded-[12px] border !border-white/10 text-white placeholder:text-zinc-500 !h-[52px] !pl-[48px] !pr-4 !text-[14px]"
-            icon={<EmailIcon className="text-zinc-500 text-[22px]" />}
+            icon={<EmailIcon className="text-brand text-[22px]" />}
           />
         </div>
       ))}

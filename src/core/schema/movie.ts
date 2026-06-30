@@ -33,6 +33,21 @@ export const movieCrewSchema = z.object({
   updatedAt: z.union([z.string(), z.date()]).optional(),
 });
 
+export const awardSchema = z.object({
+  name: z.string(),
+  awardList: z.array(z.string()),
+});
+
+export const formAwardSchema = z.object({
+  name: z.string().transform((str) => str.trim()),
+  awardList: z.array(
+    z.union([
+      z.object({ value: z.string() }).transform((o) => o.value),
+      z.string(),
+    ])
+  ).transform((arr) => arr.map((item) => item.trim()).filter(Boolean)),
+});
+
 export const movieSchema = z.object({
   id: z.string(),
   title: z.string().min(1, "Title is required"),
@@ -51,13 +66,14 @@ export const movieSchema = z.object({
   university: z.string().optional().nullable(),
   school: z.string().optional().nullable(),
   language: z.string().optional().nullable(),
+  subtitle: z.string().optional().nullable(),
   contentWarnings: z.array(z.nativeEnum(ContentWarning)).optional(),
   otherContentWarning: z.string().optional().nullable(),
   colorType: z.string().min(1, "Color type is required"),
   studio: z.string().optional().nullable(),
   crew: z.array(movieCrewSchema).optional(),
   btsVideos: z.array(z.string()).optional(),
-  awards: z.array(z.string()).optional(),
+  awards: z.array(awardSchema).optional(),
   createdBy: z.string().optional(),
   creator: z.unknown().optional().nullable(),
   createdAt: z.union([z.string(), z.date()]).optional(),
@@ -91,13 +107,14 @@ export const createMovieSchema = z.object({
   university: z.string().optional().nullable().or(z.literal("")),
   school: z.string().optional().nullable().or(z.literal("")),
   language: z.string().optional().nullable().or(z.literal("")),
+  subtitle: z.string().optional().nullable().or(z.literal("")),
   crew: z.array(movieCrewInputItemWithRoleSchema).optional().nullable(),
   btsVideo: z.array(z.string()).optional().nullable(),
   contentWarnings: z.array(z.nativeEnum(ContentWarning)).optional().nullable(),
   otherContentWarning: z.string().optional().nullable(),
   colorType: z.string().min(1, "Color type is required"),
   studio: z.string().optional().nullable(),
-  awards: z.array(z.string()).optional().nullable(),
+  awards: z.array(formAwardSchema).transform((arr) => arr.filter((a) => a.name !== "")).optional().nullable(),
   tags: z.array(z.string()).optional().nullable(),
 });
 
@@ -120,13 +137,14 @@ export const updateMovieSchema = z.object({
   university: z.string().optional().nullable().or(z.literal("")),
   school: z.string().optional().nullable().or(z.literal("")),
   language: z.string().optional().nullable().or(z.literal("")),
+  subtitle: z.string().optional().nullable().or(z.literal("")),
   crew: z.array(movieCrewInputItemWithRoleSchema).optional().nullable(),
   btsVideo: z.array(z.string()).optional().nullable(),
   contentWarnings: z.array(z.nativeEnum(ContentWarning)).optional().nullable(),
   otherContentWarning: z.string().optional().nullable(),
   colorType: z.string().min(1, "Color type is required"),
   studio: z.string().optional().nullable(),
-  awards: z.array(z.string()).optional().nullable(),
+  awards: z.array(formAwardSchema).transform((arr) => arr.filter((a) => a.name !== "")).optional().nullable(),
   tags: z.array(z.string()).optional().nullable(),
 });
 

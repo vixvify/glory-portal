@@ -78,24 +78,16 @@ export function getMovieFormDefaultValues(
       university: editingMovie.university || "",
       school: editingMovie.school || "",
       language: editingMovie.language || "",
+      subtitle: editingMovie.subtitle || "",
       contentWarnings: editingMovie.contentWarnings || [],
       otherContentWarning: editingMovie.otherContentWarning || "",
       colorType: editingMovie.colorType || "color",
       studio: editingMovie.studio || "",
       btsVideo: editingMovie.btsVideos || [],
-      awards: (editingMovie.awards || []).map((a) => {
-        try {
-          const parsed = JSON.parse(a);
-          return {
-            project: parsed.project || "",
-            items: Array.isArray(parsed.items) && parsed.items.length > 0 
-              ? parsed.items.map((i: string) => ({ value: i }))
-              : [{ value: "" }],
-          };
-        } catch {
-          return { project: a, items: [{ value: "" }] };
-        }
-      }),
+      awards: (editingMovie.awards || []).map((a) => ({
+        name: a.name || "",
+        awardList: a.awardList?.length > 0 ? a.awardList.map(v => ({ value: v })) : [{ value: "" }],
+      })),
       releaseDate: formatInputDate(editingMovie.releaseDate),
       crew: getInitialCrewFormValues(editingMovie, crewRoles),
     };
@@ -115,12 +107,13 @@ export function getMovieFormDefaultValues(
     university: "",
     school: "",
     language: LANGUAGE_OPTIONS[0],
+    subtitle: LANGUAGE_OPTIONS[0],
     contentWarnings: [],
     otherContentWarning: "",
     colorType: "color",
     studio: "",
     btsVideo: [],
-    awards: [{ project: "", items: [{ value: "" }] }],
+    awards: [{ name: "", awardList: [{ value: "" }] }],
     crew: getInitialCrewFormValues(null, crewRoles),
   };
 }
@@ -156,17 +149,6 @@ export function buildMovieFormPayload({
 }: MovieFormPayloadOptions) {
   const activeVideos = btsVideos.map((video) => video.trim()).filter(Boolean);
   const activeTrailers = trailerUrls.map((url) => url.trim()).filter(Boolean);
-  const activeAwards = (data.awards || [])
-    .filter((a) => 
-      (a.project && a.project.trim() !== "") || 
-      (a.items && a.items.some((i) => i.value && i.value.trim() !== ""))
-    )
-    .map((a) => {
-      const items = (a.items || [])
-        .map((i) => (i.value || "").trim())
-        .filter(Boolean);
-      return JSON.stringify({ project: (a.project || "").trim(), items });
-    });
 
   const filteredCrew = (data.crew || [])
     .filter((item) => item.name && item.name.trim() !== "")
@@ -175,6 +157,13 @@ export function buildMovieFormPayload({
       crewMemberId: item.crewMemberId || null,
       name: (item.name || "").trim(),
       email: item.email?.trim() || null,
+    }));
+
+  const activeAwards = (data.awards || [])
+    .filter((a) => (a.name || "").trim() !== "")
+    .map((a) => ({
+      name: a.name.trim(),
+      awardList: (a.awardList || []).map(i => (i.value || "").trim()).filter(Boolean),
     }));
 
   return {

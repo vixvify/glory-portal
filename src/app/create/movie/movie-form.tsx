@@ -326,7 +326,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   
                   <button
                     type="button"
-                    onClick={() => appendAward({ project: "", items: [{ value: "" }] })}
+                    onClick={() => appendAward({ name: "", awardList: [{ value: "" }] })}
                     className="w-full py-2.5 px-4 bg-[#333333] hover:bg-zinc-700 text-sm font-medium rounded-md text-white text-center transition-colors"
                   >
                     + เพิ่มโครงการ
@@ -519,6 +519,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       <label className="text-sm font-medium text-zinc-100 block mb-2">คำบรรยาย</label>
                       <Select
                         options={LANGUAGE_SELECT_OPTIONS}
+                        {...register("subtitle")}
                       />
                     </div>
                     <div className="space-y-2">
