@@ -39,7 +39,7 @@ export const CrewSection: React.FC<CrewSectionProps> = ({
     <div className="border border-[#8A8A8A] rounded-[16px] py-5 px-6 bg-[#1C1C1C] space-y-4 overflow-visible">
       <h3 className="text-white font-semibold text-[15px] tracking-wide">{label}</h3>
       {fields.map((item, index) => (
-        <div key={item.id} className="group space-y-3 pt-4 mt-4 first:pt-0 first:mt-0">
+        <div key={`crew-${item.index}`} className="group space-y-3 pt-4 mt-4 first:pt-0 first:mt-0">
           <div className="relative">
             <CreatableSearchSelect
               value={{

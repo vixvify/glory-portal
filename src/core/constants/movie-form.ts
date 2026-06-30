@@ -50,7 +50,7 @@ export const LANGUAGE_OPTIONS = ["ไทย", "อังกฤษ", "เกา�
 export const AFFILIATION_TABS = [
   { type: "university" as AffiliationType, label: "มหาวิทยาลัย" },
   { type: "school" as AffiliationType, label: "โรงเรียน" },
-  { type: "studio" as AffiliationType, label: "สตูดิโอ/อิสระ" },
+  { type: "studio" as AffiliationType, label: "สังกัด" },
 ] as const;
 
 export const LANGUAGE_SELECT_OPTIONS = LANGUAGE_OPTIONS.map((l) => ({ value: l, label: l }));

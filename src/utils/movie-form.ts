@@ -226,15 +226,26 @@ export function getFilteredCategories(crewRoles: CrewRole[]): CrewCategory[] {
     categoriesMap.set(config.id, { label: config.label, roles: [] });
   });
 
+  const formatRoleName = (name: string) => {
+    if (name === name.toUpperCase()) {
+      return name
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+    }
+    return name;
+  };
+
   for (const role of crewRoles) {
     const catId = (role.category || "other").toLowerCase();
     if (!categoriesMap.has(catId)) {
       categoriesMap.set(catId, { label: role.categoryLabelTh || role.category || "อื่นๆ", roles: [] });
     }
+    const formattedName = formatRoleName(role.name);
     categoriesMap.get(catId)!.roles.push({
       id: role.name.toLowerCase(),
       code: role.name,
-      label: role.labelTh ? `${role.labelTh} (${role.name})` : role.name,
+      label: role.labelTh ? `${role.labelTh} (${formattedName})` : formattedName,
     });
   }
 

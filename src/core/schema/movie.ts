@@ -65,7 +65,7 @@ export const movieSchema = z.object({
   duration: z.number().min(1, "Duration is required"),
   university: z.string().optional().nullable(),
   school: z.string().optional().nullable(),
-  language: z.string().optional().nullable(),
+  language: z.string().min(1, "Language is required"),
   subtitle: z.string().optional().nullable(),
   contentWarnings: z.array(z.nativeEnum(ContentWarning)).optional(),
   otherContentWarning: z.string().optional().nullable(),
@@ -106,16 +106,26 @@ export const createMovieSchema = z.object({
   duration: z.number().min(1, "Duration is required"),
   university: z.string().optional().nullable().or(z.literal("")),
   school: z.string().optional().nullable().or(z.literal("")),
-  language: z.string().optional().nullable().or(z.literal("")),
+  language: z.string().min(1, "Language is required"),
   subtitle: z.string().optional().nullable().or(z.literal("")),
-  crew: z.array(movieCrewInputItemWithRoleSchema).optional().nullable(),
+  crew: z.array(movieCrewInputItemWithRoleSchema).refine((crew) => crew.some((c) => c.name && c.name.trim() !== ""), "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน"),
   btsVideo: z.array(z.string()).optional().nullable(),
-  contentWarnings: z.array(z.nativeEnum(ContentWarning)).optional().nullable(),
+  contentWarnings: z.array(z.union([z.nativeEnum(ContentWarning), z.literal("OTHER")])).optional().nullable(),
   otherContentWarning: z.string().optional().nullable(),
   colorType: z.string().min(1, "Color type is required"),
   studio: z.string().optional().nullable(),
   awards: z.array(formAwardSchema).transform((arr) => arr.filter((a) => a.name !== "")).optional().nullable(),
   tags: z.array(z.string()).optional().nullable(),
+}).superRefine((data, ctx) => {
+  if (data.contentWarnings?.includes("OTHER" as any)) {
+    if (!data.otherContentWarning || data.otherContentWarning.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "กรุณาระบุคำเตือนเนื้อหาอื่นๆ",
+        path: ["otherContentWarning"],
+      });
+    }
+  }
 });
 
 export const updateMovieSchema = z.object({
@@ -136,16 +146,26 @@ export const updateMovieSchema = z.object({
   duration: z.number().min(1, "Duration is required"),
   university: z.string().optional().nullable().or(z.literal("")),
   school: z.string().optional().nullable().or(z.literal("")),
-  language: z.string().optional().nullable().or(z.literal("")),
+  language: z.string().min(1, "Language is required"),
   subtitle: z.string().optional().nullable().or(z.literal("")),
-  crew: z.array(movieCrewInputItemWithRoleSchema).optional().nullable(),
+  crew: z.array(movieCrewInputItemWithRoleSchema).refine((crew) => crew.some((c) => c.name && c.name.trim() !== ""), "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน"),
   btsVideo: z.array(z.string()).optional().nullable(),
-  contentWarnings: z.array(z.nativeEnum(ContentWarning)).optional().nullable(),
+  contentWarnings: z.array(z.union([z.nativeEnum(ContentWarning), z.literal("OTHER")])).optional().nullable(),
   otherContentWarning: z.string().optional().nullable(),
   colorType: z.string().min(1, "Color type is required"),
   studio: z.string().optional().nullable(),
   awards: z.array(formAwardSchema).transform((arr) => arr.filter((a) => a.name !== "")).optional().nullable(),
   tags: z.array(z.string()).optional().nullable(),
+}).superRefine((data, ctx) => {
+  if (data.contentWarnings?.includes("OTHER" as any)) {
+    if (!data.otherContentWarning || data.otherContentWarning.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "กรุณาระบุคำเตือนเนื้อหาอื่นๆ",
+        path: ["otherContentWarning"],
+      });
+    }
+  }
 });
 
 export const movieIdSchema = z.string().min(1, "Movie ID is required");

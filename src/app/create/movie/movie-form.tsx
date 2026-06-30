@@ -71,7 +71,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     handleSubmit,
     setValue,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitted },
   } = useForm<MovieFormInputs>({
     defaultValues: getMovieFormDefaultValues(editingMovie, categories, crewRoles),
   });
@@ -81,6 +81,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     control,
     name: "contentWarnings",
   }) || [];
+  const watchedOtherContentWarning = useWatch({ control, name: "otherContentWarning" });
 
   const { previewUrl: movieCoverPreview,
     resetPreview: resetMovieCoverPreview,
@@ -181,7 +182,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       {...register("youtubeUrl", {
                         required: "กรุณากรอกลิงก์ภาพยนตร์",
                       })}
-                      className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white placeholder:text-zinc-500"
+                      className="text-white placeholder:text-zinc-500"
                     />
                     <div className="w-full mt-2"><YoutubePreview url={watchedYoutubeUrl} /></div>
                     
@@ -243,7 +244,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                             value={item.value}
                             onChange={(e) => trailerUrls.updateItem(item.id, e.target.value)}
                             placeholder="https://www.youtube.com/watch?v=..."
-                            className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white placeholder:text-zinc-500 pr-10"
+                            className="text-white placeholder:text-zinc-500 pr-10"
                           />
                           {index > 0 && (
                             <button
@@ -283,7 +284,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                           value={item.value}
                           onChange={(e) => btsVideos.updateItem(item.id, e.target.value)}
                           placeholder="https://www.youtube.com/watch?v=..."
-                          className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white placeholder:text-zinc-500 pr-10"
+                          className="text-white placeholder:text-zinc-500 pr-10"
                         />
                         {index > 0 && (
                           <button
@@ -391,7 +392,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                           <div className="space-y-2">
                             <label className="text-sm font-medium text-zinc-100 block mb-2">หมวดหมู่รอง</label>
                             <Select
-                              options={categories.map(c => ({ value: c.id, label: c.labelTh || c.name }))}
+                              options={[
+                                { value: "", label: "ไม่ระบุหมวดหมู่รอง" },
+                                ...categories.map(c => ({ value: c.id, label: c.labelTh || c.name }))
+                              ]}
                               value={field.value?.[1] || ""}
                               onChange={(e) => {
                                 const newVals = [...(field.value || [])];
@@ -411,7 +415,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       <Input
                         type="date"
                         {...register("releaseDate")}
-                        className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white w-full"
+                        className="text-white w-full"
                       />
                     </div>
                     <div className="space-y-2">
@@ -420,7 +424,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                         type="number"
                         placeholder="120"
                         {...register("duration")}
-                        className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white"
+                        className="text-white"
                       />
                     </div>
                   </div>
@@ -474,8 +478,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                             type="text"
                             value={field.value || ""}
                             onChange={field.onChange}
-                            placeholder={affiliationType === "school" ? "พิมพ์ชื่อโรงเรียน..." : "พิมพ์ชื่อสตูดิโอ หรือทีมอิสระ..."}
-                            className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white w-full"
+                            placeholder={affiliationType === "school" ? "พิมพ์ชื่อโรงเรียน..." : "พิมพ์ชื่อสังกัด..."}
+                            className="text-white w-full"
                           />
                         )}
                       />
@@ -512,6 +516,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       <label className="text-sm font-medium text-zinc-100 block mb-2">ภาษา</label>
                       <Select
                         options={LANGUAGE_SELECT_OPTIONS}
+                        error={errors.language?.message as string}
                         {...register("language")}
                       />
                     </div>
@@ -563,8 +568,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       <div className="pt-2 animate-fade-in">
                         <Input
                           placeholder="ระบุคำเตือนเนื้อหาอื่นๆ..."
+                          error={
+                            (errors.otherContentWarning?.message as string) ||
+                            (isSubmitted && watchedContentWarnings.includes("OTHER") && (!watchedOtherContentWarning || watchedOtherContentWarning.trim() === "")
+                              ? "กรุณาระบุคำเตือนเนื้อหาอื่นๆ"
+                              : undefined)
+                          }
                           {...register("otherContentWarning")}
-                          className="!bg-[#0D0D0D] border !border-[#3A3A3A] text-white"
+                          className="text-white"
                         />
                       </div>
                     )}
@@ -578,6 +589,11 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               <div className="space-y-6">
                 <div>
                   <h2 className="text-[18px] font-bold text-brand">ข้อมูลทีมงาน</h2>
+                  {(errors.crew?.root?.message || (errors.crew as any)?.message || (isSubmitted && !fields.some(f => f.name?.trim()) ? "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน" : null)) && (
+                    <p className="text-[12px] text-red-400 mt-1 animate-fade-in">
+                      {(errors.crew?.root?.message || (errors.crew as any)?.message || "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน") as string}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-4">
