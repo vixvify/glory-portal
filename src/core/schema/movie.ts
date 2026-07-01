@@ -39,7 +39,7 @@ export const awardSchema = z.object({
 });
 
 export const formAwardSchema = z.object({
-  name: z.string().transform((str) => str.trim()),
+  projectName: z.string().transform((str) => str.trim()),
   awardList: z.array(
     z.union([
       z.object({ value: z.string() }).transform((o) => o.value),
@@ -114,10 +114,10 @@ export const createMovieSchema = z.object({
   otherContentWarning: z.string().optional().nullable(),
   colorType: z.string().min(1, "Color type is required"),
   studio: z.string().optional().nullable(),
-  awards: z.array(formAwardSchema).transform((arr) => arr.filter((a) => a.name !== "")).optional().nullable(),
+  awards: z.array(formAwardSchema).transform((arr) => arr.filter((a) => a.projectName !== "")).optional().nullable(),
   tags: z.array(z.string()).optional().nullable(),
 }).superRefine((data, ctx) => {
-  if (data.contentWarnings?.includes("OTHER" as any)) {
+  if ((data.contentWarnings as string[] | undefined)?.includes("OTHER")) {
     if (!data.otherContentWarning || data.otherContentWarning.trim() === "") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -154,10 +154,10 @@ export const updateMovieSchema = z.object({
   otherContentWarning: z.string().optional().nullable(),
   colorType: z.string().min(1, "Color type is required"),
   studio: z.string().optional().nullable(),
-  awards: z.array(formAwardSchema).transform((arr) => arr.filter((a) => a.name !== "")).optional().nullable(),
+  awards: z.array(formAwardSchema).transform((arr) => arr.filter((a) => a.projectName !== "")).optional().nullable(),
   tags: z.array(z.string()).optional().nullable(),
 }).superRefine((data, ctx) => {
-  if (data.contentWarnings?.includes("OTHER" as any)) {
+  if ((data.contentWarnings as string[] | undefined)?.includes("OTHER")) {
     if (!data.otherContentWarning || data.otherContentWarning.trim() === "") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

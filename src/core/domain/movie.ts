@@ -154,12 +154,12 @@ export interface MovieFormProps {
 export type AffiliationType = "university" | "school" | "studio";
 
 export interface Award {
-  name: string;
+  projectName: string;
   awardList: string[];
 }
 
 export interface MovieAwardInputProject {
-  name: string;
+  projectName: string;
   awardList: { value: string }[];
 }
 

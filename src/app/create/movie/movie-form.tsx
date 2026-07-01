@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useDeferredValue } from "react";
 import Image from "next/image";
 import YoutubePreview from "@/components/preview/youtube";
-import { useForm, Controller, useWatch, useFieldArray, Control, UseFormRegister } from "react-hook-form";
+import { useForm, Controller, useWatch, useFieldArray } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
@@ -327,7 +327,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   
                   <button
                     type="button"
-                    onClick={() => appendAward({ name: "", awardList: [{ value: "" }] })}
+                    onClick={() => appendAward({ projectName: "", awardList: [{ value: "" }] })}
                     className="w-full py-2.5 px-4 bg-[#333333] hover:bg-zinc-700 text-sm font-medium rounded-md text-white text-center transition-colors"
                   >
                     + เพิ่มโครงการ
@@ -589,9 +589,9 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               <div className="space-y-6">
                 <div>
                   <h2 className="text-[18px] font-bold text-brand">ข้อมูลทีมงาน</h2>
-                  {(errors.crew?.root?.message || (errors.crew as any)?.message || (isSubmitted && !fields.some(f => f.name?.trim()) ? "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน" : null)) && (
+                  {(errors.crew?.root?.message || (errors.crew as { message?: string })?.message || (isSubmitted && !fields.some(f => f.name?.trim()) ? "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน" : null)) && (
                     <p className="text-[12px] text-red-400 mt-1 animate-fade-in">
-                      {(errors.crew?.root?.message || (errors.crew as any)?.message || "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน") as string}
+                      {(errors.crew?.root?.message || (errors.crew as { message?: string })?.message || "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน") as string}
                     </p>
                   )}
                 </div>

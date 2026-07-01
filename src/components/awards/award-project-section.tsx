@@ -35,7 +35,7 @@ export function AwardProjectSection({ control, pIndex, removeProject, register }
           <label className="text-sm font-medium text-zinc-100 block mb-2">ชื่อโครงการ</label>
           <Input
             type="text"
-            {...register(`awards.${pIndex}.name` as const)}
+            {...register(`awards.${pIndex}.projectName` as const)}
             className="!bg-white/5 backdrop-blur-md border !border-white/20 text-white placeholder:text-zinc-400 shadow-inner"
           />
         </div>

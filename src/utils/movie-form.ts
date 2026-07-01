@@ -14,7 +14,9 @@ import {
   AffiliationType,
   MovieFormInputs,
   MovieCrewInputItemWithRole,
+  ContentWarning,
 } from "@/core/domain/movie";
+import { formatScreamingSnakeCaseToTitleCase } from "@/utils/string";
 
 type MovieFormPayloadOptions = {
   data: MovieFormInputs;
@@ -85,7 +87,7 @@ export function getMovieFormDefaultValues(
       studio: editingMovie.studio || "",
       btsVideo: editingMovie.btsVideos || [],
       awards: (editingMovie.awards || []).map((a) => ({
-        name: a.name || "",
+        projectName: a.projectName || "",
         awardList: a.awardList?.length > 0 ? a.awardList.map(v => ({ value: v })) : [{ value: "" }],
       })),
       releaseDate: formatInputDate(editingMovie.releaseDate),
@@ -113,7 +115,7 @@ export function getMovieFormDefaultValues(
     colorType: "color",
     studio: "",
     btsVideo: [],
-    awards: [{ name: "", awardList: [{ value: "" }] }],
+    awards: [{ projectName: "", awardList: [{ value: "" }] }],
     crew: getInitialCrewFormValues(null, crewRoles),
   };
 }
@@ -160,9 +162,9 @@ export function buildMovieFormPayload({
     }));
 
   const activeAwards = (data.awards || [])
-    .filter((a) => (a.name || "").trim() !== "")
+    .filter((a) => (a.projectName || "").trim() !== "")
     .map((a) => ({
-      name: a.name.trim(),
+      projectName: a.projectName.trim(),
       awardList: (a.awardList || []).map(i => (i.value || "").trim()).filter(Boolean),
     }));
 
@@ -189,7 +191,7 @@ export function toCreateMoviePayload(rawPayload: unknown): CreateMovie {
 
   return {
     ...validated,
-    contentWarnings: validated.contentWarnings ?? undefined,
+    contentWarnings: (validated.contentWarnings?.filter(w => w !== "OTHER") as ContentWarning[]) ?? undefined,
     awards: validated.awards ?? undefined,
     trailerUrls: validated.trailerUrls ?? undefined,
     tags: validated.tags ?? undefined,
@@ -206,7 +208,7 @@ export function toUpdateMoviePayload(
   return {
     ...validated,
     id: editingMovie.id,
-    contentWarnings: validated.contentWarnings ?? undefined,
+    contentWarnings: (validated.contentWarnings?.filter(w => w !== "OTHER") as ContentWarning[]) ?? undefined,
     awards: validated.awards ?? undefined,
     trailerUrls: validated.trailerUrls ?? undefined,
     tags: validated.tags ?? undefined,
@@ -226,22 +228,12 @@ export function getFilteredCategories(crewRoles: CrewRole[]): CrewCategory[] {
     categoriesMap.set(config.id, { label: config.label, roles: [] });
   });
 
-  const formatRoleName = (name: string) => {
-    if (name === name.toUpperCase()) {
-      return name
-        .split('_')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(' ');
-    }
-    return name;
-  };
-
   for (const role of crewRoles) {
     const catId = (role.category || "other").toLowerCase();
     if (!categoriesMap.has(catId)) {
       categoriesMap.set(catId, { label: role.categoryLabelTh || role.category || "อื่นๆ", roles: [] });
     }
-    const formattedName = formatRoleName(role.name);
+    const formattedName = formatScreamingSnakeCaseToTitleCase(role.name);
     categoriesMap.get(catId)!.roles.push({
       id: role.name.toLowerCase(),
       code: role.name,
