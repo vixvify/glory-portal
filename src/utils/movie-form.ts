@@ -16,7 +16,6 @@ import {
   MovieCrewInputItemWithRole,
   ContentWarning,
 } from "@/core/domain/movie";
-import { formatScreamingSnakeCaseToTitleCase } from "@/utils/string";
 
 type MovieFormPayloadOptions = {
   data: MovieFormInputs;
@@ -233,11 +232,11 @@ export function getFilteredCategories(crewRoles: CrewRole[]): CrewCategory[] {
     if (!categoriesMap.has(catId)) {
       categoriesMap.set(catId, { label: role.categoryLabelTh || role.category || "อื่นๆ", roles: [] });
     }
-    const formattedName = formatScreamingSnakeCaseToTitleCase(role.name);
+    const labelEn = role.labelEn || role.name;
     categoriesMap.get(catId)!.roles.push({
       id: role.name.toLowerCase(),
       code: role.name,
-      label: role.labelTh ? `${role.labelTh} (${formattedName})` : formattedName,
+      label: role.labelTh ? `${role.labelTh} (${labelEn})` : labelEn,
     });
   }
 
