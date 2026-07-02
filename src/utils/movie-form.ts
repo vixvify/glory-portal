@@ -80,7 +80,9 @@ export function getMovieFormDefaultValues(
       school: editingMovie.school || "",
       language: editingMovie.language || "",
       subtitle: editingMovie.subtitle || "",
-      contentWarnings: editingMovie.contentWarnings || [],
+      contentWarnings: editingMovie.otherContentWarning 
+        ? [...(editingMovie.contentWarnings || []), "OTHER" as ContentWarning] 
+        : (editingMovie.contentWarnings || []),
       otherContentWarning: editingMovie.otherContentWarning || "",
       colorType: editingMovie.colorType || "color",
       studio: editingMovie.studio || "",

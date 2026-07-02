@@ -612,63 +612,89 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     className="w-full"
                   />
                   
-                  {selectedDept && (
-                    <div className="relative mt-2 animate-fade-in">
-                      <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#B8860B] pointer-events-none" />
-                      <input
-                        type="text"
-                        placeholder={`ค้นหาตำแหน่งใน${filteredCategories.find(c => c.id === selectedDept)?.label || "ฝ่าย"}`}
-                        value={crewRoleSearch}
-                        onChange={(e) => setCrewRoleSearch(e.target.value)}
-                        className="w-full bg-[#0D0D0D] border border-[#3A3A3A] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-8 mt-6">
                   {(() => {
-                    if (!selectedDept) return null;
+                    const hasAnyData = fields.some(f => f.name && f.name.trim() !== "");
+                    const shouldShowSearch = selectedDept || hasAnyData;
                     
-                    const searchLower = deferredCrewRoleSearch.toLowerCase().trim();
-                    const activeCat = filteredCategories.find(c => c.id === selectedDept);
-                    
-                    if (!activeCat) return null;
-                    
-                    const matchedRoles = activeCat.roles.filter(role => role.label.toLowerCase().includes(searchLower));
-
-                    if (matchedRoles.length === 0) {
-                      return (
-                        <div className="py-12 flex flex-col items-center justify-center border border-dashed border-[#3A3A3A] rounded-[16px] bg-black/20 animate-fade-in">
-                          <p className="text-sm font-medium text-zinc-400">ไม่พบตำแหน่ง &quot;{deferredCrewRoleSearch}&quot;</p>
-                          <p className="text-xs text-zinc-500 mt-1">ลองพิมพ์คำค้นหาด้วยคีย์เวิร์ดอื่นดูอีกครั้ง</p>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div className="space-y-4 animate-fade-in">
-                        <div className="space-y-4">
-                          {matchedRoles.map(role => {
-                            const fieldsForRole = fields.map((f, i) => ({ ...f, index: i })).filter((f) => f.role === role.id);
-                            return (
-                              <CrewSection
-                                key={role.id}
-                                label={role.label}
-                                fields={fieldsForRole}
-                                onAdd={() => append({ role: role.id, crewMemberId: null, name: "", email: "" })}
-                                onRemove={remove}
-                                onUpdate={handleUpdateCrew}
-                                placeholder="ชื่อจริง - นามสกุล"
-                                addButtonLabel={`เพิ่มรายชื่อ`}
-                                crewOptions={crewOptions}
-                              />
-                            );
-                          })}
-                        </div>
+                    return shouldShowSearch && (
+                      <div className="relative mt-2 animate-fade-in">
+                        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#B8860B] pointer-events-none" />
+                        <input
+                          type="text"
+                          placeholder={selectedDept ? `ค้นหาตำแหน่งใน${filteredCategories.find(c => c.id === selectedDept)?.label}` : "ค้นหาตำแหน่งทีมงาน..."}
+                          value={crewRoleSearch}
+                          onChange={(e) => setCrewRoleSearch(e.target.value)}
+                          className="w-full bg-[#0D0D0D] border border-[#3A3A3A] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors"
+                        />
                       </div>
                     );
                   })()}
+                </div>
+
+                <div className="space-y-8 mt-6">
+                  {filteredCategories.map((cat) => {
+                    const searchLower = deferredCrewRoleSearch.toLowerCase().trim();
+                    const isSelectedCat = cat.id === selectedDept;
+
+                    if (selectedDept && !isSelectedCat) return null;
+
+                    const rolesToRender = cat.roles.filter((role) => {
+                      const hasData = fields.some(
+                        (f) => f.role === role.id && f.name && f.name.trim() !== ""
+                      );
+                      
+                      const isVisible = hasData || isSelectedCat;
+                      if (!isVisible) return false;
+
+                      if (searchLower) {
+                        return role.label.toLowerCase().includes(searchLower);
+                      }
+
+                      return true;
+                    });
+
+                    if (rolesToRender.length === 0) return null;
+
+                    return (
+                      <div key={cat.id} className="space-y-4 animate-fade-in">
+                        {rolesToRender.map((role) => {
+                          const fieldsForRole = fields
+                            .map((f, i) => ({ ...f, index: i }))
+                            .filter((f) => f.role === role.id);
+                          return (
+                            <CrewSection
+                              key={role.id}
+                              label={role.label}
+                              fields={fieldsForRole}
+                              onAdd={() =>
+                                append({
+                                  role: role.id,
+                                  crewMemberId: null,
+                                  name: "",
+                                  email: "",
+                                })
+                              }
+                              onRemove={remove}
+                              onUpdate={handleUpdateCrew}
+                              placeholder="ชื่อจริง - นามสกุล"
+                              addButtonLabel={`เพิ่มรายชื่อ`}
+                              crewOptions={crewOptions}
+                            />
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                  
+                  {selectedDept && deferredCrewRoleSearch && !filteredCategories.some(cat => 
+                    cat.id === selectedDept && 
+                    cat.roles.some(role => role.label.toLowerCase().includes(deferredCrewRoleSearch.toLowerCase().trim()))
+                  ) && (
+                    <div className="py-12 flex flex-col items-center justify-center border border-dashed border-[#3A3A3A] rounded-[16px] bg-black/20 animate-fade-in">
+                      <p className="text-sm font-medium text-zinc-400">ไม่พบตำแหน่ง &quot;{deferredCrewRoleSearch}&quot;</p>
+                      <p className="text-xs text-zinc-500 mt-1">ลองพิมพ์คำค้นหาด้วยคีย์เวิร์ดอื่นดูอีกครั้ง</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
