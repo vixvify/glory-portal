@@ -20,6 +20,7 @@ export default function EditMoviePage() {
     useCategoriesQuery();
   const { data: universities = [], isLoading: isUniversitiesLoading } =
     useUniversitiesQuery();
+
   const { data: crewRoles = [], isLoading: isCrewRolesLoading } =
     useCrewRolesQuery();
   const { data: availableCrew = [], isLoading: isCrewLoading } =
@@ -29,6 +30,7 @@ export default function EditMoviePage() {
     isMovieLoading ||
     isCategoriesLoading ||
     isUniversitiesLoading ||
+
     isCrewRolesLoading ||
     isCrewLoading;
 
@@ -51,6 +53,7 @@ export default function EditMoviePage() {
       editingMovie={movie}
       categories={categories}
       universities={universities}
+
       crewRoles={crewRoles}
       availableCrew={availableCrew}
     />

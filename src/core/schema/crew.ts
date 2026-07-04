@@ -24,6 +24,7 @@ export const updateCrewMemberSchema = z.object({
 export const crewRoleSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
+  labelEn: z.string().default(""),
   createdAt: z.union([z.string(), z.date()]).optional(),
 });
 

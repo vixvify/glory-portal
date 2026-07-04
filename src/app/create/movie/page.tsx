@@ -14,6 +14,7 @@ export default function CreateMoviePage() {
     useCategoriesQuery();
   const { data: universities = [], isLoading: isUniversitiesLoading } =
     useUniversitiesQuery();
+
   const { data: crewRoles = [], isLoading: isCrewRolesLoading } =
     useCrewRolesQuery();
   const { data: availableCrew = [], isLoading: isCrewLoading } =
@@ -22,6 +23,7 @@ export default function CreateMoviePage() {
   const isMasterLoading =
     isCategoriesLoading ||
     isUniversitiesLoading ||
+
     isCrewRolesLoading ||
     isCrewLoading;
 
@@ -33,6 +35,7 @@ export default function CreateMoviePage() {
     <MovieForm
       categories={categories}
       universities={universities}
+
       crewRoles={crewRoles}
       availableCrew={availableCrew}
     />

@@ -1,7 +1,20 @@
 import { Rating } from "./rating";
 import { User } from "./user";
 import { CrewRole, CrewMember } from "./crew";
-import { Category, AgeRating, Language } from "./master-data";
+import { Category } from "./master-data";
+
+export enum ContentWarning {
+  PROFANITY = 'PROFANITY',
+  DRUGS = 'DRUGS',
+  VIOLENCE = 'VIOLENCE',
+  GORE = 'GORE',
+  SEXUAL_CONTENT = 'SEXUAL_CONTENT',
+  NUDITY = 'NUDITY',
+  SMOKING = 'SMOKING',
+  ALCOHOL = 'ALCOHOL',
+  MENTAL_HEALTH = 'MENTAL_HEALTH',
+  FLASHING_LIGHTS = 'FLASHING_LIGHTS',
+}
 
 export interface MovieCrew {
   id: string;
@@ -23,7 +36,7 @@ export interface Movie {
   categories: Category[];
   thumbnail: string;
   youtubeUrl: string;
-  trailerUrl?: string | null;
+  trailerUrls?: string[];
   views: number;
   ratings: Rating[];
   releaseDate: string | Date;
@@ -35,9 +48,10 @@ export interface Movie {
   university?: string | null;
   school?: string | null;
   language?: string | null;
-  awards: string[];
-  hasProfanity: boolean;
-  hasDrugs: boolean;
+  subtitle?: string | null;
+  awards: Award[];
+  contentWarnings: ContentWarning[];
+  otherContentWarning?: string | null;
   colorType: string;
   studio?: string | null;
   crew: MovieCrew[];
@@ -72,7 +86,7 @@ export interface CreateMovie {
   categoryIds: string[];
   thumbnail: File | null;
   youtubeUrl: string;
-  trailerUrl?: string | null;
+  trailerUrls?: string[];
   releaseDate: string;
   matchRate?: number;
   aspectRatio: string;
@@ -81,13 +95,15 @@ export interface CreateMovie {
   university?: string | null;
   school?: string | null;
   language?: string | null;
+  subtitle?: string | null;
   crew?: MovieCrewInputItemWithRole[] | null;
   btsVideo?: string[] | null;
-  hasProfanity?: boolean;
-  hasDrugs?: boolean;
+  contentWarnings?: ContentWarning[];
+  otherContentWarning?: string | null;
   colorType: string;
   studio?: string | null;
-  awards?: string[];
+  awards?: Award[];
+  tags?: string[];
 }
 
 export interface UpdateMovie {
@@ -97,7 +113,7 @@ export interface UpdateMovie {
   categoryIds: string[];
   thumbnail: File | string;
   youtubeUrl: string;
-  trailerUrl?: string | null;
+  trailerUrls?: string[];
   releaseDate: string;
   matchRate?: number;
   aspectRatio: string;
@@ -106,13 +122,15 @@ export interface UpdateMovie {
   university?: string | null;
   school?: string | null;
   language?: string | null;
+  subtitle?: string | null;
   crew?: MovieCrewInputItemWithRole[] | null;
   btsVideo?: string[] | null;
-  hasProfanity?: boolean;
-  hasDrugs?: boolean;
+  contentWarnings?: ContentWarning[];
+  otherContentWarning?: string | null;
   colorType: string;
   studio?: string | null;
-  awards?: string[];
+  awards?: Award[];
+  tags?: string[];
 }
 
 export interface MovieFilterParams {
@@ -135,13 +153,23 @@ export interface MovieFormProps {
 
 export type AffiliationType = "university" | "school" | "studio";
 
+export interface Award {
+  projectName: string;
+  awardList: string[];
+}
+
+export interface MovieAwardInputProject {
+  projectName: string;
+  awardList: { value: string }[];
+}
+
 export type MovieFormInputs = {
   title: string;
   description: string;
   categoryIds: string[];
   thumbnail?: File | null;
   youtubeUrl: string;
-  trailerUrl?: string;
+  trailerUrls?: string[];
   releaseDate: string;
   aspectRatio: string;
   ageRating: string;
@@ -149,11 +177,14 @@ export type MovieFormInputs = {
   university?: string;
   school?: string;
   language?: string;
-  hasProfanity: boolean;
-  hasDrugs: boolean;
+  subtitle?: string;
+  contentWarnings: string[];
+  otherContentWarning: string;
   colorType: string;
   studio?: string;
   crew?: MovieCrewInputItemWithRole[];
   btsVideo?: string[];
-  awards?: string[];
+  awards?: MovieAwardInputProject[];
+  tags?: string[];
 };
+

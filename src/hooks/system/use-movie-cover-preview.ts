@@ -8,7 +8,6 @@ function getExistingThumbnail(editingMovie: Movie | null): string | null {
 }
 
 export function useMovieCoverPreview(editingMovie: Movie | null) {
-  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(() =>
     getExistingThumbnail(editingMovie),
   );
@@ -22,14 +21,11 @@ export function useMovieCoverPreview(editingMovie: Movie | null) {
   }, [previewUrl]);
 
   const resetPreview = useCallback(() => {
-    setSelectedFileName(null);
     setPreviewUrl(getExistingThumbnail(editingMovie));
   }, [editingMovie]);
 
   const setFilePreview = useCallback(
     (file: File | null) => {
-      setSelectedFileName(file?.name ?? null);
-
       if (file) {
         setPreviewUrl(URL.createObjectURL(file));
         return;
@@ -41,7 +37,6 @@ export function useMovieCoverPreview(editingMovie: Movie | null) {
   );
 
   return {
-    selectedFileName,
     previewUrl,
     resetPreview,
     setFilePreview,

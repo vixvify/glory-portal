@@ -15,6 +15,8 @@ export class MasterDataRepositoryImpl implements MasterDataRepository {
     return response;
   }
 
+
+
   async getCrewRoles(): Promise<ApiResponse<CrewRole[]>> {
     const response = await httpClient.get<CrewRole[]>("/masterdata/crew-roles");
     return response;
