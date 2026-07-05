@@ -18,6 +18,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LocalPlayIcon from "@mui/icons-material/LocalPlay";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import SettingsIcon from "@mui/icons-material/Settings";
+import ShareIcon from "@mui/icons-material/Share";
 import { Button } from "@/components/ui/button";
 import { useMyMoviesQuery, useDeleteMovieMutation, useMyContributedMoviesQuery } from "@/hooks/db/use-movies";
 import {
@@ -30,6 +32,7 @@ import { ConfirmModal } from "@/components/modal/confirm-modal";
 import { AvatarUpload } from "@/components/profile/avatar-upload";
 import { CoverUpload } from "@/components/profile/cover-upload";
 import { ShortsGrid } from "@/components/profile/shorts-grid";
+import { EditProfileModal } from "@/components/profile/edit-profile-modal";
 import { LOCALIZATION } from "@/core/constants/localization";
 import { Movie } from "@/core/domain/movie";
 
@@ -40,6 +43,7 @@ export default function ProfilePage() {
   const [deleteMovieId, setDeleteMovieId] = useState<string | null>(null);
   const [deleteCrewId, setDeleteCrewId] = useState<string | null>(null);
   const [isDeletingLocal, setIsDeletingLocal] = useState(false);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"recommend" | "works" | "awards" | "about">("recommend");
 
   const { data: myMovies = [], isLoading: isMoviesLoading } = useMyMoviesQuery({
@@ -123,6 +127,30 @@ export default function ProfilePage() {
         d
       </span>
     );
+  };
+
+  const handleShareProfile = async () => {
+    // Generate a public URL for this user's profile
+    const shareUrl = `${window.location.origin}/users/${currentUser?.id}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `โปรไฟล์ของ ${currentUser?.name} บน Glory`,
+          text: `เข้าไปดูผลงานและประวัติของ ${currentUser?.name} ได้ที่นี่`,
+          url: shareUrl,
+        });
+      } catch (err) {
+        // User cancelled or error
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        showToast("คัดลอกลิงก์โปรไฟล์แล้ว นำไปแชร์ต่อได้เลย!", "success");
+      } catch (err) {
+        showToast("ไม่สามารถคัดลอกลิงก์ได้", "error");
+      }
+    }
   };
 
   if (!currentUser) {
@@ -268,6 +296,22 @@ export default function ProfilePage() {
                 <Button variant="outline" className="rounded-full px-8 bg-zinc-800/50 border-zinc-700 text-white hover:bg-zinc-700" disabled>
                   สนับสนุน
                 </Button>
+                <Button 
+                  variant="outline" 
+                  className="rounded-full w-10 h-10 p-0 flex items-center justify-center bg-zinc-800/50 border-zinc-700 text-white hover:bg-zinc-700 hover:text-brand transition-colors"
+                  onClick={handleShareProfile}
+                  title="แชร์โปรไฟล์"
+                >
+                  <ShareIcon className="text-[20px]" />
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="rounded-full w-10 h-10 p-0 flex items-center justify-center bg-zinc-800/50 border-zinc-700 text-white hover:bg-zinc-700 hover:text-brand transition-colors"
+                  onClick={() => setIsEditProfileOpen(true)}
+                  title="แก้ไขโปรไฟล์"
+                >
+                  <SettingsIcon className="text-[20px]" />
+                </Button>
               </div>
             </div>
           </div>
@@ -287,7 +331,7 @@ export default function ProfilePage() {
                  การเข้าชมโปรไฟล์
                </div>
                <div className="text-xl md:text-2xl font-bold text-white flex items-center justify-center md:justify-end gap-2">
-                 100
+                 0
                </div>
              </div>
           </div>
@@ -543,6 +587,14 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+      )}
+
+      {currentUser && (
+        <EditProfileModal
+          isOpen={isEditProfileOpen}
+          onClose={() => setIsEditProfileOpen(false)}
+          currentUser={currentUser}
+        />
       )}
     </div>
   );

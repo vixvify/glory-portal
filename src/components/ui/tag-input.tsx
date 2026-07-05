@@ -1,85 +1,130 @@
-"use client";
-
-import React, { useState, useRef, KeyboardEvent } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 
 interface TagInputProps {
   value: string[];
   onChange: (tags: string[]) => void;
+  suggestions?: string[];
   placeholder?: string;
 }
 
-export function TagInput({ value, onChange, placeholder = "พิมพ์แท็กแล้วกด Enter" }: TagInputProps) {
-  const [inputVal, setInputVal] = useState("");
-  const [isAdding, setIsAdding] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+export function TagInput({ value, onChange, suggestions = [], placeholder = "เพิ่มแท็ก..." }: TagInputProps) {
+  const [inputValue, setInputValue] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const addTag = (raw: string) => {
-    const tag = raw.trim();
-    if (tag && !value.includes(tag)) {
-      onChange([...value, tag]);
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
     }
-    setInputVal("");
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleAddTag = (tagToAdd: string) => {
+    const trimmed = tagToAdd.trim();
+    if (trimmed && !value.includes(trimmed)) {
+      onChange([...value, trimmed]);
+    }
+    setInputValue("");
+    setIsOpen(false);
   };
 
-  const removeTag = (index: number) => {
-    onChange(value.filter((_, i) => i !== index));
+  const handleRemoveTag = (tagToRemove: string) => {
+    onChange(value.filter((tag) => tag !== tagToRemove));
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
       e.preventDefault();
-      addTag(inputVal);
-    } else if (e.key === "Backspace" && inputVal === "" && value.length > 0) {
-      removeTag(value.length - 1);
+      handleAddTag(inputValue);
+    } else if (e.key === "Backspace" && inputValue === "" && value.length > 0) {
+      // Remove last tag if backspace is pressed when input is empty
+      const newValue = [...value];
+      newValue.pop();
+      onChange(newValue);
     }
   };
+
+  // Filter suggestions based on input, and exclude already selected tags
+  const filteredSuggestions = suggestions.filter(
+    (suggestion) =>
+      suggestion.toLowerCase().includes(inputValue.toLowerCase()) &&
+      !value.includes(suggestion)
+  );
 
   return (
-    <div className="w-full flex flex-col items-start gap-3">
-      {value.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {value.map((tag, i) => (
-            <span
-              key={i}
-              className="flex items-center gap-1 bg-zinc-800 text-white text-sm font-medium px-3 py-1.5 rounded-full"
+    <div className="relative w-full" ref={wrapperRef}>
+      <div
+        className="min-h-[50px] w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 flex flex-wrap gap-2 focus-within:border-brand transition-colors"
+        onClick={() => setIsOpen(true)}
+      >
+        {value.map((tag, idx) => (
+          <span
+            key={idx}
+            className="flex items-center gap-1.5 px-3 py-1 bg-zinc-800 text-zinc-200 rounded-lg text-sm font-medium"
+          >
+            {tag}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRemoveTag(tag);
+              }}
+              className="text-zinc-400 hover:text-white transition-colors"
             >
-              {tag}
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); removeTag(i); }}
-                className="text-zinc-400 hover:text-white transition-colors ml-1"
-              >
-                <CloseIcon sx={{ fontSize: 14 }} />
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
-
-      {isAdding || value.length === 0 ? (
+              <CloseIcon className="text-[14px]" />
+            </button>
+          </span>
+        ))}
         <input
-          ref={inputRef}
           type="text"
-          value={inputVal}
-          onChange={(e) => setInputVal(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={() => {
-            if (inputVal.trim()) addTag(inputVal);
-            setIsAdding(false);
+          value={inputValue}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+            setIsOpen(true);
           }}
-          placeholder={value.length === 0 ? placeholder : "พิมพ์แท็กแล้วกด Enter..."}
-          className="w-full bg-[#0D0D0D] border border-[#3A3A3A] rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-500 outline-none focus:border-brand transition-colors"
-          autoFocus={isAdding}
+          onKeyDown={handleKeyDown}
+          onFocus={() => setIsOpen(true)}
+          placeholder={value.length === 0 ? placeholder : ""}
+          className="flex-1 min-w-[120px] bg-transparent text-white text-sm focus:outline-none placeholder:text-zinc-500"
         />
-      ) : (
-        <button
-          type="button"
-          onClick={() => setIsAdding(true)}
-          className="text-sm text-white font-medium hover:text-brand transition-colors flex items-center"
-        >
-          เพิ่มแท็ก
-        </button>
+      </div>
+
+      {/* Suggestions Dropdown */}
+      {isOpen && (inputValue.length > 0 || filteredSuggestions.length > 0) && (
+        <div className="absolute z-50 w-full mt-2 bg-[#1a1a1a] border border-zinc-800 rounded-xl shadow-xl overflow-hidden max-h-60 overflow-y-auto">
+          {filteredSuggestions.map((suggestion, idx) => (
+            <button
+              key={idx}
+              type="button"
+              className="w-full text-left px-4 py-3 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors border-b border-zinc-800/50 last:border-0"
+              onClick={(e) => {
+                e.preventDefault();
+                handleAddTag(suggestion);
+              }}
+            >
+              {suggestion}
+            </button>
+          ))}
+          
+          {/* Allow adding custom tag if it doesn't strictly match a suggestion */}
+          {inputValue.trim() && !filteredSuggestions.some(s => s.toLowerCase() === inputValue.trim().toLowerCase()) && (
+            <button
+              type="button"
+              className="w-full text-left px-4 py-3 text-sm text-brand font-medium hover:bg-zinc-800 transition-colors"
+              onClick={(e) => {
+                e.preventDefault();
+                handleAddTag(inputValue);
+              }}
+            >
+              + เพิ่ม "{inputValue}" เป็นตำแหน่งใหม่
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
