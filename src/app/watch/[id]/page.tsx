@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useMovieQueryById } from "@/hooks/db/use-movies";
-import { getYouTubeEmbedUrl } from "@/utils/youtube";
+import { useYoutubePlayer } from "@/hooks/use-youtube-player";
+import { watchSessionService } from "@/infra/container";
+import { getYouTubeId } from "@/utils/youtube";
+import { useAppStore } from "@/store/use-store";
 import Loading from "@/app/loading";
 
 export default function WatchPage() {
@@ -12,6 +15,20 @@ export default function WatchPage() {
   const router = useRouter();
   const { data: movie, isLoading, error } = useMovieQueryById(params.id);
   const [showControls, setShowControls] = useState(true);
+  const currentUser = useAppStore((s) => s.currentUser);
+
+  const videoId = movie ? (getYouTubeId(movie.youtubeUrl) ?? "") : "";
+
+  useYoutubePlayer({
+    containerId: "yt-player",
+    videoId,
+    movieId: params.id,
+    userId: currentUser?.email || "",
+    source: "main_movie",
+    onSessionEnd: currentUser?.email
+      ? (payload) => watchSessionService.postWatchSession(payload).catch(console.error)
+      : () => {},
+  });
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -56,8 +73,6 @@ export default function WatchPage() {
     );
   }
 
-  const embedUrl = getYouTubeEmbedUrl(movie.youtubeUrl);
-
   return (
     <div className="w-screen h-screen bg-black overflow-hidden relative flex items-center justify-center select-none">
       <div
@@ -83,14 +98,7 @@ export default function WatchPage() {
       </div>
 
       <div className="absolute inset-0 w-full h-full z-0 bg-black">
-        <iframe
-          src={embedUrl}
-          title={movie.title}
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          className="w-full h-full border-none"
-        />
+        <div id="yt-player" className="w-full h-full border-none" />
       </div>
     </div>
   );
