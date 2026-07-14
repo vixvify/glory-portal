@@ -348,7 +348,7 @@ export default function ProfilePage() {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as "recommend" | "works" | "awards" | "about")}
                 className={`pb-4 px-1 text-sm md:text-base font-bold tracking-wide border-b-2 transition-all whitespace-nowrap cursor-pointer ${
                   activeTab === tab.id
                     ? "text-brand border-brand"

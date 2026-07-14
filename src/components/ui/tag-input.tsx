@@ -121,7 +121,7 @@ export function TagInput({ value, onChange, suggestions = [], placeholder = "เ
                 handleAddTag(inputValue);
               }}
             >
-              + เพิ่ม "{inputValue}" เป็นตำแหน่งใหม่
+              + เพิ่ม &quot;{inputValue}&quot; เป็นตำแหน่งใหม่
             </button>
           )}
         </div>

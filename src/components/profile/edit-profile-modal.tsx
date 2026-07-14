@@ -46,6 +46,7 @@ export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileMo
 
   if (!isOpen) return null;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     try {
       setIsSubmitting(true);
@@ -55,7 +56,7 @@ export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileMo
         name: data.name,
         bio: data.bio,
         positions: data.positions || [],
-        birthday: data.birthday ? new Date(data.birthday) : undefined,
+        birthday: data.birthday ? data.birthday : undefined,
         ig: data.ig,
         facebook: data.facebook,
         youtube: data.youtube,
