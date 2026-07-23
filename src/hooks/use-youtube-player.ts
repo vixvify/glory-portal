@@ -122,8 +122,8 @@ export function useYoutubePlayer({
 
       if (Math.abs(diff) > 2) {
         session.current.seekEvents.push({
-          from: session.current.lastCurrentTime,
-          to: current,
+          direction: diff > 0 ? "forward" : "backward",
+          time: Math.abs(diff),
         });
       }
 
