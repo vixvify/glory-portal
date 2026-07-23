@@ -1,8 +1,8 @@
 export type CompletionType = "completed" | "abandoned" | "paused";
 
 export interface SeekEvent {
-  direction: "forward" | "backward";
-  time: number;
+  seekFrom: number;
+  seekTo: number;
 }
 
 export interface WatchSessionPayload {

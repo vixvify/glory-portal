@@ -120,13 +120,6 @@ export function useYoutubePlayer({
         session.current.watchedSeconds += diff;
       }
 
-      if (Math.abs(diff) > 2) {
-        session.current.seekEvents.push({
-          direction: diff > 0 ? "forward" : "backward",
-          time: Math.abs(diff),
-        });
-      }
-
       session.current.lastCurrentTime = current;
     }, 1000);
   }
@@ -150,6 +143,18 @@ export function useYoutubePlayer({
           session.current.replayCount++;
           session.current.hasEnded = false;
         }
+
+        // Detect seek based on gap from last current time
+        const currentOnResume = player.getCurrentTime();
+        const gap = currentOnResume - session.current.lastCurrentTime;
+        if (Math.abs(gap) > 2 && session.current.lastCurrentTime > 0) {
+          session.current.seekEvents.push({
+            seekFrom: session.current.lastCurrentTime,
+            seekTo: currentOnResume,
+          });
+        }
+        session.current.lastCurrentTime = currentOnResume;
+
         startInterval();
         break;
 
