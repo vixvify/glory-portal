@@ -50,13 +50,112 @@ export function useYoutubePlayer({
   useEffect(() => {
     if (!videoId) return;
 
+    const currentSession = session.current;
+
+    function startInterval() {
+      intervalRef.current = setInterval(() => {
+        if (!playerRef.current) return;
+
+        const current = playerRef.current.getCurrentTime();
+        const diff = current - currentSession.lastCurrentTime;
+
+        if (diff > 0 && diff < 2) {
+          currentSession.watchedSeconds += diff;
+        }
+
+        currentSession.lastCurrentTime = current;
+      }, 1000);
+    }
+
+    function stopInterval() {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    }
+
+    function buildPayload(): WatchSessionPayload {
+      const s = currentSession;
+      const watchedSeconds = Math.round(s.watchedSeconds);
+      const percentWatched =
+        s.duration > 0 ? Math.min((watchedSeconds / s.duration) * 100, 100) : 0;
+
+      const payload = {
+        movieId: propsRef.current.movieId,
+        userId: propsRef.current.userId,
+        source: propsRef.current.source,
+        startSecond: s.startSecond,
+        endSecond: s.endSecond,
+        watchedSeconds,
+        duration: s.duration,
+        percentWatched,
+        completionType: s.completionType,
+        pauseCount: s.pauseCount,
+        replayCount: s.replayCount,
+        seekEvents: [...s.seekEvents],
+      };
+      
+      s.seekEvents = [];
+      
+      return payload;
+    }
+
+    function handleStateChange(event: YT.OnStateChangeEvent) {
+      const player = playerRef.current!;
+
+      switch (event.data) {
+        case YT.PlayerState.PLAYING:
+          const currentOnResume = player.getCurrentTime();
+
+          if (currentSession.startSecond === 0) {
+            currentSession.startSecond = currentOnResume;
+          }
+          if (currentSession.hasEnded) {
+            currentSession.replayCount++;
+            currentSession.hasEnded = false;
+          }
+
+          const gap = currentOnResume - currentSession.lastCurrentTime;
+          if (Math.abs(gap) > 2 && currentSession.lastCurrentTime > 0) {
+            currentSession.seekEvents.push({
+              seekFrom: currentSession.lastCurrentTime,
+              seekTo: currentOnResume,
+            });
+          }
+          currentSession.lastCurrentTime = currentOnResume;
+
+          startInterval();
+          break;
+
+        case YT.PlayerState.PAUSED:
+          stopInterval();
+          currentSession.pauseCount++;
+          currentSession.endSecond = player.getCurrentTime();
+          currentSession.completionType = "paused";
+          propsRef.current.onSessionEnd(buildPayload());
+          break;
+
+        case YT.PlayerState.ENDED:
+          stopInterval();
+          currentSession.hasEnded = true;
+          currentSession.endSecond = player.getDuration();
+          currentSession.completionType = "completed";
+          propsRef.current.onSessionEnd(buildPayload());
+          break;
+
+        case YT.PlayerState.BUFFERING:
+          stopInterval();
+          break;
+      }
+    }
+
     const initPlayer = () => {
       playerRef.current = new YT.Player(containerId, {
         videoId,
         playerVars: { enablejsapi: 1, rel: 0 },
         events: {
           onReady: (e) => {
-            session.current.duration = e.target.getDuration();
+            currentSession.duration = e.target.getDuration();
           },
           onStateChange: handleStateChange,
         },
@@ -78,9 +177,9 @@ export function useYoutubePlayer({
 
     const handleBeforeUnload = () => {
       stopInterval();
-      session.current.completionType = "abandoned";
-      session.current.endSecond =
-        playerRef.current?.getCurrentTime() ?? session.current.endSecond;
+      currentSession.completionType = "abandoned";
+      currentSession.endSecond =
+        playerRef.current?.getCurrentTime() ?? currentSession.endSecond;
       const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
       navigator.sendBeacon(
         `${apiBase}/watch-sessions`,
@@ -93,112 +192,16 @@ export function useYoutubePlayer({
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       stopInterval();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      const s = session.current;
-      if (s.completionType !== "completed" && s.completionType !== "abandoned") {
+      const s = currentSession;
+      if (s.completionType !== "completed" && s.completionType !== "abandoned" && s.completionType !== "paused") {
         s.completionType = "abandoned";
         try {
           s.endSecond = playerRef.current?.getCurrentTime() ?? s.endSecond;
-        } catch {
-        }
+        } catch {}
         propsRef.current.onSessionEnd(buildPayload());
       }
 
       playerRef.current?.destroy();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoId]);
-
-  function startInterval() {
-    intervalRef.current = setInterval(() => {
-      if (!playerRef.current) return;
-
-      const current = playerRef.current.getCurrentTime();
-      const diff = current - session.current.lastCurrentTime;
-
-      if (diff > 0 && diff < 2) {
-        session.current.watchedSeconds += diff;
-      }
-
-      session.current.lastCurrentTime = current;
-    }, 1000);
-  }
-
-  function stopInterval() {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }
-
-  function handleStateChange(event: YT.OnStateChangeEvent) {
-    const player = playerRef.current!;
-
-    switch (event.data) {
-      case YT.PlayerState.PLAYING:
-        if (session.current.startSecond === 0) {
-          session.current.startSecond = player.getCurrentTime();
-        }
-        if (session.current.hasEnded) {
-          session.current.replayCount++;
-          session.current.hasEnded = false;
-        }
-
-        // Detect seek based on gap from last current time
-        const currentOnResume = player.getCurrentTime();
-        const gap = currentOnResume - session.current.lastCurrentTime;
-        if (Math.abs(gap) > 2 && session.current.lastCurrentTime > 0) {
-          session.current.seekEvents.push({
-            seekFrom: session.current.lastCurrentTime,
-            seekTo: currentOnResume,
-          });
-        }
-        session.current.lastCurrentTime = currentOnResume;
-
-        startInterval();
-        break;
-
-      case YT.PlayerState.PAUSED:
-        stopInterval();
-        session.current.pauseCount++;
-        session.current.endSecond = player.getCurrentTime();
-        session.current.completionType = "paused";
-        propsRef.current.onSessionEnd(buildPayload());
-        break;
-
-      case YT.PlayerState.ENDED:
-        stopInterval();
-        session.current.hasEnded = true;
-        session.current.endSecond = player.getDuration();
-        session.current.completionType = "completed";
-        propsRef.current.onSessionEnd(buildPayload());
-        break;
-
-      case YT.PlayerState.BUFFERING:
-        stopInterval();
-        break;
-    }
-  }
-
-  function buildPayload(): WatchSessionPayload {
-    const s = session.current;
-    const watchedSeconds = Math.round(s.watchedSeconds);
-    const percentWatched =
-      s.duration > 0 ? Math.min((watchedSeconds / s.duration) * 100, 100) : 0;
-
-    return {
-      movieId: propsRef.current.movieId,
-      userId: propsRef.current.userId,
-      source: propsRef.current.source,
-      startSecond: s.startSecond,
-      endSecond: s.endSecond,
-      watchedSeconds,
-      duration: s.duration,
-      percentWatched,
-      completionType: s.completionType,
-      pauseCount: s.pauseCount,
-      replayCount: s.replayCount,
-      seekEvents: [...s.seekEvents],
-    };
-  }
+  }, [videoId, containerId]);
 }
