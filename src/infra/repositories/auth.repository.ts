@@ -24,4 +24,12 @@ export class AuthRepositoryImpl implements AuthRepository {
     const response = await httpClient.get<User>("/auth/me");
     return response;
   }
+  async updateProfile(data: FormData): Promise<ApiResponse<User>> {
+    const response = await httpClient.patch<User>("/auth/profile", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response;
+  }
 }

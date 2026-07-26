@@ -2,7 +2,6 @@ import { Rating } from "./rating";
 import { User } from "./user";
 import { CrewRole, CrewMember } from "./crew";
 import { Category } from "./master-data";
-
 export enum ContentWarning {
   PROFANITY = 'PROFANITY',
   DRUGS = 'DRUGS',

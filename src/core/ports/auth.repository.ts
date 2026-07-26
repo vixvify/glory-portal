@@ -6,4 +6,5 @@ export interface AuthRepository {
   login(user: LoginUser): Promise<ApiResponse<User>>;
   logout(): Promise<ApiResponse<void>>;
   getCurrentUser(): Promise<ApiResponse<User>>;
+  updateProfile(data: FormData): Promise<ApiResponse<User>>;
 }

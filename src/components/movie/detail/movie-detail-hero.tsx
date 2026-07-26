@@ -1,15 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckIcon from "@mui/icons-material/Check";
 import { Movie } from "@/core/domain/movie";
 import { Button } from "@/components/ui/button";
-import { getYouTubeId } from "@/utils/youtube";
-import { getYouTubeBackgroundEmbedUrl } from "@/core/constants/youtube";
 import { useRouter } from "next/navigation";
+import { useYouTubeBackground } from "@/hooks/system/use-youtube-background";
 
 interface Props {
   movie: Movie;
@@ -25,60 +23,44 @@ export default function MovieDetailHero({
   const router = useRouter();
 
   const trailerUrl = movie.trailerUrls?.[0] || '';
-  const videoId = useMemo(
-    () => getYouTubeId(trailerUrl),
-    [trailerUrl],
+  const { videoLoaded, iframeRef, backgroundEmbedUrl } = useYouTubeBackground(
+    trailerUrl
   );
-  const backgroundEmbedUrl = useMemo(() => {
-    if (!videoId) return null;
-    return getYouTubeBackgroundEmbedUrl(videoId);
-  }, [videoId]);
-
-  const [videoLoaded, setVideoLoaded] = useState(false);
-
-  useEffect(() => {
-    if (!backgroundEmbedUrl) return;
-    const timer = setTimeout(() => setVideoLoaded(true), 1500);
-    return () => clearTimeout(timer);
-  }, [backgroundEmbedUrl]);
 
   const isPortrait = movie.aspectRatio === "portrait" || movie.aspectRatio === "portait";
 
   return (
     <div className="relative rounded-lg overflow-hidden shadow-2xl glass-panel">
-      <div className={`relative w-full bg-black/45 overflow-hidden ${
-        isPortrait
+      <div className={`relative w-full bg-black/45 overflow-hidden ${isPortrait
           ? "min-h-[450px] md:h-[520px] flex flex-col md:flex-row items-center md:items-end justify-center md:justify-start p-8 md:p-12 gap-8"
           : "h-[420px] md:h-[520px]"
-      }`}>
-        <div
-          className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 z-0 ${
-            isPortrait ? "hidden" : ""
-          }`}
-          style={{
-            backgroundImage: `url(${movie.thumbnail})`,
-            ...(!isPortrait ? {
-              opacity: videoLoaded ? 0 : 0.8,
-              visibility: videoLoaded ? "hidden" : "visible",
-            } : {})
-          }}
-        />
-
+        }`}>
         {!isPortrait && backgroundEmbedUrl && (
           <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
             <iframe
-              src={backgroundEmbedUrl}
+              ref={iframeRef}
+              src={`${backgroundEmbedUrl}&origin=${typeof window !== "undefined" ? window.location.origin : ""}`}
               title="Trailer Background"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              className={`absolute top-1/2 left-1/2 w-[100vw] h-[56.25vw] min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 pointer-events-none scale-[1.35] transition-opacity duration-1000 ${
-                videoLoaded ? "opacity-45" : "opacity-0"
-               }`}
+              className="absolute top-1/2 left-1/2 w-[100vw] h-[56.25vw] min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 pointer-events-none scale-[1.35] opacity-45"
               style={{ pointerEvents: "none" }}
               tabIndex={-1}
             />
           </div>
         )}
+
+        <div
+          className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 z-0 ${isPortrait ? "hidden" : ""
+            }`}
+          style={{
+            backgroundImage: `url(${movie.thumbnail})`,
+            ...(!isPortrait ? {
+              opacity: videoLoaded ? 0 : 1,
+              visibility: videoLoaded ? "hidden" : "visible",
+            } : {})
+          }}
+        />
 
         <div className="absolute inset-0 bg-transparent pointer-events-auto z-10" />
 
