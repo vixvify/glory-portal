@@ -1,10 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-store";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 import InstagramIcon from "@mui/icons-material/Instagram";
@@ -12,12 +10,10 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import WorkIcon from "@mui/icons-material/Work";
-import CakeIcon from "@mui/icons-material/Cake";
 import LockIcon from "@mui/icons-material/Lock";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LocalPlayIcon from "@mui/icons-material/LocalPlay";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ShareIcon from "@mui/icons-material/Share";
 import { Button } from "@/components/ui/button";
@@ -140,14 +136,14 @@ export default function ProfilePage() {
           text: `เข้าไปดูผลงานและประวัติของ ${currentUser?.name} ได้ที่นี่`,
           url: shareUrl,
         });
-      } catch (err) {
+      } catch {
         // User cancelled or error
       }
     } else {
       try {
         await navigator.clipboard.writeText(shareUrl);
         showToast("คัดลอกลิงก์โปรไฟล์แล้ว นำไปแชร์ต่อได้เลย!", "success");
-      } catch (err) {
+      } catch {
         showToast("ไม่สามารถคัดลอกลิงก์ได้", "error");
       }
     }

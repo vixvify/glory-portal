@@ -3,6 +3,7 @@ import "./globals.css";
 import Providers from "./providers";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
+import ThemeRegistry from "@/components/ThemeRegistry/ThemeRegistry";
 
 export const metadata: Metadata = {
   title: "GLORY - Watch Premium Thai & International Short Films",
@@ -21,13 +22,15 @@ export default function RootLayout({
       className="h-full antialiased font-sans"
     >
       <body className="min-h-full flex flex-col">
-        <Providers>
-          <Navbar />
-          <div className="flex-1 flex flex-col">
-            {children}
-          </div>
-          <Footer />
-        </Providers>
+        <ThemeRegistry>
+          <Providers>
+            <Navbar />
+            <div className="flex-1 flex flex-col">
+              {children}
+            </div>
+            <Footer />
+          </Providers>
+        </ThemeRegistry>
       </body>
     </html>
   );
