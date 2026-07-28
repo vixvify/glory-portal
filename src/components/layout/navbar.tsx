@@ -90,7 +90,7 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (pathname.startsWith("/watch")) {
+  if (pathname.startsWith("/watch") || pathname.startsWith("/auth")) {
     return null;
   }
 
