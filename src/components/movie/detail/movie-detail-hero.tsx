@@ -22,8 +22,9 @@ export default function MovieDetailHero({
 }: Props) {
   const router = useRouter();
 
+  const trailerUrl = movie.trailerUrls?.[0] || '';
   const { videoLoaded, iframeRef, backgroundEmbedUrl } = useYouTubeBackground(
-    movie.trailerUrl,
+    trailerUrl
   );
 
   const isPortrait = movie.aspectRatio === "portrait" || movie.aspectRatio === "portait";
@@ -121,7 +122,7 @@ export default function MovieDetailHero({
                   เล่น
                 </Button>
 
-                {movie.trailerUrl && (
+                {(movie.trailerUrls?.[0] || '') && (
                   <Button variant="secondary" size="md" onClick={onTrailerClick} className="px-6 active:scale-95 transition-transform">
                     <PlayArrowIcon className="text-xl mr-1.5 text-brand" />
                     ตัวอย่างภาพยนตร์
@@ -153,7 +154,7 @@ export default function MovieDetailHero({
                   เล่น
                 </Button>
 
-                {movie.trailerUrl && (
+                {(movie.trailerUrls?.[0] || '') && (
                   <Button variant="secondary" size="md" onClick={onTrailerClick} className="px-6">
                     <PlayArrowIcon className="text-xl mr-1.5 text-brand" />
                     ตัวอย่างภาพยนตร์

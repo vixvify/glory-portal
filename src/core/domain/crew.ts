@@ -5,6 +5,7 @@ export interface CrewRole {
   id: string;
   name: string;
   labelTh: string;
+  labelEn: string;
   category: string;
   categoryLabelTh: string;
   createdAt: Date;

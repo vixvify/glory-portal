@@ -53,6 +53,9 @@ export const httpClient = {
 
   delete: <T>(url: string, config?: AxiosRequestConfig) =>
     handleRequest<T>(() => http.delete(url, config)),
+
+  patch: <T>(url: string, data?: unknown, config?: AxiosRequestConfig) =>
+    handleRequest<T>(() => http.patch(url, data, config)),
 };
 
 export default httpClient;

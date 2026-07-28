@@ -6,6 +6,7 @@ import {
   LANGUAGE_OPTIONS,
   CrewCategory,
   CrewRoleDefinition,
+  CREW_CATEGORY_CONFIG,
 } from "@/core/constants/movie-form";
 import { createMovieSchema, updateMovieSchema } from "@/core/schema/movie";
 import { parseSchema } from "@/lib/validation";
@@ -13,6 +14,7 @@ import {
   AffiliationType,
   MovieFormInputs,
   MovieCrewInputItemWithRole,
+  ContentWarning,
 } from "@/core/domain/movie";
 
 type MovieFormPayloadOptions = {
@@ -20,17 +22,12 @@ type MovieFormPayloadOptions = {
   editingMovie: Movie | null;
   affiliationType: AffiliationType;
   btsVideos: string[];
-  awards: string[];
+  trailerUrls: string[];
 };
 
 export function formatInputDate(date?: string | Date): string {
-  if (!date) {
-    return "";
-  }
-
-  return typeof date === "string"
-    ? date.split("T")[0]
-    : date.toISOString().split("T")[0];
+  if (!date) return "";
+  return (typeof date === "string" ? new Date(date) : date).toISOString().split("T")[0];
 }
 
 export function getInitialCrewFormValues(
@@ -46,7 +43,7 @@ export function getInitialCrewFormValues(
             c.role.toLowerCase() === role.id.toLowerCase(),
         )
         .map((c) => ({
-          role: role.name,
+          role: role.name.toLowerCase(),
           crewMemberId: c.crewMember?.id || null,
           name: c.crewMember?.name || "",
           email: c.crewMember?.email || "",
@@ -57,7 +54,7 @@ export function getInitialCrewFormValues(
     }
     return [
       {
-        role: role.name,
+        role: role.name.toLowerCase(),
         crewMemberId: null,
         name: "",
         email: "",
@@ -76,18 +73,24 @@ export function getMovieFormDefaultValues(
       ...editingMovie,
       categoryIds: editingMovie.categories.map((c) => c.id),
       thumbnail: null,
-      trailerUrl: editingMovie.trailerUrl || "",
+      trailerUrls: editingMovie.trailerUrls || [],
       aspectRatio: editingMovie.aspectRatio || "landscape",
       ageRating: editingMovie.ageRating || "",
       university: editingMovie.university || "",
       school: editingMovie.school || "",
       language: editingMovie.language || "",
-      hasProfanity: editingMovie.hasProfanity ?? false,
-      hasDrugs: editingMovie.hasDrugs ?? false,
+      subtitle: editingMovie.subtitle || "",
+      contentWarnings: editingMovie.otherContentWarning 
+        ? [...(editingMovie.contentWarnings || []), "OTHER" as ContentWarning] 
+        : (editingMovie.contentWarnings || []),
+      otherContentWarning: editingMovie.otherContentWarning || "",
       colorType: editingMovie.colorType || "color",
       studio: editingMovie.studio || "",
       btsVideo: editingMovie.btsVideos || [],
-      awards: editingMovie.awards || [],
+      awards: (editingMovie.awards || []).map((a) => ({
+        projectName: a.projectName || "",
+        awardList: a.awardList?.length > 0 ? a.awardList.map(v => ({ value: v })) : [{ value: "" }],
+      })),
       releaseDate: formatInputDate(editingMovie.releaseDate),
       crew: getInitialCrewFormValues(editingMovie, crewRoles),
     };
@@ -99,7 +102,7 @@ export function getMovieFormDefaultValues(
     categoryIds: categories[0] ? [categories[0].id] : [],
     thumbnail: null,
     youtubeUrl: "",
-    trailerUrl: "",
+    trailerUrls: [],
     releaseDate: new Date().toISOString().split("T")[0],
     aspectRatio: "landscape",
     ageRating: AGE_RATING_OPTIONS[0] || "",
@@ -107,12 +110,13 @@ export function getMovieFormDefaultValues(
     university: "",
     school: "",
     language: LANGUAGE_OPTIONS[0],
-    hasProfanity: false,
-    hasDrugs: false,
+    subtitle: LANGUAGE_OPTIONS[0],
+    contentWarnings: [],
+    otherContentWarning: "",
     colorType: "color",
     studio: "",
     btsVideo: [],
-    awards: [""],
+    awards: [{ projectName: "", awardList: [{ value: "" }] }],
     crew: getInitialCrewFormValues(null, crewRoles),
   };
 }
@@ -131,15 +135,9 @@ export function getInitialAffiliationType(
   return "university";
 }
 
-export function getSelectedContentWarnings(
-  hasProfanity: boolean,
-  hasDrugs: boolean,
-): string[] {
-  return [
-    ...(hasProfanity ? ["profanity"] : []),
-    ...(hasDrugs ? ["drugs"] : []),
-  ];
-}
+
+
+
 
 export function getInitialStringList(values?: string[]): string[] {
   return values && values.length > 0 ? values : [""];
@@ -150,10 +148,10 @@ export function buildMovieFormPayload({
   editingMovie,
   affiliationType,
   btsVideos,
-  awards,
+  trailerUrls,
 }: MovieFormPayloadOptions) {
   const activeVideos = btsVideos.map((video) => video.trim()).filter(Boolean);
-  const activeAwards = awards.map((award) => award.trim()).filter(Boolean);
+  const activeTrailers = trailerUrls.map((url) => url.trim()).filter(Boolean);
 
   const filteredCrew = (data.crew || [])
     .filter((item) => item.name && item.name.trim() !== "")
@@ -164,17 +162,28 @@ export function buildMovieFormPayload({
       email: item.email?.trim() || null,
     }));
 
+  const activeAwards = (data.awards || [])
+    .filter((a) => (a.projectName || "").trim() !== "")
+    .map((a) => ({
+      projectName: a.projectName.trim(),
+      awardList: (a.awardList || []).map(i => (i.value || "").trim()).filter(Boolean),
+    }));
+
   return {
     ...data,
+    categoryIds: Array.from(new Set((data.categoryIds || []).filter(Boolean))),
     thumbnail: data.thumbnail || editingMovie?.thumbnail,
     duration: Number(data.duration),
     btsVideo: activeVideos,
+    trailerUrls: activeTrailers,
     awards: activeAwards,
     university:
       affiliationType === "university" ? data.university || null : null,
     school: affiliationType === "school" ? data.school || null : null,
     studio: affiliationType === "studio" ? data.studio || null : null,
     crew: filteredCrew,
+    contentWarnings: (data.contentWarnings || []).filter(w => w !== "OTHER"),
+    otherContentWarning: (data.contentWarnings || []).includes("OTHER") ? data.otherContentWarning || "" : "",
   };
 }
 
@@ -183,7 +192,10 @@ export function toCreateMoviePayload(rawPayload: unknown): CreateMovie {
 
   return {
     ...validated,
+    contentWarnings: (validated.contentWarnings?.filter(w => w !== "OTHER") as ContentWarning[]) ?? undefined,
     awards: validated.awards ?? undefined,
+    trailerUrls: validated.trailerUrls ?? undefined,
+    tags: validated.tags ?? undefined,
     thumbnail: validated.thumbnail as File,
   };
 }
@@ -197,78 +209,42 @@ export function toUpdateMoviePayload(
   return {
     ...validated,
     id: editingMovie.id,
+    contentWarnings: (validated.contentWarnings?.filter(w => w !== "OTHER") as ContentWarning[]) ?? undefined,
     awards: validated.awards ?? undefined,
+    trailerUrls: validated.trailerUrls ?? undefined,
+    tags: validated.tags ?? undefined,
     thumbnail:
       validated.thumbnail instanceof File ||
-      typeof validated.thumbnail === "string"
+        typeof validated.thumbnail === "string"
         ? validated.thumbnail
         : editingMovie.thumbnail,
   };
 }
 
 export function getFilteredCategories(crewRoles: CrewRole[]): CrewCategory[] {
-  const categoriesMap = new Map<
-    string,
-    { label: string; roles: CrewRoleDefinition[] }
-  >();
 
-  const categoryOrder = [
-    "production_management",
-    "directing",
-    "screenplay",
-    "camera",
-    "lighting",
-    "grip",
-    "sound",
-    "art",
-    "costume",
-    "makeup",
-    "cast",
-    "vfx",
-    "post_production",
-  ];
+  const categoriesMap = new Map<string, { label: string; roles: CrewRoleDefinition[] }>();
+
+  CREW_CATEGORY_CONFIG.forEach(config => {
+    categoriesMap.set(config.id, { label: config.label, roles: [] });
+  });
 
   for (const role of crewRoles) {
-    const catId = role.category || "other";
-    const catLabel = role.categoryLabelTh || role.category || "อื่นๆ";
-
+    const catId = (role.category || "other").toLowerCase();
     if (!categoriesMap.has(catId)) {
-      categoriesMap.set(catId, {
-        label: catLabel,
-        roles: [],
-      });
+      categoriesMap.set(catId, { label: role.categoryLabelTh || role.category || "อื่นๆ", roles: [] });
     }
-
+    const labelEn = role.labelEn || role.name;
     categoriesMap.get(catId)!.roles.push({
       id: role.name.toLowerCase(),
       code: role.name,
-      label: role.labelTh || role.name,
+      label: role.labelTh ? `${role.labelTh} (${labelEn})` : labelEn,
     });
   }
 
-  const result: CrewCategory[] = [];
-  for (const catId of categoryOrder) {
-    const cat = categoriesMap.get(catId);
-    if (cat && cat.roles.length > 0) {
-      result.push({
-        id: catId,
-        label: cat.label,
-        roles: cat.roles,
-      });
-    }
-  }
-
-  for (const [catId, cat] of categoriesMap.entries()) {
-    if (!categoryOrder.includes(catId) && cat.roles.length > 0) {
-      result.push({
-        id: catId,
-        label: cat.label,
-        roles: cat.roles,
-      });
-    }
-  }
-
-  return result;
+  return Array.from(categoriesMap.entries())
+    .map(([id, data]) => ({ id, ...data }))
+    .filter(cat => cat.roles && cat.roles.length > 0);
 }
 
 export function getCrewOptions(availableCrew: CrewMember[]): CrewOption[] {

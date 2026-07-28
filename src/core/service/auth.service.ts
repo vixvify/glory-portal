@@ -1,4 +1,4 @@
-import { User, RegisterUser, LoginUser } from "../domain/user";
+import { User, RegisterUser, LoginUser, UpdateProfile } from "../domain/user";
 import { AuthRepository } from "../ports/auth.repository";
 import { parseSchema } from "@/lib/validation";
 import { registerUserSchema, loginUserSchema } from "../schema/auth";
@@ -55,6 +55,19 @@ export class AuthService {
     } catch (error) {
       console.error(error);
       return null;
+    }
+  }
+  async updateProfile(data: UpdateProfile): Promise<User> {
+    try {
+      const formData = toFormData(data as unknown as Record<string, unknown>);
+      const response = await this.authRepository.updateProfile(formData);
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      return response.data;
+    } catch (error) {
+      console.error("Error in updateProfile:", error);
+      throw error;
     }
   }
 }
