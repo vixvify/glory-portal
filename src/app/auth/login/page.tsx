@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import EmailIcon from "@mui/icons-material/Email";
-import LockIcon from "@mui/icons-material/Lock";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useForm } from "react-hook-form";
@@ -49,41 +47,43 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
-      <div className="w-full max-w-md glass-panel-gold rounded-2xl shadow-2xl p-8 space-y-6">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-[#1c1c1e] border border-white/5 border-t-white/20 border-l-white/20 rounded-2xl p-8 flex flex-col gap-4 shadow-2xl">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-white tracking-tight mb-2">
-            เข้าสู่ระบบ
+          <h2 className="text-3xl font-extrabold text-white tracking-tight mb-2">
+            ยินดีต้อนรับ
           </h2>
-          <p className="text-xs text-zinc-400">ยินดีต้อนรับกลับสู่ ThaiFlix</p>
+          <p className="text-sm text-zinc-400">ร่วมบอกเล่าเรื่องราวของคุณได้ที่นี่</p>
         </div>
 
         {error && (
-          <div className="p-3 bg-red-950/40 border border-red-800 text-red-400 text-xs rounded-lg text-center animate-shake">
+          <div className="p-3 bg-red-950/40 border border-red-800 text-red-400 text-xs rounded-lg text-center">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <Input
-            label="ที่อยู่อีเมล"
-            placeholder="you@example.com"
+            label="อีเมล"
             type="email"
-            icon={<EmailIcon className="text-zinc-500 text-lg" />}
+            placeholder=""
+            variant="auth"
             error={errors.email?.message}
             {...register("email")}
           />
 
           <Input
             label="รหัสผ่าน"
-            placeholder="••••••••"
             type={showPassword ? "text" : "password"}
-            icon={<LockIcon className="text-zinc-500 text-lg" />}
+            placeholder=""
+            variant="auth"
+            error={errors.password?.message}
+            {...register("password")}
             suffix={
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-zinc-500 hover:text-white cursor-pointer flex items-center justify-center border-0 bg-transparent"
+                className="text-zinc-500 hover:text-white cursor-pointer bg-transparent border-0 flex items-center h-full px-2"
               >
                 {showPassword ? (
                   <VisibilityOffIcon className="text-lg" />
@@ -92,44 +92,33 @@ export default function LoginPage() {
                 )}
               </button>
             }
-            error={errors.password?.message}
-            {...register("password")}
           />
-
-          <div className="flex justify-end text-xs -mt-1 pb-1">
-            <Link
-              href="/auth/forgot-password"
-              className="text-zinc-400 hover:text-brand transition-colors cursor-pointer"
-            >
-              ลืมรหัสผ่าน?
-            </Link>
-          </div>
+            <div className="flex justify-end -mt-2">
+              <Link
+                href="/auth/forgot-password"
+                className="text-sm text-zinc-400 hover:text-brand transition-colors"
+              >
+                ลืมรหัสผ่าน
+              </Link>
+            </div>
 
           <Button
             type="submit"
+            variant="auth"
             isLoading={loginMutation.isPending}
-            className="w-full mt-2"
           >
             เข้าสู่ระบบ
           </Button>
         </form>
 
-        <div className="relative flex py-4 items-center">
-          <div className="flex-grow border-t border-zinc-800/80"></div>
-          <span className="flex-shrink mx-3 text-[10px] text-zinc-500 uppercase tracking-widest font-semibold font-mono">
-            Or
-          </span>
-          <div className="flex-grow border-t border-zinc-800/80"></div>
-        </div>
-
-        <div className="text-center">
-          <Link
-            href="/auth/register"
-            className="text-xs text-zinc-400 hover:text-brand transition-colors cursor-pointer"
+        <Link href="/auth/register" className="block w-full">
+          <Button
+            type="button"
+            variant="auth-outline"
           >
-            ใหม่กับ ThaiFlix? สมัครสมาชิกเลย
-          </Link>
-        </div>
+            สร้างบัญชี
+          </Button>
+        </Link>
       </div>
       <Toast />
     </div>
