@@ -7,7 +7,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useUpdateProfileMutation } from "@/hooks/db/use-profile";
 import { useCrewRolesQuery } from "@/hooks/db/use-master-data";
 import { TagInput } from "@/components/ui/tag-input";
-import { LOCALIZATION } from "@/core/constants/localization";
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -31,7 +30,7 @@ export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileMo
     ? new Date(currentUser.birthday).toISOString().split("T")[0]
     : "";
 
-  const { register, handleSubmit, reset, control } = useForm({
+  const { register, handleSubmit, control } = useForm({
     defaultValues: {
       name: currentUser.name || "",
       bio: currentUser.bio || "",
@@ -66,7 +65,7 @@ export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileMo
       await updateProfileMutation.mutateAsync(payload);
       showToast("อัปเดตโปรไฟล์เรียบร้อยแล้ว", "success");
       onClose();
-    } catch (error) {
+    } catch {
       showToast("เกิดข้อผิดพลาดในการอัปเดตข้อมูล", "error");
     } finally {
       setIsSubmitting(false);
