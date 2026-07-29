@@ -48,7 +48,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="w-full max-w-[460px] bg-[#1c1c1e] border border-white/5 border-t-white/20 border-l-white/20 rounded-2xl p-8 flex flex-col gap-4 shadow-2xl">
+      <div className="w-full max-w-md bg-[#1c1c1e] border border-white/5 border-t-white/20 border-l-white/20 rounded-2xl p-8 flex flex-col gap-4 shadow-2xl">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-white tracking-tight mb-2">
             ยินดีต้อนรับ
