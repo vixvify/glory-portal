@@ -7,6 +7,8 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginUserSchema } from "@/core/schema/auth";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useLoginMutation } from "@/hooks/db/use-auth";
 import Link from "next/link";
 import { Toast } from "@/components/ui/toast";
@@ -46,8 +48,8 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="w-full max-w-[460px] bg-[#1c1c1e] border border-white/5 border-t-white/20 border-l-white/20 rounded-2xl p-8 space-y-5 shadow-2xl">
-        <div className="text-center mb-6">
+      <div className="w-full max-w-[460px] bg-[#1c1c1e] border border-white/5 border-t-white/20 border-l-white/20 rounded-2xl p-8 flex flex-col gap-4 shadow-2xl">
+        <div className="text-center">
           <h2 className="text-3xl font-extrabold text-white tracking-tight mb-2">
             ยินดีต้อนรับ
           </h2>
@@ -60,33 +62,28 @@ export default function LoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-1">
-            <label className="text-lg text-white font-bold block">อีเมล</label>
-            <input
-              type="email"
-              placeholder=""
-              className="w-full bg-[#3f3f42] border border-zinc-500 rounded-xl px-4 py-3 text-base text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-brand [color-scheme:dark]"
-              {...register("email")}
-            />
-            {errors.email && (
-              <p className="text-[11px] text-red-400 mt-1">{errors.email.message}</p>
-            )}
-          </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <Input
+            label="อีเมล"
+            type="email"
+            placeholder=""
+            variant="auth"
+            error={errors.email?.message}
+            {...register("email")}
+          />
 
-          <div className="space-y-1">
-            <label className="text-lg text-white font-bold block">รหัสผ่าน</label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder=""
-                className="w-full bg-[#3f3f42] border border-zinc-500 rounded-xl px-4 py-3 pr-11 text-base text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-brand [color-scheme:dark]"
-                {...register("password")}
-              />
+          <Input
+            label="รหัสผ่าน"
+            type={showPassword ? "text" : "password"}
+            placeholder=""
+            variant="auth"
+            error={errors.password?.message}
+            {...register("password")}
+            suffix={
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white cursor-pointer bg-transparent border-0 flex items-center"
+                className="text-zinc-500 hover:text-white cursor-pointer bg-transparent border-0 flex items-center h-full px-2"
               >
                 {showPassword ? (
                   <VisibilityOffIcon className="text-lg" />
@@ -94,11 +91,9 @@ export default function LoginPage() {
                   <VisibilityIcon className="text-lg" />
                 )}
               </button>
-            </div>
-            {errors.password && (
-              <p className="text-[11px] text-red-400 mt-1">{errors.password.message}</p>
-            )}
-            <div className="flex justify-end pt-1">
+            }
+          />
+            <div className="flex justify-end -mt-2">
               <Link
                 href="/auth/forgot-password"
                 className="text-sm text-zinc-400 hover:text-brand transition-colors"
@@ -106,31 +101,23 @@ export default function LoginPage() {
                 ลืมรหัสผ่าน
               </Link>
             </div>
-          </div>
 
-          <button
+          <Button
             type="submit"
-            disabled={loginMutation.isPending}
-            className="w-full bg-gradient-to-b from-[#c89f3a] to-[#997316] hover:opacity-90 text-white font-bold rounded-2xl py-3 text-lg transition-opacity disabled:opacity-50 disabled:pointer-events-none mt-6"
+            variant="auth"
+            isLoading={loginMutation.isPending}
           >
-            {loginMutation.isPending ? (
-              <span className="flex items-center justify-center gap-2">
-                <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                กำลังโหลด...
-              </span>
-            ) : (
-              "เข้าสู่ระบบ"
-            )}
-          </button>
+            เข้าสู่ระบบ
+          </Button>
         </form>
 
-        <Link href="/auth/register" className="block w-full mt-4">
-          <button
+        <Link href="/auth/register" className="block w-full">
+          <Button
             type="button"
-            className="w-full border border-zinc-500 hover:border-zinc-400 text-white font-bold rounded-2xl py-3 text-lg transition-colors bg-transparent"
+            variant="auth-outline"
           >
             สร้างบัญชี
-          </button>
+          </Button>
         </Link>
       </div>
       <Toast />

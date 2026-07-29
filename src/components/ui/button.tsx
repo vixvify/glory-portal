@@ -1,7 +1,7 @@
 import React from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "brand" | "secondary" | "outline" | "ghost" | "white" | "glass";
+  variant?: "brand" | "secondary" | "outline" | "ghost" | "white" | "glass" | "auth" | "auth-outline";
   size?: "sm" | "md" | "lg";
   isLoading?: boolean;
 }
@@ -9,7 +9,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = "brand", size = "md", isLoading, children, className = "", ...props }, ref) => {
     const baseStyle =
-      "inline-flex items-center justify-center font-bold rounded-md transition-all duration-300 active:scale-[0.98] select-none cursor-pointer focus:outline-none disabled:opacity-50 disabled:pointer-events-none tracking-wide";
+      "inline-flex items-center justify-center font-bold transition-all duration-300 active:scale-[0.98] select-none cursor-pointer focus:outline-none disabled:opacity-50 disabled:pointer-events-none tracking-wide";
 
     const variants = {
       brand: "bg-brand text-zinc-950 hover:bg-brand-hover shadow-sm border border-brand/25 transition-all duration-300",
@@ -18,18 +18,21 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ghost: "text-zinc-400 hover:text-brand bg-transparent hover:bg-zinc-800/30 transition-all duration-300",
       white: "bg-white text-zinc-950 hover:bg-zinc-100 shadow-md shadow-white/5 transition-all duration-300",
       glass: "glass-button",
+      auth: "bg-gradient-to-r from-[#CAA22A] to-[#A47E1C] hover:opacity-90 text-white transition-opacity",
+      "auth-outline": "border border-zinc-500 hover:border-zinc-400 text-white transition-colors bg-transparent",
     };
 
     const sizes = {
-      sm: "px-3 py-1.5 text-xs",
-      md: "px-5 py-2.5 text-sm",
-      lg: "px-8 py-3.5 text-base",
+      sm: "px-3 py-1.5 text-xs rounded-md",
+      md: "px-5 py-2.5 text-sm rounded-md",
+      lg: "px-8 py-3.5 text-base rounded-md",
+      auth: "w-full py-2.5 text-lg rounded-xl font-bold",
     };
 
     return (
       <button
         ref={ref}
-        className={`${baseStyle} ${variants[variant]} ${sizes[size]} ${className}`}
+        className={`${baseStyle} ${variants[variant]} ${variant.startsWith("auth") ? sizes["auth"] : sizes[size]} ${className}`}
         {...props}
       >
         {isLoading ? (
