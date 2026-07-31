@@ -21,7 +21,10 @@ interface HomeViewProps {
   actorList: CrewMember[];
   moviesByRating: Movie[];
   universityMovies: Movie[];
-  categoryMoviesMap: Record<string, Movie[]>;
+  dramaMovies: Movie[];
+  thrillerHorrorMovies: Movie[];
+  comedyMovies: Movie[];
+  romanceMovies: Movie[];
   favorites: Movie[];
   portraitMovies: Movie[];
   btsVideos?: BtsVideoItem[];
@@ -37,7 +40,10 @@ export default function HomeView({
   staffList,
   actorList,
   universityMovies,
-  categoryMoviesMap,
+  dramaMovies,
+  thrillerHorrorMovies,
+  comedyMovies,
+  romanceMovies,
   moviesByRating,
   favorites,
   portraitMovies,
@@ -106,7 +112,6 @@ export default function HomeView({
           onToggleFavorite={handleToggleFavorite}
         />
 
-        {/* Ad Banner Placeholder */}
         <AdBanner />
 
         {favorites.length > 0 && (
@@ -119,16 +124,45 @@ export default function HomeView({
           />
         )}
 
-        {categories.map((category) => (
+        {dramaMovies.length > 0 && (
           <MovieRow
-            key={`${category.id}-views`}
-            title={category.labelTh || category.name}
-            movies={categoryMoviesMap[category.id] || []}
+            title="ดราม่าเรียกน้ำตา"
+            movies={dramaMovies}
             onPlayClick={handlePlayMovie}
             favorites={favorites}
             onToggleFavorite={handleToggleFavorite}
           />
-        ))}
+        )}
+
+        {thrillerHorrorMovies.length > 0 && (
+          <MovieRow
+            title="สั่นประสาท"
+            movies={thrillerHorrorMovies}
+            onPlayClick={handlePlayMovie}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
+          />
+        )}
+
+        {comedyMovies.length > 0 && (
+          <MovieRow
+            title="ยิ้มได้ทั้งวัน"
+            movies={comedyMovies}
+            onPlayClick={handlePlayMovie}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
+          />
+        )}
+
+        {romanceMovies.length > 0 && (
+          <MovieRow
+            title="รักหวานฉ่ำ"
+            movies={romanceMovies}
+            onPlayClick={handlePlayMovie}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
+          />
+        )}
 
         {btsVideos.length > 0 && (
           <MovieBtsRow

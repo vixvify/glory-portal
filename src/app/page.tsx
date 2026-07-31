@@ -66,23 +66,44 @@ export default async function Page() {
       })
     : Promise.resolve([]);
 
-  const categoryMoviePromises = categories.map(async (category) => {
-    const movies = await movieService.getMovies({
-      search: category.name,
+  const getCuratedMovies = (categoryName: string) =>
+    movieService.getMovies({
+      search: categoryName,
       searchby: "category",
       page: 1,
       pagesize: 10,
+      sort: "desc",
+      sortby: "createdAt",
       aspectRatio: "landscape",
     });
-    return [category.id, movies] as const;
-  });
 
-  const [movieByUniversity, ...categoryMoviesEntries] = await Promise.all([
+  const [
+    movieByUniversity,
+    dramaMovies,
+    thrillerMovies,
+    horrorMovies,
+    comedyMovies,
+    romanceMovies,
+  ] = await Promise.all([
     movieByUniversityPromise,
-    ...categoryMoviePromises,
+    getCuratedMovies("ดราม่า"),
+    getCuratedMovies("ระทึกขวัญ"),
+    getCuratedMovies("สยองขวัญ"),
+    getCuratedMovies("ตลก"),
+    getCuratedMovies("โรแมนติก"),
   ]);
 
-  const categoryMoviesMap = Object.fromEntries(categoryMoviesEntries);
+  // Combine, deduplicate, and sort using a declarative approach
+  const thrillerHorrorMovies = Array.from(
+    new Map([...thrillerMovies, ...horrorMovies].map((m) => [m.id, m])).values()
+  )
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt || 0).getTime() -
+        new Date(a.createdAt || 0).getTime()
+    )
+    .slice(0, 10);
+
   const btsVideos = mapMoviesToBtsVideos(moviesWithBts);
 
   return (
@@ -97,7 +118,10 @@ export default async function Page() {
       portraitMovies={portraitMovies}
       universityMovies={movieByUniversity}
       moviesByRating={moviesByRating}
-      categoryMoviesMap={categoryMoviesMap}
+      dramaMovies={dramaMovies}
+      thrillerHorrorMovies={thrillerHorrorMovies}
+      comedyMovies={comedyMovies}
+      romanceMovies={romanceMovies}
     />
   );
 }
