@@ -109,9 +109,9 @@ export default function Navbar() {
           <Image
             src="/logo.png"
             alt="GLORY"
-            width={32}
-            height={32}
-            className="w-8 h-8 object-contain"
+            width={64}
+            height={64}
+            className="w-14 h-14 md:w-16 md:h-16 object-contain drop-shadow-sm"
             priority
           />
         </Link>
