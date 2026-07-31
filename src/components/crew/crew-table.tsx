@@ -4,7 +4,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonIcon from "@mui/icons-material/Person";
 import { CrewMember } from "@/core/domain/crew";
-import { LOCALIZATION } from "@/core/constants/localization";
+import { CREW_MESSAGES } from "@/core/constants/crew-messages";
 
 import { Button } from "@/components/ui/button";
 
@@ -95,7 +95,7 @@ export const CrewTable: React.FC<CrewTableProps> = ({
                           : "bg-zinc-800/60 text-zinc-400 border border-zinc-800"
                       }`}
                     >
-                      {LOCALIZATION.COMMON.CONTRIBUTION(movieCount)}
+                      {CREW_MESSAGES.COMMON.CONTRIBUTION(movieCount)}
                     </span>
                   </td>
 

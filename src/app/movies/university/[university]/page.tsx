@@ -8,6 +8,7 @@ import {
   useToggleFavoriteMutation,
 } from "@/hooks/db/use-favorites";
 import { useAppStore } from "@/store/use-store";
+import { FAVORITE_MESSAGES } from "@/core/constants/favorite-messages";
 import MovieGrid from "@/components/movie/grids/movie-grid";
 import MovieCardPortrait from "@/components/movie/cards/movie-card-portrait";
 import Link from "next/link";
@@ -53,13 +54,13 @@ export default function UniversityPage() {
         {
           onSuccess: () => {
             if (isCurrentlyFavorite) {
-              showToast("นำออกจากรายการโปรดแล้ว", "info");
+              showToast(FAVORITE_MESSAGES.TOAST.REMOVE_FAVORITE_SUCCESS, "info");
             } else {
-              showToast("เพิ่มลงในรายการโปรดแล้ว", "success");
+              showToast(FAVORITE_MESSAGES.TOAST.ADD_FAVORITE_SUCCESS, "success");
             }
           },
           onError: () => {
-            showToast("เกิดข้อผิดพลาดในการปรับปรุงรายการโปรด", "error");
+            showToast(FAVORITE_MESSAGES.ERRORS.FAVORITE_UPDATE, "error");
           },
         },
       );

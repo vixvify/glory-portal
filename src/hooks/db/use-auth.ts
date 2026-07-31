@@ -3,6 +3,7 @@ import { authService } from "@/infra/container";
 import { RegisterUser, LoginUser, User } from "@/core/domain/user";
 import { useAppStore } from "@/store/use-store";
 import { useRouter } from "next/navigation";
+import { AUTH_MESSAGES } from "@/core/constants/auth-messages";
 
 export function useRegisterMutation() {
   const { showToast } = useAppStore();
@@ -11,7 +12,7 @@ export function useRegisterMutation() {
     mutationFn: (data) => authService.register(data),
     onSuccess: () => {
       showToast(
-        "ลงทะเบียนสำเร็จแล้ว! กรุณาเข้าสู่ระบบเพื่อเข้าใช้งาน.",
+        AUTH_MESSAGES.TOAST.REGISTER_SUCCESS,
         "success",
       );
     },
@@ -26,7 +27,7 @@ export function useLoginMutation() {
     mutationFn: (data) => authService.login(data),
     onSuccess: (user) => {
       setCurrentUser(user);
-      showToast("เข้าสู่ระบบสำเร็จ! ยินดีต้อนรับกลับ.", "success");
+      showToast(AUTH_MESSAGES.TOAST.LOGIN_SUCCESS, "success");
       queryClient.invalidateQueries({ queryKey: ["favorites"] });
     },
   });
@@ -41,7 +42,7 @@ export function useLogoutMutation() {
     mutationFn: () => authService.logout(),
     onSuccess: () => {
       setCurrentUser(null);
-      showToast("ออกจากระบบสำเร็จ", "info");
+      showToast(AUTH_MESSAGES.TOAST.LOGOUT_SUCCESS, "info");
       queryClient.clear();
       router.push("/auth/login");
     },

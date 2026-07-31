@@ -13,13 +13,13 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants = {
       brand: "bg-brand text-zinc-950 hover:bg-brand-hover shadow-sm border border-brand/25 transition-all duration-300",
-      secondary: "bg-zinc-900 hover:bg-zinc-800 text-zinc-100 border border-zinc-700/50 hover:border-brand/40 transition-all duration-300",
-      outline: "border border-zinc-700/60 hover:border-brand/50 hover:bg-brand/5 text-zinc-300 hover:text-brand transition-all duration-300",
+      secondary: "bg-card-secondary hover:bg-card-hover text-zinc-100 border border-theme-border hover:border-brand/40 transition-all duration-300",
+      outline: "border border-theme-border hover:border-brand/50 hover:bg-brand/5 text-zinc-300 hover:text-brand transition-all duration-300",
       ghost: "text-zinc-400 hover:text-brand bg-transparent hover:bg-zinc-800/30 transition-all duration-300",
       white: "bg-white text-zinc-950 hover:bg-zinc-100 shadow-md shadow-white/5 transition-all duration-300",
       glass: "glass-button",
-      auth: "bg-gradient-to-r from-[#CAA22A] to-[#A47E1C] hover:opacity-90 text-white transition-opacity",
-      "auth-outline": "border border-zinc-500 hover:border-zinc-400 text-white transition-colors bg-transparent",
+      auth: "bg-gradient-to-r from-btn-from to-btn-to hover:opacity-90 text-white transition-opacity",
+      "auth-outline": "border border-theme-border hover:border-brand/50 text-white transition-colors bg-transparent",
     };
 
     const sizes = {

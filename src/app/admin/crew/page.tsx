@@ -15,7 +15,8 @@ import {
   useDeleteCrewMemberMutation,
 } from "@/hooks/db/use-crew-members";
 import { useDebounce } from "@/hooks/system/use-debounce";
-import { LOCALIZATION } from "@/core/constants/localization";
+import { CREW_MESSAGES } from "@/core/constants/crew-messages";
+import { COMMON_MESSAGES } from "@/core/constants/common-messages";
 
 export default function AdminCrewPage() {
   const router = useRouter();
@@ -49,10 +50,10 @@ export default function AdminCrewPage() {
       try {
         setIsDeletingLocal(true);
         await deleteCrewMutation.mutateAsync(deleteCrewId);
-        showToast(LOCALIZATION.TOAST.DELETE_CREW_SUCCESS, "success");
+        showToast(CREW_MESSAGES.TOAST.DELETE_CREW_SUCCESS, "success");
       } catch (err: unknown) {
         const errorMessage =
-          err instanceof Error ? err.message : LOCALIZATION.ERRORS.DELETE;
+          err instanceof Error ? err.message : COMMON_MESSAGES.ERRORS.DELETE;
         showToast(errorMessage, "error");
       } finally {
         setIsDeletingLocal(false);
@@ -111,11 +112,11 @@ export default function AdminCrewPage() {
 
       <ConfirmModal
         isOpen={deleteCrewId !== null}
-        title={LOCALIZATION.CONFIRM.DELETE_CREW_TITLE}
-        message={LOCALIZATION.CONFIRM.DELETE_CREW_MSG}
+        title={CREW_MESSAGES.CONFIRM.DELETE_CREW_TITLE}
+        message={CREW_MESSAGES.CONFIRM.DELETE_CREW_MSG}
         variant="danger"
-        confirmText={LOCALIZATION.CONFIRM.DELETE_CREW_BTN}
-        cancelText={LOCALIZATION.CONFIRM.CANCEL}
+        confirmText={CREW_MESSAGES.CONFIRM.DELETE_CREW_BTN}
+        cancelText={COMMON_MESSAGES.CONFIRM.CANCEL}
         onClose={() => setDeleteCrewId(null)}
         onConfirm={handleDeleteConfirm}
       />
@@ -129,10 +130,10 @@ export default function AdminCrewPage() {
             </div>
             <div className="space-y-1.5 text-center">
               <h3 className="text-xl font-bold tracking-wide text-white">
-                {LOCALIZATION.LOADING.DELETE_CREW}
+                {CREW_MESSAGES.LOADING.DELETE_CREW}
               </h3>
               <p className="text-xs text-zinc-400 font-light">
-                {LOCALIZATION.LOADING.SUB_DELETE_CREW}
+                {CREW_MESSAGES.LOADING.SUB_DELETE_CREW}
               </p>
             </div>
           </div>

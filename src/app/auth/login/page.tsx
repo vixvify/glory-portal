@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useLoginMutation } from "@/hooks/db/use-auth";
 import Link from "next/link";
 import { Toast } from "@/components/ui/toast";
+import { AUTH_MESSAGES } from "@/core/constants/auth-messages";
 
 type LoginFormValues = {
   email: string;
@@ -42,18 +43,20 @@ export default function LoginPage() {
       await loginMutation.mutateAsync(data);
       router.push("/");
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "เข้าสู่ระบบไม่สำเร็จ");
+      setError(err instanceof Error ? err.message : AUTH_MESSAGES.ERRORS.LOGIN_FAILED);
     }
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-[#1c1c1e] border border-white/5 border-t-white/20 border-l-white/20 rounded-2xl p-8 flex flex-col gap-4 shadow-2xl">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-card-secondary border border-theme-border rounded-2xl p-8 flex flex-col gap-4 shadow-2xl">
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-white tracking-tight mb-2">
+          <h2 className="text-3xl font-bold text-white tracking-tight mb-2">
             ยินดีต้อนรับ
           </h2>
-          <p className="text-sm text-zinc-400">ร่วมบอกเล่าเรื่องราวของคุณได้ที่นี่</p>
+          <p className="text-sm text-zinc-400">
+            ร่วมบอกเล่าเรื่องราวของคุณได้ที่นี่
+          </p>
         </div>
 
         {error && (
@@ -66,7 +69,7 @@ export default function LoginPage() {
           <Input
             label="อีเมล"
             type="email"
-            placeholder=""
+            placeholder="กรอกอีเมลของคุณ"
             variant="auth"
             error={errors.email?.message}
             {...register("email")}
@@ -75,7 +78,7 @@ export default function LoginPage() {
           <Input
             label="รหัสผ่าน"
             type={showPassword ? "text" : "password"}
-            placeholder=""
+            placeholder="กรอกรหัสผ่านของคุณ"
             variant="auth"
             error={errors.password?.message}
             {...register("password")}
@@ -93,14 +96,14 @@ export default function LoginPage() {
               </button>
             }
           />
-            <div className="flex justify-end -mt-2">
-              <Link
-                href="/auth/forgot-password"
-                className="text-sm text-zinc-400 hover:text-brand transition-colors"
-              >
-                ลืมรหัสผ่าน
-              </Link>
-            </div>
+          <div className="flex justify-end -mt-2">
+            <Link
+              href="/auth/forgot-password"
+              className="text-sm text-zinc-400 hover:text-brand transition-colors"
+            >
+              ลืมรหัสผ่าน
+            </Link>
+          </div>
 
           <Button
             type="submit"
@@ -112,10 +115,7 @@ export default function LoginPage() {
         </form>
 
         <Link href="/auth/register" className="block w-full">
-          <Button
-            type="button"
-            variant="auth-outline"
-          >
+          <Button type="button" variant="auth-outline">
             สร้างบัญชี
           </Button>
         </Link>

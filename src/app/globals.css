@@ -10,6 +10,10 @@
   --theme-bg-rgb: 9, 7, 15;
   --theme-card: #14111d;
   --theme-card-hover: #1e1a2b;
+  --theme-card-secondary: #151121;
+  --theme-border: rgba(139, 92, 246, 0.15);
+  --theme-btn-from: #8b5cf6;
+  --theme-btn-to: #6d28d9;
   --foreground: #ffffff;
 }
 
@@ -21,6 +25,10 @@
   --theme-bg-rgb: 5, 11, 17;
   --theme-card: #0f1624;
   --theme-card-hover: #172237;
+  --theme-card-secondary: #0b111a;
+  --theme-border: rgba(6, 182, 212, 0.15);
+  --theme-btn-from: #06b6d4;
+  --theme-btn-to: #0891b2;
 }
 
 [data-theme="gold"] {
@@ -31,6 +39,10 @@
   --theme-bg-rgb: 9, 8, 7;
   --theme-card: rgba(22, 19, 16, 0.4);
   --theme-card-hover: rgba(38, 33, 27, 0.55);
+  --theme-card-secondary: #14110e;
+  --theme-border: rgba(229, 184, 66, 0.15);
+  --theme-btn-from: #e5b842;
+  --theme-btn-to: #b38820;
 }
 
 [data-theme="crimson"] {
@@ -41,6 +53,10 @@
   --theme-bg-rgb: 15, 7, 7;
   --theme-card: #1a1111;
   --theme-card-hover: #2b1c1c;
+  --theme-card-secondary: #140b0b;
+  --theme-border: rgba(229, 9, 20, 0.15);
+  --theme-btn-from: #e50914;
+  --theme-btn-to: #b80710;
 }
 
 @theme inline {
@@ -50,6 +66,10 @@
   --color-brand-hover: var(--theme-primary-hover);
   --color-card: var(--theme-card);
   --color-card-hover: var(--theme-card-hover);
+  --color-card-secondary: var(--theme-card-secondary);
+  --color-theme-border: var(--theme-border);
+  --color-btn-from: var(--theme-btn-from);
+  --color-btn-to: var(--theme-btn-to);
   --font-sans: 'Kanit', Arial, Helvetica, sans-serif;
   --font-serif: 'Cinzel', Georgia, serif;
   --font-mono: var(--font-geist-mono);

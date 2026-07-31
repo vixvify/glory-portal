@@ -6,7 +6,9 @@ import PersonIcon from "@mui/icons-material/Person";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import { useUpdateProfileMutation } from "@/hooks/db/use-profile";
 import { useAppStore } from "@/store/use-store";
-import { LOCALIZATION } from "@/core/constants/localization";
+import { PROFILE_MESSAGES } from "@/core/constants/profile-messages";
+import { COMMON_MESSAGES } from "@/core/constants/common-messages";
+import { UPLOAD_LIMITS } from "@/core/constants/upload";
 import imageCompression from "browser-image-compression";
 
 interface AvatarUploadProps {
@@ -25,25 +27,25 @@ export function AvatarUpload({ photoUrl, name, isOwner }: AvatarUploadProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate type
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-    if (!validTypes.includes(file.type)) {
-      showToast("รองรับเฉพาะไฟล์รูปภาพ (JPG, PNG, WEBP, GIF) เท่านั้น", "error");
+    if (
+      !(UPLOAD_LIMITS.AVATAR.ALLOWED_TYPES as readonly string[]).includes(
+        file.type,
+      )
+    ) {
+      showToast(PROFILE_MESSAGES.TOAST.INVALID_IMAGE_TYPE, "error");
       return;
     }
 
-    // Validate size (e.g., max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      showToast("ขนาดรูปภาพต้องไม่เกิน 5MB", "error");
+    if (file.size > UPLOAD_LIMITS.AVATAR.SIZE_BYTES) {
+      showToast(PROFILE_MESSAGES.TOAST.AVATAR_SIZE_LIMIT, "error");
       return;
     }
 
-    // Show preview
     const objectUrl = URL.createObjectURL(file);
     setPreviewUrl(objectUrl);
 
     try {
-      showToast("กำลังบีบอัดและอัปโหลดรูปภาพ...", "success");
+      showToast(PROFILE_MESSAGES.TOAST.UPLOADING_AVATAR, "success");
       const options = {
         maxSizeMB: 0.2,
         maxWidthOrHeight: 800,
@@ -51,21 +53,18 @@ export function AvatarUpload({ photoUrl, name, isOwner }: AvatarUploadProps) {
       };
       const compressedFile = await imageCompression(file, options);
 
-      // Force cast to File to prevent "[object Blob]" validation error on the backend
       const finalFile = new File([compressedFile], file.name, {
         type: compressedFile.type || file.type,
       });
 
       await updateProfile({ photo: finalFile });
-      showToast("อัปเดตรูปโปรไฟล์เรียบร้อยแล้ว", "success");
+      showToast(PROFILE_MESSAGES.TOAST.UPLOAD_AVATAR_SUCCESS, "success");
     } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? err.message : LOCALIZATION.ERRORS.SAVE;
+        err instanceof Error ? err.message : COMMON_MESSAGES.ERRORS.SAVE;
       showToast(errorMessage, "error");
     } finally {
-      // Clear preview to fall back to the real photoUrl from global store
       setPreviewUrl(null);
-      // Clean up the object URL to avoid memory leaks
       URL.revokeObjectURL(objectUrl);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -81,7 +80,7 @@ export function AvatarUpload({ photoUrl, name, isOwner }: AvatarUploadProps) {
   const displayUrl = previewUrl || photoUrl;
 
   return (
-    <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full p-1 bg-[#0d0d0d] shrink-0 group">
+    <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full p-1 bg-background shrink-0 group">
       <div className="w-full h-full rounded-full bg-zinc-900 overflow-hidden flex items-center justify-center relative">
         {displayUrl ? (
           <Image
@@ -103,7 +102,7 @@ export function AvatarUpload({ photoUrl, name, isOwner }: AvatarUploadProps) {
           <button
             onClick={handleCameraClick}
             disabled={isPending}
-            className="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-zinc-800 border-2 border-[#0d0d0d] text-white flex items-center justify-center hover:bg-brand hover:text-black transition-colors z-10 shadow-lg disabled:opacity-50"
+            className="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-zinc-800 border-2 border-background text-white flex items-center justify-center hover:bg-brand hover:text-black transition-colors z-10 shadow-lg disabled:opacity-50"
             title="เปลี่ยนรูปโปรไฟล์"
           >
             {isPending ? (

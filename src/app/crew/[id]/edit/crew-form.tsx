@@ -8,7 +8,8 @@ import PeopleIcon from "@mui/icons-material/People";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CrewMember } from "@/core/domain/crew";
-import { LOCALIZATION } from "@/core/constants/localization";
+import { CREW_MESSAGES } from "@/core/constants/crew-messages";
+import { COMMON_MESSAGES } from "@/core/constants/common-messages";
 import { useAppStore } from "@/store/use-store";
 import {
   useCreateCrewMemberMutation,
@@ -63,19 +64,19 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
           name: data.name.trim(),
           email: data.email?.trim() || null,
         });
-        showToast(LOCALIZATION.TOAST.EDIT_CREW_SUCCESS, "success");
+        showToast(CREW_MESSAGES.TOAST.EDIT_CREW_SUCCESS, "success");
       } else {
         await createCrewMutation.mutateAsync({
           name: data.name.trim(),
           email: data.email?.trim() || undefined,
         });
-        showToast(LOCALIZATION.TOAST.ADD_CREW_SUCCESS, "success");
+        showToast(CREW_MESSAGES.TOAST.ADD_CREW_SUCCESS, "success");
       }
  
       router.push("/");
     } catch (err: unknown) {
       const errMsg =
-        err instanceof Error ? err.message : LOCALIZATION.ERRORS.SAVE;
+        err instanceof Error ? err.message : COMMON_MESSAGES.ERRORS.SAVE;
       showToast(errMsg, "error");
       console.error(err);
     } finally {
@@ -167,13 +168,13 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
             <div className="space-y-1.5 text-center">
               <h3 className="text-xl font-bold tracking-wide text-white">
                 {editingCrew
-                  ? LOCALIZATION.LOADING.SAVE_CREW
-                  : LOCALIZATION.LOADING.SAVE_CREW}
+                  ? CREW_MESSAGES.LOADING.SAVE_CREW
+                  : CREW_MESSAGES.LOADING.SAVE_CREW}
               </h3>
               <p className="text-xs text-zinc-400 font-light">
                 {editingCrew
-                  ? LOCALIZATION.LOADING.SUB_SAVE_CREW
-                  : LOCALIZATION.LOADING.SUB_SAVE_CREW}
+                  ? CREW_MESSAGES.LOADING.SUB_SAVE_CREW
+                  : CREW_MESSAGES.LOADING.SUB_SAVE_CREW}
               </p>
             </div>
           </div>

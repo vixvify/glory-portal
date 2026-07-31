@@ -19,10 +19,10 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         <div className="relative">
           <select
             ref={ref}
-            className={`w-full bg-[#0D0D0D] border rounded-lg py-2.5 px-4 pr-10 text-sm text-white focus:outline-none transition-colors font-light cursor-pointer appearance-none ${
+            className={`w-full bg-background border rounded-lg py-2.5 px-4 pr-10 text-sm text-white focus:outline-none transition-colors font-light cursor-pointer appearance-none ${
               error
                 ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
-                : "border-[#3A3A3A] focus:border-brand"
+                : "border-theme-border focus:border-brand"
             } ${className}`}
             {...props}
           >

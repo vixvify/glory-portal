@@ -2,17 +2,18 @@ import { Rating } from "./rating";
 import { User } from "./user";
 import { CrewRole, CrewMember } from "./crew";
 import { Category } from "./master-data";
+
 export enum ContentWarning {
-  PROFANITY = 'PROFANITY',
-  DRUGS = 'DRUGS',
-  VIOLENCE = 'VIOLENCE',
-  GORE = 'GORE',
-  SEXUAL_CONTENT = 'SEXUAL_CONTENT',
-  NUDITY = 'NUDITY',
-  SMOKING = 'SMOKING',
-  ALCOHOL = 'ALCOHOL',
-  MENTAL_HEALTH = 'MENTAL_HEALTH',
-  FLASHING_LIGHTS = 'FLASHING_LIGHTS',
+  PROFANITY = "PROFANITY",
+  DRUGS = "DRUGS",
+  VIOLENCE = "VIOLENCE",
+  GORE = "GORE",
+  SEXUAL_CONTENT = "SEXUAL_CONTENT",
+  NUDITY = "NUDITY",
+  SMOKING = "SMOKING",
+  ALCOHOL = "ALCOHOL",
+  MENTAL_HEALTH = "MENTAL_HEALTH",
+  FLASHING_LIGHTS = "FLASHING_LIGHTS",
 }
 
 export interface MovieCrew {
@@ -186,4 +187,3 @@ export type MovieFormInputs = {
   awards?: MovieAwardInputProject[];
   tags?: string[];
 };
-
