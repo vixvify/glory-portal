@@ -56,8 +56,7 @@ export default function MovieRankRow({
                 key={movie.id}
                 className="relative flex-none snap-start transition-all duration-300 w-[280px] sm:w-[340px] md:w-[400px] group/rank"
               >
-                {/* Dark gradient overlay behind the rank number for better legibility */}
-                <div className="absolute top-0 left-0 w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-gradient-to-br from-black/85 via-black/45 to-transparent rounded-tl-lg z-20 pointer-events-none" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(0,0,0,0.85)_0%,_rgba(0,0,0,0.4)_30%,_transparent_60%)] z-20 pointer-events-none" />
                 <div className="absolute top-2.5 left-2.5 z-25 font-sans text-4xl sm:text-5xl md:text-6xl font-black text-luxury-gold drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] select-none">
                   {index + 1}
                 </div>
