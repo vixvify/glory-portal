@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -21,6 +22,11 @@ export default function MovieDetailHero({
   onTrailerClick,
 }: Props) {
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const trailerUrl = movie.trailerUrls?.[0] || '';
   const { videoLoaded, iframeRef, backgroundEmbedUrl } = useYouTubeBackground(
@@ -39,7 +45,7 @@ export default function MovieDetailHero({
           <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
             <iframe
               ref={iframeRef}
-              src={`${backgroundEmbedUrl}&origin=${typeof window !== "undefined" ? window.location.origin : ""}`}
+              src={`${backgroundEmbedUrl}&origin=${isMounted ? window.location.origin : ""}`}
               title="Trailer Background"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

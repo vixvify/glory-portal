@@ -5,7 +5,9 @@ import Image from "next/image";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import { useUpdateProfileMutation } from "@/hooks/db/use-profile";
 import { useAppStore } from "@/store/use-store";
-import { LOCALIZATION } from "@/core/constants/localization";
+import { PROFILE_MESSAGES } from "@/core/constants/profile-messages";
+import { COMMON_MESSAGES } from "@/core/constants/common-messages";
+import { UPLOAD_LIMITS } from "@/core/constants/upload";
 import imageCompression from "browser-image-compression";
 
 interface CoverUploadProps {
@@ -14,7 +16,11 @@ interface CoverUploadProps {
   isOwner: boolean;
 }
 
-export function CoverUpload({ coverUrl, fallbackPhotoUrl, isOwner }: CoverUploadProps) {
+export function CoverUpload({
+  coverUrl,
+  fallbackPhotoUrl,
+  isOwner,
+}: CoverUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { mutateAsync: updateProfile, isPending } = useUpdateProfileMutation();
@@ -24,47 +30,44 @@ export function CoverUpload({ coverUrl, fallbackPhotoUrl, isOwner }: CoverUpload
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate type
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-    if (!validTypes.includes(file.type)) {
-      showToast("รองรับเฉพาะไฟล์รูปภาพ (JPG, PNG, WEBP, GIF) เท่านั้น", "error");
+    if (
+      !(UPLOAD_LIMITS.COVER.ALLOWED_TYPES as readonly string[]).includes(
+        file.type,
+      )
+    ) {
+      showToast(PROFILE_MESSAGES.TOAST.INVALID_IMAGE_TYPE, "error");
       return;
     }
 
-    // Validate size (e.g., max 10MB for cover before compression)
-    if (file.size > 10 * 1024 * 1024) {
-      showToast("ขนาดรูปภาพหน้าปกต้องไม่เกิน 10MB", "error");
+    if (file.size > UPLOAD_LIMITS.COVER.SIZE_BYTES) {
+      showToast(PROFILE_MESSAGES.TOAST.COVER_SIZE_LIMIT, "error");
       return;
     }
 
-    // Show preview
     const objectUrl = URL.createObjectURL(file);
     setPreviewUrl(objectUrl);
 
     try {
-      showToast("กำลังบีบอัดและอัปโหลดภาพปก...", "success");
+      showToast(PROFILE_MESSAGES.TOAST.UPLOADING_COVER, "success");
       const options = {
-        maxSizeMB: 0.5, // 500KB for cover
-        maxWidthOrHeight: 1920, // 1080p
+        maxSizeMB: 0.5,
+        maxWidthOrHeight: 1920,
         useWebWorker: true,
       };
       const compressedFile = await imageCompression(file, options);
 
-      // Force cast to File to prevent "[object Blob]" validation error on the backend
       const finalFile = new File([compressedFile], file.name, {
         type: compressedFile.type || file.type,
       });
 
       await updateProfile({ coverPhoto: finalFile });
-      showToast("อัปเดตภาพปกเรียบร้อยแล้ว", "success");
+      showToast(PROFILE_MESSAGES.TOAST.UPLOAD_COVER_SUCCESS, "success");
     } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? err.message : LOCALIZATION.ERRORS.SAVE;
+        err instanceof Error ? err.message : COMMON_MESSAGES.ERRORS.SAVE;
       showToast(errorMessage, "error");
     } finally {
-      // Clear preview to fall back to the real coverUrl from global store
       setPreviewUrl(null);
-      // Clean up the object URL to avoid memory leaks
       URL.revokeObjectURL(objectUrl);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";

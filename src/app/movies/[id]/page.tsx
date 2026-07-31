@@ -20,6 +20,9 @@ import MovieInfoPanel from "@/components/movie/detail/movie-info-panel";
 import MovieCrewRow from "@/components/movie/rows/movie-crew-row";
 import MovieBtsSection from "@/components/movie/detail/movie-bts-section";
 import { CONTENT_WARNING_OPTIONS } from "@/core/constants/movie-form";
+import { MOVIE_MESSAGES } from "@/core/constants/movie-messages";
+import { AUTH_MESSAGES } from "@/core/constants/auth-messages";
+import { COMMON_MESSAGES } from "@/core/constants/common-messages";
 
 export default function MovieDetails() {
   const params = useParams<{ id: string }>();
@@ -49,8 +52,8 @@ export default function MovieDetails() {
       addRatingMutation.mutate(
         { movieId, stars, comment: comment.trim() || null },
         {
-          onSuccess: () => showToast("เพิ่มคะแนนแล้ว", "success"),
-          onError: () => showToast("เกิดข้อผิดพลาด", "error"),
+          onSuccess: () => showToast(MOVIE_MESSAGES.TOAST.ADD_RATING_SUCCESS, "success"),
+          onError: () => showToast(COMMON_MESSAGES.ERRORS.DEFAULT, "error"),
         },
       );
     },
@@ -62,8 +65,8 @@ export default function MovieDetails() {
       updateRatingMutation.mutate(
         { movieId, stars, comment: comment.trim() || null },
         {
-          onSuccess: () => showToast("แก้ไขคะแนนแล้ว", "success"),
-          onError: () => showToast("เกิดข้อผิดพลาด", "error"),
+          onSuccess: () => showToast(MOVIE_MESSAGES.TOAST.EDIT_RATING_SUCCESS, "success"),
+          onError: () => showToast(COMMON_MESSAGES.ERRORS.DEFAULT, "error"),
         },
       );
     },
@@ -75,8 +78,8 @@ export default function MovieDetails() {
       deleteRatingMutation.mutate(
         { movieId },
         {
-          onSuccess: () => showToast("ลบคะแนนแล้ว", "success"),
-          onError: () => showToast("เกิดข้อผิดพลาด", "error"),
+          onSuccess: () => showToast(MOVIE_MESSAGES.TOAST.DELETE_RATING_SUCCESS, "success"),
+          onError: () => showToast(COMMON_MESSAGES.ERRORS.DEFAULT, "error"),
         },
       );
     },
@@ -167,7 +170,7 @@ export default function MovieDetails() {
               onUpdate={handleUpdateRating}
               onDelete={handleDeleteRating}
               onAuthRequired={() => {
-                showToast("กรุณาเข้าสู่ระบบก่อนโหวตคะแนน", "warning");
+                showToast(AUTH_MESSAGES.TOAST.LOGIN_REQUIRED_VOTE, "warning");
                 router.push("/auth/login");
               }}
             />

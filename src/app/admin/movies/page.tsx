@@ -16,7 +16,8 @@ import { ConfirmModal } from "@/components/modal/confirm-modal";
 import { useMoviesQuery, useDeleteMovieMutation } from "@/hooks/db/use-movies";
 import { useCategoriesQuery } from "@/hooks/db/use-master-data";
 import { useDebounce } from "@/hooks/system/use-debounce";
-import { LOCALIZATION } from "@/core/constants/localization";
+import { MOVIE_MESSAGES } from "@/core/constants/movie-messages";
+import { COMMON_MESSAGES } from "@/core/constants/common-messages";
 import { MovieFilterParams } from "@/core/domain/movie";
 
 type Sortby = "title" | "releasedate" | "views";
@@ -67,10 +68,10 @@ export default function AdminMoviesPage() {
       try {
         setIsDeletingLocal(true);
         await deleteMovieMutation.mutateAsync(deleteMovieId);
-        showToast(LOCALIZATION.TOAST.DELETE_MOVIE_SUCCESS, "success");
+        showToast(MOVIE_MESSAGES.TOAST.DELETE_MOVIE_SUCCESS, "success");
       } catch (err: unknown) {
         const errorMessage =
-          err instanceof Error ? err.message : LOCALIZATION.ERRORS.DELETE;
+          err instanceof Error ? err.message : COMMON_MESSAGES.ERRORS.DELETE;
         showToast(errorMessage, "error");
       } finally {
         setIsDeletingLocal(false);
@@ -164,11 +165,11 @@ export default function AdminMoviesPage() {
 
       <ConfirmModal
         isOpen={deleteMovieId !== null}
-        title={LOCALIZATION.CONFIRM.DELETE_MOVIE_TITLE}
-        message={LOCALIZATION.CONFIRM.DELETE_MOVIE_MSG}
+        title={MOVIE_MESSAGES.CONFIRM.DELETE_MOVIE_TITLE}
+        message={MOVIE_MESSAGES.CONFIRM.DELETE_MOVIE_MSG}
         variant="danger"
-        confirmText={LOCALIZATION.CONFIRM.DELETE_MOVIE_BTN}
-        cancelText={LOCALIZATION.CONFIRM.CANCEL}
+        confirmText={MOVIE_MESSAGES.CONFIRM.DELETE_MOVIE_BTN}
+        cancelText={COMMON_MESSAGES.CONFIRM.CANCEL}
         onClose={() => setDeleteMovieId(null)}
         onConfirm={handleDeleteConfirm}
       />
@@ -182,10 +183,10 @@ export default function AdminMoviesPage() {
             </div>
             <div className="space-y-1.5 text-center">
               <h3 className="text-xl font-bold tracking-wide text-white">
-                {LOCALIZATION.LOADING.DELETE_MOVIE}
+                {MOVIE_MESSAGES.LOADING.DELETE_MOVIE}
               </h3>
               <p className="text-xs text-zinc-400 font-light">
-                {LOCALIZATION.LOADING.SUB_DELETE_MOVIE}
+                {MOVIE_MESSAGES.LOADING.SUB_DELETE_MOVIE}
               </p>
             </div>
           </div>

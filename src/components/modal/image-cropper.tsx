@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import CloseIcon from "@mui/icons-material/Close";
 import { Button } from "../ui/button";
-import { LOCALIZATION } from "@/core/constants/localization";
+import { PROFILE_MESSAGES } from "@/core/constants/profile-messages";
 
 interface ImageCropperProps {
   isOpen: boolean;
@@ -143,10 +143,10 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
 
         <div className="space-y-1">
           <h3 className="text-lg font-bold text-white">
-            {LOCALIZATION.CROP.TITLE}
+            {PROFILE_MESSAGES.CROP.TITLE}
           </h3>
           <p className="text-xs text-zinc-400">
-            {LOCALIZATION.CROP.SUBTITLE}
+            {PROFILE_MESSAGES.CROP.SUBTITLE}
           </p>
         </div>
 
@@ -185,7 +185,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
 
         <div className="space-y-2">
           <div className="flex justify-between items-center text-xs text-zinc-400 font-semibold">
-            <span>{LOCALIZATION.CROP.ZOOM}</span>
+            <span>{PROFILE_MESSAGES.CROP.ZOOM}</span>
             <span>{Math.round(zoom * 100)}%</span>
           </div>
           <input
@@ -206,14 +206,14 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
             onClick={onClose}
             className="flex-1 py-2.5 text-xs font-semibold rounded-xl"
           >
-            {LOCALIZATION.CROP.CANCEL}
+            {PROFILE_MESSAGES.CROP.CANCEL}
           </Button>
           <Button
             type="button"
             onClick={handleCropConfirm}
             className="flex-1 py-2.5 text-xs font-semibold rounded-xl bg-brand hover:bg-brand-hover text-white border-0"
           >
-            {LOCALIZATION.CROP.CONFIRM}
+            {PROFILE_MESSAGES.CROP.CONFIRM}
           </Button>
         </div>
       </div>

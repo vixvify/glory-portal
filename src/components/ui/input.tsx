@@ -9,25 +9,48 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ label, icon, suffix, error, variant = "default", className = "", ...props }, ref) => {
-    const baseInputStyle = "w-full border text-white focus:outline-none transition-colors [color-scheme:dark]";
-    
+  (
+    {
+      label,
+      icon,
+      suffix,
+      error,
+      variant = "default",
+      className = "",
+      ...props
+    },
+    ref,
+  ) => {
+    const baseInputStyle =
+      "w-full border text-white focus:outline-none transition-colors [color-scheme:dark]";
+
     const variants = {
-      default: "bg-[#0D0D0D] rounded-lg py-2.5 text-sm placeholder-zinc-600 font-light",
+      default:
+        "bg-background rounded-lg py-2.5 text-sm placeholder-zinc-600 font-light",
       auth: "bg-[#3f3f42] border-zinc-500 rounded-xl py-2.5 text-base placeholder-zinc-500 focus:ring-1 focus:ring-brand",
     };
 
     const errorStyle = error
       ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
-      : (variant === "default" ? "border-[#3A3A3A] focus:border-brand" : "");
+      : variant === "default"
+        ? "border-theme-border focus:border-brand"
+        : "";
 
     const paddingX = icon ? "pl-10 pr-4" : "px-4";
-    const paddingY = suffix ? "pr-11" : ""; // If both exist, we might need more logic, but for now this is fine
+    const paddingY = suffix ? "pr-11" : "";
 
     return (
-      <div className={`w-full text-left ${variant === "auth" ? "flex flex-col gap-1.5" : "space-y-1"}`}>
+      <div
+        className={`w-full text-left ${variant === "auth" ? "flex flex-col gap-1.5" : "space-y-1"}`}
+      >
         {label && (
-          <label className={variant === "auth" ? "text-lg text-white font-bold block" : "text-xs text-zinc-400 font-medium block"}>
+          <label
+            className={
+              variant === "auth"
+                ? "text-lg text-white font-bold block"
+                : "text-xs text-zinc-400 font-medium block"
+            }
+          >
             {label}
           </label>
         )}
@@ -49,13 +72,19 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
         {error && (
-          <p className={variant === "auth" ? "text-[11px] text-red-400 mt-1" : "text-[11px] text-red-400 mt-1 pl-1 animate-fade-in"}>
+          <p
+            className={
+              variant === "auth"
+                ? "text-[11px] text-red-400 mt-1"
+                : "text-[11px] text-red-400 mt-1 pl-1 animate-fade-in"
+            }
+          >
             {error}
           </p>
         )}
       </div>
     );
-  }
+  },
 );
 
 Input.displayName = "Input";

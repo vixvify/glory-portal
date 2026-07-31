@@ -52,8 +52,7 @@ export class AuthService {
         throw new Error(response.error);
       }
       return response.data;
-    } catch (error) {
-      console.error(error);
+    } catch {
       return null;
     }
   }
