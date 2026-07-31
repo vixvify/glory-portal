@@ -10,6 +10,7 @@ import MovieBtsRow from "@/components/movie/rows/movie-bts-row";
 import PlayerModal from "@/components/modal/player-modal";
 import { useState, useCallback } from "react";
 import { BtsVideoItem } from "@/app/home/home";
+import AdBanner from "@/components/ui/ad-banner";
 
 interface HomeViewProps {
   recommendedMovies: Movie[];
@@ -60,10 +61,20 @@ export default function HomeView({
         onToggleFavorite={handleToggleFavorite}
       />
 
-      <div className="relative z-20 px-6 md:px-16 space-y-12 -mt-6 md:-mt-10">
+      <div className="relative z-20 px-6 md:px-16 space-y-10 md:space-y-12 -mt-6 md:-mt-10 pb-16">
+        
+        <MovieRow
+          title="รับชมต่อ"
+          movies={recommendedMovies}
+          onPlayClick={handlePlayMovie}
+          favorites={favorites}
+          onToggleFavorite={handleToggleFavorite}
+          directPlay={true}
+        />
+
         {universityMovies.length > 0 && universityName && (
           <MovieRow
-            title={`ผลงานจาก ${universityName}`}
+            title={`ผลงานจาก${universityName}`}
             movies={universityMovies}
             onPlayClick={handlePlayMovie}
             favorites={favorites}
@@ -94,6 +105,9 @@ export default function HomeView({
           favorites={favorites}
           onToggleFavorite={handleToggleFavorite}
         />
+
+        {/* Ad Banner Placeholder */}
+        <AdBanner />
 
         {favorites.length > 0 && (
           <MovieRow
@@ -132,9 +146,9 @@ export default function HomeView({
           onToggleFavorite={handleToggleFavorite}
         />
 
-        {staffList.length > 0 && <CrewRow title="ทีมงาน" crew={staffList} />}
-
         {actorList.length > 0 && <CrewRow title="นักแสดง" crew={actorList} />}
+
+        {staffList.length > 0 && <CrewRow title="ทีมงาน" crew={staffList} />}
       </div>
 
       <PlayerModal

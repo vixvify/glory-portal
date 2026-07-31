@@ -4,6 +4,7 @@ import {
   crewMemberService,
 } from "@/infra/container";
 import { mapMoviesToBtsVideos } from "@/utils/movie-bts";
+import { splitCrewByRole } from "@/utils/crew";
 import HomePage from "./home/home";
 
 export const dynamic = "force-dynamic";
@@ -13,8 +14,7 @@ export default async function Page() {
     recommendedMovies,
     popularMovies,
     categories,
-    staffList,
-    actorList,
+    allCrewMembers,
     portraitMovies,
     mostActiveUniversity,
     moviesByRating,
@@ -37,7 +37,6 @@ export default async function Page() {
     }),
     masterDataService.getCategories(),
     crewMemberService.getCrewMembers(),
-    crewMemberService.getCrewMembers({ search: "cast", searchby: "role" }),
     movieService.getMovies({
       page: 1,
       pagesize: 10,
@@ -54,6 +53,8 @@ export default async function Page() {
     movieService.getMoviesWithAward(),
     movieService.getMoviesWithBts(),
   ]);
+
+  const { actorList, staffList } = splitCrewByRole(allCrewMembers);
 
   const movieByUniversityPromise = mostActiveUniversity
     ? movieService.getMovies({

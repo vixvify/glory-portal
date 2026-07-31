@@ -13,6 +13,7 @@ interface MovieRowProps {
   onPlayClick: (movie: Movie) => void;
   favorites: Movie[];
   onToggleFavorite: (movieId: string) => void;
+  directPlay?: boolean;
 }
 
 export default function MovieRow({
@@ -21,6 +22,7 @@ export default function MovieRow({
   onPlayClick,
   favorites,
   onToggleFavorite,
+  directPlay = false,
 }: MovieRowProps) {
   const { rowRef, showLeftArrow, showRightArrow, handleScroll } =
     useScrollRow(movies);
@@ -29,7 +31,7 @@ export default function MovieRow({
 
   return (
     <div className="space-y-3 group/row relative">
-      <h3 className="text-base md:text-lg lg:text-xl font-bold text-zinc-100 tracking-wide hover:text-white cursor-pointer transition-colors duration-200 pl-3.5 border-l-3 border-brand/85 inline-block">
+      <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-zinc-100 tracking-wide hover:text-white cursor-pointer transition-colors duration-200 inline-block">
         {title}
       </h3>
 
@@ -46,8 +48,8 @@ export default function MovieRow({
           ref={rowRef}
           className="flex overflow-x-auto gap-4 py-4 px-1.5 no-scrollbar scroll-smooth snap-x snap-mandatory"
         >
-          {movies.map((movie) => (
-            <Link href={`/movies/${movie.id}`} key={movie.id}>
+          {movies.map((movie) => {
+            const cardContent = (
               <div className="flex-none snap-start transition-all duration-300 w-[280px] sm:w-[340px] md:w-[400px]">
                 <MovieCard
                   movie={movie}
@@ -56,8 +58,22 @@ export default function MovieRow({
                   onToggleFavorite={onToggleFavorite}
                 />
               </div>
-            </Link>
-          ))}
+            );
+
+            if (directPlay) {
+              return (
+                <div key={movie.id} onClick={() => onPlayClick(movie)}>
+                  {cardContent}
+                </div>
+              );
+            }
+
+            return (
+              <Link href={`/movies/${movie.id}`} key={movie.id}>
+                {cardContent}
+              </Link>
+            );
+          })}
         </div>
 
         {showRightArrow && (
