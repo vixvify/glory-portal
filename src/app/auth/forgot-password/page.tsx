@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
   // const { showToast } = useAppStore();
 
   const [step, setStep] = useState<"request" | "verify" | "success">("request");
-  // const [email, setEmail] = useState("");
+  const [email] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading] = useState(false); // Only keep isLoading if used in UI
   const [error, setError] = useState("");
