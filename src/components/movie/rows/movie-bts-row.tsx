@@ -65,7 +65,6 @@ export default function MovieBtsRow({
                 className="flex-none snap-start group relative overflow-hidden rounded-3xl cursor-pointer transition-all duration-300 hover:scale-[1.02] bg-zinc-900 w-[280px] sm:w-[340px] md:w-[400px] aspect-video glass-border shadow-[0_10px_30px_rgba(0,0,0,0.65)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.85)]"
                 onClick={() => onPlayClick(item.videoUrl)}
               >
-                {/* Top-left glass reflection */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/5 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20 mix-blend-overlay" />
                 {!hasError ? (
                   <Image

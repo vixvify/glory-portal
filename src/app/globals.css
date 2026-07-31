@@ -348,3 +348,11 @@ html {
   transform-origin: left;
 }
 
+
+.text-glow-gold {
+  background: linear-gradient(135deg, #fdf1cd 0%, #f3ce6b 50%, #d4a636 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 15px rgba(243, 206, 107, 0.65)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.85));
+}

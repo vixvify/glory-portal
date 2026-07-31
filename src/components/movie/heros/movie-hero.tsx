@@ -2,8 +2,7 @@
 
 import { useCallback, useEffect, useState, useRef } from "react";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+
 import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
 import { Movie } from "@/core/domain/movie";
@@ -53,23 +52,12 @@ export default function MovieHero({
     return () => stopTimer();
   }, [isHovered, startTimer, stopTimer]);
 
-  const handlePrev = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setActiveIndex(
-      (prev) => (prev - 1 + heroMovies.length) % heroMovies.length,
-    );
-  };
 
-  const handleNext = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setActiveIndex((prev) => (prev + 1) % heroMovies.length);
-  };
 
   if (!heroMovies.length) return null;
 
   const currentMovie = heroMovies[activeIndex];
   
-  // Calculate next 2 movies for the thumbnails
   const nextMovies = [
     heroMovies[(activeIndex) % heroMovies.length],
     heroMovies[(activeIndex + 1) % heroMovies.length],
@@ -82,7 +70,6 @@ export default function MovieHero({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Background Images */}
       {heroMovies.map((movie, index) => (
         <div
           key={movie.id}
@@ -94,14 +81,11 @@ export default function MovieHero({
         />
       ))}
 
-      {/* Gradients to make text readable */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent pointer-events-none z-0" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none z-0" />
 
-      {/* Main Content & Thumbnails Wrapper */}
       <div className="relative z-10 w-full flex flex-col md:flex-row md:items-end justify-between gap-8 transition-all duration-500 transform translate-y-0">
         
-        {/* Left: Text and Buttons */}
         <div className="max-w-4xl space-y-4 md:space-y-6">
           <Link
             href={`/movies/${currentMovie.id}`}
@@ -119,7 +103,6 @@ export default function MovieHero({
             className="flex flex-col gap-1.5 animate-fade-in"
             key={`meta-${currentMovie.id}`}
           >
-            {/* Top Line: Year | Age | Categories */}
             <div className="flex items-center gap-2 md:gap-3 text-xs md:text-sm font-bold text-white drop-shadow-md tracking-wide">
               <span>
                 {currentMovie.releaseDate
@@ -138,7 +121,6 @@ export default function MovieHero({
               )}
             </div>
 
-            {/* Warnings Line */}
             {currentMovie.contentWarnings && currentMovie.contentWarnings.length > 0 && (
               <div className="text-white text-xs md:text-sm font-bold italic drop-shadow-md">
                 {mapContentWarnings(currentMovie.contentWarnings as string[])}
@@ -180,7 +162,6 @@ export default function MovieHero({
           </div>
         </div>
 
-        {/* Right: Thumbnails */}
         <div className="flex gap-4 animate-fade-in shrink-0">
           {nextMovies.map((movie, idx) => (
             <div
@@ -202,7 +183,6 @@ export default function MovieHero({
         </div>
       </div>
 
-      {/* Pagination Dots */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
         {heroMovies.map((_, index) => (
           <button

@@ -25,7 +25,8 @@ export default function MovieDetailHero({
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    const timer = setTimeout(() => setIsMounted(true), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const trailerUrl = movie.trailerUrls?.[0] || '';

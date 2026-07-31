@@ -36,7 +36,7 @@ export default function HomeView({
   recommendedMovies,
   popularMovies,
   awardsMovies,
-  categories,
+  // categories: _categories,
   staffList,
   actorList,
   universityMovies,

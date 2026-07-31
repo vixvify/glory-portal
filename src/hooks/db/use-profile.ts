@@ -12,9 +12,7 @@ export function useUpdateProfileMutation() {
       return await authService.updateProfile(data);
     },
     onSuccess: (updatedUser) => {
-      // Update global store
       setCurrentUser(updatedUser);
-      // Invalidate relevant queries if necessary
       queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
     },
   });
