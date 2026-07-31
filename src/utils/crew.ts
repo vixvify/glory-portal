@@ -1,9 +1,7 @@
 import { CrewMember } from "@/core/domain/crew";
 import { MovieCrew } from "@/core/domain/movie";
 
-/**
- * Determines if a given movie crew role indicates an actor.
- */
+
 export const isActorRole = (movieCrew: MovieCrew): boolean => {
   return (
     movieCrew.crewRole?.category === "cast" ||
@@ -12,11 +10,7 @@ export const isActorRole = (movieCrew: MovieCrew): boolean => {
   );
 };
 
-/**
- * Splits a list of crew members into actors and staff based on their movie roles.
- * - An actor is anyone who has at least one movie role as an actor.
- * - Staff is anyone who has at least one movie role that is NOT an actor.
- */
+
 export const splitCrewByRole = (
   allCrewMembers: CrewMember[],
 ): { actorList: CrewMember[]; staffList: CrewMember[] } => {
