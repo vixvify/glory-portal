@@ -58,24 +58,25 @@ export default async function Page() {
 
   const movieByUniversityPromise = mostActiveUniversity
     ? movieService.getMovies({
-        search: mostActiveUniversity,
-        searchby: "university",
-        page: 1,
-        pagesize: 10,
-        aspectRatio: "landscape",
-      })
-    : Promise.resolve([]);
-
-  const getCuratedMovies = (categoryName: string) =>
-    movieService.getMovies({
-      search: categoryName,
-      searchby: "category",
+      search: mostActiveUniversity,
+      searchby: "university",
       page: 1,
       pagesize: 10,
-      sort: "desc",
-      sortby: "createdAt",
       aspectRatio: "landscape",
-    });
+    })
+    : Promise.resolve([]);
+
+  const getCuratedMovies = async (categoryName: string) => {
+    const movies = await movieService.getMoviesByCategory(categoryName);
+    return movies
+      .filter((m) => m.aspectRatio === "landscape")
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt || 0).getTime() -
+          new Date(a.createdAt || 0).getTime()
+      )
+      .slice(0, 10);
+  };
 
   const [
     movieByUniversity,
@@ -86,14 +87,14 @@ export default async function Page() {
     romanceMovies,
   ] = await Promise.all([
     movieByUniversityPromise,
-    getCuratedMovies("ดราม่า"),
-    getCuratedMovies("ระทึกขวัญ"),
-    getCuratedMovies("สยองขวัญ"),
-    getCuratedMovies("ตลก"),
-    getCuratedMovies("โรแมนติก"),
+    getCuratedMovies("drama"),
+    getCuratedMovies("thriller"),
+    getCuratedMovies("horror"),
+    getCuratedMovies("comedy"),
+    getCuratedMovies("romance"),
   ]);
 
-  // Combine, deduplicate, and sort using a declarative approach
+
   const thrillerHorrorMovies = Array.from(
     new Map([...thrillerMovies, ...horrorMovies].map((m) => [m.id, m])).values()
   )
