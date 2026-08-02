@@ -713,7 +713,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               type="submit"
               isLoading={isSaving}
               disabled={isSaving}
-              className="min-w-[140px] min-h-[48px] py-3 px-6 text-[15px] font-bold rounded-xl bg-brand !text-white hover:brightness-105 hover:-translate-y-0.5 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)] transition-all duration-300"
+              className="min-w-[140px] min-h-[48px] py-3 px-6 text-[15px] font-bold rounded-xl bg-gradient-to-r from-[#CAA22A] to-[#A47E1C] !text-white hover:brightness-105 hover:-translate-y-0.5 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)] transition-all duration-300"
             >
               เสร็จสิ้น
             </Button>
