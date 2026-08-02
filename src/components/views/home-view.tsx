@@ -10,6 +10,7 @@ import MovieBtsRow from "@/components/movie/rows/movie-bts-row";
 import PlayerModal from "@/components/modal/player-modal";
 import { useState, useCallback } from "react";
 import { BtsVideoItem } from "@/app/home/home";
+import AdBanner from "@/components/ui/ad-banner";
 
 interface HomeViewProps {
   recommendedMovies: Movie[];
@@ -20,7 +21,10 @@ interface HomeViewProps {
   actorList: CrewMember[];
   moviesByRating: Movie[];
   universityMovies: Movie[];
-  categoryMoviesMap: Record<string, Movie[]>;
+  dramaMovies: Movie[];
+  thrillerHorrorMovies: Movie[];
+  comedyMovies: Movie[];
+  romanceMovies: Movie[];
   favorites: Movie[];
   portraitMovies: Movie[];
   btsVideos?: BtsVideoItem[];
@@ -32,11 +36,14 @@ export default function HomeView({
   recommendedMovies,
   popularMovies,
   awardsMovies,
-  categories,
+  // categories: _categories,
   staffList,
   actorList,
   universityMovies,
-  categoryMoviesMap,
+  dramaMovies,
+  thrillerHorrorMovies,
+  comedyMovies,
+  romanceMovies,
   moviesByRating,
   favorites,
   portraitMovies,
@@ -60,10 +67,20 @@ export default function HomeView({
         onToggleFavorite={handleToggleFavorite}
       />
 
-      <div className="relative z-20 px-6 md:px-16 space-y-12 -mt-6 md:-mt-10">
+      <div className="relative z-20 px-6 md:px-16 space-y-10 md:space-y-12 -mt-6 md:-mt-10 pb-16">
+        
+        <MovieRow
+          title="รับชมต่อ"
+          movies={recommendedMovies}
+          onPlayClick={handlePlayMovie}
+          favorites={favorites}
+          onToggleFavorite={handleToggleFavorite}
+          directPlay={true}
+        />
+
         {universityMovies.length > 0 && universityName && (
           <MovieRow
-            title={`ผลงานจาก ${universityName}`}
+            title={`ผลงานจาก${universityName}`}
             movies={universityMovies}
             onPlayClick={handlePlayMovie}
             favorites={favorites}
@@ -95,6 +112,8 @@ export default function HomeView({
           onToggleFavorite={handleToggleFavorite}
         />
 
+        <AdBanner />
+
         {favorites.length > 0 && (
           <MovieRow
             title="รายการโปรดของคุณ"
@@ -105,16 +124,45 @@ export default function HomeView({
           />
         )}
 
-        {categories.map((category) => (
+        {dramaMovies.length > 0 && (
           <MovieRow
-            key={`${category.id}-views`}
-            title={category.labelTh || category.name}
-            movies={categoryMoviesMap[category.id] || []}
+            title="ดราม่าเรียกน้ำตา"
+            movies={dramaMovies}
             onPlayClick={handlePlayMovie}
             favorites={favorites}
             onToggleFavorite={handleToggleFavorite}
           />
-        ))}
+        )}
+
+        {thrillerHorrorMovies.length > 0 && (
+          <MovieRow
+            title="สั่นประสาท"
+            movies={thrillerHorrorMovies}
+            onPlayClick={handlePlayMovie}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
+          />
+        )}
+
+        {comedyMovies.length > 0 && (
+          <MovieRow
+            title="ยิ้มได้ทั้งวัน"
+            movies={comedyMovies}
+            onPlayClick={handlePlayMovie}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
+          />
+        )}
+
+        {romanceMovies.length > 0 && (
+          <MovieRow
+            title="รักหวานฉ่ำ"
+            movies={romanceMovies}
+            onPlayClick={handlePlayMovie}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
+          />
+        )}
 
         {btsVideos.length > 0 && (
           <MovieBtsRow
@@ -132,9 +180,9 @@ export default function HomeView({
           onToggleFavorite={handleToggleFavorite}
         />
 
-        {staffList.length > 0 && <CrewRow title="ทีมงาน" crew={staffList} />}
-
         {actorList.length > 0 && <CrewRow title="นักแสดง" crew={actorList} />}
+
+        {staffList.length > 0 && <CrewRow title="ทีมงาน" crew={staffList} />}
       </div>
 
       <PlayerModal

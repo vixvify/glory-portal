@@ -7,7 +7,6 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { Input } from "./input";
 
-// --- Custom Hooks & Shared Components ---
 
 function useDropdown(onCloseCallback?: () => void) {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,7 +34,6 @@ function DropdownMenu({ isOpen, onClose, children }: { isOpen: boolean; onClose:
   );
 }
 
-// --- Interfaces ---
 
 interface SelectOption {
   id: string;
@@ -54,7 +52,6 @@ interface CreatableSearchSelectProps {
   addLabelPrefix?: string;
 }
 
-// --- Components ---
 
 export function CreatableSearchSelect({
   value,

@@ -13,7 +13,9 @@ interface Props {
 
 function MovieCardPortrait({ movie }: Props) {
   return (
-    <div className="group relative cursor-pointer glass-card rounded-lg overflow-hidden z-10 hover:z-20 flex flex-col h-full border border-white/5 transition-all duration-300">
+    <div className="group relative cursor-pointer glass-border rounded-3xl overflow-hidden z-10 hover:z-20 flex flex-col h-full bg-zinc-900 shadow-[0_10px_30px_rgba(0,0,0,0.65)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.85)] transition-all duration-300">
+      <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/5 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20 mix-blend-overlay" />
+
       <div className="relative w-full overflow-hidden bg-zinc-950 transition-all duration-300 aspect-[2/3]">
         <Image
           src={movie.thumbnail}
@@ -23,16 +25,7 @@ function MovieCardPortrait({ movie }: Props) {
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
-        <div className="absolute top-2 left-2 flex flex-wrap gap-1 max-w-[calc(100%-16px)]">
-          {movie.categories && movie.categories.map((cat) => (
-            <span
-              key={cat.id}
-              className="px-2 py-0.5 text-[9px] font-bold tracking-wider bg-black/60 backdrop-blur-md text-zinc-300 border border-zinc-700/50 rounded uppercase whitespace-nowrap"
-            >
-              {cat.labelTh || cat.name}
-            </span>
-          ))}
-        </div>
+
       </div>
     </div>
   );

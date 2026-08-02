@@ -14,8 +14,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Toast } from "@/components/ui/toast";
-import { useAppStore } from "@/store/use-store";
-import { AUTH_MESSAGES } from "@/core/constants/auth-messages";
+// import { useAppStore } from "@/store/use-store";
+// import { AUTH_MESSAGES } from "@/core/constants/auth-messages";
 import {
   forgotPasswordRequestSchema,
   forgotPasswordResetSchema,
@@ -25,12 +25,12 @@ import {
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
-  const { showToast } = useAppStore();
+  // const { showToast } = useAppStore();
 
   const [step, setStep] = useState<"request" | "verify" | "success">("request");
-  const [email, setEmail] = useState("");
+  const [email] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false); // Only keep isLoading if used in UI
   const [error, setError] = useState("");
 
   const requestForm = useForm<ForgotPasswordRequestFormValues>({
@@ -47,7 +47,7 @@ export default function ForgotPasswordPage() {
     },
   });
 
-  const onRequestSubmit = async (data: ForgotPasswordRequestFormValues) => {
+  const onRequestSubmit = async () => {
     // setError("");
     // setIsLoading(true);
     // try {
@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
     // }
   };
 
-  const onResetSubmit = async (data: ForgotPasswordResetFormValues) => {
+  const onResetSubmit = async () => {
     // setError("");
     // setIsLoading(true);
     // try {
