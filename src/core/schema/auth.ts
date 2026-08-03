@@ -36,3 +36,25 @@ export const loginUserSchema = userSchema.pick({
   email: true,
   password: true,
 });
+
+export const forgotPasswordRequestSchema = z.object({
+  email: z.string().email("กรุณากรอกที่อยู่อีเมลที่ถูกต้อง"),
+});
+
+export const forgotPasswordResetSchema = z
+  .object({
+    code: z
+      .string()
+      .min(6, "รหัสยืนยันต้องมีอย่างน้อย 6 หลัก")
+      .max(6, "รหัสยืนยันต้องมี 6 หลัก"),
+    password: z.string().min(6, "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร"),
+    confirmPassword: z.string().min(6, "กรุณากรอกรหัสผ่านเพื่อยืนยัน"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "รหัสผ่านไม่ตรงกัน",
+    path: ["confirmPassword"],
+  });
+
+export type ForgotPasswordRequestFormValues = z.infer<typeof forgotPasswordRequestSchema>;
+export type ForgotPasswordResetFormValues = z.infer<typeof forgotPasswordResetSchema>;
+

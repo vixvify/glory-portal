@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -15,46 +14,32 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Toast } from "@/components/ui/toast";
-import { useAppStore } from "@/store/use-store";
-
-const requestSchema = z.object({
-  email: z.string().email("กรุณากรอกที่อยู่อีเมลที่ถูกต้อง"),
-});
-
-const resetSchema = z
-  .object({
-    code: z
-      .string()
-      .min(6, "รหัสยืนยันต้องมีอย่างน้อย 6 หลัก")
-      .max(6, "รหัสยืนยันต้องมี 6 หลัก"),
-    password: z.string().min(6, "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร"),
-    confirmPassword: z.string().min(6, "กรุณากรอกรหัสผ่านเพื่อยืนยัน"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "รหัสผ่านไม่ตรงกัน",
-    path: ["confirmPassword"],
-  });
-
-type RequestFormValues = z.infer<typeof requestSchema>;
-type ResetFormValues = z.infer<typeof resetSchema>;
+// import { useAppStore } from "@/store/use-store";
+// import { AUTH_MESSAGES } from "@/core/constants/auth-messages";
+import {
+  forgotPasswordRequestSchema,
+  forgotPasswordResetSchema,
+  ForgotPasswordRequestFormValues,
+  ForgotPasswordResetFormValues,
+} from "@/core/schema/auth";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
-  const { showToast } = useAppStore();
+  // const { showToast } = useAppStore();
 
   const [step, setStep] = useState<"request" | "verify" | "success">("request");
-  const [email, setEmail] = useState("");
+  const [email] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false); // Only keep isLoading if used in UI
   const [error, setError] = useState("");
 
-  const requestForm = useForm<RequestFormValues>({
-    resolver: zodResolver(requestSchema),
+  const requestForm = useForm<ForgotPasswordRequestFormValues>({
+    resolver: zodResolver(forgotPasswordRequestSchema),
     defaultValues: { email: "" },
   });
 
-  const resetForm = useForm<ResetFormValues>({
-    resolver: zodResolver(resetSchema),
+  const resetForm = useForm<ForgotPasswordResetFormValues>({
+    resolver: zodResolver(forgotPasswordResetSchema),
     defaultValues: {
       code: "",
       password: "",
@@ -62,43 +47,41 @@ export default function ForgotPasswordPage() {
     },
   });
 
-  const onRequestSubmit = async (data: RequestFormValues) => {
-    setError("");
-    setIsLoading(true);
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setEmail(data.email);
-      showToast("ส่งรหัสยืนยันไปยังอีเมลของคุณแล้ว", "success");
-      setStep("verify");
-    } catch (err) {
-      setError("เกิดข้อผิดพลาดในการส่งอีเมล");
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+  const onRequestSubmit = async () => {
+    // setError("");
+    // setIsLoading(true);
+    // try {
+    //   await new Promise((resolve) => setTimeout(resolve, 1500));
+    //   setEmail(data.email);
+    //   showToast(AUTH_MESSAGES.TOAST.VERIFY_CODE_SENT, "success");
+    //   setStep("verify");
+    // } catch (err) {
+    //   setError(AUTH_MESSAGES.ERRORS.SEND_EMAIL_FAILED);
+    //   console.error(err);
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
-  const onResetSubmit = async (data: ResetFormValues) => {
-    setError("");
-    setIsLoading(true);
-    try {
-      if (data.code !== "123456") {
-        throw new Error("รหัสยืนยันไม่ถูกต้อง (กรุณาใช้รหัส 123456)");
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      showToast("รีเซ็ตรหัสผ่านสำเร็จแล้ว", "success");
-      setStep("success");
-    } catch (err: unknown) {
-      const errMsg =
-        err instanceof Error
-          ? err.message
-          : "เกิดข้อผิดพลาดในการรีเซ็ตรหัสผ่าน";
-      setError(errMsg);
-    } finally {
-      setIsLoading(false);
-    }
+  const onResetSubmit = async () => {
+    // setError("");
+    // setIsLoading(true);
+    // try {
+    //   if (data.code !== "123456") {
+    //     throw new Error(AUTH_MESSAGES.ERRORS.INVALID_VERIFY_CODE);
+    //   }
+    //   await new Promise((resolve) => setTimeout(resolve, 1500));
+    //   showToast(AUTH_MESSAGES.TOAST.RESET_PASSWORD_SUCCESS, "success");
+    //   setStep("success");
+    // } catch (err: unknown) {
+    //   const errMsg =
+    //     err instanceof Error
+    //       ? err.message
+    //       : AUTH_MESSAGES.ERRORS.RESET_PASSWORD_FAILED;
+    //   setError(errMsg);
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   return (

@@ -12,14 +12,23 @@ export interface AwardProjectSectionProps {
   register: UseFormRegister<MovieFormInputs>;
 }
 
-export function AwardProjectSection({ control, pIndex, removeProject, register }: AwardProjectSectionProps) {
-  const { fields: itemFields, append: appendItem, remove: removeItem } = useFieldArray({
+export function AwardProjectSection({
+  control,
+  pIndex,
+  removeProject,
+  register,
+}: AwardProjectSectionProps) {
+  const {
+    fields: itemFields,
+    append: appendItem,
+    remove: removeItem,
+  } = useFieldArray({
     control,
     name: `awards.${pIndex}.awardList`,
   });
 
   return (
-    <div className="bg-white/5 backdrop-blur-md border border-[#757575] shadow-lg rounded-xl p-5 relative">
+    <div className="bg-card-secondary/30 backdrop-blur-md border border-theme-border shadow-lg rounded-xl p-5 relative">
       {pIndex > 0 && (
         <button
           type="button"
@@ -29,25 +38,31 @@ export function AwardProjectSection({ control, pIndex, removeProject, register }
           <CloseIcon className="w-4 h-4" />
         </button>
       )}
-      
+
       <div className="space-y-4">
         <div>
-          <label className="text-sm font-medium text-zinc-100 block mb-2">ชื่อโครงการ</label>
+          <label className="text-sm font-medium text-zinc-100 block mb-2">
+            ชื่อโครงการ
+          </label>
           <Input
             type="text"
             {...register(`awards.${pIndex}.projectName` as const)}
             className="!bg-white/5 backdrop-blur-md border !border-white/20 text-white placeholder:text-zinc-400 shadow-inner"
           />
         </div>
-        
+
         <div>
-          <label className="text-sm font-medium text-zinc-100 block mb-2">ชื่อรายการ</label>
+          <label className="text-sm font-medium text-zinc-100 block mb-2">
+            ชื่อรายการ
+          </label>
           <div className="space-y-2">
             {itemFields.map((item, iIndex) => (
               <div key={item.id} className="relative group">
                 <Input
                   type="text"
-                  {...register(`awards.${pIndex}.awardList.${iIndex}.value` as const)}
+                  {...register(
+                    `awards.${pIndex}.awardList.${iIndex}.value` as const,
+                  )}
                   className="!bg-white/5 backdrop-blur-md border !border-white/20 text-white placeholder:text-zinc-400 pr-10 shadow-inner"
                 />
                 {iIndex > 0 && (
@@ -67,7 +82,7 @@ export function AwardProjectSection({ control, pIndex, removeProject, register }
         <button
           type="button"
           onClick={() => appendItem({ value: "" })}
-          className="py-2 px-4 bg-[#333333] hover:bg-zinc-700 text-sm font-medium rounded-md text-white text-center transition-colors w-fit"
+          className="py-2 px-4 bg-card-secondary hover:bg-card-hover border border-theme-border text-sm font-medium rounded-md text-white text-center transition-colors w-fit cursor-pointer"
         >
           + เพิ่มรายการ
         </button>

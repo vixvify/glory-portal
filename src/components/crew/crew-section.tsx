@@ -36,7 +36,7 @@ export const CrewSection: React.FC<CrewSectionProps> = ({
   crewOptions,
 }) => {
   return (
-    <div className="border border-[#8A8A8A] rounded-[16px] py-5 px-6 bg-[#1C1C1C] space-y-4 overflow-visible">
+    <div className="border border-theme-border rounded-[16px] py-5 px-6 bg-card-secondary space-y-4 overflow-visible">
       <h3 className="text-white font-semibold text-[15px] tracking-wide">{label}</h3>
       {fields.map((item, index) => (
         <div key={`crew-${item.index}`} className="group space-y-3 pt-4 mt-4 first:pt-0 first:mt-0">
@@ -56,7 +56,7 @@ export const CrewSection: React.FC<CrewSectionProps> = ({
                   email: val.email || "",
                 });
               }}
-              className="w-full [&_svg]:text-brand [&_svg]:!text-[22px] [&_input]:!bg-[#0D0D0D] [&_input]:!rounded-[12px] [&_input]:border [&_input]:!border-white/10 [&_input]:!h-[52px] [&_input]:!pl-[48px] [&_input]:!pr-4 [&_input]:!text-[14px] [&_input]:!text-white [&_input]:placeholder:text-zinc-500"
+              className="w-full [&_svg]:text-brand [&_svg]:!text-[22px] [&_input]:!bg-background [&_input]:!rounded-[12px] [&_input]:border [&_input]:!border-white/10 [&_input]:!h-[52px] [&_input]:!pl-[48px] [&_input]:!pr-4 [&_input]:!text-[14px] [&_input]:!text-white [&_input]:placeholder:text-zinc-500"
             />
             {index > 0 && (
               <Button
@@ -83,7 +83,7 @@ export const CrewSection: React.FC<CrewSectionProps> = ({
                 email: e.target.value,
               });
             }}
-            className="read-only:opacity-60 read-only:cursor-not-allowed !bg-[#0D0D0D] !rounded-[12px] border !border-white/10 text-white placeholder:text-zinc-500 !h-[52px] !pl-[48px] !pr-4 !text-[14px]"
+            className="read-only:opacity-60 read-only:cursor-not-allowed !bg-background !rounded-[12px] border !border-white/10 text-white placeholder:text-zinc-500 !h-[52px] !pl-[48px] !pr-4 !text-[14px]"
             icon={<EmailIcon className="text-brand text-[22px]" />}
           />
         </div>
@@ -92,7 +92,7 @@ export const CrewSection: React.FC<CrewSectionProps> = ({
       <button
         type="button"
         onClick={onAdd}
-        className="py-2 px-4 bg-[#333333] hover:bg-zinc-700 text-sm font-medium rounded-md text-white text-center transition-colors w-fit"
+        className="py-2 px-4 bg-card-secondary hover:bg-card-hover border border-theme-border text-sm font-medium rounded-md text-white text-center transition-colors w-fit cursor-pointer"
       >
         + {addButtonLabel}
       </button>

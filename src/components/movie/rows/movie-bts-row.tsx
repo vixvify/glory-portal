@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import PlayCircleOutlinedIcon from "@mui/icons-material/PlayCircleOutlined";
+
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useScrollRow } from "@/hooks/system/use-scroll-row";
@@ -38,7 +38,7 @@ export default function MovieBtsRow({
 
   return (
     <div className="space-y-3 group/row relative">
-      <h3 className="text-base md:text-lg lg:text-xl font-bold text-zinc-100 tracking-wide hover:text-white cursor-pointer transition-colors duration-200 pl-3.5 border-l-3 border-brand/85 inline-block">
+      <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-zinc-100 tracking-wide hover:text-white cursor-pointer transition-colors duration-200 inline-block">
         {title}
       </h3>
 
@@ -62,9 +62,10 @@ export default function MovieBtsRow({
             return (
               <div
                 key={item.id}
-                className="flex-none snap-start group relative overflow-hidden rounded-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] bg-zinc-900 w-[280px] sm:w-[340px] md:w-[400px] aspect-video"
+                className="flex-none snap-start group relative overflow-hidden rounded-3xl cursor-pointer transition-all duration-300 hover:scale-[1.02] bg-zinc-900 w-[280px] sm:w-[340px] md:w-[400px] aspect-video glass-border shadow-[0_10px_30px_rgba(0,0,0,0.65)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.85)]"
                 onClick={() => onPlayClick(item.videoUrl)}
               >
+                <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/5 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20 mix-blend-overlay" />
                 {!hasError ? (
                   <Image
                     src={item.thumbnailUrl}
@@ -99,9 +100,7 @@ export default function MovieBtsRow({
                 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
                 
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <PlayCircleOutlinedIcon className="text-white/80 group-hover:text-white transition-colors duration-300" style={{ fontSize: '3rem' }} />
-                </div>
+
               </div>
             );
           })}

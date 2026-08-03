@@ -21,7 +21,7 @@ export default function CrewRow({ title, crew }: CrewRowProps) {
 
   return (
     <div className="space-y-2 group/row relative">
-      <h3 className="text-base md:text-xl font-bold text-zinc-100 tracking-wide hover:text-white cursor-pointer transition-colors duration-200 pl-1 inline-block">
+      <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-zinc-100 tracking-wide hover:text-white cursor-pointer transition-colors duration-200 inline-block">
         {title}
       </h3>
 

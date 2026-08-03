@@ -192,7 +192,7 @@ export function toCreateMoviePayload(rawPayload: unknown): CreateMovie {
 
   return {
     ...validated,
-    contentWarnings: (validated.contentWarnings?.filter(w => w !== "OTHER") as ContentWarning[]) ?? undefined,
+    contentWarnings: (validated.contentWarnings?.filter(w => w !== "OTHER") as ContentWarning[]),
     awards: validated.awards ?? undefined,
     trailerUrls: validated.trailerUrls ?? undefined,
     tags: validated.tags ?? undefined,
@@ -209,7 +209,7 @@ export function toUpdateMoviePayload(
   return {
     ...validated,
     id: editingMovie.id,
-    contentWarnings: (validated.contentWarnings?.filter(w => w !== "OTHER") as ContentWarning[]) ?? undefined,
+    contentWarnings: (validated.contentWarnings?.filter(w => w !== "OTHER") as ContentWarning[]),
     awards: validated.awards ?? undefined,
     trailerUrls: validated.trailerUrls ?? undefined,
     tags: validated.tags ?? undefined,

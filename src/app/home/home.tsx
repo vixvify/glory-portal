@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import { Movie, BtsVideoItem } from "@/core/domain/movie";
 import { useAppStore } from "@/store/use-store";
+import { FAVORITE_MESSAGES } from "@/core/constants/favorite-messages";
 import { Toast } from "@/components/ui/toast";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
 import {
@@ -27,7 +28,10 @@ interface Props {
   actorList: CrewMember[];
   moviesByRating: Movie[];
   universityMovies: Movie[];
-  categoryMoviesMap: Record<string, Movie[]>;
+  dramaMovies: Movie[];
+  thrillerHorrorMovies: Movie[];
+  comedyMovies: Movie[];
+  romanceMovies: Movie[];
   portraitMovies: Movie[];
 }
 
@@ -44,7 +48,10 @@ export default function HomePage(props: Props) {
     actorList,
     moviesByRating,
     universityMovies,
-    categoryMoviesMap,
+    dramaMovies,
+    thrillerHorrorMovies,
+    comedyMovies,
+    romanceMovies,
     portraitMovies,
   } = props;
 
@@ -78,13 +85,13 @@ export default function HomePage(props: Props) {
         {
           onSuccess: () => {
             if (isCurrentlyFavorite) {
-              showToast("นำออกจากรายการโปรดแล้ว", "info");
+              showToast(FAVORITE_MESSAGES.TOAST.REMOVE_FAVORITE_SUCCESS, "info");
             } else {
-              showToast("เพิ่มลงในรายการโปรดแล้ว", "success");
+              showToast(FAVORITE_MESSAGES.TOAST.ADD_FAVORITE_SUCCESS, "success");
             }
           },
           onError: () => {
-            showToast("เกิดข้อผิดพลาดในการปรับปรุงรายการโปรด", "error");
+            showToast(FAVORITE_MESSAGES.ERRORS.FAVORITE_UPDATE, "error");
           },
         },
       );
@@ -107,7 +114,10 @@ export default function HomePage(props: Props) {
           actorList={actorList}
           moviesByRating={moviesByRating}
           universityMovies={universityMovies}
-          categoryMoviesMap={categoryMoviesMap}
+          dramaMovies={dramaMovies}
+          thrillerHorrorMovies={thrillerHorrorMovies}
+          comedyMovies={comedyMovies}
+          romanceMovies={romanceMovies}
           favorites={favorites}
           handlePlayMovie={handlePlayMovie}
           handleToggleFavorite={handleToggleFavorite}

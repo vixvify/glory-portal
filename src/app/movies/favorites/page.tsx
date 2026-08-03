@@ -7,6 +7,8 @@ import {
   useToggleFavoriteMutation,
 } from "@/hooks/db/use-favorites";
 import { useAppStore } from "@/store/use-store";
+import { FAVORITE_MESSAGES } from "@/core/constants/favorite-messages";
+import { AUTH_MESSAGES } from "@/core/constants/auth-messages";
 import MovieGrid from "@/components/movie/grids/movie-grid";
 import Loading from "@/app/loading";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
@@ -27,7 +29,7 @@ export default function FavoritesPage() {
   const handleToggleFavorite = useCallback(
     (movieId: string) => {
       if (!currentUser) {
-        showToast("กรุณาเข้าสู่ระบบก่อนใช้งาน", "warning");
+        showToast(AUTH_MESSAGES.TOAST.LOGIN_REQUIRED, "warning");
         return;
       }
       const isCurrentlyFavorite = favorites.some((m) => m.id === movieId);
@@ -37,13 +39,13 @@ export default function FavoritesPage() {
         {
           onSuccess: () => {
             if (isCurrentlyFavorite) {
-              showToast("นำออกจากรายการของฉันแล้ว", "info");
+              showToast(FAVORITE_MESSAGES.TOAST.REMOVE_MY_LIST_SUCCESS, "info");
             } else {
-              showToast("เพิ่มลงในรายการของฉันแล้ว", "success");
+              showToast(FAVORITE_MESSAGES.TOAST.ADD_MY_LIST_SUCCESS, "success");
             }
           },
           onError: () => {
-            showToast("เกิดข้อผิดพลาดในการปรับปรุงรายการ", "error");
+            showToast(FAVORITE_MESSAGES.ERRORS.FAVORITE_LIST_UPDATE, "error");
           },
         },
       );

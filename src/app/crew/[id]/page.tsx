@@ -12,6 +12,7 @@ import { useCrewMemberQueryById } from "@/hooks/db/use-crew-members";
 import { useFavoritesQuery, useToggleFavoriteMutation } from "@/hooks/db/use-favorites";
 import { useAppStore } from "@/store/use-store";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
+import { FAVORITE_MESSAGES } from "@/core/constants/favorite-messages";
 import MovieCard from "@/components/movie/cards/movie-card";
 import MovieCardPortrait from "@/components/movie/cards/movie-card-portrait";
 import { Toast } from "@/components/ui/toast";
@@ -44,13 +45,13 @@ export default function CrewProfilePage() {
         {
           onSuccess: () => {
             if (isCurrentlyFavorite) {
-              showToast("นำออกจากรายการโปรดแล้ว", "info");
+              showToast(FAVORITE_MESSAGES.TOAST.REMOVE_FAVORITE_SUCCESS, "info");
             } else {
-              showToast("เพิ่มลงในรายการโปรดแล้ว", "success");
+              showToast(FAVORITE_MESSAGES.TOAST.ADD_FAVORITE_SUCCESS, "success");
             }
           },
           onError: () => {
-            showToast("เกิดข้อผิดพลาดในการปรับปรุงรายการโปรด", "error");
+            showToast(FAVORITE_MESSAGES.ERRORS.FAVORITE_UPDATE, "error");
           },
         },
       );

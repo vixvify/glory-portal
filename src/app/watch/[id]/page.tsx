@@ -9,6 +9,7 @@ import { watchSessionService } from "@/infra/container";
 import { getYouTubeId } from "@/utils/youtube";
 import { useAppStore } from "@/store/use-store";
 import Loading from "@/app/loading";
+import { MOVIE_MESSAGES } from "@/core/constants/movie-messages";
 
 export default function WatchPage() {
   const params = useParams<{ id: string }>();
@@ -58,7 +59,7 @@ export default function WatchPage() {
     return (
       <div className="w-screen h-screen bg-zinc-950 flex flex-col items-center justify-center text-center p-6 space-y-4">
         <h2 className="text-xl md:text-2xl font-bold text-white">
-          เกิดข้อผิดพลาดในการโหลดภาพยนตร์
+          {MOVIE_MESSAGES.ERRORS.LOAD_MOVIE}
         </h2>
         <p className="text-sm text-zinc-400 max-w-md">
           ไม่สามารถดึงข้อมูลภาพยนตร์ได้ หรือไม่มีข้อมูลภาพยนตร์นี้ในระบบ

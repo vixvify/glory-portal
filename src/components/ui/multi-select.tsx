@@ -72,8 +72,8 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className={`w-full text-left bg-[#0D0D0D] border rounded-lg py-2.5 pl-4 pr-3 text-sm focus:outline-none transition-colors font-light cursor-pointer flex items-center justify-between min-h-[42px] ${
-            isOpen ? "border-brand" : "border-[#3A3A3A]"
+          className={`w-full text-left bg-background border rounded-lg py-2.5 pl-4 pr-3 text-sm focus:outline-none transition-colors font-light cursor-pointer flex items-center justify-between min-h-[42px] ${
+            isOpen ? "border-brand" : "border-theme-border"
           } ${error ? "border-red-500" : ""} ${
             selectedValues.length > 0 ? "text-white" : "text-zinc-400"
           }`}

@@ -15,7 +15,7 @@ import { CreatableSearchSelect, SearchSelect } from "@/components/ui/search-sele
 import { Select } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { TagInput } from "@/components/ui/tag-input";
-import { LOCALIZATION } from "@/core/constants/localization";
+import { MOVIE_MESSAGES } from "@/core/constants/movie-messages";
 import { useAppStore } from "@/store/use-store";
 import {
   COLOR_OPTIONS,
@@ -132,16 +132,16 @@ export const MovieForm: React.FC<MovieFormProps> = ({
         await updateMovieMutation.mutateAsync(
           toUpdateMoviePayload(rawPayload, editingMovie),
         );
-        showToast(LOCALIZATION.TOAST.EDIT_MOVIE_SUCCESS, "success");
+        showToast(MOVIE_MESSAGES.TOAST.EDIT_MOVIE_SUCCESS, "success");
       } else {
         await createMovieMutation.mutateAsync(toCreateMoviePayload(rawPayload));
-        showToast(LOCALIZATION.TOAST.ADD_MOVIE_SUCCESS, "success");
+        showToast(MOVIE_MESSAGES.TOAST.ADD_MOVIE_SUCCESS, "success");
       }
 
       router.push("/");
     } catch (err: unknown) {
       const errMsg =
-        err instanceof Error ? err.message : LOCALIZATION.ERRORS.SAVE_MOVIE;
+        err instanceof Error ? err.message : MOVIE_MESSAGES.ERRORS.SAVE_MOVIE;
       showToast(errMsg, "error");
       console.error(err);
     }
@@ -713,7 +713,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               type="submit"
               isLoading={isSaving}
               disabled={isSaving}
-              className="min-w-[140px] min-h-[48px] py-3 px-6 text-[15px] font-bold rounded-xl bg-brand !text-white hover:brightness-105 hover:-translate-y-0.5 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)] transition-all duration-300"
+              className="min-w-[140px] min-h-[48px] py-3 px-6 text-[15px] font-bold rounded-xl bg-gradient-to-r from-[#CAA22A] to-[#A47E1C] !text-white hover:brightness-105 hover:-translate-y-0.5 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)] transition-all duration-300"
             >
               เสร็จสิ้น
             </Button>
@@ -730,10 +730,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
             </div>
             <div className="space-y-1.5 text-center">
               <h3 className="text-xl font-bold tracking-wide text-white">
-                {LOCALIZATION.LOADING.SAVE_MOVIE}
+                {MOVIE_MESSAGES.LOADING.SAVE_MOVIE}
               </h3>
               <p className="text-xs text-zinc-400 font-light">
-                {LOCALIZATION.LOADING.SUB_SAVE_MOVIE}
+                {MOVIE_MESSAGES.LOADING.SUB_SAVE_MOVIE}
               </p>
             </div>
           </div>

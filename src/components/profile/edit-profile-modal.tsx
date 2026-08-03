@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { User, UpdateProfile } from "@/core/domain/user";
 import { useAppStore } from "@/store/use-store";
+import { PROFILE_MESSAGES } from "@/core/constants/profile-messages";
 import { Button } from "@/components/ui/button";
 import CloseIcon from "@mui/icons-material/Close";
 import { useUpdateProfileMutation } from "@/hooks/db/use-profile";
@@ -14,18 +15,22 @@ interface EditProfileModalProps {
   currentUser: User;
 }
 
-export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileModalProps) {
+export function EditProfileModal({
+  isOpen,
+  onClose,
+  currentUser,
+}: EditProfileModalProps) {
   const { showToast } = useAppStore();
   const updateProfileMutation = useUpdateProfileMutation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: crewRolesData = [] } = useCrewRolesQuery();
-  const crewRoleSuggestions = crewRolesData.map((role) => role.labelTh || role.name);
+  const crewRoleSuggestions = crewRolesData.map(
+    (role) => role.labelTh || role.name,
+  );
 
-  // Initial positions is an array
   const defaultPositions = currentUser.positions || [];
 
-  // Format date to YYYY-MM-DD for the date input
   const defaultBirthday = currentUser.birthday
     ? new Date(currentUser.birthday).toISOString().split("T")[0]
     : "";
@@ -45,12 +50,10 @@ export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileMo
 
   if (!isOpen) return null;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: UpdateProfile) => {
     try {
       setIsSubmitting(true);
-      
-      // Process data to match API schema
+
       const payload: UpdateProfile = {
         name: data.name,
         bio: data.bio,
@@ -63,10 +66,10 @@ export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileMo
       };
 
       await updateProfileMutation.mutateAsync(payload);
-      showToast("อัปเดตโปรไฟล์เรียบร้อยแล้ว", "success");
+      showToast(PROFILE_MESSAGES.TOAST.UPDATE_PROFILE_SUCCESS, "success");
       onClose();
     } catch {
-      showToast("เกิดข้อผิดพลาดในการอัปเดตข้อมูล", "error");
+      showToast(PROFILE_MESSAGES.ERRORS.UPDATE_PROFILE, "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -74,9 +77,8 @@ export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileMo
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="bg-[#121212] border border-zinc-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-zinc-800 bg-zinc-900/50">
+      <div className="bg-card border border-theme-border rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+        <div className="flex items-center justify-between p-6 border-b border-theme-border bg-card-secondary/50">
           <h2 className="text-xl font-bold text-white">แก้ไขข้อมูลโปรไฟล์</h2>
           <button
             onClick={onClose}
@@ -86,16 +88,21 @@ export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileMo
           </button>
         </div>
 
-        {/* Body / Form */}
         <div className="overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-zinc-700">
-          <form id="edit-profile-form" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            
-            {/* Section: Basic Info */}
+          <form
+            id="edit-profile-form"
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-6"
+          >
             <div>
-              <h3 className="text-sm font-semibold text-brand mb-4 uppercase tracking-wider">ข้อมูลพื้นฐาน</h3>
+              <h3 className="text-sm font-semibold text-brand mb-4 uppercase tracking-wider">
+                ข้อมูลพื้นฐาน
+              </h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-1">ชื่อ-นามสกุล / นามแฝง</label>
+                  <label className="block text-sm font-medium text-zinc-400 mb-1">
+                    ชื่อ-นามสกุล / นามแฝง
+                  </label>
                   <input
                     {...register("name")}
                     type="text"
@@ -104,7 +111,9 @@ export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileMo
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-1">วันเกิด</label>
+                  <label className="block text-sm font-medium text-zinc-400 mb-1">
+                    วันเกิด
+                  </label>
                   <input
                     {...register("birthday")}
                     type="date"
@@ -112,7 +121,9 @@ export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileMo
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-1">ตำแหน่งประจำ</label>
+                  <label className="block text-sm font-medium text-zinc-400 mb-1">
+                    ตำแหน่งประจำ
+                  </label>
                   <Controller
                     control={control}
                     name="positions"
@@ -125,16 +136,21 @@ export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileMo
                       />
                     )}
                   />
-                  <p className="text-xs text-zinc-500 mt-1">กด Enter เพื่อเพิ่มตำแหน่งใหม่ หากไม่พบในระบบ</p>
+                  <p className="text-xs text-zinc-500 mt-1">
+                    กด Enter เพื่อเพิ่มตำแหน่งใหม่ หากไม่พบในระบบ
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Section: About */}
             <div className="pt-4 border-t border-zinc-800/50">
-              <h3 className="text-sm font-semibold text-brand mb-4 uppercase tracking-wider">เกี่ยวกับฉัน</h3>
+              <h3 className="text-sm font-semibold text-brand mb-4 uppercase tracking-wider">
+                เกี่ยวกับฉัน
+              </h3>
               <div>
-                <label className="block text-sm font-medium text-zinc-400 mb-1">ประวัติส่วนตัว (Bio)</label>
+                <label className="block text-sm font-medium text-zinc-400 mb-1">
+                  ประวัติส่วนตัว (Bio)
+                </label>
                 <textarea
                   {...register("bio")}
                   rows={4}
@@ -144,12 +160,15 @@ export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileMo
               </div>
             </div>
 
-            {/* Section: Social Media */}
             <div className="pt-4 border-t border-zinc-800/50">
-              <h3 className="text-sm font-semibold text-brand mb-4 uppercase tracking-wider">ช่องทางการติดต่อ</h3>
+              <h3 className="text-sm font-semibold text-brand mb-4 uppercase tracking-wider">
+                ช่องทางการติดต่อ
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-1">Instagram (Username)</label>
+                  <label className="block text-sm font-medium text-zinc-400 mb-1">
+                    Instagram (Username)
+                  </label>
                   <input
                     {...register("ig")}
                     type="text"
@@ -158,7 +177,9 @@ export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileMo
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-1">Facebook (URL หรือ ชื่อ)</label>
+                  <label className="block text-sm font-medium text-zinc-400 mb-1">
+                    Facebook (URL หรือ ชื่อ)
+                  </label>
                   <input
                     {...register("facebook")}
                     type="text"
@@ -167,7 +188,9 @@ export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileMo
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-1">YouTube (URL หรือ Channel)</label>
+                  <label className="block text-sm font-medium text-zinc-400 mb-1">
+                    YouTube (URL หรือ Channel)
+                  </label>
                   <input
                     {...register("youtube")}
                     type="text"
@@ -176,7 +199,9 @@ export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileMo
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-1">TikTok (Username หรือ URL)</label>
+                  <label className="block text-sm font-medium text-zinc-400 mb-1">
+                    TikTok (Username หรือ URL)
+                  </label>
                   <input
                     {...register("tiktok")}
                     type="text"
@@ -186,11 +211,9 @@ export function EditProfileModal({ isOpen, onClose, currentUser }: EditProfileMo
                 </div>
               </div>
             </div>
-
           </form>
         </div>
 
-        {/* Footer */}
         <div className="p-6 border-t border-zinc-800 bg-zinc-900/50 flex justify-end gap-3">
           <Button
             type="button"

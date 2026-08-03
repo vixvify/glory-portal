@@ -8,15 +8,22 @@ interface TagInputProps {
   placeholder?: string;
 }
 
-export function TagInput({ value, onChange, suggestions = [], placeholder = "เพิ่มแท็ก..." }: TagInputProps) {
+export function TagInput({
+  value,
+  onChange,
+  suggestions = [],
+  placeholder = "เพิ่มแท็ก...",
+}: TagInputProps) {
   const [inputValue, setInputValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // Close suggestions when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
@@ -42,18 +49,16 @@ export function TagInput({ value, onChange, suggestions = [], placeholder = "เ
       e.preventDefault();
       handleAddTag(inputValue);
     } else if (e.key === "Backspace" && inputValue === "" && value.length > 0) {
-      // Remove last tag if backspace is pressed when input is empty
       const newValue = [...value];
       newValue.pop();
       onChange(newValue);
     }
   };
 
-  // Filter suggestions based on input, and exclude already selected tags
   const filteredSuggestions = suggestions.filter(
     (suggestion) =>
       suggestion.toLowerCase().includes(inputValue.toLowerCase()) &&
-      !value.includes(suggestion)
+      !value.includes(suggestion),
   );
 
   return (
@@ -94,9 +99,8 @@ export function TagInput({ value, onChange, suggestions = [], placeholder = "เ
         />
       </div>
 
-      {/* Suggestions Dropdown */}
       {isOpen && (inputValue.length > 0 || filteredSuggestions.length > 0) && (
-        <div className="absolute z-50 w-full mt-2 bg-[#1a1a1a] border border-zinc-800 rounded-xl shadow-xl overflow-hidden max-h-60 overflow-y-auto">
+        <div className="absolute z-50 w-full mt-2 bg-background border border-zinc-800 rounded-xl shadow-xl overflow-hidden max-h-60 overflow-y-auto">
           {filteredSuggestions.map((suggestion, idx) => (
             <button
               key={idx}
@@ -110,20 +114,22 @@ export function TagInput({ value, onChange, suggestions = [], placeholder = "เ
               {suggestion}
             </button>
           ))}
-          
-          {/* Allow adding custom tag if it doesn't strictly match a suggestion */}
-          {inputValue.trim() && !filteredSuggestions.some(s => s.toLowerCase() === inputValue.trim().toLowerCase()) && (
-            <button
-              type="button"
-              className="w-full text-left px-4 py-3 text-sm text-brand font-medium hover:bg-zinc-800 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                handleAddTag(inputValue);
-              }}
-            >
-              + เพิ่ม &quot;{inputValue}&quot; เป็นตำแหน่งใหม่
-            </button>
-          )}
+
+          {inputValue.trim() &&
+            !filteredSuggestions.some(
+              (s) => s.toLowerCase() === inputValue.trim().toLowerCase(),
+            ) && (
+              <button
+                type="button"
+                className="w-full text-left px-4 py-3 text-sm text-brand font-medium hover:bg-zinc-800 transition-colors"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleAddTag(inputValue);
+                }}
+              >
+                + เพิ่ม &quot;{inputValue}&quot; เป็นตำแหน่งใหม่
+              </button>
+            )}
         </div>
       )}
     </div>

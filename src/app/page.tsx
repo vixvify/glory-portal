@@ -4,6 +4,7 @@ import {
   crewMemberService,
 } from "@/infra/container";
 import { mapMoviesToBtsVideos } from "@/utils/movie-bts";
+import { splitCrewByRole } from "@/utils/crew";
 import HomePage from "./home/home";
 
 export const dynamic = "force-dynamic";
@@ -13,8 +14,7 @@ export default async function Page() {
     recommendedMovies,
     popularMovies,
     categories,
-    staffList,
-    actorList,
+    allCrewMembers,
     portraitMovies,
     mostActiveUniversity,
     moviesByRating,
@@ -37,7 +37,6 @@ export default async function Page() {
     }),
     masterDataService.getCategories(),
     crewMemberService.getCrewMembers(),
-    crewMemberService.getCrewMembers({ search: "cast", searchby: "role" }),
     movieService.getMovies({
       page: 1,
       pagesize: 10,
@@ -55,33 +54,57 @@ export default async function Page() {
     movieService.getMoviesWithBts(),
   ]);
 
+  const { actorList, staffList } = splitCrewByRole(allCrewMembers);
+
   const movieByUniversityPromise = mostActiveUniversity
     ? movieService.getMovies({
-        search: mostActiveUniversity,
-        searchby: "university",
-        page: 1,
-        pagesize: 10,
-        aspectRatio: "landscape",
-      })
-    : Promise.resolve([]);
-
-  const categoryMoviePromises = categories.map(async (category) => {
-    const movies = await movieService.getMovies({
-      search: category.name,
-      searchby: "category",
+      search: mostActiveUniversity,
+      searchby: "university",
       page: 1,
       pagesize: 10,
       aspectRatio: "landscape",
-    });
-    return [category.id, movies] as const;
-  });
+    })
+    : Promise.resolve([]);
 
-  const [movieByUniversity, ...categoryMoviesEntries] = await Promise.all([
+  const getCuratedMovies = async (categoryName: string) => {
+    const movies = await movieService.getMoviesByCategory(categoryName);
+    return movies
+      .filter((m) => m.aspectRatio === "landscape")
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt || 0).getTime() -
+          new Date(a.createdAt || 0).getTime()
+      )
+      .slice(0, 10);
+  };
+
+  const [
+    movieByUniversity,
+    dramaMovies,
+    thrillerMovies,
+    horrorMovies,
+    comedyMovies,
+    romanceMovies,
+  ] = await Promise.all([
     movieByUniversityPromise,
-    ...categoryMoviePromises,
+    getCuratedMovies("drama"),
+    getCuratedMovies("thriller"),
+    getCuratedMovies("horror"),
+    getCuratedMovies("comedy"),
+    getCuratedMovies("romance"),
   ]);
 
-  const categoryMoviesMap = Object.fromEntries(categoryMoviesEntries);
+
+  const thrillerHorrorMovies = Array.from(
+    new Map([...thrillerMovies, ...horrorMovies].map((m) => [m.id, m])).values()
+  )
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt || 0).getTime() -
+        new Date(a.createdAt || 0).getTime()
+    )
+    .slice(0, 10);
+
   const btsVideos = mapMoviesToBtsVideos(moviesWithBts);
 
   return (
@@ -96,7 +119,10 @@ export default async function Page() {
       portraitMovies={portraitMovies}
       universityMovies={movieByUniversity}
       moviesByRating={moviesByRating}
-      categoryMoviesMap={categoryMoviesMap}
+      dramaMovies={dramaMovies}
+      thrillerHorrorMovies={thrillerHorrorMovies}
+      comedyMovies={comedyMovies}
+      romanceMovies={romanceMovies}
     />
   );
 }
