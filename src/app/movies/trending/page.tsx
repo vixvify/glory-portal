@@ -10,6 +10,7 @@ import {
 import { useAppStore } from "@/store/use-store";
 import { FAVORITE_MESSAGES } from "@/core/constants/favorite-messages";
 import MovieRow from "@/components/movie/rows/movie-row";
+import MovieRowPortrait from "@/components/movie/rows/movie-row-portrait";
 import Loading from "@/app/loading";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import { LayoutToggle, LayoutOrientation } from "@/components/ui/layout-toggle";
@@ -95,29 +96,55 @@ export default function TrendingPage() {
         </div>
 
         <div className="space-y-12">
-          <MovieRow
-            title="มาใหม่"
-            movies={newMovies}
-            onPlayClick={handlePlayMovie}
-            favorites={favorites}
-            onToggleFavorite={handleToggleFavorite}
-          />
-
-          <MovieRow
-            title="มาแรง"
-            movies={popularNewMovies}
-            onPlayClick={handlePlayMovie}
-            favorites={favorites}
-            onToggleFavorite={handleToggleFavorite}
-          />
-
-          <MovieRow
-            title="ถูกใจผู้ชม"
-            movies={ratedNewMovies}
-            onPlayClick={handlePlayMovie}
-            favorites={favorites}
-            onToggleFavorite={handleToggleFavorite}
-          />
+          {orientation === "landscape" ? (
+            <>
+              <MovieRow
+                title="มาใหม่"
+                movies={newMovies}
+                onPlayClick={handlePlayMovie}
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+              />
+              <MovieRow
+                title="มาแรง"
+                movies={popularNewMovies}
+                onPlayClick={handlePlayMovie}
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+              />
+              <MovieRow
+                title="ถูกใจผู้ชม"
+                movies={ratedNewMovies}
+                onPlayClick={handlePlayMovie}
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+              />
+            </>
+          ) : (
+            <>
+              <MovieRowPortrait
+                title="มาใหม่"
+                movies={newMovies}
+                onPlayClick={handlePlayMovie}
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+              />
+              <MovieRowPortrait
+                title="มาแรง"
+                movies={popularNewMovies}
+                onPlayClick={handlePlayMovie}
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+              />
+              <MovieRowPortrait
+                title="ถูกใจผู้ชม"
+                movies={ratedNewMovies}
+                onPlayClick={handlePlayMovie}
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+              />
+            </>
+          )}
         </div>
       </main>
     </div>
