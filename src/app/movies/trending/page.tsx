@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
 import {
@@ -11,20 +11,21 @@ import { useAppStore } from "@/store/use-store";
 import { FAVORITE_MESSAGES } from "@/core/constants/favorite-messages";
 import MovieRow from "@/components/movie/rows/movie-row";
 import Loading from "@/app/loading";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
+import { LayoutToggle, LayoutOrientation } from "@/components/ui/layout-toggle";
 
 export default function TrendingPage() {
   const router = useRouter();
   const { playMovie: handlePlayMovie } = useMoviePlayer();
   const { currentUser, showToast } = useAppStore();
+  const [orientation, setOrientation] = useState<LayoutOrientation>("landscape");
 
   const { data: newMovies = [], isLoading: isLoadingNew } = useMoviesQuery({
     sort: "desc",
     sortby: "createdAt",
     page: 1,
     pagesize: 10,
-    aspectRatio: "landscape",
+    aspectRatio: orientation,
   });
 
   const { data: popularNewMovies = [], isLoading: isLoadingPopNew } =
@@ -33,7 +34,7 @@ export default function TrendingPage() {
       sortby: "views",
       page: 1,
       pagesize: 10,
-      aspectRatio: "landscape",
+      aspectRatio: orientation,
     });
 
   const { data: ratedNewMovies = [], isLoading: isLoadingRatedNew } =
@@ -42,7 +43,7 @@ export default function TrendingPage() {
       sortby: "averageRating",
       page: 1,
       pagesize: 10,
-      aspectRatio: "landscape",
+      aspectRatio: orientation,
     });
 
   const { data: favorites = [], isLoading: isLoadingFavs } =
@@ -88,20 +89,14 @@ export default function TrendingPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-brand selection:text-black">
-      <main className="max-w-8xl mx-auto w-full px-6 md:px-16 pt-28 pb-16 space-y-10 animate-fade-in">
-        <div className="space-y-2">
-          <button
-            onClick={() => router.back()}
-            className="w-8 h-8 rounded-full bg-zinc-900/60 border border-zinc-800 hover:border-brand/40 hover:text-brand flex items-center justify-center text-zinc-400 cursor-pointer transition-all duration-300 shadow-md focus:outline-none"
-            aria-label="ย้อนกลับ"
-          >
-            <ArrowBackIcon className="text-sm" />
-          </button>
+      <main className="max-w-8xl mx-auto w-full px-6 md:px-16 pt-32 md:pt-36 pb-16 space-y-10 animate-fade-in">
+        <div className="flex justify-start">
+          <LayoutToggle value={orientation} onChange={setOrientation} />
         </div>
 
         <div className="space-y-12">
           <MovieRow
-            title="ใหม่"
+            title="มาใหม่"
             movies={newMovies}
             onPlayClick={handlePlayMovie}
             favorites={favorites}
