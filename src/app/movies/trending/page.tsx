@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
+import { keepPreviousData } from "@tanstack/react-query";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
 import {
   useFavoritesQuery,
@@ -21,31 +22,40 @@ export default function TrendingPage() {
   const { currentUser, showToast } = useAppStore();
   const [orientation, setOrientation] = useState<LayoutOrientation>("landscape");
 
-  const { data: newMovies = [], isLoading: isLoadingNew } = useMoviesQuery({
-    sort: "desc",
-    sortby: "createdAt",
-    page: 1,
-    pagesize: 10,
-    aspectRatio: orientation,
-  });
+  const { data: newMovies = [], isLoading: isLoadingNew } = useMoviesQuery(
+    {
+      sort: "desc",
+      sortby: "createdAt",
+      page: 1,
+      pagesize: 10,
+      aspectRatio: orientation,
+    },
+    { placeholderData: keepPreviousData }
+  );
 
   const { data: popularNewMovies = [], isLoading: isLoadingPopNew } =
-    useMoviesQuery({
-      sort: "desc",
-      sortby: "views",
-      page: 1,
-      pagesize: 10,
-      aspectRatio: orientation,
-    });
+    useMoviesQuery(
+      {
+        sort: "desc",
+        sortby: "views",
+        page: 1,
+        pagesize: 10,
+        aspectRatio: orientation,
+      },
+      { placeholderData: keepPreviousData }
+    );
 
   const { data: ratedNewMovies = [], isLoading: isLoadingRatedNew } =
-    useMoviesQuery({
-      sort: "desc",
-      sortby: "averageRating",
-      page: 1,
-      pagesize: 10,
-      aspectRatio: orientation,
-    });
+    useMoviesQuery(
+      {
+        sort: "desc",
+        sortby: "averageRating",
+        page: 1,
+        pagesize: 10,
+        aspectRatio: orientation,
+      },
+      { placeholderData: keepPreviousData }
+    );
 
   const { data: favorites = [], isLoading: isLoadingFavs } =
     useFavoritesQuery(!!currentUser);
