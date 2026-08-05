@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { keepPreviousData } from "@tanstack/react-query";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
 import {
   useFavoritesQuery,
@@ -10,11 +11,11 @@ import {
 import { useAppStore } from "@/store/use-store";
 import { FAVORITE_MESSAGES } from "@/core/constants/favorite-messages";
 import MovieRow from "@/components/movie/rows/movie-row";
-import MovieRowPortrait from "@/components/movie/rows/movie-row-portrait";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import { useCategoriesQuery } from "@/hooks/db/use-master-data";
 import { isEmptyAll } from "@/utils/check";
+import { LayoutToggle, LayoutOrientation } from "@/components/ui/layout-toggle";
+import Loading from "@/app/loading";
 
 export default function CategoryPage() {
   const params = useParams<{ category: string }>();
@@ -35,43 +36,29 @@ export default function CategoryPage() {
     ? (currentCategory.labelTh || currentCategory.name)
     : categoryName;
 
-  const { data: moviesByCategory = [] } = useMoviesQuery({
+  const [orientation, setOrientation] = useState<LayoutOrientation>("landscape");
+
+  const { data: moviesByCategory = [], isLoading: isLoadingCategory } = useMoviesQuery({
     search: categoryName,
     searchby: "category",
-    aspectRatio: "landscape",
-  });
+    aspectRatio: orientation,
+  }, { placeholderData: keepPreviousData });
 
-  const { data: landscapeByViews = [] } = useMoviesQuery({
+  const { data: moviesByViews = [], isLoading: isLoadingViews } = useMoviesQuery({
     search: categoryName,
     searchby: "category",
     sort: "desc",
     sortby: "views",
-    aspectRatio: "landscape",
-  });
+    aspectRatio: orientation,
+  }, { placeholderData: keepPreviousData });
 
-  const { data: landscapeByRating = [] } = useMoviesQuery({
+  const { data: moviesByRating = [], isLoading: isLoadingRating } = useMoviesQuery({
     search: categoryName,
     searchby: "category",
     sort: "desc",
     sortby: "averageRating",
-    aspectRatio: "landscape",
-  });
-
-  const { data: portraitByViews = [] } = useMoviesQuery({
-    search: categoryName,
-    searchby: "category",
-    sort: "desc",
-    sortby: "views",
-    aspectRatio: "portrait",
-  });
-
-  const { data: portraitByRating = [] } = useMoviesQuery({
-    search: categoryName,
-    searchby: "category",
-    sort: "desc",
-    sortby: "averageRating",
-    aspectRatio: "portrait",
-  });
+    aspectRatio: orientation,
+  }, { placeholderData: keepPreviousData });
 
   const { data: favorites = [] } = useFavoritesQuery(!!currentUser);
   const toggleFavoriteMutation = useToggleFavoriteMutation();
@@ -103,25 +90,20 @@ export default function CategoryPage() {
     [currentUser, favorites, toggleFavoriteMutation, showToast, router],
   );
 
+  const isPageLoading = isLoadingCategory || isLoadingViews || isLoadingRating;
+
+  if (isPageLoading) {
+    return <Loading />;
+  }
+
   return (
     <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-brand selection:text-black">
-      <main className="max-w-8xl mx-auto w-full px-6 md:px-16 pt-28 pb-16 space-y-8 animate-fade-in">
-        <div className="space-y-2">
-          <button
-            onClick={() => router.back()}
-            className="w-8 h-8 rounded-full bg-zinc-900/60 border border-zinc-800 hover:border-brand/40 hover:text-brand flex items-center justify-center text-zinc-400 cursor-pointer transition-all duration-300 shadow-md focus:outline-none"
-            aria-label="ย้อนกลับ"
-          >
-            <ArrowBackIcon className="text-sm" />
-          </button>
+      <main className="max-w-8xl mx-auto w-full px-6 md:px-16 pt-32 md:pt-36 pb-16 space-y-10 animate-fade-in">
+        <div className="flex justify-start">
+          <LayoutToggle value={orientation} onChange={setOrientation} />
         </div>
 
-        {isEmptyAll(
-          landscapeByViews,
-          landscapeByRating,
-          portraitByViews,
-          portraitByRating,
-        ) ? (
+        {isEmptyAll(moviesByCategory, moviesByViews, moviesByRating) ? (
           <div className="text-center py-24 space-y-3">
             <p className="text-lg text-zinc-500 font-light">
               ไม่พบภาพยนตร์ในหมวดหมู่นี้
@@ -129,55 +111,38 @@ export default function CategoryPage() {
           </div>
         ) : (
           <div className="space-y-12 pb-10">
-            {moviesByCategory.length > 0 && (
-              <MovieRow
-                title={categoryDisplayTitle}
-                movies={moviesByCategory}
-                onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-              />
-            )}
-
-            {landscapeByViews.length > 0 && (
-              <MovieRow
-                title={`${categoryDisplayTitle}ยอดนิยม`}
-                movies={landscapeByViews}
-                onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-              />
-            )}
-
-            {landscapeByRating.length > 0 && (
-              <MovieRow
-                title={`${categoryDisplayTitle}ถูกใจผู้ชม`}
-                movies={landscapeByRating}
-                onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-              />
-            )}
-
-            {portraitByViews.length > 0 && (
-              <MovieRowPortrait
-                title={`${categoryDisplayTitle}แนวตั้งยอดนิยม`}
-                movies={portraitByViews}
-                onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-              />
-            )}
-
-            {portraitByRating.length > 0 && (
-              <MovieRowPortrait
-                title={`${categoryDisplayTitle}แนวตั้งถูกใจผู้ชม`}
-                movies={portraitByRating}
-                onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-              />
-            )}
+            <>
+              {moviesByCategory.length > 0 && (
+                <MovieRow
+                  title={categoryDisplayTitle}
+                  movies={moviesByCategory}
+                  onPlayClick={handlePlayMovie}
+                  favorites={favorites}
+                  onToggleFavorite={handleToggleFavorite}
+                  orientation={orientation}
+                />
+              )}
+              {moviesByViews.length > 0 && (
+                <MovieRow
+                  title={`${categoryDisplayTitle}ยอดนิยม`}
+                  movies={moviesByViews}
+                  onPlayClick={handlePlayMovie}
+                  favorites={favorites}
+                  onToggleFavorite={handleToggleFavorite}
+                  orientation={orientation}
+                />
+              )}
+              {moviesByRating.length > 0 && (
+                <MovieRow
+                  title={`${categoryDisplayTitle}ถูกใจผู้ชม`}
+                  movies={moviesByRating}
+                  onPlayClick={handlePlayMovie}
+                  favorites={favorites}
+                  onToggleFavorite={handleToggleFavorite}
+                  orientation={orientation}
+                />
+              )}
+            </>
           </div>
         )}
       </main>
