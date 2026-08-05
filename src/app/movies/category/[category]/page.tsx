@@ -15,6 +15,7 @@ import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import { useCategoriesQuery } from "@/hooks/db/use-master-data";
 import { isEmptyAll } from "@/utils/check";
 import { LayoutToggle, LayoutOrientation } from "@/components/ui/layout-toggle";
+import { PageLayout } from "@/components/ui/page-layout";
 import Loading from "@/app/loading";
 
 export default function CategoryPage() {
@@ -97,9 +98,8 @@ export default function CategoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-brand selection:text-black">
-      <main className="max-w-8xl mx-auto w-full px-6 md:px-16 pt-32 md:pt-36 pb-16 space-y-10 animate-fade-in">
-        <div className="flex justify-start">
+    <PageLayout>
+      <div className="flex justify-start">
           <LayoutToggle value={orientation} onChange={setOrientation} />
         </div>
 
@@ -111,7 +111,6 @@ export default function CategoryPage() {
           </div>
         ) : (
           <div className="space-y-12 pb-10">
-            <>
               {moviesByCategory.length > 0 && (
                 <MovieRow
                   title={categoryDisplayTitle}
@@ -142,10 +141,8 @@ export default function CategoryPage() {
                   orientation={orientation}
                 />
               )}
-            </>
           </div>
         )}
-      </main>
-    </div>
+    </PageLayout>
   );
 }

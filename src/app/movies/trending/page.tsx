@@ -11,10 +11,10 @@ import {
 import { useAppStore } from "@/store/use-store";
 import { FAVORITE_MESSAGES } from "@/core/constants/favorite-messages";
 import MovieRow from "@/components/movie/rows/movie-row";
-import MovieRowPortrait from "@/components/movie/rows/movie-row-portrait";
 import Loading from "@/app/loading";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import { LayoutToggle, LayoutOrientation } from "@/components/ui/layout-toggle";
+import { PageLayout } from "@/components/ui/page-layout";
 
 export default function TrendingPage() {
   const router = useRouter();
@@ -99,64 +99,37 @@ export default function TrendingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-brand selection:text-black">
-      <main className="max-w-8xl mx-auto w-full px-6 md:px-16 pt-32 md:pt-36 pb-16 space-y-10 animate-fade-in">
-        <div className="flex justify-start">
+    <PageLayout>
+      <div className="flex justify-start">
           <LayoutToggle value={orientation} onChange={setOrientation} />
         </div>
 
         <div className="space-y-12">
-          {orientation === "landscape" ? (
-            <>
-              <MovieRow
-                title="มาใหม่"
-                movies={newMovies}
-                onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-              />
-              <MovieRow
-                title="มาแรง"
-                movies={popularNewMovies}
-                onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-              />
-              <MovieRow
-                title="ถูกใจผู้ชม"
-                movies={ratedNewMovies}
-                onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-              />
-            </>
-          ) : (
-            <>
-              <MovieRowPortrait
-                title="แนวตั้งมาใหม่"
-                movies={newMovies}
-                onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-              />
-              <MovieRowPortrait
-                title="แนวตั้งมาแรง"
-                movies={popularNewMovies}
-                onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-              />
-              <MovieRowPortrait
-                title="แนวตั้งถูกใจผู้ชม"
-                movies={ratedNewMovies}
-                onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-              />
-            </>
-          )}
+          <MovieRow
+            title={orientation === "landscape" ? "มาใหม่" : "แนวตั้งมาใหม่"}
+            movies={newMovies}
+            onPlayClick={handlePlayMovie}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
+            orientation={orientation}
+          />
+          <MovieRow
+            title={orientation === "landscape" ? "มาแรง" : "แนวตั้งมาแรง"}
+            movies={popularNewMovies}
+            onPlayClick={handlePlayMovie}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
+            orientation={orientation}
+          />
+          <MovieRow
+            title={orientation === "landscape" ? "ถูกใจผู้ชม" : "แนวตั้งถูกใจผู้ชม"}
+            movies={ratedNewMovies}
+            onPlayClick={handlePlayMovie}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
+            orientation={orientation}
+          />
         </div>
-      </main>
-    </div>
+    </PageLayout>
   );
 }

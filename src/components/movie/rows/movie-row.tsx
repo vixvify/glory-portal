@@ -53,7 +53,7 @@ export default function MovieRow({
         >
           {movies.map((movie) => {
             const cardContent = orientation === "landscape" ? (
-              <div className="flex-none snap-start transition-all duration-300 w-[280px] sm:w-[340px] md:w-[400px]">
+              <div className="flex-none snap-start w-[280px] sm:w-[340px] md:w-[400px]">
                 <MovieCard
                   movie={movie}
                   onPlayClick={onPlayClick}
@@ -62,7 +62,7 @@ export default function MovieRow({
                 />
               </div>
             ) : (
-              <div className="flex-none snap-start transition-all duration-300 w-[160px] sm:w-[200px] md:w-[240px]">
+              <div className="flex-none snap-start w-[160px] sm:w-[200px] md:w-[240px]">
                 <MovieCardPortrait
                   movie={movie}
                   onPlayClick={onPlayClick}
