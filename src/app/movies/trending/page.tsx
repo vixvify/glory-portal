@@ -133,21 +133,21 @@ export default function TrendingPage() {
           ) : (
             <>
               <MovieRowPortrait
-                title="มาใหม่"
+                title="แนวตั้งมาใหม่"
                 movies={newMovies}
                 onPlayClick={handlePlayMovie}
                 favorites={favorites}
                 onToggleFavorite={handleToggleFavorite}
               />
               <MovieRowPortrait
-                title="มาแรง"
+                title="แนวตั้งมาแรง"
                 movies={popularNewMovies}
                 onPlayClick={handlePlayMovie}
                 favorites={favorites}
                 onToggleFavorite={handleToggleFavorite}
               />
               <MovieRowPortrait
-                title="ถูกใจผู้ชม"
+                title="แนวตั้งถูกใจผู้ชม"
                 movies={ratedNewMovies}
                 onPlayClick={handlePlayMovie}
                 favorites={favorites}

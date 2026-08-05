@@ -5,6 +5,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Movie } from "@/core/domain/movie";
 import MovieCard from "../cards/movie-card";
+import MovieCardPortrait from "../cards/movie-card-portrait";
 import Link from "next/link";
 
 interface MovieRowProps {
@@ -14,6 +15,7 @@ interface MovieRowProps {
   favorites: Movie[];
   onToggleFavorite: (movieId: string) => void;
   directPlay?: boolean;
+  orientation?: "landscape" | "portrait";
 }
 
 export default function MovieRow({
@@ -23,6 +25,7 @@ export default function MovieRow({
   favorites,
   onToggleFavorite,
   directPlay = false,
+  orientation = "landscape",
 }: MovieRowProps) {
   const { rowRef, showLeftArrow, showRightArrow, handleScroll } =
     useScrollRow(movies);
@@ -49,9 +52,18 @@ export default function MovieRow({
           className="flex overflow-x-auto gap-4 py-4 px-1.5 no-scrollbar scroll-smooth snap-x snap-mandatory"
         >
           {movies.map((movie) => {
-            const cardContent = (
+            const cardContent = orientation === "landscape" ? (
               <div className="flex-none snap-start transition-all duration-300 w-[280px] sm:w-[340px] md:w-[400px]">
                 <MovieCard
+                  movie={movie}
+                  onPlayClick={onPlayClick}
+                  isFavorite={favorites.some((fav) => fav.id === movie.id)}
+                  onToggleFavorite={onToggleFavorite}
+                />
+              </div>
+            ) : (
+              <div className="flex-none snap-start transition-all duration-300 w-[160px] sm:w-[200px] md:w-[240px]">
+                <MovieCardPortrait
                   movie={movie}
                   onPlayClick={onPlayClick}
                   isFavorite={favorites.some((fav) => fav.id === movie.id)}
