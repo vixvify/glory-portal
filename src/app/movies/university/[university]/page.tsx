@@ -29,8 +29,6 @@ export default function UniversityPage() {
     aspectRatio: orientation,
   }, { placeholderData: keepPreviousData });
 
-
-
   if (isLoading) {
     return <Loading />;
   }

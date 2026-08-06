@@ -56,8 +56,6 @@ export default function CategoryPage() {
     aspectRatio: orientation,
   }, { placeholderData: keepPreviousData });
 
-
-
   const isPageLoading = isLoadingCategory || isLoadingViews || isLoadingRating;
 
   if (isPageLoading) {
