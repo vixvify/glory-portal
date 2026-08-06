@@ -70,7 +70,8 @@ export default function UniversityPage() {
 
   return (
     <PageLayout>
-      <div className="flex justify-start">
+      <div className="space-y-8">
+        <div className="flex justify-start">
           <LayoutToggle value={orientation} onChange={setOrientation} />
         </div>
 
@@ -85,7 +86,7 @@ export default function UniversityPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-12 pb-10">
+          <div className="pb-10">
             <MovieGrid
               movies={movies}
               onPlayClick={handlePlayMovie}
@@ -95,6 +96,7 @@ export default function UniversityPage() {
             />
           </div>
         )}
+      </div>
     </PageLayout>
   );
 }

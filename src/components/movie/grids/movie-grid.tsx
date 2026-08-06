@@ -25,32 +25,20 @@ export default function MovieGrid({
       ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
       : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6";
 
+  const CardComponent = orientation === "landscape" ? MovieCard : MovieCardPortrait;
+
   return (
     <div className={gridClass}>
-      {movies.map((movie) => {
-        const cardContent =
-          orientation === "landscape" ? (
-            <MovieCard
-              movie={movie}
-              onPlayClick={onPlayClick}
-              isFavorite={favorites.some((fav) => fav.id === movie.id)}
-              onToggleFavorite={onToggleFavorite}
-            />
-          ) : (
-            <MovieCardPortrait
-              movie={movie}
-              onPlayClick={onPlayClick}
-              isFavorite={favorites.some((fav) => fav.id === movie.id)}
-              onToggleFavorite={onToggleFavorite}
-            />
-          );
-
-        return (
-          <Link href={`/movies/${movie.id}`} key={movie.id}>
-            {cardContent}
-          </Link>
-        );
-      })}
+      {movies.map((movie) => (
+        <Link href={`/movies/${movie.id}`} key={movie.id}>
+          <CardComponent
+            movie={movie}
+            onPlayClick={onPlayClick}
+            isFavorite={favorites.some((fav) => fav.id === movie.id)}
+            onToggleFavorite={onToggleFavorite}
+          />
+        </Link>
+      ))}
     </div>
   );
 }

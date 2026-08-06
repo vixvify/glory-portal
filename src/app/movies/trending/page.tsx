@@ -100,11 +100,12 @@ export default function TrendingPage() {
 
   return (
     <PageLayout>
-      <div className="flex justify-start">
+      <div className="space-y-8">
+        <div className="flex justify-start">
           <LayoutToggle value={orientation} onChange={setOrientation} />
         </div>
 
-        <div className="space-y-12">
+        <div className="space-y-12 pb-10">
           <MovieRow
             title={orientation === "landscape" ? "มาใหม่" : "แนวตั้งมาใหม่"}
             movies={newMovies}
@@ -130,6 +131,7 @@ export default function TrendingPage() {
             orientation={orientation}
           />
         </div>
+      </div>
     </PageLayout>
   );
 }

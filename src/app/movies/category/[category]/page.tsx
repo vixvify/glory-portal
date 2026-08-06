@@ -99,7 +99,8 @@ export default function CategoryPage() {
 
   return (
     <PageLayout>
-      <div className="flex justify-start">
+      <div className="space-y-8">
+        <div className="flex justify-start">
           <LayoutToggle value={orientation} onChange={setOrientation} />
         </div>
 
@@ -143,6 +144,7 @@ export default function CategoryPage() {
               )}
           </div>
         )}
+      </div>
     </PageLayout>
   );
 }
