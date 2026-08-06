@@ -16,6 +16,7 @@ import {
 import { useLogoutMutation } from "@/hooks/db/use-auth";
 import { useFavoritesQuery } from "@/hooks/db/use-favorites";
 import { useSearchPlaceholder } from "@/hooks/system/use-search-placeholder";
+import { MOCK_SCHOOLS } from "@/core/constants/mock-schools";
 
 export default function Navbar() {
   const router = useRouter();
@@ -96,9 +97,8 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 md:px-16 transition-all duration-500 ease-out bg-zinc-950/50 backdrop-blur-md border-b border-white/5 shadow-2xl shadow-black/35 ${
-        isScrolled ? "py-2.5" : "py-5"
-      }`}
+      className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 md:px-16 transition-all duration-500 ease-out bg-zinc-950/50 backdrop-blur-md border-b border-white/5 shadow-2xl shadow-black/35 ${isScrolled ? "py-2.5" : "py-5"
+        }`}
       style={{ fontFamily: "var(--font-sans), Arial, Helvetica, sans-serif" }}
     >
       <div className="flex items-center gap-6">
@@ -119,11 +119,10 @@ export default function Navbar() {
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar select-none">
           <Link
             href="/"
-            className={`px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all duration-300 whitespace-nowrap border ${
-              pathname === "/" && !showMoviesMenu
+            className={`px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all duration-300 whitespace-nowrap border ${pathname === "/" && !showMoviesMenu
                 ? "bg-white/15 text-white border-white/20 font-semibold shadow-md"
                 : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/5"
-            }`}
+              }`}
           >
             หน้าแรก
           </Link>
@@ -134,11 +133,10 @@ export default function Navbar() {
               setShowMoviesMenu(false);
               setSearchQuery("");
             }}
-            className={`px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all duration-300 whitespace-nowrap border ${
-              pathname === "/movies/trending"
+            className={`px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all duration-300 whitespace-nowrap border ${pathname === "/movies/trending"
                 ? "bg-white/15 text-white border-white/20 font-semibold shadow-md"
                 : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/5"
-            }`}
+              }`}
           >
             ใหม่และมาแรง
           </button>
@@ -146,19 +144,17 @@ export default function Navbar() {
           <button
             ref={buttonRef}
             onClick={() => setShowMoviesMenu(!showMoviesMenu)}
-            className={`flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all duration-300 whitespace-nowrap border ${
-              showMoviesMenu ||
-              pathname.startsWith("/movies/category") ||
-              pathname.startsWith("/movies/university")
+            className={`flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all duration-300 whitespace-nowrap border ${showMoviesMenu ||
+                pathname.startsWith("/movies/category") ||
+                pathname.startsWith("/movies/university")
                 ? "bg-white/15 text-white border-white/20 font-semibold shadow-md"
                 : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/5"
-            }`}
+              }`}
           >
             หมวดหมู่
             <KeyboardArrowDownIcon
-              className={`text-sm transition-transform duration-300 ${
-                showMoviesMenu ? "rotate-180 text-brand" : "text-zinc-400"
-              }`}
+              className={`text-sm transition-transform duration-300 ${showMoviesMenu ? "rotate-180 text-brand" : "text-zinc-400"
+                }`}
             />
           </button>
         </div>
@@ -166,11 +162,10 @@ export default function Navbar() {
 
       <div className="flex items-center gap-4 md:gap-5 flex-shrink-0">
         <div
-          className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-            isSearchExpanded
+          className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${isSearchExpanded
               ? "w-40 md:w-64 glass-input border-white/10 scale-100 opacity-100"
               : "w-8 bg-transparent border-transparent"
-          }`}
+            }`}
         >
           <button
             onClick={() => setIsSearchExpanded(!isSearchExpanded)}
@@ -279,31 +274,28 @@ export default function Navbar() {
           <div className="flex border-b border-white/5 mb-3 pb-2 gap-1">
             <button
               onClick={() => setActiveTab("category")}
-              className={`flex-1 text-center py-2 text-[10px] font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === "category"
+              className={`flex-1 text-center py-2 text-[10px] font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${activeTab === "category"
                   ? "bg-brand/15 text-brand border border-brand/25"
                   : "text-zinc-400 hover:text-white border border-transparent"
-              }`}
+                }`}
             >
               หมวดหมู่
             </button>
             <button
               onClick={() => setActiveTab("university")}
-              className={`flex-1 text-center py-2 text-[10px] font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === "university"
+              className={`flex-1 text-center py-2 text-[10px] font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${activeTab === "university"
                   ? "bg-brand/15 text-brand border border-brand/25"
                   : "text-zinc-400 hover:text-white border border-transparent"
-              }`}
+                }`}
             >
               มหาวิทยาลัย
             </button>
             <button
               onClick={() => setActiveTab("favorites")}
-              className={`flex-1 text-center py-2 text-[10px] font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === "favorites"
+              className={`flex-1 text-center py-2 text-[10px] font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${activeTab === "favorites"
                   ? "bg-brand/15 text-brand border border-brand/25"
                   : "text-zinc-400 hover:text-white border border-transparent"
-              }`}
+                }`}
             >
               รายการของฉัน
             </button>
