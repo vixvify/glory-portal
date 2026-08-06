@@ -10,12 +10,11 @@ import {
 } from "@/hooks/db/use-favorites";
 import { useAppStore } from "@/store/use-store";
 import { FAVORITE_MESSAGES } from "@/core/constants/favorite-messages";
-import MovieRow from "@/components/movie/rows/movie-row";
+import MovieGrid from "@/components/movie/grids/movie-grid";
 import Loading from "@/app/loading";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import { LayoutToggle, LayoutOrientation } from "@/components/ui/layout-toggle";
 import { PageLayout } from "@/components/ui/page-layout";
-import { isEmptyAll } from "@/utils/check";
 import { MOCK_SCHOOLS } from "@/core/constants/mock-schools";
 
 export default function SchoolDetailPage() {
@@ -34,16 +33,6 @@ export default function SchoolDetailPage() {
 
   const { data: moviesBySchool = [], isLoading: isLoadingSchool } = useMoviesQuery(
     { search: schoolName, searchby: "school", aspectRatio: orientation },
-    { placeholderData: keepPreviousData }
-  );
-
-  const { data: moviesByViews = [], isLoading: isLoadingViews } = useMoviesQuery(
-    { search: schoolName, searchby: "school", sort: "desc", sortby: "views", aspectRatio: orientation },
-    { placeholderData: keepPreviousData }
-  );
-
-  const { data: moviesByRating = [], isLoading: isLoadingRating } = useMoviesQuery(
-    { search: schoolName, searchby: "school", sort: "desc", sortby: "averageRating", aspectRatio: orientation },
     { placeholderData: keepPreviousData }
   );
 
@@ -78,11 +67,7 @@ export default function SchoolDetailPage() {
     [currentUser, favorites, toggleFavoriteMutation, showToast, router]
   );
 
-  const isPageLoading =
-    isLoadingSchool ||
-    isLoadingViews ||
-    isLoadingRating ||
-    (!!currentUser && isLoadingFavs);
+  const isPageLoading = isLoadingSchool || (!!currentUser && isLoadingFavs);
 
   if (isPageLoading) {
     return <Loading />;
@@ -96,47 +81,24 @@ export default function SchoolDetailPage() {
         </div>
 
         <h1 className="text-2xl md:text-3xl font-bold text-white">
-          ผลงานจาก {displaySchoolName}
+          {displaySchoolName}
         </h1>
 
-        {isEmptyAll(moviesBySchool, moviesByViews, moviesByRating) ? (
+        {moviesBySchool.length === 0 ? (
           <div className="text-center py-24 space-y-3">
             <p className="text-lg text-zinc-500 font-light">
               ไม่พบภาพยนตร์จากโรงเรียนนี้ในระบบ
             </p>
           </div>
         ) : (
-          <div className="space-y-12 pb-10">
-            {moviesBySchool.length > 0 && (
-              <MovieRow
-                title={displaySchoolName}
-                movies={moviesBySchool}
-                onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-                orientation={orientation}
-              />
-            )}
-            {moviesBySchool.length >= 5 && moviesByViews.length > 0 && (
-              <MovieRow
-                title={`${displaySchoolName}ยอดนิยม`}
-                movies={moviesByViews}
-                onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-                orientation={orientation}
-              />
-            )}
-            {moviesBySchool.length >= 5 && moviesByRating.length > 0 && (
-              <MovieRow
-                title={`${displaySchoolName}ถูกใจผู้ชม`}
-                movies={moviesByRating}
-                onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-                orientation={orientation}
-              />
-            )}
+          <div className="pb-10">
+            <MovieGrid
+              movies={moviesBySchool}
+              onPlayClick={handlePlayMovie}
+              favorites={favorites}
+              onToggleFavorite={handleToggleFavorite}
+              orientation={orientation}
+            />
           </div>
         )}
       </div>
