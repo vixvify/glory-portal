@@ -9,7 +9,7 @@ import {
 
 export function useMoviesQuery(
   params?: MovieFilterParams,
-  options?: Omit<UseQueryOptions<Movie[], Error, Movie[], any>, "queryKey" | "queryFn">,
+  options?: Omit<UseQueryOptions<Movie[], Error>, "queryKey" | "queryFn">,
 ) {
   return useQuery<Movie[], Error>({
     queryKey: params ? ["movies", params] : ["movies"],

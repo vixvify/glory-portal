@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useParams } from "next/navigation";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
 import { useFavoriteHandler } from "@/hooks/system/use-favorite-handler";
-import { useAppStore } from "@/store/use-store";
+
 import MovieGrid from "@/components/movie/grids/movie-grid";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import { LayoutToggle, LayoutOrientation } from "@/components/ui/layout-toggle";
@@ -14,13 +14,11 @@ import Loading from "@/app/loading";
 
 export default function UniversityPage() {
   const params = useParams<{ university: string }>();
-  const router = useRouter();
   const universityName = params.university
     ? decodeURIComponent(params.university)
     : "";
 
   const { playMovie: handlePlayMovie } = useMoviePlayer();
-  const { currentUser } = useAppStore();
   const { favorites, handleToggleFavorite } = useFavoriteHandler();
 
   const [orientation, setOrientation] = useState<LayoutOrientation>("landscape");

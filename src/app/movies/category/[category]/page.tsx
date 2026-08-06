@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useParams } from "next/navigation";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
 import { useFavoriteHandler } from "@/hooks/system/use-favorite-handler";
-import { useAppStore } from "@/store/use-store";
+
 import MovieRow from "@/components/movie/rows/movie-row";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import { useCategoriesQuery } from "@/hooks/db/use-master-data";
@@ -16,13 +16,11 @@ import Loading from "@/app/loading";
 
 export default function CategoryPage() {
   const params = useParams<{ category: string }>();
-  const router = useRouter();
   const categoryName = params.category
     ? decodeURIComponent(params.category)
     : "";
 
   const { playMovie: handlePlayMovie } = useMoviePlayer();
-  const { currentUser } = useAppStore();
   const { favorites, handleToggleFavorite } = useFavoriteHandler();
 
   const { data: categories = [] } = useCategoriesQuery();

@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useParams } from "next/navigation";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
 import { useFavoriteHandler } from "@/hooks/system/use-favorite-handler";
-import { useAppStore } from "@/store/use-store";
+
 import MovieGrid from "@/components/movie/grids/movie-grid";
 import Loading from "@/app/loading";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
@@ -15,7 +15,6 @@ import { MOCK_SCHOOLS } from "@/core/constants/mock-schools";
 
 export default function SchoolDetailPage() {
   const params = useParams<{ school: string }>();
-  const router = useRouter();
   const schoolName = params.school ? decodeURIComponent(params.school) : "";
 
   const mappedSchool = MOCK_SCHOOLS.find(
@@ -24,7 +23,6 @@ export default function SchoolDetailPage() {
   const displaySchoolName = mappedSchool ? mappedSchool.label : schoolName;
 
   const { playMovie: handlePlayMovie } = useMoviePlayer();
-  const { currentUser } = useAppStore();
   const { favorites, handleToggleFavorite } = useFavoriteHandler();
   const [orientation, setOrientation] = useState<LayoutOrientation>("landscape");
 

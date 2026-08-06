@@ -1,11 +1,10 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
 import { useFavoriteHandler } from "@/hooks/system/use-favorite-handler";
-import { useAppStore } from "@/store/use-store";
+
 import MovieRow from "@/components/movie/rows/movie-row";
 import Loading from "@/app/loading";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
@@ -57,9 +56,7 @@ function RandomSchoolRow({
 }
 
 export default function SchoolPage() {
-  const router = useRouter();
   const { playMovie: handlePlayMovie } = useMoviePlayer();
-  const { currentUser } = useAppStore();
   const { favorites, handleToggleFavorite } = useFavoriteHandler();
   const [orientation, setOrientation] = useState<LayoutOrientation>("landscape");
 
