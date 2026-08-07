@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MovieIcon from "@mui/icons-material/Movie";
 import PersonIcon from "@mui/icons-material/Person";
@@ -33,8 +34,16 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
+    let active = true;
+    requestAnimationFrame(() => {
+      if (active) {
+        setMounted(true);
+      }
+    });
+    return () => {
+      active = false;
+      setMounted(false);
+    };
   }, []);
 
   if (!isOpen) return null;
@@ -44,10 +53,12 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       if (iconType === "avatar-preview") {
         return (
           <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-brand mx-auto relative shadow-lg bg-zinc-900">
-            <img
+            <Image
               src={previewUrl}
               alt="Avatar Preview"
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              unoptimized
             />
           </div>
         );
@@ -55,10 +66,12 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       if (iconType === "cover-preview") {
         return (
           <div className="w-full h-40 rounded-xl overflow-hidden border border-zinc-800/80 mx-auto relative shadow-lg bg-zinc-950">
-            <img
+            <Image
               src={previewUrl}
               alt="Cover Preview"
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              unoptimized
             />
           </div>
         );
