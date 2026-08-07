@@ -5,6 +5,7 @@ import Image from "next/image";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckIcon from "@mui/icons-material/Check";
+import AddIcon from "@mui/icons-material/Add";
 import { Movie } from "@/core/domain/movie";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
@@ -14,12 +15,16 @@ interface Props {
   movie: Movie;
   onPlayClick: () => void;
   onTrailerClick: () => void;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
 }
 
 export default function MovieDetailHero({
   movie,
   onPlayClick,
   onTrailerClick,
+  isFavorite,
+  onToggleFavorite,
 }: Props) {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
@@ -136,8 +141,13 @@ export default function MovieDetailHero({
                   </Button>
                 )}
 
-                <button className="flex items-center justify-center w-11 h-11 rounded-md border border-zinc-700 bg-zinc-900/60 hover:bg-zinc-800 text-emerald-400 cursor-pointer transition-colors">
-                  <CheckIcon className="text-xl" />
+                <button
+                  onClick={onToggleFavorite}
+                  className={`flex items-center justify-center w-11 h-11 rounded-md border border-zinc-700 hover:bg-zinc-800 cursor-pointer transition-colors ${
+                    isFavorite ? "bg-zinc-900/60 text-emerald-400" : "bg-black/40 text-white hover:text-emerald-400"
+                  }`}
+                >
+                  {isFavorite ? <CheckIcon className="text-xl" /> : <AddIcon className="text-xl" />}
                 </button>
               </div>
             </div>
@@ -168,8 +178,13 @@ export default function MovieDetailHero({
                   </Button>
                 )}
 
-                <button className="flex items-center justify-center w-11 h-11 rounded-md border border-zinc-700 bg-zinc-900/60 hover:bg-zinc-800 text-emerald-400 cursor-pointer transition-colors">
-                  <CheckIcon className="text-xl" />
+                <button
+                  onClick={onToggleFavorite}
+                  className={`flex items-center justify-center w-11 h-11 rounded-md border border-zinc-700 hover:bg-zinc-800 cursor-pointer transition-colors ${
+                    isFavorite ? "bg-zinc-900/60 text-emerald-400" : "bg-black/40 text-white hover:text-emerald-400"
+                  }`}
+                >
+                  {isFavorite ? <CheckIcon className="text-xl" /> : <AddIcon className="text-xl" />}
                 </button>
               </div>
             </div>
