@@ -9,6 +9,7 @@ import { PROFILE_MESSAGES } from "@/core/constants/profile-messages";
 import { COMMON_MESSAGES } from "@/core/constants/common-messages";
 import { UPLOAD_LIMITS } from "@/core/constants/upload";
 import imageCompression from "browser-image-compression";
+import { ConfirmModal } from "@/components/modal/confirm-modal";
 
 interface CoverUploadProps {
   coverUrl?: string | null;
@@ -23,10 +24,12 @@ export function CoverUpload({
 }: CoverUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const { mutateAsync: updateProfile, isPending } = useUpdateProfileMutation();
   const { showToast } = useAppStore();
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -46,6 +49,13 @@ export function CoverUpload({
 
     const objectUrl = URL.createObjectURL(file);
     setPreviewUrl(objectUrl);
+    setPendingFile(file);
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirmCover = async () => {
+    if (!pendingFile) return;
+    setIsConfirmOpen(false);
 
     try {
       showToast(PROFILE_MESSAGES.TOAST.UPLOADING_COVER, "success");
@@ -54,10 +64,10 @@ export function CoverUpload({
         maxWidthOrHeight: 1920,
         useWebWorker: true,
       };
-      const compressedFile = await imageCompression(file, options);
+      const compressedFile = await imageCompression(pendingFile, options);
 
-      const finalFile = new File([compressedFile], file.name, {
-        type: compressedFile.type || file.type,
+      const finalFile = new File([compressedFile], pendingFile.name, {
+        type: compressedFile.type || pendingFile.type,
       });
 
       await updateProfile({ coverPhoto: finalFile });
@@ -67,8 +77,11 @@ export function CoverUpload({
         err instanceof Error ? err.message : COMMON_MESSAGES.ERRORS.SAVE;
       showToast(errorMessage, "error");
     } finally {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
       setPreviewUrl(null);
-      URL.revokeObjectURL(objectUrl);
+      setPendingFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -80,7 +93,7 @@ export function CoverUpload({
     fileInputRef.current?.click();
   };
 
-  const displayUrl = previewUrl || coverUrl;
+  const displayUrl = (isPending && previewUrl) ? previewUrl : coverUrl;
 
   return (
     <div className="relative w-full h-full group">
@@ -129,6 +142,27 @@ export function CoverUpload({
           />
         </>
       )}
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        onClose={() => {
+          setIsConfirmOpen(false);
+          setPendingFile(null);
+          if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+          }
+          setPreviewUrl(null);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
+        }}
+        onConfirm={handleConfirmCover}
+        title={PROFILE_MESSAGES.CONFIRM.UPDATE_COVER_TITLE}
+        message={PROFILE_MESSAGES.CONFIRM.UPDATE_COVER_MSG}
+        confirmText={PROFILE_MESSAGES.CONFIRM.UPDATE_COVER_BTN}
+        cancelText={COMMON_MESSAGES.CONFIRM.CANCEL}
+        iconType="cover-preview"
+        previewUrl={previewUrl || undefined}
+      />
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { PROFILE_MESSAGES } from "@/core/constants/profile-messages";
 import { COMMON_MESSAGES } from "@/core/constants/common-messages";
 import { UPLOAD_LIMITS } from "@/core/constants/upload";
 import imageCompression from "browser-image-compression";
+import { ConfirmModal } from "@/components/modal/confirm-modal";
 
 interface AvatarUploadProps {
   photoUrl?: string | null;
@@ -20,10 +21,12 @@ interface AvatarUploadProps {
 export function AvatarUpload({ photoUrl, name, isOwner }: AvatarUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const { mutateAsync: updateProfile, isPending } = useUpdateProfileMutation();
   const { showToast } = useAppStore();
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -43,6 +46,13 @@ export function AvatarUpload({ photoUrl, name, isOwner }: AvatarUploadProps) {
 
     const objectUrl = URL.createObjectURL(file);
     setPreviewUrl(objectUrl);
+    setPendingFile(file);
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirmAvatar = async () => {
+    if (!pendingFile) return;
+    setIsConfirmOpen(false);
 
     try {
       showToast(PROFILE_MESSAGES.TOAST.UPLOADING_AVATAR, "success");
@@ -51,10 +61,10 @@ export function AvatarUpload({ photoUrl, name, isOwner }: AvatarUploadProps) {
         maxWidthOrHeight: 800,
         useWebWorker: true,
       };
-      const compressedFile = await imageCompression(file, options);
+      const compressedFile = await imageCompression(pendingFile, options);
 
-      const finalFile = new File([compressedFile], file.name, {
-        type: compressedFile.type || file.type,
+      const finalFile = new File([compressedFile], pendingFile.name, {
+        type: compressedFile.type || pendingFile.type,
       });
 
       await updateProfile({ photo: finalFile });
@@ -64,8 +74,11 @@ export function AvatarUpload({ photoUrl, name, isOwner }: AvatarUploadProps) {
         err instanceof Error ? err.message : COMMON_MESSAGES.ERRORS.SAVE;
       showToast(errorMessage, "error");
     } finally {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
       setPreviewUrl(null);
-      URL.revokeObjectURL(objectUrl);
+      setPendingFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -77,7 +90,7 @@ export function AvatarUpload({ photoUrl, name, isOwner }: AvatarUploadProps) {
     fileInputRef.current?.click();
   };
 
-  const displayUrl = previewUrl || photoUrl;
+  const displayUrl = (isPending && previewUrl) ? previewUrl : photoUrl;
 
   return (
     <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full p-1 bg-background shrink-0 group">
@@ -120,6 +133,27 @@ export function AvatarUpload({ photoUrl, name, isOwner }: AvatarUploadProps) {
           />
         </>
       )}
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        onClose={() => {
+          setIsConfirmOpen(false);
+          setPendingFile(null);
+          if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+          }
+          setPreviewUrl(null);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
+        }}
+        onConfirm={handleConfirmAvatar}
+        title={PROFILE_MESSAGES.CONFIRM.UPDATE_AVATAR_TITLE}
+        message={PROFILE_MESSAGES.CONFIRM.UPDATE_AVATAR_MSG}
+        confirmText={PROFILE_MESSAGES.CONFIRM.UPDATE_AVATAR_BTN}
+        cancelText={COMMON_MESSAGES.CONFIRM.CANCEL}
+        iconType="avatar-preview"
+        previewUrl={previewUrl || undefined}
+      />
     </div>
   );
 }
