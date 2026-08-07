@@ -7,8 +7,6 @@ import { Movie } from "@/core/domain/movie";
 interface Props {
   movie: Movie;
   onPlayClick: (movie: Movie) => void;
-  isFavorite: boolean;
-  onToggleFavorite: (movieId: string) => void;
 }
 
 function MovieCard({ movie }: Props) {

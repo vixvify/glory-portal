@@ -6,28 +6,32 @@ import { keepPreviousData } from "@tanstack/react-query";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
 
 import MovieGrid from "@/components/movie/grids/movie-grid";
+import Loading from "@/app/loading";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import { LayoutToggle, LayoutOrientation } from "@/components/ui/layout-toggle";
 import { PageLayout } from "@/components/ui/page-layout";
-import Loading from "@/app/loading";
+import { MOCK_SCHOOLS } from "@/core/constants/mock-schools";
 
-export default function UniversityPage() {
-  const params = useParams<{ university: string }>();
-  const universityName = params.university
-    ? decodeURIComponent(params.university)
-    : "";
+export default function SchoolDetailPage() {
+  const params = useParams<{ school: string }>();
+  const schoolName = params.school ? decodeURIComponent(params.school) : "";
+
+  const mappedSchool = MOCK_SCHOOLS.find(
+    (s) => s.searchKey.toLowerCase() === schoolName.toLowerCase()
+  );
+  const displaySchoolName = mappedSchool ? mappedSchool.label : schoolName;
 
   const { playMovie: handlePlayMovie } = useMoviePlayer();
-
   const [orientation, setOrientation] = useState<LayoutOrientation>("landscape");
 
-  const { data: movies = [], isLoading } = useMoviesQuery({
-    search: universityName,
-    searchby: "university",
-    aspectRatio: orientation,
-  }, { placeholderData: keepPreviousData });
+  const { data: moviesBySchool = [], isLoading: isLoadingSchool } = useMoviesQuery(
+    { search: schoolName, searchby: "school", aspectRatio: orientation },
+    { placeholderData: keepPreviousData }
+  );
 
-  if (isLoading) {
+  const isPageLoading = isLoadingSchool;
+
+  if (isPageLoading) {
     return <Loading />;
   }
 
@@ -39,19 +43,19 @@ export default function UniversityPage() {
         </div>
 
         <h1 className="text-2xl md:text-3xl font-bold text-white">
-          ผลงานจาก {universityName}
+          {displaySchoolName}
         </h1>
 
-        {movies.length === 0 ? (
+        {moviesBySchool.length === 0 ? (
           <div className="text-center py-24 space-y-3">
             <p className="text-lg text-zinc-500 font-light">
-              ไม่พบภาพยนตร์จากสถาบันนี้ในระบบ
+              ไม่พบภาพยนตร์จากโรงเรียนนี้ในระบบ
             </p>
           </div>
         ) : (
           <div className="pb-10">
             <MovieGrid
-              movies={movies}
+              movies={moviesBySchool}
               onPlayClick={handlePlayMovie}
               orientation={orientation}
             />

@@ -23,6 +23,7 @@ import { CONTENT_WARNING_OPTIONS } from "@/core/constants/movie-form";
 import { MOVIE_MESSAGES } from "@/core/constants/movie-messages";
 import { AUTH_MESSAGES } from "@/core/constants/auth-messages";
 import { COMMON_MESSAGES } from "@/core/constants/common-messages";
+import { useFavoriteHandler } from "@/hooks/system/use-favorite-handler";
 
 export default function MovieDetails() {
   const params = useParams<{ id: string }>();
@@ -34,6 +35,8 @@ export default function MovieDetails() {
     movie?.id ?? "",
     !!currentUser,
   );
+  
+  const { favorites, handleToggleFavorite } = useFavoriteHandler();
 
   const addRatingMutation = useAddRatingMutation();
   const updateRatingMutation = useUpdateRatingMutation();
@@ -96,6 +99,8 @@ export default function MovieDetails() {
           movie={movie}
           onPlayClick={() => playMovie(movie)}
           onTrailerClick={() => setIsPlayingTrailer(true)}
+          isFavorite={favorites.some((fav) => fav.id === movie.id)}
+          onToggleFavorite={() => handleToggleFavorite(movie.id)}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-2 md:px-4">

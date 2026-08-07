@@ -1,14 +1,9 @@
 "use client";
 
-import { useCallback } from "react";
 import { useRouter } from "next/navigation";
-import {
-  useFavoritesQuery,
-  useToggleFavoriteMutation,
-} from "@/hooks/db/use-favorites";
-import { useAppStore } from "@/store/use-store";
 import { FAVORITE_MESSAGES } from "@/core/constants/favorite-messages";
-import { AUTH_MESSAGES } from "@/core/constants/auth-messages";
+import { useFavoritesQuery } from "@/hooks/db/use-favorites";
+import { useAppStore } from "@/store/use-store";
 import MovieGrid from "@/components/movie/grids/movie-grid";
 import Loading from "@/app/loading";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
@@ -21,37 +16,9 @@ export default function FavoritesPage() {
   const router = useRouter();
   const { playMovie: handlePlayMovie } = useMoviePlayer();
 
-  const { currentUser, showToast } = useAppStore();
+  const { currentUser } = useAppStore();
 
   const { data: favorites = [], isLoading } = useFavoritesQuery(!!currentUser);
-  const toggleFavoriteMutation = useToggleFavoriteMutation();
-
-  const handleToggleFavorite = useCallback(
-    (movieId: string) => {
-      if (!currentUser) {
-        showToast(AUTH_MESSAGES.TOAST.LOGIN_REQUIRED, "warning");
-        return;
-      }
-      const isCurrentlyFavorite = favorites.some((m) => m.id === movieId);
-
-      toggleFavoriteMutation.mutate(
-        { movieId, isFavorite: isCurrentlyFavorite },
-        {
-          onSuccess: () => {
-            if (isCurrentlyFavorite) {
-              showToast(FAVORITE_MESSAGES.TOAST.REMOVE_MY_LIST_SUCCESS, "info");
-            } else {
-              showToast(FAVORITE_MESSAGES.TOAST.ADD_MY_LIST_SUCCESS, "success");
-            }
-          },
-          onError: () => {
-            showToast(FAVORITE_MESSAGES.ERRORS.FAVORITE_LIST_UPDATE, "error");
-          },
-        },
-      );
-    },
-    [currentUser, favorites, toggleFavoriteMutation, showToast],
-  );
 
   if (isLoading && currentUser) {
     return <Loading />;
@@ -123,8 +90,6 @@ export default function FavoritesPage() {
             <MovieGrid
               movies={favorites}
               onPlayClick={handlePlayMovie}
-              favorites={favorites}
-              onToggleFavorite={handleToggleFavorite}
             />
           </div>
         )}

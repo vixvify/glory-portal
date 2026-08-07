@@ -71,8 +71,6 @@ export default function HomeView({
           title="รับชมต่อ"
           movies={recommendedMovies}
           onPlayClick={handlePlayMovie}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
           directPlay={true}
         />
 
@@ -81,8 +79,6 @@ export default function HomeView({
             title={`ผลงานจาก${universityName}`}
             movies={universityMovies}
             onPlayClick={handlePlayMovie}
-            favorites={favorites}
-            onToggleFavorite={handleToggleFavorite}
           />
         )}
 
@@ -90,24 +86,18 @@ export default function HomeView({
           title="ชนะรางวัล"
           movies={awardsMovies}
           onPlayClick={handlePlayMovie}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
         />
 
         <MovieRow
           title="ถูกใจผู้ชม"
           movies={moviesByRating}
           onPlayClick={handlePlayMovie}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
         />
 
         <MovieRankRow
           title="ติดอันดับ"
           movies={popularMovies}
           onPlayClick={handlePlayMovie}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
         />
 
         <AdBanner />
@@ -117,8 +107,6 @@ export default function HomeView({
             title="รายการโปรดของคุณ"
             movies={favorites}
             onPlayClick={handlePlayMovie}
-            favorites={favorites}
-            onToggleFavorite={handleToggleFavorite}
           />
         )}
 
@@ -127,8 +115,6 @@ export default function HomeView({
             title="ดราม่าเรียกน้ำตา"
             movies={dramaMovies}
             onPlayClick={handlePlayMovie}
-            favorites={favorites}
-            onToggleFavorite={handleToggleFavorite}
           />
         )}
 
@@ -137,8 +123,6 @@ export default function HomeView({
             title="สั่นประสาท"
             movies={thrillerHorrorMovies}
             onPlayClick={handlePlayMovie}
-            favorites={favorites}
-            onToggleFavorite={handleToggleFavorite}
           />
         )}
 
@@ -147,8 +131,6 @@ export default function HomeView({
             title="ยิ้มได้ทั้งวัน"
             movies={comedyMovies}
             onPlayClick={handlePlayMovie}
-            favorites={favorites}
-            onToggleFavorite={handleToggleFavorite}
           />
         )}
 
@@ -157,8 +139,6 @@ export default function HomeView({
             title="รักหวานฉ่ำ"
             movies={romanceMovies}
             onPlayClick={handlePlayMovie}
-            favorites={favorites}
-            onToggleFavorite={handleToggleFavorite}
           />
         )}
 
@@ -174,8 +154,6 @@ export default function HomeView({
           title="ภาพยนตร์แนวตั้ง"
           movies={portraitMovies}
           onPlayClick={handlePlayMovie}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
         />
 
         {actorList.length > 0 && <CrewRow title="นักแสดง" crew={actorList} />}
