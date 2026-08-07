@@ -11,6 +11,7 @@ interface Toast {
 
 interface AppState {
   currentUser: User | null;
+  isCheckingAuth: boolean;
   setCurrentUser: (user: User | null) => void;
 
   toast: Toast | null;
@@ -25,10 +26,11 @@ let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
 export const useAppStore = create<AppState>()((set) => ({
   currentUser: null,
+  isCheckingAuth: true,
   toast: null,
   searchQuery: "",
 
-  setCurrentUser: (user) => set({ currentUser: user }),
+  setCurrentUser: (user) => set({ currentUser: user, isCheckingAuth: false }),
 
   setSearchQuery: (query) => set({ searchQuery: query }),
 
