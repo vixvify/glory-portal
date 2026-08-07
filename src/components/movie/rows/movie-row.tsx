@@ -12,8 +12,6 @@ interface MovieRowProps {
   title: string;
   movies: Movie[];
   onPlayClick: (movie: Movie) => void;
-  favorites: Movie[];
-  onToggleFavorite: (movieId: string) => void;
   directPlay?: boolean;
   orientation?: "landscape" | "portrait";
 }
@@ -22,8 +20,6 @@ export default function MovieRow({
   title,
   movies,
   onPlayClick,
-  favorites,
-  onToggleFavorite,
   directPlay = false,
   orientation = "landscape",
 }: MovieRowProps) {
@@ -57,8 +53,6 @@ export default function MovieRow({
                 <MovieCard
                   movie={movie}
                   onPlayClick={onPlayClick}
-                  isFavorite={favorites.some((fav) => fav.id === movie.id)}
-                  onToggleFavorite={onToggleFavorite}
                 />
               </div>
             ) : (
@@ -66,8 +60,6 @@ export default function MovieRow({
                 <MovieCardPortrait
                   movie={movie}
                   onPlayClick={onPlayClick}
-                  isFavorite={favorites.some((fav) => fav.id === movie.id)}
-                  onToggleFavorite={onToggleFavorite}
                 />
               </div>
             );

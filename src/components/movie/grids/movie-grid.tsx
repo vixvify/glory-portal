@@ -8,16 +8,12 @@ import Link from "next/link";
 interface Props {
   movies: Movie[];
   onPlayClick: (movie: Movie) => void;
-  favorites: Movie[];
-  onToggleFavorite: (movieId: string) => void;
   orientation?: "landscape" | "portrait";
 }
 
 export default function MovieGrid({
   movies,
   onPlayClick,
-  favorites,
-  onToggleFavorite,
   orientation = "landscape",
 }: Props) {
   const gridClass =
@@ -34,8 +30,6 @@ export default function MovieGrid({
           <CardComponent
             movie={movie}
             onPlayClick={onPlayClick}
-            isFavorite={favorites.some((fav) => fav.id === movie.id)}
-            onToggleFavorite={onToggleFavorite}
           />
         </Link>
       ))}

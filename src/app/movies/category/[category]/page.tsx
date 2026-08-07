@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
-import { useFavoriteHandler } from "@/hooks/system/use-favorite-handler";
 
 import MovieRow from "@/components/movie/rows/movie-row";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
@@ -21,7 +20,6 @@ export default function CategoryPage() {
     : "";
 
   const { playMovie: handlePlayMovie } = useMoviePlayer();
-  const { favorites, handleToggleFavorite } = useFavoriteHandler();
 
   const { data: categories = [] } = useCategoriesQuery();
   const currentCategory = categories.find(
@@ -82,8 +80,6 @@ export default function CategoryPage() {
                 title={categoryDisplayTitle}
                 movies={moviesByCategory}
                 onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
                 orientation={orientation}
               />
             )}
@@ -92,8 +88,6 @@ export default function CategoryPage() {
                 title={`${categoryDisplayTitle}ยอดนิยม`}
                 movies={moviesByViews}
                 onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
                 orientation={orientation}
               />
             )}
@@ -102,8 +96,6 @@ export default function CategoryPage() {
                 title={`${categoryDisplayTitle}ถูกใจผู้ชม`}
                 movies={moviesByRating}
                 onPlayClick={handlePlayMovie}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
                 orientation={orientation}
               />
             )}

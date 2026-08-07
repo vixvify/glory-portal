@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
-import { useFavoriteHandler } from "@/hooks/system/use-favorite-handler";
 
 import MovieGrid from "@/components/movie/grids/movie-grid";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
@@ -19,7 +18,6 @@ export default function UniversityPage() {
     : "";
 
   const { playMovie: handlePlayMovie } = useMoviePlayer();
-  const { favorites, handleToggleFavorite } = useFavoriteHandler();
 
   const [orientation, setOrientation] = useState<LayoutOrientation>("landscape");
 
@@ -55,8 +53,6 @@ export default function UniversityPage() {
             <MovieGrid
               movies={movies}
               onPlayClick={handlePlayMovie}
-              favorites={favorites}
-              onToggleFavorite={handleToggleFavorite}
               orientation={orientation}
             />
           </div>

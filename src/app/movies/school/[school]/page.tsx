@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
-import { useFavoriteHandler } from "@/hooks/system/use-favorite-handler";
 
 import MovieGrid from "@/components/movie/grids/movie-grid";
 import Loading from "@/app/loading";
@@ -23,7 +22,6 @@ export default function SchoolDetailPage() {
   const displaySchoolName = mappedSchool ? mappedSchool.label : schoolName;
 
   const { playMovie: handlePlayMovie } = useMoviePlayer();
-  const { favorites, handleToggleFavorite } = useFavoriteHandler();
   const [orientation, setOrientation] = useState<LayoutOrientation>("landscape");
 
   const { data: moviesBySchool = [], isLoading: isLoadingSchool } = useMoviesQuery(
@@ -59,8 +57,6 @@ export default function SchoolDetailPage() {
             <MovieGrid
               movies={moviesBySchool}
               onPlayClick={handlePlayMovie}
-              favorites={favorites}
-              onToggleFavorite={handleToggleFavorite}
               orientation={orientation}
             />
           </div>

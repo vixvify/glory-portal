@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
-import { useFavoriteHandler } from "@/hooks/system/use-favorite-handler";
 
 import MovieRow from "@/components/movie/rows/movie-row";
 import Loading from "@/app/loading";
@@ -26,15 +25,11 @@ function pickRandom<T>(arr: T[], count: number): T[] {
 function RandomSchoolRow({
   school,
   orientation,
-  favorites,
   onPlayClick,
-  onToggleFavorite,
 }: {
   school: { searchKey: string; label: string };
   orientation: LayoutOrientation;
-  favorites: Movie[];
   onPlayClick: (movie: Movie) => void;
-  onToggleFavorite: (movieId: string) => void;
 }) {
   const { data: movies = [], isLoading } = useMoviesQuery(
     { search: school.searchKey, searchby: "school", aspectRatio: orientation },
@@ -48,8 +43,6 @@ function RandomSchoolRow({
       title={school.label}
       movies={movies}
       onPlayClick={onPlayClick}
-      favorites={favorites}
-      onToggleFavorite={onToggleFavorite}
       orientation={orientation}
     />
   );
@@ -57,7 +50,6 @@ function RandomSchoolRow({
 
 export default function SchoolPage() {
   const { playMovie: handlePlayMovie } = useMoviePlayer();
-  const { favorites, handleToggleFavorite } = useFavoriteHandler();
   const [orientation, setOrientation] = useState<LayoutOrientation>("landscape");
 
   const randomSchools = useMemo(() => pickRandom(MOCK_SCHOOLS, 2), []);
@@ -86,8 +78,6 @@ export default function SchoolPage() {
               title="ผลงานจากนักเรียน"
               movies={allSchoolMovies}
               onPlayClick={handlePlayMovie}
-              favorites={favorites}
-              onToggleFavorite={handleToggleFavorite}
               orientation={orientation}
             />
           )}
@@ -97,9 +87,7 @@ export default function SchoolPage() {
               key={school.searchKey}
               school={school}
               orientation={orientation}
-              favorites={favorites}
               onPlayClick={handlePlayMovie}
-              onToggleFavorite={handleToggleFavorite}
             />
           ))}
 
