@@ -69,10 +69,8 @@ export default function AdminMoviesPage() {
         setIsDeletingLocal(true);
         await deleteMovieMutation.mutateAsync(deleteMovieId);
         showToast(MOVIE_MESSAGES.TOAST.DELETE_MOVIE_SUCCESS, "success");
-      } catch (err: unknown) {
-        const errorMessage =
-          err instanceof Error ? err.message : COMMON_MESSAGES.ERRORS.DELETE;
-        showToast(errorMessage, "error");
+      } catch {
+        showToast(COMMON_MESSAGES.ERRORS.DELETE, "error");
       } finally {
         setIsDeletingLocal(false);
         setDeleteMovieId(null);
@@ -100,8 +98,7 @@ export default function AdminMoviesPage() {
               <span className="text-zinc-300">ระบบจัดการข้อมูลภาพยนตร์</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-wide bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent flex items-center gap-2">
-              <MovieIcon className="text-brand" />{" "}
-              ภาพยนตร์ ({movies.length})
+              <MovieIcon className="text-brand" /> ภาพยนตร์ ({movies.length})
             </h1>
           </div>
 
