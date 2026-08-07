@@ -454,7 +454,7 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <div className="text-center py-20 text-zinc-500 font-light">
-                  ไม่มีประวัติรางวัลเกียรติยศ
+                  {PROFILE_MESSAGES.COMMON.NO_AWARDS}
                 </div>
               )}
             </div>
@@ -470,7 +470,7 @@ export default function ProfilePage() {
                   </h3>
                   <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6">
                     <p className="text-sm text-zinc-300 font-light leading-loose whitespace-pre-line">
-                      {currentUser.bio || "ไม่มีข้อมูลประวัติผู้ใช้งาน"}
+                      {currentUser.bio || PROFILE_MESSAGES.COMMON.NO_BIO}
                     </p>
                   </div>
                 </div>
@@ -493,7 +493,7 @@ export default function ProfilePage() {
                     </div>
                   ) : (
                     <p className="text-sm text-zinc-500 font-light italic">
-                      ไม่ได้ระบุตำแหน่งประจำตัว
+                      {PROFILE_MESSAGES.COMMON.NO_POSITIONS}
                     </p>
                   )}
                 </div>
@@ -599,7 +599,7 @@ export default function ProfilePage() {
                     </div>
                   ) : (
                     <p className="text-sm text-zinc-500 font-light italic">
-                      ไม่ได้ระบุลิงก์โซเชียลมีเดีย
+                      {PROFILE_MESSAGES.COMMON.NO_SOCIALS}
                     </p>
                   )}
                 </div>

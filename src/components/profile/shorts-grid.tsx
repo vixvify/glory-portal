@@ -2,20 +2,19 @@ import Image from "next/image";
 import LocalPlayIcon from "@mui/icons-material/LocalPlay";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Movie } from "@/core/domain/movie";
+import { MOVIE_MESSAGES } from "@/core/constants/movie-messages";
 
 interface ShortsGridProps {
   movies: Movie[];
 }
 
 export function ShortsGrid({ movies }: ShortsGridProps) {
-  const shorts = movies.filter(
-    (m) => m.aspectRatio === "portrait" || m.aspectRatio === "vertical"
-  );
+  const shorts = movies.filter((m) => m.aspectRatio === "portrait");
 
   if (shorts.length === 0) {
     return (
       <div className="col-span-full py-10 text-center text-zinc-500 font-light border border-dashed border-zinc-800 rounded-xl">
-        ยังไม่มีคลิปสั้น
+        {MOVIE_MESSAGES.COMMON.NO_SHORTS}
       </div>
     );
   }

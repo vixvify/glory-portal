@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MovieIcon from "@mui/icons-material/Movie";
 import PersonIcon from "@mui/icons-material/Person";
@@ -13,7 +14,8 @@ interface ConfirmModalProps {
   confirmText?: string;
   cancelText?: string;
   variant?: "brand" | "danger";
-  iconType?: "movie" | "crew" | "delete" | "delete-crew";
+  iconType?: "movie" | "crew" | "delete" | "delete-crew" | "avatar-preview" | "cover-preview";
+  previewUrl?: string;
 }
 
 export const ConfirmModal: React.FC<ConfirmModalProps> = ({
@@ -26,10 +28,43 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   cancelText = "ยกเลิก",
   variant = "brand",
   iconType,
+  previewUrl,
 }) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
   if (!isOpen) return null;
 
   const renderIcon = () => {
+    if (previewUrl) {
+      if (iconType === "avatar-preview") {
+        return (
+          <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-brand mx-auto relative shadow-lg bg-zinc-900">
+            <img
+              src={previewUrl}
+              alt="Avatar Preview"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        );
+      }
+      if (iconType === "cover-preview") {
+        return (
+          <div className="w-full h-40 rounded-xl overflow-hidden border border-zinc-800/80 mx-auto relative shadow-lg bg-zinc-950">
+            <img
+              src={previewUrl}
+              alt="Cover Preview"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        );
+      }
+    }
+
     if (iconType === "movie") {
       return (
         <div className="w-16 h-16 bg-brand/10 border border-brand/20 text-brand rounded-full flex items-center justify-center mx-auto text-2xl">
@@ -56,9 +91,9 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       ? "bg-red-500 hover:bg-red-600 text-white border-0 shadow-sm"
       : "bg-brand hover:bg-brand-hover text-white border-0 shadow-sm";
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 z-[110] flex items-center justify-center animate-fade-in bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-card border border-zinc-800/60 p-6 md:p-8 rounded-2xl max-w-sm w-full text-center space-y-6 shadow-2xl relative animate-scale-up">
+      <div className="bg-card-secondary border border-zinc-800/60 p-6 md:p-8 rounded-2xl max-w-sm w-full text-center space-y-6 shadow-2xl relative animate-scale-up">
         {renderIcon()}
 
         <div className="space-y-2">
@@ -86,4 +121,6 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       </div>
     </div>
   );
+
+  return mounted ? createPortal(modalContent, document.body) : null;
 };

@@ -3,11 +3,13 @@ import { useForm, Controller } from "react-hook-form";
 import { User, UpdateProfile } from "@/core/domain/user";
 import { useAppStore } from "@/store/use-store";
 import { PROFILE_MESSAGES } from "@/core/constants/profile-messages";
+import { COMMON_MESSAGES } from "@/core/constants/common-messages";
 import { Button } from "@/components/ui/button";
 import CloseIcon from "@mui/icons-material/Close";
 import { useUpdateProfileMutation } from "@/hooks/db/use-profile";
 import { useCrewRolesQuery } from "@/hooks/db/use-master-data";
 import { TagInput } from "@/components/ui/tag-input";
+import { ConfirmModal } from "@/components/modal/confirm-modal";
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -23,6 +25,8 @@ export function EditProfileModal({
   const { showToast } = useAppStore();
   const updateProfileMutation = useUpdateProfileMutation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [pendingData, setPendingData] = useState<UpdateProfile | null>(null);
 
   const { data: crewRolesData = [] } = useCrewRolesQuery();
   const crewRoleSuggestions = crewRolesData.map(
@@ -50,19 +54,26 @@ export function EditProfileModal({
 
   if (!isOpen) return null;
 
-  const onSubmit = async (data: UpdateProfile) => {
+  const onSubmit = (data: UpdateProfile) => {
+    setPendingData(data);
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirmSave = async () => {
+    if (!pendingData) return;
+    setIsConfirmOpen(false);
     try {
       setIsSubmitting(true);
 
       const payload: UpdateProfile = {
-        name: data.name,
-        bio: data.bio,
-        positions: data.positions || [],
-        birthday: data.birthday ? data.birthday : undefined,
-        ig: data.ig,
-        facebook: data.facebook,
-        youtube: data.youtube,
-        tiktok: data.tiktok,
+        name: pendingData.name,
+        bio: pendingData.bio,
+        positions: pendingData.positions || [],
+        birthday: pendingData.birthday ? pendingData.birthday : undefined,
+        ig: pendingData.ig,
+        facebook: pendingData.facebook,
+        youtube: pendingData.youtube,
+        tiktok: pendingData.tiktok,
       };
 
       await updateProfileMutation.mutateAsync(payload);
@@ -72,12 +83,13 @@ export function EditProfileModal({
       showToast(PROFILE_MESSAGES.ERRORS.UPDATE_PROFILE, "error");
     } finally {
       setIsSubmitting(false);
+      setPendingData(null);
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="bg-card border border-theme-border rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+      <div className="bg-card-secondary border border-theme-border rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
         <div className="flex items-center justify-between p-6 border-b border-theme-border bg-card-secondary/50">
           <h2 className="text-xl font-bold text-white">แก้ไขข้อมูลโปรไฟล์</h2>
           <button
@@ -222,7 +234,7 @@ export function EditProfileModal({
             disabled={isSubmitting}
             className="rounded-xl border-zinc-700 bg-transparent text-white hover:bg-zinc-800"
           >
-            ยกเลิก
+            {COMMON_MESSAGES.CONFIRM.CANCEL}
           </Button>
           <Button
             type="submit"
@@ -231,10 +243,23 @@ export function EditProfileModal({
             disabled={isSubmitting}
             className="rounded-xl px-8 font-bold"
           >
-            {isSubmitting ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
+            {isSubmitting ? PROFILE_MESSAGES.LOADING.SAVING : PROFILE_MESSAGES.CONFIRM.SAVE_PROFILE_BTN}
           </Button>
         </div>
       </div>
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        onClose={() => {
+          setIsConfirmOpen(false);
+          setPendingData(null);
+        }}
+        onConfirm={handleConfirmSave}
+        title={PROFILE_MESSAGES.CONFIRM.SAVE_PROFILE_TITLE}
+        message={PROFILE_MESSAGES.CONFIRM.SAVE_PROFILE_MSG}
+        confirmText={PROFILE_MESSAGES.CONFIRM.SAVE_PROFILE_BTN}
+        cancelText={COMMON_MESSAGES.CONFIRM.CANCEL}
+        iconType="crew"
+      />
     </div>
   );
 }

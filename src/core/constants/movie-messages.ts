@@ -33,6 +33,7 @@ export const MOVIE_MESSAGES = {
   },
   COMMON: {
     MOVIES_COUNT: (count: number) => `ภาพยนตร์ (${count})`,
+    NO_SHORTS: "ยังไม่มีคลิปสั้น",
   },
 } as const;
 
