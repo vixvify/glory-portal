@@ -36,7 +36,6 @@ export default function HomeView({
   recommendedMovies,
   popularMovies,
   awardsMovies,
-
   staffList,
   actorList,
   universityMovies,
@@ -68,7 +67,6 @@ export default function HomeView({
       />
 
       <div className="relative z-20 px-6 md:px-16 space-y-10 md:space-y-12 -mt-6 md:-mt-10 pb-16">
-
         <MovieRow
           title="รับชมต่อ"
           movies={recommendedMovies}
