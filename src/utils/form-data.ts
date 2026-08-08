@@ -2,7 +2,11 @@ export const toFormData = (data: Record<string, unknown>): FormData => {
   const formData = new FormData();
 
   Object.entries(data).forEach(([key, value]) => {
-    if (value === undefined || value === null) return;
+    if (value === undefined) return;
+    if (value === null) {
+      formData.append(key, "null");
+      return;
+    }
 
     if (key === "thumbnail") {
       if (value instanceof File) {

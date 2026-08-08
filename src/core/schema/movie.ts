@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { masterDataSchema } from "./master-data";
 import { crewRoleSchema } from "./crew";
-import { ContentWarning } from "../domain/movie";
 
 export const ratingSchema = z
   .object({
@@ -67,7 +66,7 @@ export const movieSchema = z.object({
   school: z.string().optional().nullable(),
   language: z.string().min(1, "Language is required"),
   subtitle: z.string().optional().nullable(),
-  contentWarnings: z.array(z.nativeEnum(ContentWarning)).optional(),
+  contentWarnings: z.array(z.string()).optional(),
   otherContentWarning: z.string().optional().nullable(),
   colorType: z.string().min(1, "Color type is required"),
   studio: z.string().optional().nullable(),
@@ -102,30 +101,20 @@ export const createMovieSchema = z.object({
   trailerUrls: z.array(z.string().url("Must be a valid URL")).optional().nullable(),
   releaseDate: z.string().min(1, "Release date is required"),
   aspectRatio: z.string().min(1, "Aspect ratio is required"),
-  ageRating: z.string().min(1, "Age rating is required"),
+  ageRatingId: z.string().uuid("Age rating is required"),
   duration: z.number().min(1, "Duration is required"),
-  university: z.string().optional().nullable().or(z.literal("")),
-  school: z.string().optional().nullable().or(z.literal("")),
-  language: z.string().min(1, "Language is required"),
-  subtitle: z.string().optional().nullable().or(z.literal("")),
+  universityId: z.string().uuid().optional().nullable().or(z.literal("")),
+  schoolId: z.string().uuid().optional().nullable().or(z.literal("")),
+  languageId: z.string().uuid("Language is required").optional().nullable().or(z.literal("")),
+  subtitleId: z.string().uuid().optional().nullable().or(z.literal("")),
   crew: z.array(movieCrewInputItemWithRoleSchema).refine((crew) => crew.some((c) => c.name && c.name.trim() !== ""), "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน"),
   btsVideo: z.array(z.string()).optional().nullable(),
-  contentWarnings: z.array(z.union([z.nativeEnum(ContentWarning), z.literal("OTHER")])).optional().nullable(),
+  contentWarningIds: z.array(z.string().uuid()).optional().nullable(),
   otherContentWarning: z.string().optional().nullable(),
-  colorType: z.string().min(1, "Color type is required"),
+  colorTypeId: z.string().uuid("Color type is required"),
   studio: z.string().optional().nullable(),
   awards: z.array(formAwardSchema).transform((arr) => arr.filter((a) => a.projectName !== "")).optional().nullable(),
   tags: z.array(z.string()).optional().nullable(),
-}).superRefine((data, ctx) => {
-  if ((data.contentWarnings as string[] | undefined)?.includes("OTHER")) {
-    if (!data.otherContentWarning || data.otherContentWarning.trim() === "") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "กรุณาระบุคำเตือนเนื้อหาอื่นๆ",
-        path: ["otherContentWarning"],
-      });
-    }
-  }
 });
 
 export const updateMovieSchema = z.object({
@@ -142,30 +131,20 @@ export const updateMovieSchema = z.object({
   trailerUrls: z.array(z.string().url("Must be a valid URL")).optional().nullable(),
   releaseDate: z.string().min(1, "Release date is required"),
   aspectRatio: z.string().min(1, "Aspect ratio is required"),
-  ageRating: z.string().min(1, "Age rating is required"),
+  ageRatingId: z.string().uuid("Age rating is required"),
   duration: z.number().min(1, "Duration is required"),
-  university: z.string().optional().nullable().or(z.literal("")),
-  school: z.string().optional().nullable().or(z.literal("")),
-  language: z.string().min(1, "Language is required"),
-  subtitle: z.string().optional().nullable().or(z.literal("")),
+  universityId: z.string().uuid().optional().nullable().or(z.literal("")),
+  schoolId: z.string().uuid().optional().nullable().or(z.literal("")),
+  languageId: z.string().uuid("Language is required").optional().nullable().or(z.literal("")),
+  subtitleId: z.string().uuid().optional().nullable().or(z.literal("")),
   crew: z.array(movieCrewInputItemWithRoleSchema).refine((crew) => crew.some((c) => c.name && c.name.trim() !== ""), "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน"),
   btsVideo: z.array(z.string()).optional().nullable(),
-  contentWarnings: z.array(z.union([z.nativeEnum(ContentWarning), z.literal("OTHER")])).optional().nullable(),
+  contentWarningIds: z.array(z.string().uuid()).optional().nullable(),
   otherContentWarning: z.string().optional().nullable(),
-  colorType: z.string().min(1, "Color type is required"),
+  colorTypeId: z.string().uuid("Color type is required"),
   studio: z.string().optional().nullable(),
   awards: z.array(formAwardSchema).transform((arr) => arr.filter((a) => a.projectName !== "")).optional().nullable(),
   tags: z.array(z.string()).optional().nullable(),
-}).superRefine((data, ctx) => {
-  if ((data.contentWarnings as string[] | undefined)?.includes("OTHER")) {
-    if (!data.otherContentWarning || data.otherContentWarning.trim() === "") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "กรุณาระบุคำเตือนเนื้อหาอื่นๆ",
-        path: ["otherContentWarning"],
-      });
-    }
-  }
 });
 
 export const movieIdSchema = z.string().min(1, "Movie ID is required");

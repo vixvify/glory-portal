@@ -349,11 +349,11 @@ export default function Navbar() {
                 ) : (
                   universities.map((uni) => (
                     <button
-                      key={uni}
-                      onClick={() => handleUniversityClick(uni)}
+                      key={uni.id}
+                      onClick={() => handleUniversityClick(uni.name)}
                       className="w-full text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand"
                     >
-                      {uni}
+                      {uni.name}
                     </button>
                   ))
                 )}

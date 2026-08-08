@@ -18,12 +18,8 @@ import { TagInput } from "@/components/ui/tag-input";
 import { MOVIE_MESSAGES } from "@/core/constants/movie-messages";
 import { useAppStore } from "@/store/use-store";
 import {
-  COLOR_OPTIONS,
   ASPECT_RATIO_OPTIONS,
-  CONTENT_WARNING_OPTIONS,
   AFFILIATION_TABS,
-  LANGUAGE_SELECT_OPTIONS,
-  AGE_RATING_SELECT_OPTIONS,
 } from "@/core/constants/movie-form";
 import {
   useCreateMovieMutation,
@@ -39,6 +35,7 @@ import {
   getFilteredCategories,
   getCrewOptions,
   getInitialAffiliationType,
+  isOtherContentWarning,
 } from "@/utils/movie-form";
 import { AffiliationType } from "@/core/domain/movie";
 import { useDynamicStringList } from "@/hooks/system/use-dynamic-string-list";
@@ -50,6 +47,12 @@ export const MovieForm: React.FC<MovieFormProps> = ({
   editingMovie = null,
   categories,
   universities,
+  schools,
+  languages,
+  subtitles,
+  colorTypes,
+  contentWarnings,
+  ageRatings,
   crewRoles,
   availableCrew,
 }) => {
@@ -73,13 +76,21 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     control,
     formState: { errors, isSubmitted },
   } = useForm<MovieFormInputs>({
-    defaultValues: getMovieFormDefaultValues(editingMovie, categories, crewRoles),
+    defaultValues: getMovieFormDefaultValues(editingMovie, categories, crewRoles, {
+      ageRatings,
+      universities,
+      schools,
+      languages,
+      subtitles,
+      colorTypes,
+      contentWarnings,
+    }),
   });
 
   const watchedYoutubeUrl = useWatch({ control, name: "youtubeUrl" });
   const watchedContentWarnings = useWatch({
     control,
-    name: "contentWarnings",
+    name: "contentWarningIds",
   }) || [];
   const watchedOtherContentWarning = useWatch({ control, name: "otherContentWarning" });
 
@@ -120,6 +131,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
   const onSubmitForm = async (data: MovieFormInputs) => {
     try {
+      const isOtherWarningSelected = data.contentWarningIds.some(id =>
+        isOtherContentWarning(id, contentWarnings)
+      );
+
+      if (!isOtherWarningSelected) {
+        data.otherContentWarning = "";
+      }
+
       const rawPayload = buildMovieFormPayload({
         data,
         editingMovie,
@@ -163,16 +182,16 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
         <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_450px] gap-8 items-start">
-            
-            
+
+
             <div className="space-y-8 w-full min-w-0">
-              
-              
+
+
               <div className="space-y-6">
                 <div>
                   <h2 className="text-[18px] font-bold text-brand">อัปโหลด</h2>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-zinc-100 block mb-2">เพิ่มลิงก์ภาพยนตร์</label>
@@ -185,7 +204,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       className="text-white placeholder:text-zinc-500"
                     />
                     <div className="w-full mt-2"><YoutubePreview url={watchedYoutubeUrl} /></div>
-                    
+
                     <label className="cursor-pointer block mt-2">
                       <Controller
                         name="thumbnail"
@@ -270,7 +289,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 </div>
               </div>
 
-              
+
               <div className="space-y-6">
                 <div>
                   <h2 className="text-[18px] font-bold text-brand">อัปโหลดเบื้องหลัง</h2>
@@ -309,7 +328,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 </div>
               </div>
 
-              
+
               <div className="space-y-6">
                 <div>
                   <h2 className="text-[18px] font-bold text-brand">รางวัล</h2>
@@ -324,7 +343,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       register={register}
                     />
                   ))}
-                  
+
                   <button
                     type="button"
                     onClick={() => appendAward({ projectName: "", awardList: [{ value: "" }] })}
@@ -336,15 +355,15 @@ export const MovieForm: React.FC<MovieFormProps> = ({
               </div>
             </div>
 
-            
+
             <div className="space-y-8 w-full min-w-0">
-              
-              
+
+
               <div className="space-y-6">
                 <div>
                   <h2 className="text-[18px] font-bold text-brand">ข้อมูลทั่วไป</h2>
                 </div>
-                
+
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-zinc-100 block mb-2">ชื่อเรื่อง</label>
@@ -362,9 +381,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       rows={4}
                       placeholder=""
                       {...register("description", { required: "กรุณากรอกคำโปรย" })}
-                      className={`w-full bg-[#0D0D0D] border rounded-md px-4 py-2.5 text-sm text-white focus:outline-none resize-none transition-colors ${
-                        errors.description ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500" : "border-[#3A3A3A] focus:border-brand"
-                      }`}
+                      className={`w-full bg-[#0D0D0D] border rounded-md px-4 py-2.5 text-sm text-white focus:outline-none resize-none transition-colors ${errors.description ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500" : "border-[#3A3A3A] focus:border-brand"
+                        }`}
                     />
                     {errors.description && (
                       <p className="text-[11px] text-red-400 mt-1 pl-1 animate-fade-in">{errors.description.message}</p>
@@ -431,7 +449,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
                   <div className="space-y-3">
                     <label className="text-sm font-medium text-zinc-100 pb-2 block">สถาบัน/สังกัด</label>
-                    
+
                     <div className="flex gap-2">
                       {AFFILIATION_TABS.map(({ type, label }) => (
                         <button
@@ -439,33 +457,51 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                           type="button"
                           onClick={() => {
                             setAffiliationType(type);
-                            setValue("university", "");
-                            setValue("school", "");
+                            setValue("universityId", "");
+                            setValue("schoolId", "");
                             setValue("studio", "");
                           }}
-                          className={`px-4 py-1.5 text-sm rounded-full border transition-all ${
-                            affiliationType === type
+                          className={`px-4 py-1.5 text-sm rounded-full border transition-all ${affiliationType === type
                               ? "bg-brand border-brand text-white font-semibold"
                               : "bg-transparent border-zinc-600 text-zinc-400 hover:border-zinc-400 hover:text-white"
-                          }`}
+                            }`}
                         >
                           {label}
                         </button>
                       ))}
                     </div>
-                    
                     {affiliationType === "university" ? (
                       <Controller
-                        name="university"
+                        name="universityId"
                         control={control}
                         render={({ field }) => (
                           <CreatableSearchSelect
-                            value={{ id: field.value || "", name: field.value || "" }}
-                            onChange={(val) => field.onChange(val.name)}
-                            options={affiliationConfigs.university.options}
+                            value={{ id: field.value || "", name: universities.find(u => u.id === field.value)?.name || field.value || "" }}
+                            onChange={(val) => {
+                              // If it's a new item, val.id will be the same as val.name
+                              // Wait, the backend expects a UUID, so a new name might fail if it tries to pass name as UUID.
+                              // Actually, FE can't create universities on the fly here if UUID is required, unless the backend handles it or it's mapped.
+                              field.onChange(val.id)
+                            }}
+                            options={universities}
                             placeholder={affiliationConfigs.university.placeholder}
                             hideIcon={true}
                             addLabelPrefix={affiliationConfigs.university.prefix}
+                          />
+                        )}
+                      />
+                    ) : affiliationType === "school" ? (
+                      <Controller
+                        name="schoolId"
+                        control={control}
+                        render={({ field }) => (
+                          <CreatableSearchSelect
+                            value={{ id: field.value || "", name: schools.find(s => s.id === field.value)?.name || field.value || "" }}
+                            onChange={(val) => field.onChange(val.id)}
+                            options={schools}
+                            placeholder="พิมพ์ชื่อโรงเรียน..."
+                            hideIcon={true}
+                            addLabelPrefix="เพิ่มโรงเรียน"
                           />
                         )}
                       />
@@ -478,7 +514,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                             type="text"
                             value={field.value || ""}
                             onChange={field.onChange}
-                            placeholder={affiliationType === "school" ? "พิมพ์ชื่อโรงเรียน..." : "พิมพ์ชื่อสังกัด..."}
+                            placeholder="พิมพ์ชื่อสังกัด..."
                             className="text-white w-full"
                           />
                         )}
@@ -504,34 +540,34 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                 </div>
               </div>
 
-              
+
               <div className="space-y-6">
                 <div>
                   <h2 className="text-[18px] font-bold text-brand">ข้อมูลการนำเสนอ</h2>
                 </div>
-                
+
                 <div className="space-y-6">
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-zinc-100 block mb-2">ภาษา</label>
                       <Select
-                        options={LANGUAGE_SELECT_OPTIONS}
-                        error={errors.language?.message as string}
-                        {...register("language")}
+                        options={languages.map(l => ({ value: l.id, label: l.name }))}
+                        error={errors.languageId?.message as string}
+                        {...register("languageId")}
                       />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-zinc-100 block mb-2">คำบรรยาย</label>
                       <Select
-                        options={LANGUAGE_SELECT_OPTIONS}
-                        {...register("subtitle")}
+                        options={subtitles.map(s => ({ value: s.id, label: s.name }))}
+                        {...register("subtitleId")}
                       />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-zinc-100 block mb-2">สี</label>
                       <Select
-                        options={COLOR_OPTIONS}
-                        {...register("colorType")}
+                        options={colorTypes.map(c => ({ value: c.id, label: c.name }))}
+                        {...register("colorTypeId")}
                       />
                     </div>
                   </div>
@@ -547,8 +583,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-zinc-100 block mb-2">เรตภาพยนตร์</label>
                       <Select
-                        options={AGE_RATING_SELECT_OPTIONS}
-                        {...register("ageRating")}
+                        options={ageRatings.map(a => ({ value: a.id, label: a.name }))}
+                        {...register("ageRatingId")}
                       />
                     </div>
                   </div>
@@ -556,29 +592,35 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-zinc-100 block mb-2">คำเตือนเนื้อหา</label>
                     <MultiSelect
-                      options={CONTENT_WARNING_OPTIONS}
+                      options={(() => {
+                        const opts = contentWarnings.map(c => ({ value: c.id, label: c.name }));
+                        if (!contentWarnings.some(c => c.name === "อื่น ๆ (ระบุ)" || c.name === "OTHER")) {
+                          opts.push({ value: "OTHER_CUSTOM", label: "อื่น ๆ (ระบุ)" });
+                        }
+                        return opts;
+                      })()}
                       selectedValues={watchedContentWarnings}
                       onChange={(values) => {
-                        setValue("contentWarnings", values, { shouldDirty: true });
+                        setValue("contentWarningIds", values, { shouldDirty: true });
                       }}
                       placeholder="ไม่มีคำเตือนเนื้อหา / เลือกคำเตือน..."
                     />
-                    
-                    {watchedContentWarnings.includes("OTHER") && (
-                      <div className="pt-2 animate-fade-in">
-                        <Input
-                          placeholder="ระบุคำเตือนเนื้อหาอื่นๆ..."
-                          error={
-                            (errors.otherContentWarning?.message as string) ||
-                            (isSubmitted && watchedContentWarnings.includes("OTHER") && (!watchedOtherContentWarning || watchedOtherContentWarning.trim() === "")
-                              ? "กรุณาระบุคำเตือนเนื้อหาอื่นๆ"
-                              : undefined)
-                          }
-                          {...register("otherContentWarning")}
-                          className="text-white"
-                        />
-                      </div>
-                    )}
+
+                    {watchedContentWarnings.some(id => isOtherContentWarning(id, contentWarnings)) && (
+                        <div className="pt-2 animate-fade-in">
+                          <Input
+                            placeholder="ระบุคำเตือนเนื้อหาอื่นๆ..."
+                            error={
+                              (errors.otherContentWarning?.message as string) ||
+                              (isSubmitted && watchedContentWarnings.some(id => isOtherContentWarning(id, contentWarnings)) && (!watchedOtherContentWarning || watchedOtherContentWarning.trim() === "")
+                                ? "กรุณาระบุคำเตือนเนื้อหาอื่นๆ"
+                                : undefined)
+                            }
+                            {...register("otherContentWarning")}
+                            className="text-white"
+                          />
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>
@@ -586,118 +628,118 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           </div>
 
           <div className="w-full max-w-[760px] mx-auto mt-12">
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-[18px] font-bold text-brand">ข้อมูลทีมงาน</h2>
-                  {(errors.crew?.root?.message || (errors.crew as { message?: string })?.message || (isSubmitted && !fields.some(f => f.name?.trim()) ? "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน" : null)) && (
-                    <p className="text-[12px] text-red-400 mt-1 animate-fade-in">
-                      {(errors.crew?.root?.message || (errors.crew as { message?: string })?.message || "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน") as string}
-                    </p>
-                  )}
-                </div>
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-[18px] font-bold text-brand">ข้อมูลทีมงาน</h2>
+                {(errors.crew?.root?.message || (errors.crew as { message?: string })?.message || (isSubmitted && !fields.some(f => f.name?.trim()) ? "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน" : null)) && (
+                  <p className="text-[12px] text-red-400 mt-1 animate-fade-in">
+                    {(errors.crew?.root?.message || (errors.crew as { message?: string })?.message || "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน") as string}
+                  </p>
+                )}
+              </div>
 
-                <div className="space-y-4">
-                  <SearchSelect
-                    value={selectedDept}
-                    onChange={(val) => {
-                      setSelectedDept(val);
-                      setCrewRoleSearch("");
-                    }}
-                    options={filteredCategories.map(cat => ({ 
-                      value: cat.id, 
-                      label: cat.label,
-                      searchKeywords: cat.roles.map(r => r.label).join(" ")
-                    }))}
-                    placeholder="เลือกหรือค้นหาฝ่ายในการสร้างภาพยนตร์"
-                    className="w-full"
-                  />
-                  
-                  {(() => {
-                    const hasAnyData = fields.some(f => f.name && f.name.trim() !== "");
-                    const shouldShowSearch = selectedDept || hasAnyData;
-                    
-                    return shouldShowSearch && (
-                      <div className="relative mt-2 animate-fade-in">
-                        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#B8860B] pointer-events-none" />
-                        <input
-                          type="text"
-                          placeholder={selectedDept ? `ค้นหาตำแหน่งใน${filteredCategories.find(c => c.id === selectedDept)?.label}` : "ค้นหาตำแหน่งทีมงาน..."}
-                          value={crewRoleSearch}
-                          onChange={(e) => setCrewRoleSearch(e.target.value)}
-                          className="w-full bg-[#0D0D0D] border border-[#3A3A3A] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors"
-                        />
-                      </div>
+              <div className="space-y-4">
+                <SearchSelect
+                  value={selectedDept}
+                  onChange={(val) => {
+                    setSelectedDept(val);
+                    setCrewRoleSearch("");
+                  }}
+                  options={filteredCategories.map(cat => ({
+                    value: cat.id,
+                    label: cat.label,
+                    searchKeywords: cat.roles.map(r => r.label).join(" ")
+                  }))}
+                  placeholder="เลือกหรือค้นหาฝ่ายในการสร้างภาพยนตร์"
+                  className="w-full"
+                />
+
+                {(() => {
+                  const hasAnyData = fields.some(f => f.name && f.name.trim() !== "");
+                  const shouldShowSearch = selectedDept || hasAnyData;
+
+                  return shouldShowSearch && (
+                    <div className="relative mt-2 animate-fade-in">
+                      <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#B8860B] pointer-events-none" />
+                      <input
+                        type="text"
+                        placeholder={selectedDept ? `ค้นหาตำแหน่งใน${filteredCategories.find(c => c.id === selectedDept)?.label}` : "ค้นหาตำแหน่งทีมงาน..."}
+                        value={crewRoleSearch}
+                        onChange={(e) => setCrewRoleSearch(e.target.value)}
+                        className="w-full bg-[#0D0D0D] border border-[#3A3A3A] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors"
+                      />
+                    </div>
+                  );
+                })()}
+              </div>
+
+              <div className="space-y-8 mt-6">
+                {filteredCategories.map((cat) => {
+                  const searchLower = deferredCrewRoleSearch.toLowerCase().trim();
+                  const isSelectedCat = cat.id === selectedDept;
+
+                  if (selectedDept && !isSelectedCat) return null;
+
+                  const rolesToRender = cat.roles.filter((role) => {
+                    const hasData = fields.some(
+                      (f) => f.role === role.id && f.name && f.name.trim() !== ""
                     );
-                  })()}
-                </div>
 
-                <div className="space-y-8 mt-6">
-                  {filteredCategories.map((cat) => {
-                    const searchLower = deferredCrewRoleSearch.toLowerCase().trim();
-                    const isSelectedCat = cat.id === selectedDept;
+                    const isVisible = hasData || isSelectedCat;
+                    if (!isVisible) return false;
 
-                    if (selectedDept && !isSelectedCat) return null;
+                    if (searchLower) {
+                      return role.label.toLowerCase().includes(searchLower);
+                    }
 
-                    const rolesToRender = cat.roles.filter((role) => {
-                      const hasData = fields.some(
-                        (f) => f.role === role.id && f.name && f.name.trim() !== ""
-                      );
-                      
-                      const isVisible = hasData || isSelectedCat;
-                      if (!isVisible) return false;
+                    return true;
+                  });
 
-                      if (searchLower) {
-                        return role.label.toLowerCase().includes(searchLower);
-                      }
+                  if (rolesToRender.length === 0) return null;
 
-                      return true;
-                    });
+                  return (
+                    <div key={cat.id} className="space-y-4 animate-fade-in">
+                      {rolesToRender.map((role) => {
+                        const fieldsForRole = fields
+                          .map((f, i) => ({ ...f, index: i }))
+                          .filter((f) => f.role === role.id);
+                        return (
+                          <CrewSection
+                            key={role.id}
+                            label={role.label}
+                            fields={fieldsForRole}
+                            onAdd={() =>
+                              append({
+                                role: role.id,
+                                crewMemberId: null,
+                                name: "",
+                                email: "",
+                              })
+                            }
+                            onRemove={remove}
+                            onUpdate={handleUpdateCrew}
+                            placeholder="ชื่อจริง - นามสกุล"
+                            addButtonLabel={`เพิ่มรายชื่อ`}
+                            crewOptions={crewOptions}
+                          />
+                        );
+                      })}
+                    </div>
+                  );
+                })}
 
-                    if (rolesToRender.length === 0) return null;
-
-                    return (
-                      <div key={cat.id} className="space-y-4 animate-fade-in">
-                        {rolesToRender.map((role) => {
-                          const fieldsForRole = fields
-                            .map((f, i) => ({ ...f, index: i }))
-                            .filter((f) => f.role === role.id);
-                          return (
-                            <CrewSection
-                              key={role.id}
-                              label={role.label}
-                              fields={fieldsForRole}
-                              onAdd={() =>
-                                append({
-                                  role: role.id,
-                                  crewMemberId: null,
-                                  name: "",
-                                  email: "",
-                                })
-                              }
-                              onRemove={remove}
-                              onUpdate={handleUpdateCrew}
-                              placeholder="ชื่อจริง - นามสกุล"
-                              addButtonLabel={`เพิ่มรายชื่อ`}
-                              crewOptions={crewOptions}
-                            />
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
-                  
-                  {selectedDept && deferredCrewRoleSearch && !filteredCategories.some(cat => 
-                    cat.id === selectedDept && 
-                    cat.roles.some(role => role.label.toLowerCase().includes(deferredCrewRoleSearch.toLowerCase().trim()))
-                  ) && (
+                {selectedDept && deferredCrewRoleSearch && !filteredCategories.some(cat =>
+                  cat.id === selectedDept &&
+                  cat.roles.some(role => role.label.toLowerCase().includes(deferredCrewRoleSearch.toLowerCase().trim()))
+                ) && (
                     <div className="py-12 flex flex-col items-center justify-center border border-dashed border-[#3A3A3A] rounded-[16px] bg-black/20 animate-fade-in">
                       <p className="text-sm font-medium text-zinc-400">ไม่พบตำแหน่ง &quot;{deferredCrewRoleSearch}&quot;</p>
                       <p className="text-xs text-zinc-500 mt-1">ลองพิมพ์คำค้นหาด้วยคีย์เวิร์ดอื่นดูอีกครั้ง</p>
                     </div>
                   )}
-                </div>
               </div>
             </div>
+          </div>
 
           <div className="mt-12 flex flex-row items-center justify-center gap-6">
             <Button

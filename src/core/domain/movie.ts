@@ -1,20 +1,9 @@
 import { Rating } from "./rating";
 import { User } from "./user";
 import { CrewRole, CrewMember } from "./crew";
-import { Category } from "./master-data";
+import { Category, MasterDataItem } from "./master-data";
 
-export enum ContentWarning {
-  PROFANITY = "PROFANITY",
-  DRUGS = "DRUGS",
-  VIOLENCE = "VIOLENCE",
-  GORE = "GORE",
-  SEXUAL_CONTENT = "SEXUAL_CONTENT",
-  NUDITY = "NUDITY",
-  SMOKING = "SMOKING",
-  ALCOHOL = "ALCOHOL",
-  MENTAL_HEALTH = "MENTAL_HEALTH",
-  FLASHING_LIGHTS = "FLASHING_LIGHTS",
-}
+
 
 export interface MovieCrew {
   id: string;
@@ -50,7 +39,7 @@ export interface Movie {
   language?: string | null;
   subtitle?: string | null;
   awards: Award[];
-  contentWarnings: ContentWarning[];
+  contentWarnings: string[];
   otherContentWarning?: string | null;
   colorType: string;
   studio?: string | null;
@@ -90,17 +79,17 @@ export interface CreateMovie {
   releaseDate: string;
   matchRate?: number;
   aspectRatio: string;
-  ageRating: string;
+  ageRatingId: string;
   duration: number;
-  university?: string | null;
-  school?: string | null;
-  language?: string | null;
-  subtitle?: string | null;
+  universityId?: string | null;
+  schoolId?: string | null;
+  languageId?: string | null;
+  subtitleId?: string | null;
   crew?: MovieCrewInputItemWithRole[] | null;
   btsVideo?: string[] | null;
-  contentWarnings?: ContentWarning[];
+  contentWarningIds?: string[];
   otherContentWarning?: string | null;
-  colorType: string;
+  colorTypeId: string;
   studio?: string | null;
   awards?: Award[];
   tags?: string[];
@@ -117,17 +106,17 @@ export interface UpdateMovie {
   releaseDate: string;
   matchRate?: number;
   aspectRatio: string;
-  ageRating: string;
+  ageRatingId: string;
   duration: number;
-  university?: string | null;
-  school?: string | null;
-  language?: string | null;
-  subtitle?: string | null;
+  universityId?: string | null;
+  schoolId?: string | null;
+  languageId?: string | null;
+  subtitleId?: string | null;
   crew?: MovieCrewInputItemWithRole[] | null;
   btsVideo?: string[] | null;
-  contentWarnings?: ContentWarning[];
+  contentWarningIds?: string[];
   otherContentWarning?: string | null;
-  colorType: string;
+  colorTypeId: string;
   studio?: string | null;
   awards?: Award[];
   tags?: string[];
@@ -146,7 +135,13 @@ export interface MovieFilterParams {
 export interface MovieFormProps {
   editingMovie?: Movie | null;
   categories: Category[];
-  universities: string[];
+  universities: MasterDataItem[];
+  schools: MasterDataItem[];
+  languages: MasterDataItem[];
+  subtitles: MasterDataItem[];
+  colorTypes: MasterDataItem[];
+  contentWarnings: MasterDataItem[];
+  ageRatings: MasterDataItem[];
   crewRoles: CrewRole[];
   availableCrew: CrewMember[];
 }
@@ -172,15 +167,15 @@ export type MovieFormInputs = {
   trailerUrls?: string[];
   releaseDate: string;
   aspectRatio: string;
-  ageRating: string;
+  ageRatingId: string;
   duration: number;
-  university?: string;
-  school?: string;
-  language?: string;
-  subtitle?: string;
-  contentWarnings: string[];
+  universityId?: string;
+  schoolId?: string;
+  languageId?: string;
+  subtitleId?: string;
+  contentWarningIds: string[];
   otherContentWarning: string;
-  colorType: string;
+  colorTypeId: string;
   studio?: string;
   crew?: MovieCrewInputItemWithRole[];
   btsVideo?: string[];
