@@ -127,8 +127,8 @@ export default function RegisterPage() {
         awards: activeAwards.length > 0 ? activeAwards : undefined,
       });
       router.push("/auth/login");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : AUTH_MESSAGES.ERRORS.REGISTER_FAILED);
+    } catch {
+      setError(AUTH_MESSAGES.ERRORS.REGISTER_FAILED);
     }
   };
 

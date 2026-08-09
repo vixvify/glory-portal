@@ -51,10 +51,8 @@ export default function AdminCrewPage() {
         setIsDeletingLocal(true);
         await deleteCrewMutation.mutateAsync(deleteCrewId);
         showToast(CREW_MESSAGES.TOAST.DELETE_CREW_SUCCESS, "success");
-      } catch (err: unknown) {
-        const errorMessage =
-          err instanceof Error ? err.message : COMMON_MESSAGES.ERRORS.DELETE;
-        showToast(errorMessage, "error");
+      } catch {
+        showToast(COMMON_MESSAGES.ERRORS.DELETE, "error");
       } finally {
         setIsDeletingLocal(false);
         setDeleteCrewId(null);
@@ -82,8 +80,8 @@ export default function AdminCrewPage() {
               <span className="text-zinc-300">ระบบจัดการข้อมูลทีมงาน</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-wide bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent flex items-center gap-2">
-              <PeopleIcon className="text-brand" />{" "}
-              ทีมงาน & นักแสดง ({availableCrew.length})
+              <PeopleIcon className="text-brand" /> ทีมงาน & นักแสดง (
+              {availableCrew.length})
             </h1>
           </div>
         </div>

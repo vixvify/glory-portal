@@ -42,8 +42,8 @@ export default function LoginPage() {
     try {
       await loginMutation.mutateAsync(data);
       router.push("/");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : AUTH_MESSAGES.ERRORS.LOGIN_FAILED);
+    } catch {
+      setError(AUTH_MESSAGES.ERRORS.LOGIN_FAILED);
     }
   };
 
