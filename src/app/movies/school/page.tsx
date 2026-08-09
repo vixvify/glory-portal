@@ -44,7 +44,7 @@ export default function SchoolPage() {
 
   const { data: schools = [], isLoading: isLoadingSchools } = useSchoolsQuery();
   const { data: allSchoolMovies = [], isLoading: isLoadingAll } = useMoviesQuery(
-    { searchby: "school", aspectRatio: orientation },
+    { search: "", searchby: "school", aspectRatio: orientation },
     { placeholderData: keepPreviousData }
   );
 

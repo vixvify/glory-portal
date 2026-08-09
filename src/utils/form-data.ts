@@ -8,24 +8,7 @@ export const toFormData = (data: Record<string, unknown>): FormData => {
       return;
     }
 
-    if (key === "thumbnail") {
-      if (value instanceof File) {
-        formData.append(key, value);
-      } else if (
-        value &&
-        typeof value === "object" &&
-        "length" in value &&
-        typeof value !== "string"
-      ) {
-        const list = value as unknown as FileList;
-        if (list.length > 0) {
-          formData.append(key, list[0] as File);
-        }
-      } else if (typeof value === "string") {
-        formData.append(key, value);
-      }
-      return;
-    }
+
 
     if (value instanceof File) {
       formData.append(key, value);
