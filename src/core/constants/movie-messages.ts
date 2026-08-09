@@ -1,4 +1,4 @@
-import { ContentWarning } from "@/core/domain/movie";
+
 
 export const MOVIE_MESSAGES = {
   LOADING: {
@@ -37,20 +37,7 @@ export const MOVIE_MESSAGES = {
   },
 } as const;
 
-const WARNING_MAP: Record<string, string> = {
-  [ContentWarning.PROFANITY]: "คำหยาบคาย",
-  [ContentWarning.VIOLENCE]: "ความรุนแรง",
-  [ContentWarning.DRUGS]: "ยาเสพติด",
-  [ContentWarning.GORE]: "เลือดสาด",
-  [ContentWarning.SEXUAL_CONTENT]: "เนื้อหาทางเพศ",
-  [ContentWarning.NUDITY]: "ภาพโป๊เปลือย",
-  [ContentWarning.SMOKING]: "การสูบบุหรี่",
-  [ContentWarning.ALCOHOL]: "การดื่มสุรา",
-  [ContentWarning.MENTAL_HEALTH]: "ปัญหาสุขภาพจิต",
-  [ContentWarning.FLASHING_LIGHTS]: "แสงกะพริบ",
-};
-
 export const mapContentWarnings = (warnings?: string[] | null): string | null => {
   if (!warnings || warnings.length === 0) return null;
-  return warnings.map(w => WARNING_MAP[w] || w).join(" • ");
+  return warnings.join(" • ");
 };

@@ -73,8 +73,9 @@ export function useUpdateMovieMutation() {
   const queryClient = useQueryClient();
   return useMutation<Movie, Error, UpdateMovie>({
     mutationFn: (movie) => movieService.updateMovie(movie.id, movie),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["movies"] });
+      queryClient.invalidateQueries({ queryKey: ["movie", variables.id] });
     },
   });
 }
@@ -83,8 +84,9 @@ export function useDeleteMovieMutation() {
   const queryClient = useQueryClient();
   return useMutation<void, Error, string>({
     mutationFn: (id) => movieService.deleteMovie(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ["movies"] });
+      queryClient.invalidateQueries({ queryKey: ["movie", id] });
     },
   });
 }

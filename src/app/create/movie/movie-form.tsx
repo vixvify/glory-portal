@@ -21,12 +21,8 @@ import { TagInput } from "@/components/ui/tag-input";
 import { MOVIE_MESSAGES } from "@/core/constants/movie-messages";
 import { useAppStore } from "@/store/use-store";
 import {
-  COLOR_OPTIONS,
   ASPECT_RATIO_OPTIONS,
-  CONTENT_WARNING_OPTIONS,
   AFFILIATION_TABS,
-  LANGUAGE_SELECT_OPTIONS,
-  AGE_RATING_SELECT_OPTIONS,
 } from "@/core/constants/movie-form";
 import {
   useCreateMovieMutation,
@@ -42,6 +38,7 @@ import {
   getFilteredCategories,
   getCrewOptions,
   getInitialAffiliationType,
+  isOtherContentWarning,
 } from "@/utils/movie-form";
 import { AffiliationType } from "@/core/domain/movie";
 import { useDynamicStringList } from "@/hooks/system/use-dynamic-string-list";
@@ -52,6 +49,12 @@ export const MovieForm: React.FC<MovieFormProps> = ({
   editingMovie = null,
   categories,
   universities,
+  schools,
+  languages,
+  subtitles,
+  colorTypes,
+  contentWarnings,
+  ageRatings,
   crewRoles,
   availableCrew,
 }) => {
@@ -90,23 +93,23 @@ export const MovieForm: React.FC<MovieFormProps> = ({
     control,
     formState: { errors, isSubmitted },
   } = useForm<MovieFormInputs>({
-    defaultValues: getMovieFormDefaultValues(
-      editingMovie,
-      categories,
-      crewRoles,
-    ),
+    defaultValues: getMovieFormDefaultValues(editingMovie, categories, crewRoles, {
+      ageRatings,
+      universities,
+      schools,
+      languages,
+      subtitles,
+      colorTypes,
+      contentWarnings,
+    }),
   });
 
   const watchedYoutubeUrl = useWatch({ control, name: "youtubeUrl" });
-  const watchedContentWarnings =
-    useWatch({
-      control,
-      name: "contentWarnings",
-    }) || [];
-  const watchedOtherContentWarning = useWatch({
+  const watchedContentWarnings = useWatch({
     control,
-    name: "otherContentWarning",
-  });
+    name: "contentWarningIds",
+  }) || [];
+  const watchedOtherContentWarning = useWatch({ control, name: "otherContentWarning" });
 
   const {
     previewUrl: movieCoverPreview,
@@ -153,6 +156,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
   const onSubmitForm = async (data: MovieFormInputs) => {
     try {
+      const isOtherWarningSelected = data.contentWarningIds.some(id =>
+        isOtherContentWarning(id, contentWarnings)
+      );
+
+      if (!isOtherWarningSelected) {
+        data.otherContentWarning = "";
+      }
+
       const rawPayload = buildMovieFormPayload({
         data,
         editingMovie,
@@ -212,9 +223,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       })}
                       className="text-white placeholder:text-zinc-500"
                     />
-                    <div className="w-full mt-2">
-                      <YoutubePreview url={watchedYoutubeUrl} />
-                    </div>
+                    <div className="w-full mt-2"><YoutubePreview url={watchedYoutubeUrl} /></div>
 
                     <label className="cursor-pointer block mt-2">
                       <Controller
@@ -419,14 +428,9 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     <textarea
                       rows={4}
                       placeholder=""
-                      {...register("description", {
-                        required: "กรุณากรอกคำโปรย",
-                      })}
-                      className={`w-full bg-[#0D0D0D] border rounded-md px-4 py-2.5 text-sm text-white focus:outline-none resize-none transition-colors ${
-                        errors.description
-                          ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
-                          : "border-[#3A3A3A] focus:border-brand"
-                      }`}
+                      {...register("description", { required: "กรุณากรอกคำโปรย" })}
+                      className={`w-full bg-[#0D0D0D] border rounded-md px-4 py-2.5 text-sm text-white focus:outline-none resize-none transition-colors ${errors.description ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500" : "border-[#3A3A3A] focus:border-brand"
+                        }`}
                     />
                     {errors.description && (
                       <p className="text-[11px] text-red-400 mt-1 pl-1 animate-fade-in">
@@ -508,9 +512,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                   </div>
 
                   <div className="space-y-3">
-                    <label className="text-sm font-medium text-zinc-100 pb-2 block">
-                      สถาบัน/สังกัด
-                    </label>
+                    <label className="text-sm font-medium text-zinc-100 pb-2 block">สถาบัน/สังกัด</label>
 
                     <div className="flex gap-2">
                       {AFFILIATION_TABS.map(({ type, label }) => (
@@ -519,40 +521,53 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                           type="button"
                           onClick={() => {
                             setAffiliationType(type);
-                            setValue("university", "");
-                            setValue("school", "");
+                            setValue("universityId", "");
+                            setValue("schoolId", "");
                             setValue("studio", "");
                           }}
-                          className={`px-4 py-1.5 text-sm rounded-full border transition-all ${
-                            affiliationType === type
+                          className={`px-4 py-1.5 text-sm rounded-full border transition-all ${affiliationType === type
                               ? "bg-brand border-brand text-white font-semibold"
                               : "bg-transparent border-zinc-600 text-zinc-400 hover:border-zinc-400 hover:text-white"
-                          }`}
+                            }`}
                         >
                           {label}
                         </button>
                       ))}
                     </div>
-
                     {affiliationType === "university" ? (
                       <Controller
-                        name="university"
+                        name="universityId"
                         control={control}
                         render={({ field }) => (
                           <CreatableSearchSelect
-                            value={{
-                              id: field.value || "",
-                              name: field.value || "",
+                            value={{ id: field.value || "", name: universities.find(u => u.id === field.value)?.name || field.value || "" }}
+                            onChange={(val) => {
+                              // If it's a new item, val.id will be the same as val.name
+                              // Wait, the backend expects a UUID, so a new name might fail if it tries to pass name as UUID.
+                              // Actually, FE can't create universities on the fly here if UUID is required, unless the backend handles it or it's mapped.
+                              field.onChange(val.id)
                             }}
-                            onChange={(val) => field.onChange(val.name)}
-                            options={affiliationConfigs.university.options}
-                            placeholder={
-                              affiliationConfigs.university.placeholder
-                            }
+                            options={universities}
+                            placeholder={affiliationConfigs.university.placeholder}
                             hideIcon={true}
                             addLabelPrefix={
                               affiliationConfigs.university.prefix
                             }
+                          />
+                        )}
+                      />
+                    ) : affiliationType === "school" ? (
+                      <Controller
+                        name="schoolId"
+                        control={control}
+                        render={({ field }) => (
+                          <CreatableSearchSelect
+                            value={{ id: field.value || "", name: schools.find(s => s.id === field.value)?.name || field.value || "" }}
+                            onChange={(val) => field.onChange(val.id)}
+                            options={schools}
+                            placeholder="พิมพ์ชื่อโรงเรียน..."
+                            hideIcon={true}
+                            addLabelPrefix="เพิ่มโรงเรียน"
                           />
                         )}
                       />
@@ -565,11 +580,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                             type="text"
                             value={field.value || ""}
                             onChange={field.onChange}
-                            placeholder={
-                              affiliationType === "school"
-                                ? "พิมพ์ชื่อโรงเรียน..."
-                                : "พิมพ์ชื่อสังกัด..."
-                            }
+                            placeholder="พิมพ์ชื่อสังกัด..."
                             className="text-white w-full"
                           />
                         )}
@@ -611,9 +622,9 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                         ภาษา
                       </label>
                       <Select
-                        options={LANGUAGE_SELECT_OPTIONS}
-                        error={errors.language?.message as string}
-                        {...register("language")}
+                        options={languages.map(l => ({ value: l.id, label: l.name }))}
+                        error={errors.languageId?.message as string}
+                        {...register("languageId")}
                       />
                     </div>
                     <div className="space-y-2">
@@ -621,8 +632,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                         คำบรรยาย
                       </label>
                       <Select
-                        options={LANGUAGE_SELECT_OPTIONS}
-                        {...register("subtitle")}
+                        options={subtitles.map(s => ({ value: s.id, label: s.name }))}
+                        {...register("subtitleId")}
                       />
                     </div>
                     <div className="space-y-2">
@@ -630,8 +641,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                         สี
                       </label>
                       <Select
-                        options={COLOR_OPTIONS}
-                        {...register("colorType")}
+                        options={colorTypes.map(c => ({ value: c.id, label: c.name }))}
+                        {...register("colorTypeId")}
                       />
                     </div>
                   </div>
@@ -651,8 +662,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                         เรตภาพยนตร์
                       </label>
                       <Select
-                        options={AGE_RATING_SELECT_OPTIONS}
-                        {...register("ageRating")}
+                        options={ageRatings.map(a => ({ value: a.id, label: a.name }))}
+                        {...register("ageRatingId")}
                       />
                     </div>
                   </div>
@@ -662,34 +673,35 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                       คำเตือนเนื้อหา
                     </label>
                     <MultiSelect
-                      options={CONTENT_WARNING_OPTIONS}
+                      options={(() => {
+                        const opts = contentWarnings.map(c => ({ value: c.id, label: c.name }));
+                        if (!contentWarnings.some(c => c.name === "อื่น ๆ (ระบุ)" || c.name === "OTHER")) {
+                          opts.push({ value: "OTHER_CUSTOM", label: "อื่น ๆ (ระบุ)" });
+                        }
+                        return opts;
+                      })()}
                       selectedValues={watchedContentWarnings}
                       onChange={(values) => {
-                        setValue("contentWarnings", values, {
-                          shouldDirty: true,
-                        });
+                        setValue("contentWarningIds", values, { shouldDirty: true });
                       }}
                       placeholder="ไม่มีคำเตือนเนื้อหา / เลือกคำเตือน..."
                     />
 
-                    {watchedContentWarnings.includes("OTHER") && (
-                      <div className="pt-2 animate-fade-in">
-                        <Input
-                          placeholder="ระบุคำเตือนเนื้อหาอื่นๆ..."
-                          error={
-                            (errors.otherContentWarning?.message as string) ||
-                            (isSubmitted &&
-                            watchedContentWarnings.includes("OTHER") &&
-                            (!watchedOtherContentWarning ||
-                              watchedOtherContentWarning.trim() === "")
-                              ? "กรุณาระบุคำเตือนเนื้อหาอื่นๆ"
-                              : undefined)
-                          }
-                          {...register("otherContentWarning")}
-                          className="text-white"
-                        />
-                      </div>
-                    )}
+                    {watchedContentWarnings.some(id => isOtherContentWarning(id, contentWarnings)) && (
+                        <div className="pt-2 animate-fade-in">
+                          <Input
+                            placeholder="ระบุคำเตือนเนื้อหาอื่นๆ..."
+                            error={
+                              (errors.otherContentWarning?.message as string) ||
+                              (isSubmitted && watchedContentWarnings.some(id => isOtherContentWarning(id, contentWarnings)) && (!watchedOtherContentWarning || watchedOtherContentWarning.trim() === "")
+                                ? "กรุณาระบุคำเตือนเนื้อหาอื่นๆ"
+                                : undefined)
+                            }
+                            {...register("otherContentWarning")}
+                            className="text-white"
+                          />
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>
@@ -699,20 +711,10 @@ export const MovieForm: React.FC<MovieFormProps> = ({
           <div className="w-full max-w-[760px] mx-auto mt-12">
             <div className="space-y-6">
               <div>
-                <h2 className="text-[18px] font-bold text-brand">
-                  ข้อมูลทีมงาน
-                </h2>
-                {(errors.crew?.root?.message ||
-                  (errors.crew as { message?: string })?.message ||
-                  (isSubmitted && !fields.some((f) => f.name?.trim())
-                    ? "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน"
-                    : null)) && (
+                <h2 className="text-[18px] font-bold text-brand">ข้อมูลทีมงาน</h2>
+                {(errors.crew?.root?.message || (errors.crew as { message?: string })?.message || (isSubmitted && !fields.some(f => f.name?.trim()) ? "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน" : null)) && (
                   <p className="text-[12px] text-red-400 mt-1 animate-fade-in">
-                    {
-                      (errors.crew?.root?.message ||
-                        (errors.crew as { message?: string })?.message ||
-                        "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน") as string
-                    }
+                    {(errors.crew?.root?.message || (errors.crew as { message?: string })?.message || "กรุณาเพิ่มทีมงานอย่างน้อย 1 คน") as string}
                   </p>
                 )}
               </div>
@@ -724,16 +726,32 @@ export const MovieForm: React.FC<MovieFormProps> = ({
                     setSelectedDept(val);
                     setCrewRoleSearch("");
                   }}
-                  options={filteredCategories.map((cat) => ({
+                  options={filteredCategories.map(cat => ({
                     value: cat.id,
                     label: cat.label,
-                    searchKeywords: cat.roles.map((r) => r.label).join(" "),
+                    searchKeywords: cat.roles.map(r => r.label).join(" ")
                   }))}
                   placeholder="เลือกหรือค้นหาฝ่ายในการสร้างภาพยนตร์"
                   className="w-full"
                 />
 
                 {(() => {
+                  /*
+                  const hasAnyData = fields.some(f => f.name && f.name.trim() !== "");
+                  const shouldShowSearch = selectedDept || hasAnyData;
+
+                  return shouldShowSearch && (
+                    <div className="relative mt-2 animate-fade-in">
+                      <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#B8860B] pointer-events-none" />
+                      <input
+                        type="text"
+                        placeholder={selectedDept ? `ค้นหาตำแหน่งใน${filteredCategories.find(c => c.id === selectedDept)?.label}` : "ค้นหาตำแหน่งทีมงาน..."}
+                        value={crewRoleSearch}
+                        onChange={(e) => setCrewRoleSearch(e.target.value)}
+                        className="w-full bg-[#0D0D0D] border border-[#3A3A3A] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors"
+                      />
+                    </div>
+                  */
                   const hasAnyData = fields.some(
                     (f) => f.name && f.name.trim() !== "",
                   );
@@ -762,17 +780,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({
 
               <div className="space-y-8 mt-6">
                 {filteredCategories.map((cat) => {
-                  const searchLower = deferredCrewRoleSearch
-                    .toLowerCase()
-                    .trim();
+                  const searchLower = deferredCrewRoleSearch.toLowerCase().trim();
                   const isSelectedCat = cat.id === selectedDept;
 
                   if (selectedDept && !isSelectedCat) return null;
 
                   const rolesToRender = cat.roles.filter((role) => {
                     const hasData = fields.some(
-                      (f) =>
-                        f.role === role.id && f.name && f.name.trim() !== "",
+                      (f) => f.role === role.id && f.name && f.name.trim() !== ""
                     );
 
                     const isVisible = hasData || isSelectedCat;

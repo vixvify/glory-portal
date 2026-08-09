@@ -12,11 +12,11 @@ import { useAppStore } from "@/store/use-store";
 import {
   useCategoriesQuery,
   useUniversitiesQuery,
+  useSchoolsQuery,
 } from "@/hooks/db/use-master-data";
 import { useLogoutMutation } from "@/hooks/db/use-auth";
 import { useFavoritesQuery } from "@/hooks/db/use-favorites";
 import { useSearchPlaceholder } from "@/hooks/system/use-search-placeholder";
-import { MOCK_SCHOOLS } from "@/core/constants/mock-schools";
 
 export default function Navbar() {
   const router = useRouter();
@@ -25,6 +25,7 @@ export default function Navbar() {
 
   const { data: categories = [] } = useCategoriesQuery();
   const { data: universities = [] } = useUniversitiesQuery();
+  const { data: schools = [] } = useSchoolsQuery();
   const { data: favorites = [] } = useFavoritesQuery(!!currentUser);
   const logoutMutation = useLogoutMutation();
 
@@ -349,11 +350,11 @@ export default function Navbar() {
                 ) : (
                   universities.map((uni) => (
                     <button
-                      key={uni}
-                      onClick={() => handleUniversityClick(uni)}
+                      key={uni.id}
+                      onClick={() => handleUniversityClick(uni.name)}
                       className="w-full text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand"
                     >
-                      {uni}
+                      {uni.name}
                     </button>
                   ))
                 )}
@@ -366,18 +367,18 @@ export default function Navbar() {
                 >
                   โรงเรียนทั้งหมด
                 </button>
-                {MOCK_SCHOOLS.length === 0 ? (
+                {schools.length === 0 ? (
                   <p className="text-center text-zinc-500 py-3 text-xs font-light">
                     ไม่มีข้อมูลโรงเรียน
                   </p>
                 ) : (
-                  MOCK_SCHOOLS.map((school) => (
+                  schools.map((school) => (
                     <button
-                      key={school.searchKey}
-                      onClick={() => handleSchoolClick(school.searchKey)}
+                      key={school.id}
+                      onClick={() => handleSchoolClick(school.name)}
                       className="w-full text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand"
                     >
-                      {school.label}
+                      {school.name}
                     </button>
                   ))
                 )}
