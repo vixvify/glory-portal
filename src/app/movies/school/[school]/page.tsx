@@ -10,16 +10,11 @@ import Loading from "@/app/loading";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import { LayoutToggle, LayoutOrientation } from "@/components/ui/layout-toggle";
 import { PageLayout } from "@/components/ui/page-layout";
-import { MOCK_SCHOOLS } from "@/core/constants/mock-schools";
 
 export default function SchoolDetailPage() {
   const params = useParams<{ school: string }>();
   const schoolName = params.school ? decodeURIComponent(params.school) : "";
-
-  const mappedSchool = MOCK_SCHOOLS.find(
-    (s) => s.searchKey.toLowerCase() === schoolName.toLowerCase()
-  );
-  const displaySchoolName = mappedSchool ? mappedSchool.label : schoolName;
+  const displaySchoolName = schoolName;
 
   const { playMovie: handlePlayMovie } = useMoviePlayer();
   const [orientation, setOrientation] = useState<LayoutOrientation>("landscape");
