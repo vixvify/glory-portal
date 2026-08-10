@@ -19,7 +19,6 @@ import MovieRatingPanel from "@/components/movie/detail/movie-rating-panel";
 import MovieInfoPanel from "@/components/movie/detail/movie-info-panel";
 import MovieCrewRow from "@/components/movie/rows/movie-crew-row";
 import MovieBtsSection from "@/components/movie/detail/movie-bts-section";
-import { CONTENT_WARNING_OPTIONS } from "@/core/constants/movie-form";
 import { MOVIE_MESSAGES } from "@/core/constants/movie-messages";
 import { AUTH_MESSAGES } from "@/core/constants/auth-messages";
 import { COMMON_MESSAGES } from "@/core/constants/common-messages";
@@ -138,9 +137,7 @@ export default function MovieDetails() {
             </div>
 
             {(() => {
-              const activeWarnings = (movie.contentWarnings || [])
-                .map(w => CONTENT_WARNING_OPTIONS.find(opt => opt.value === w)?.label)
-                .filter(Boolean);
+              const activeWarnings = [...(movie.contentWarnings || [])];
               if (movie.otherContentWarning) activeWarnings.push(movie.otherContentWarning);
               
               if (activeWarnings.length === 0) return null;

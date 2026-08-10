@@ -1,38 +1,28 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
+import { useSchoolsQuery } from "@/hooks/db/use-master-data";
 
 import MovieRow from "@/components/movie/rows/movie-row";
 import Loading from "@/app/loading";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import { LayoutToggle, LayoutOrientation } from "@/components/ui/layout-toggle";
 import { PageLayout } from "@/components/ui/page-layout";
-
 import { Movie } from "@/core/domain/movie";
-import { MOCK_SCHOOLS } from "@/core/constants/mock-schools";
 
-function pickRandom<T>(arr: T[], count: number): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a.slice(0, Math.min(count, a.length));
-}
-
-function RandomSchoolRow({
-  school,
+function SchoolMovieRow({
+  schoolName,
   orientation,
   onPlayClick,
 }: {
-  school: { searchKey: string; label: string };
+  schoolName: string;
   orientation: LayoutOrientation;
   onPlayClick: (movie: Movie) => void;
 }) {
   const { data: movies = [], isLoading } = useMoviesQuery(
-    { search: school.searchKey, searchby: "school", aspectRatio: orientation },
+    { search: schoolName, searchby: "school", aspectRatio: orientation },
     { placeholderData: keepPreviousData }
   );
 
@@ -40,7 +30,7 @@ function RandomSchoolRow({
 
   return (
     <MovieRow
-      title={school.label}
+      title={schoolName}
       movies={movies}
       onPlayClick={onPlayClick}
       orientation={orientation}
@@ -52,14 +42,13 @@ export default function SchoolPage() {
   const { playMovie: handlePlayMovie } = useMoviePlayer();
   const [orientation, setOrientation] = useState<LayoutOrientation>("landscape");
 
-  const randomSchools = useMemo(() => pickRandom(MOCK_SCHOOLS, 2), []);
-
+  const { data: schools = [], isLoading: isLoadingSchools } = useSchoolsQuery();
   const { data: allSchoolMovies = [], isLoading: isLoadingAll } = useMoviesQuery(
-    { searchby: "school", aspectRatio: orientation },
+    { search: "", searchby: "school", aspectRatio: orientation },
     { placeholderData: keepPreviousData }
   );
 
-  const isPageLoading = isLoadingAll;
+  const isPageLoading = isLoadingAll || isLoadingSchools;
 
   if (isPageLoading) {
     return <Loading />;
@@ -82,10 +71,10 @@ export default function SchoolPage() {
             />
           )}
 
-          {randomSchools.map((school) => (
-            <RandomSchoolRow
-              key={school.searchKey}
-              school={school}
+          {schools.map((school) => (
+            <SchoolMovieRow
+              key={school.id}
+              schoolName={school.name}
               orientation={orientation}
               onPlayClick={handlePlayMovie}
             />
@@ -103,3 +92,4 @@ export default function SchoolPage() {
     </PageLayout>
   );
 }
+

@@ -2,8 +2,6 @@ import { CreateMovie, Movie, UpdateMovie } from "@/core/domain/movie";
 import { Category } from "@/core/domain/master-data";
 import { CrewRole, CrewOption, CrewMember } from "@/core/domain/crew";
 import {
-  AGE_RATING_OPTIONS,
-  LANGUAGE_OPTIONS,
   CrewCategory,
   CrewRoleDefinition,
   CREW_CATEGORY_CONFIG,
@@ -14,8 +12,8 @@ import {
   AffiliationType,
   MovieFormInputs,
   MovieCrewInputItemWithRole,
-  ContentWarning,
 } from "@/core/domain/movie";
+import { MasterDataItem } from "@/core/domain/master-data";
 
 type MovieFormPayloadOptions = {
   data: MovieFormInputs;
@@ -63,28 +61,59 @@ export function getInitialCrewFormValues(
   });
 }
 
+export function isOtherContentWarning(id: string, contentWarnings: MasterDataItem[]): boolean {
+  if (id === "OTHER_CUSTOM") return true;
+  const cw = contentWarnings.find(c => c.id === id);
+  return cw?.name === "OTHER" || cw?.name === "อื่น ๆ (ระบุ)";
+}
+
 export function getMovieFormDefaultValues(
   editingMovie: Movie | null,
   categories: Category[],
   crewRoles: CrewRole[],
+  masterData: {
+    ageRatings: MasterDataItem[];
+    universities: MasterDataItem[];
+    schools: MasterDataItem[];
+    languages: MasterDataItem[];
+    subtitles: MasterDataItem[];
+    colorTypes: MasterDataItem[];
+    contentWarnings: MasterDataItem[];
+  }
 ): MovieFormInputs {
   if (editingMovie) {
+    const mapName2Id = (name: string | null | undefined, list: MasterDataItem[]) => {
+      if (!name) return "";
+      const normalizedName = name.toLowerCase().trim();
+      const item = list.find(l => l.name.toLowerCase().trim() === normalizedName);
+      return item ? item.id : "";
+    };
+
+    const cWarningIds = editingMovie.contentWarnings
+      ?.map(w => mapName2Id(w, masterData.contentWarnings))
+      .filter(Boolean) || [];
+
+    if (editingMovie.otherContentWarning) {
+      const otherItem = masterData.contentWarnings.find(l => l.name === "อื่น ๆ (ระบุ)" || l.name === "OTHER");
+      if (otherItem) {
+        cWarningIds.push(otherItem.id);
+      } else {
+        cWarningIds.push("OTHER_CUSTOM");
+      }
+    }
     return {
       ...editingMovie,
       categoryIds: editingMovie.categories.map((c) => c.id),
       thumbnail: null,
       trailerUrls: editingMovie.trailerUrls || [],
-      aspectRatio: editingMovie.aspectRatio || "landscape",
-      ageRating: editingMovie.ageRating || "",
-      university: editingMovie.university || "",
-      school: editingMovie.school || "",
-      language: editingMovie.language || "",
-      subtitle: editingMovie.subtitle || "",
-      contentWarnings: editingMovie.otherContentWarning 
-        ? [...(editingMovie.contentWarnings || []), "OTHER" as ContentWarning] 
-        : (editingMovie.contentWarnings || []),
+      ageRatingId: mapName2Id(editingMovie.ageRating, masterData.ageRatings) || (masterData.ageRatings[0]?.id || ""),
+      universityId: mapName2Id(editingMovie.university, masterData.universities),
+      schoolId: mapName2Id(editingMovie.school, masterData.schools),
+      languageId: editingMovie.language ? (mapName2Id(editingMovie.language, masterData.languages) || "") : "",
+      subtitleId: editingMovie.subtitle ? (mapName2Id(editingMovie.subtitle, masterData.subtitles) || "") : "",
+      contentWarningIds: cWarningIds,
       otherContentWarning: editingMovie.otherContentWarning || "",
-      colorType: editingMovie.colorType || "color",
+      colorTypeId: mapName2Id(editingMovie.colorType, masterData.colorTypes) || (masterData.colorTypes[0]?.id || ""),
       studio: editingMovie.studio || "",
       btsVideo: editingMovie.btsVideos || [],
       awards: (editingMovie.awards || []).map((a) => ({
@@ -105,15 +134,15 @@ export function getMovieFormDefaultValues(
     trailerUrls: [],
     releaseDate: new Date().toISOString().split("T")[0],
     aspectRatio: "landscape",
-    ageRating: AGE_RATING_OPTIONS[0] || "",
+    ageRatingId: masterData.ageRatings[0]?.id || "",
     duration: 120,
-    university: "",
-    school: "",
-    language: LANGUAGE_OPTIONS[0],
-    subtitle: LANGUAGE_OPTIONS[0],
-    contentWarnings: [],
+    universityId: "",
+    schoolId: "",
+    languageId: masterData.languages.find(l => l.name.includes("ไทย"))?.id || masterData.languages[0]?.id || "",
+    subtitleId: masterData.subtitles.find(s => s.name.includes("ไทย"))?.id || masterData.subtitles[0]?.id || "",
+    contentWarningIds: [],
     otherContentWarning: "",
-    colorType: "color",
+    colorTypeId: masterData.colorTypes.find(c => c.name === "ภาพสี")?.id || masterData.colorTypes[0]?.id || "",
     studio: "",
     btsVideo: [],
     awards: [{ projectName: "", awardList: [{ value: "" }] }],
@@ -172,18 +201,19 @@ export function buildMovieFormPayload({
   return {
     ...data,
     categoryIds: Array.from(new Set((data.categoryIds || []).filter(Boolean))),
+    contentWarningIds: Array.from(new Set((data.contentWarningIds || []).filter((id) => Boolean(id) && id !== "OTHER_CUSTOM"))),
     thumbnail: data.thumbnail || editingMovie?.thumbnail,
     duration: Number(data.duration),
     btsVideo: activeVideos,
     trailerUrls: activeTrailers,
     awards: activeAwards,
-    university:
-      affiliationType === "university" ? data.university || null : null,
-    school: affiliationType === "school" ? data.school || null : null,
+    universityId:
+      affiliationType === "university" ? data.universityId || null : null,
+    schoolId: affiliationType === "school" ? data.schoolId || null : null,
     studio: affiliationType === "studio" ? data.studio || null : null,
+    languageId: data.languageId || null,
+    subtitleId: data.subtitleId || null,
     crew: filteredCrew,
-    contentWarnings: (data.contentWarnings || []).filter(w => w !== "OTHER"),
-    otherContentWarning: (data.contentWarnings || []).includes("OTHER") ? data.otherContentWarning || "" : "",
   };
 }
 
@@ -192,11 +222,15 @@ export function toCreateMoviePayload(rawPayload: unknown): CreateMovie {
 
   return {
     ...validated,
-    contentWarnings: (validated.contentWarnings?.filter(w => w !== "OTHER") as ContentWarning[]),
     awards: validated.awards ?? undefined,
     trailerUrls: validated.trailerUrls ?? undefined,
     tags: validated.tags ?? undefined,
+    contentWarningIds: validated.contentWarningIds ?? undefined,
     thumbnail: validated.thumbnail as File,
+    universityId: validated.universityId ?? null,
+    schoolId: validated.schoolId ?? null,
+    languageId: validated.languageId ?? null,
+    subtitleId: validated.subtitleId ?? null,
   };
 }
 
@@ -209,15 +243,19 @@ export function toUpdateMoviePayload(
   return {
     ...validated,
     id: editingMovie.id,
-    contentWarnings: (validated.contentWarnings?.filter(w => w !== "OTHER") as ContentWarning[]),
     awards: validated.awards ?? undefined,
     trailerUrls: validated.trailerUrls ?? undefined,
     tags: validated.tags ?? undefined,
+    contentWarningIds: validated.contentWarningIds ?? undefined,
     thumbnail:
       validated.thumbnail instanceof File ||
         typeof validated.thumbnail === "string"
         ? validated.thumbnail
         : editingMovie.thumbnail,
+    universityId: validated.universityId ?? null,
+    schoolId: validated.schoolId ?? null,
+    languageId: validated.languageId ?? null,
+    subtitleId: validated.subtitleId ?? null,
   };
 }
 
