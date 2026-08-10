@@ -1,5 +1,5 @@
-import { User } from "./user";
-import { Movie } from "./movie";
+import type { User } from "./user";
+import type { Movie } from "./movie";
 
 export interface Rating {
   id?: string;

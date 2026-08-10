@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "node --test --experimental-strip-types --experimental-loader ./src/tests/ts-loader.mjs src/tests/movie-service.test.ts",
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint"
   },

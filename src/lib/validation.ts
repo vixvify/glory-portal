@@ -1,4 +1,4 @@
-import { ZodSchema } from "zod";
+import type { ZodSchema } from "zod";
 
 export function parseSchema<T>(schema: ZodSchema<T>, data: unknown): T {
     const result = schema.safeParse(data);
@@ -8,4 +8,4 @@ export function parseSchema<T>(schema: ZodSchema<T>, data: unknown): T {
     }
 
     return result.data;
-}
+}

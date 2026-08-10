@@ -1,9 +1,24 @@
-import { Rating } from "./rating";
-import { User } from "./user";
-import { CrewRole, CrewMember } from "./crew";
-import { Category, MasterDataItem } from "./master-data";
+import type { Rating } from "./rating";
+import type { User } from "./user";
+import type { CrewRole, CrewMember } from "./crew";
+import type { Category } from "./master-data";
+import type { MasterDataItem } from "./master-data";
 
+export const ContentWarning = {
+  PROFANITY: "PROFANITY",
+  DRUGS: "DRUGS",
+  VIOLENCE: "VIOLENCE",
+  GORE: "GORE",
+  SEXUAL_CONTENT: "SEXUAL_CONTENT",
+  NUDITY: "NUDITY",
+  SMOKING: "SMOKING",
+  ALCOHOL: "ALCOHOL",
+  MENTAL_HEALTH: "MENTAL_HEALTH",
+  FLASHING_LIGHTS: "FLASHING_LIGHTS",
+} as const;
 
+export type ContentWarning =
+  (typeof ContentWarning)[keyof typeof ContentWarning];
 
 export interface MovieCrew {
   id: string;
