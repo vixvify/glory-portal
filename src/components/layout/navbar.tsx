@@ -15,7 +15,6 @@ import {
   useSchoolsQuery,
 } from "@/hooks/db/use-master-data";
 import { useLogoutMutation } from "@/hooks/db/use-auth";
-import { useFavoritesQuery } from "@/hooks/db/use-favorites";
 import { useSearchPlaceholder } from "@/hooks/system/use-search-placeholder";
 
 export default function Navbar() {
@@ -26,11 +25,10 @@ export default function Navbar() {
   const { data: categories = [] } = useCategoriesQuery();
   const { data: universities = [] } = useUniversitiesQuery();
   const { data: schools = [] } = useSchoolsQuery();
-  const { data: favorites = [] } = useFavoritesQuery(!!currentUser);
   const logoutMutation = useLogoutMutation();
 
   const [activeTab, setActiveTab] = useState<
-    "category" | "university" | "school" | "favorites"
+    "category" | "university" | "school"
   >("category");
 
   const onSignOut = () => {
@@ -265,6 +263,13 @@ export default function Navbar() {
                 >
                   เพิ่มภาพยนตร์
                 </Link>
+                <Link
+                  href="/movies/favorites"
+                  onClick={() => setShowProfileMenu(false)}
+                  className="w-full block text-left px-3 py-2 text-xs text-zinc-300 hover:text-brand hover:bg-brand/10 rounded-md cursor-pointer transition-colors mb-1"
+                >
+                  รายการของฉัน
+                </Link>
                 <button
                   onClick={() => {
                     onSignOut();
@@ -320,16 +325,6 @@ export default function Navbar() {
             >
               โรงเรียน
             </button>
-            <button
-              onClick={() => setActiveTab("favorites")}
-              className={`flex-1 text-center px-1 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === "favorites"
-                  ? "bg-brand/15 text-brand border border-brand/25"
-                  : "text-zinc-400 hover:text-white border border-transparent"
-              }`}
-            >
-              รายการของฉัน
-            </button>
           </div>
 
           <div className="max-h-60 overflow-y-auto pr-1 no-scrollbar space-y-1">
@@ -363,7 +358,7 @@ export default function Navbar() {
                   ))
                 )}
               </>
-            ) : activeTab === "school" ? (
+            ) : (
               <>
                 <button
                   onClick={() => handleSchoolClick(null)}
@@ -385,45 +380,6 @@ export default function Navbar() {
                       {school.name}
                     </button>
                   ))
-                )}
-              </>
-            ) : (
-              <>
-                {!currentUser ? (
-                  <div className="text-center text-zinc-500 py-4 text-xs font-light">
-                    <p className="mb-2">กรุณาเข้าสู่ระบบเพื่อดูรายการของคุณ</p>
-                    <Button
-                      onClick={onSignInClick}
-                      size="sm"
-                      className="h-7 text-[10px] px-3"
-                    >
-                      เข้าสู่ระบบ
-                    </Button>
-                  </div>
-                ) : favorites.length === 0 ? (
-                  <p className="text-center text-zinc-550 py-4 text-xs font-light">
-                    ไม่มีรายการของฉันในขณะนี้
-                  </p>
-                ) : (
-                  <>
-                    <Link
-                      href="/movies/favorites"
-                      onClick={() => setShowMoviesMenu(false)}
-                      className="w-full block text-center py-2 mb-1.5 text-xs text-brand font-semibold hover:underline bg-brand/5 rounded-md"
-                    >
-                      ดูรายการทั้งหมด ({favorites.length})
-                    </Link>
-                    {favorites.map((fav) => (
-                      <Link
-                        key={fav.id}
-                        href={`/movies/${fav.id}`}
-                        onClick={() => setShowMoviesMenu(false)}
-                        className="w-full block text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand truncate"
-                      >
-                        {fav.title}
-                      </Link>
-                    ))}
-                  </>
                 )}
               </>
             )}
