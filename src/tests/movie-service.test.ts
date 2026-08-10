@@ -6,6 +6,8 @@ import type { MovieRepository } from "@/core/ports/movie.repository";
 import type { ApiResponse } from "@/core/ports/response";
 
 const CATEGORY_ID = "11111111-1111-4111-8111-111111111111";
+const AGE_RATING_ID = "22222222-2222-4222-8222-222222222222";
+const COLOR_TYPE_ID = "33333333-3333-4333-8333-333333333333";
 const MOVIE_ID = "movie-123";
 
 function createMovieResult(): Movie {
@@ -48,12 +50,11 @@ function validMovieInput(): CreateMovie {
     youtubeUrl: "https://www.youtube.com/watch?v=test",
     releaseDate: "2026-01-01",
     aspectRatio: "16:9",
-    ageRating: "G",
+    ageRatingId: AGE_RATING_ID,
     duration: 120,
-    language: "TH",
-    colorType: "COLOR",
+    colorTypeId: COLOR_TYPE_ID,
     crew: [{ role: "DIRECTOR", name: "ผู้กำกับทดสอบ" }],
-    contentWarnings: [],
+    contentWarningIds: [],
   };
 }
 
