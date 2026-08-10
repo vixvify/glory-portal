@@ -28,7 +28,7 @@ export const toFormData = (data: Record<string, unknown>): FormData => {
       return;
     }
 
-    if (value instanceof FileList) {
+    if (typeof FileList !== "undefined" && value instanceof FileList) {
       for (let i = 0; i < value.length; i++) {
         const file = value.item(i);
         if (file) formData.append(key, file);
