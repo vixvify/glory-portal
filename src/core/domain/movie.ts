@@ -2,6 +2,7 @@ import type { Rating } from "./rating";
 import type { User } from "./user";
 import type { CrewRole, CrewMember } from "./crew";
 import type { Category } from "./master-data";
+import type { MasterDataItem } from "./master-data";
 
 export const ContentWarning = {
   PROFANITY: "PROFANITY",
@@ -16,7 +17,8 @@ export const ContentWarning = {
   FLASHING_LIGHTS: "FLASHING_LIGHTS",
 } as const;
 
-export type ContentWarning = (typeof ContentWarning)[keyof typeof ContentWarning];
+export type ContentWarning =
+  (typeof ContentWarning)[keyof typeof ContentWarning];
 
 export interface MovieCrew {
   id: string;

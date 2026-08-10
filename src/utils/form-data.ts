@@ -8,8 +8,6 @@ export const toFormData = (data: Record<string, unknown>): FormData => {
       return;
     }
 
-
-
     if (value instanceof File) {
       formData.append(key, value);
       return;
