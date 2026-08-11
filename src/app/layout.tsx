@@ -4,6 +4,7 @@ import Providers from "./providers";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import ThemeRegistry from "@/components/ThemeRegistry/ThemeRegistry";
+import { Toast } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
   title: "glory",
@@ -24,6 +25,7 @@ export default function RootLayout({
             <Navbar />
             <div className="flex-1 flex flex-col">{children}</div>
             <Footer />
+            <Toast />
           </Providers>
         </ThemeRegistry>
       </body>

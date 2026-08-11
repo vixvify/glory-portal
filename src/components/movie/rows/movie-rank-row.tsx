@@ -11,16 +11,12 @@ interface MovieRankRowProps {
   title: string;
   movies: Movie[];
   onPlayClick: (movie: Movie) => void;
-  favorites: Movie[];
-  onToggleFavorite: (movieId: string) => void;
 }
 
 export default function MovieRankRow({
   title,
   movies,
   onPlayClick,
-  favorites,
-  onToggleFavorite,
 }: MovieRankRowProps) {
   const { rowRef, showLeftArrow, showRightArrow, handleScroll } =
     useScrollRow(movies);
@@ -63,8 +59,6 @@ export default function MovieRankRow({
                 <MovieCard
                   movie={movie}
                   onPlayClick={onPlayClick}
-                  isFavorite={favorites.some((fav) => fav.id === movie.id)}
-                  onToggleFavorite={onToggleFavorite}
                 />
               </Link>
             );

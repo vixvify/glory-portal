@@ -1,5 +1,5 @@
-import { User } from "./user";
-import { MovieCrew } from "./movie";
+import type { User } from "./user";
+import type { MovieCrew } from "./movie";
 
 export interface CrewRole {
   id: string;

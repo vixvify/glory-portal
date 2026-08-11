@@ -13,9 +13,8 @@ interface InfoRowProps {
 function InfoRow({ label, value, withBorder = false }: InfoRowProps) {
   return (
     <div
-      className={`flex justify-between items-start gap-4 ${
-        withBorder ? "pt-3 border-t border-zinc-900/40" : ""
-      }`}
+      className={`flex justify-between items-start gap-4 ${withBorder ? "pt-3 border-t border-zinc-900/40" : ""
+        }`}
     >
       <span className="text-zinc-550 font-light whitespace-nowrap">
         {label}
@@ -57,10 +56,10 @@ export default function MovieInfoPanel({ movie }: Props) {
               : movie.colorType,
     },
     movie.awards &&
-      movie.awards.length > 0 && {
-        label: "รางวัลที่ได้รับ",
-        value: movie.awards.filter(Boolean).join(", "),
-      },
+    movie.awards.length > 0 && {
+      label: "รางวัลที่ได้รับ",
+      value: movie.awards.filter(Boolean).join(", "),
+    },
   ].filter(Boolean) as { label: string; value: string }[];
 
   if (rows.length === 0) return null;

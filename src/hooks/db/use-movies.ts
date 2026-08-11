@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 import { movieService } from "@/infra/container";
 import {
   Movie,
@@ -9,7 +9,7 @@ import {
 
 export function useMoviesQuery(
   params?: MovieFilterParams,
-  options?: { enabled?: boolean },
+  options?: Omit<UseQueryOptions<Movie[], Error>, "queryKey" | "queryFn">,
 ) {
   return useQuery<Movie[], Error>({
     queryKey: params ? ["movies", params] : ["movies"],
@@ -73,8 +73,9 @@ export function useUpdateMovieMutation() {
   const queryClient = useQueryClient();
   return useMutation<Movie, Error, UpdateMovie>({
     mutationFn: (movie) => movieService.updateMovie(movie.id, movie),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["movies"] });
+      queryClient.invalidateQueries({ queryKey: ["movie", variables.id] });
     },
   });
 }
@@ -83,8 +84,9 @@ export function useDeleteMovieMutation() {
   const queryClient = useQueryClient();
   return useMutation<void, Error, string>({
     mutationFn: (id) => movieService.deleteMovie(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ["movies"] });
+      queryClient.invalidateQueries({ queryKey: ["movie", id] });
     },
   });
 }

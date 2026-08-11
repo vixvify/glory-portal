@@ -6,7 +6,6 @@ import { useMoviePlayer } from "@/hooks/system/use-movie-player";
 import { Movie, BtsVideoItem } from "@/core/domain/movie";
 import { useAppStore } from "@/store/use-store";
 import { FAVORITE_MESSAGES } from "@/core/constants/favorite-messages";
-import { Toast } from "@/components/ui/toast";
 import { useMoviesQuery } from "@/hooks/db/use-movies";
 import {
   useFavoritesQuery,
@@ -130,13 +129,9 @@ export default function HomePage(props: Props) {
           filteredMovies={fetchedMovies}
           isSearching={isSearching}
           handlePlayMovie={handlePlayMovie}
-          handleToggleFavorite={handleToggleFavorite}
-          favorites={favorites}
           setSearchQuery={useAppStore.getState().setSearchQuery}
         />
       )}
-
-      <Toast />
     </div>
   );
 }

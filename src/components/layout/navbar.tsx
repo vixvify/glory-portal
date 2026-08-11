@@ -12,6 +12,7 @@ import { useAppStore } from "@/store/use-store";
 import {
   useCategoriesQuery,
   useUniversitiesQuery,
+  useSchoolsQuery,
 } from "@/hooks/db/use-master-data";
 import { useLogoutMutation } from "@/hooks/db/use-auth";
 import { useFavoritesQuery } from "@/hooks/db/use-favorites";
@@ -24,11 +25,12 @@ export default function Navbar() {
 
   const { data: categories = [] } = useCategoriesQuery();
   const { data: universities = [] } = useUniversitiesQuery();
+  const { data: schools = [] } = useSchoolsQuery();
   const { data: favorites = [] } = useFavoritesQuery(!!currentUser);
   const logoutMutation = useLogoutMutation();
 
   const [activeTab, setActiveTab] = useState<
-    "category" | "university" | "favorites"
+    "category" | "university" | "school" | "favorites"
   >("category");
 
   const onSignOut = () => {
@@ -51,6 +53,16 @@ export default function Navbar() {
 
   const handleUniversityClick = (uniName: string) => {
     router.push(`/movies/university/${encodeURIComponent(uniName)}`);
+    setShowMoviesMenu(false);
+    setSearchQuery("");
+  };
+
+  const handleSchoolClick = (schoolSearchKey: string | null) => {
+    if (schoolSearchKey === null) {
+      router.push("/movies/school");
+    } else {
+      router.push(`/movies/school/${encodeURIComponent(schoolSearchKey)}`);
+    }
     setShowMoviesMenu(false);
     setSearchQuery("");
   };
@@ -149,7 +161,8 @@ export default function Navbar() {
             className={`flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all duration-300 whitespace-nowrap border ${
               showMoviesMenu ||
               pathname.startsWith("/movies/category") ||
-              pathname.startsWith("/movies/university")
+              pathname.startsWith("/movies/university") ||
+              pathname.startsWith("/movies/school")
                 ? "bg-white/15 text-white border-white/20 font-semibold shadow-md"
                 : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/5"
             }`}
@@ -274,12 +287,12 @@ export default function Navbar() {
       {showMoviesMenu && (
         <div
           ref={moviesMenuRef}
-          className="absolute left-6 md:left-[170px] top-full mt-1.5 w-64 bg-background border border-theme-border rounded-md p-4 shadow-2xl shadow-black/90 animate-fade-in z-50"
+          className="absolute left-6 md:left-[170px] top-full mt-1.5 w-80 bg-background border border-theme-border rounded-md p-4 shadow-2xl shadow-black/90 animate-fade-in z-50"
         >
           <div className="flex border-b border-white/5 mb-3 pb-2 gap-1">
             <button
               onClick={() => setActiveTab("category")}
-              className={`flex-1 text-center py-2 text-[10px] font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
+              className={`flex-1 text-center px-1 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === "category"
                   ? "bg-brand/15 text-brand border border-brand/25"
                   : "text-zinc-400 hover:text-white border border-transparent"
@@ -289,7 +302,7 @@ export default function Navbar() {
             </button>
             <button
               onClick={() => setActiveTab("university")}
-              className={`flex-1 text-center py-2 text-[10px] font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
+              className={`flex-1 text-center px-1 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === "university"
                   ? "bg-brand/15 text-brand border border-brand/25"
                   : "text-zinc-400 hover:text-white border border-transparent"
@@ -298,8 +311,18 @@ export default function Navbar() {
               มหาวิทยาลัย
             </button>
             <button
+              onClick={() => setActiveTab("school")}
+              className={`flex-1 text-center px-1 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
+                activeTab === "school"
+                  ? "bg-brand/15 text-brand border border-brand/25"
+                  : "text-zinc-400 hover:text-white border border-transparent"
+              }`}
+            >
+              โรงเรียน
+            </button>
+            <button
               onClick={() => setActiveTab("favorites")}
-              className={`flex-1 text-center py-2 text-[10px] font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
+              className={`flex-1 text-center px-1 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === "favorites"
                   ? "bg-brand/15 text-brand border border-brand/25"
                   : "text-zinc-400 hover:text-white border border-transparent"
@@ -312,12 +335,6 @@ export default function Navbar() {
           <div className="max-h-60 overflow-y-auto pr-1 no-scrollbar space-y-1">
             {activeTab === "category" ? (
               <>
-                <button
-                  onClick={() => handleNavClick(null)}
-                  className="w-full text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand"
-                >
-                  หนังทั้งหมด
-                </button>
                 {categories.map((cat) => (
                   <button
                     key={cat.id}
@@ -337,11 +354,35 @@ export default function Navbar() {
                 ) : (
                   universities.map((uni) => (
                     <button
-                      key={uni}
-                      onClick={() => handleUniversityClick(uni)}
+                      key={uni.id}
+                      onClick={() => handleUniversityClick(uni.name)}
                       className="w-full text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand"
                     >
-                      {uni}
+                      {uni.name}
+                    </button>
+                  ))
+                )}
+              </>
+            ) : activeTab === "school" ? (
+              <>
+                <button
+                  onClick={() => handleSchoolClick(null)}
+                  className="w-full text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand"
+                >
+                  โรงเรียนทั้งหมด
+                </button>
+                {schools.length === 0 ? (
+                  <p className="text-center text-zinc-500 py-3 text-xs font-light">
+                    ไม่มีข้อมูลโรงเรียน
+                  </p>
+                ) : (
+                  schools.map((school) => (
+                    <button
+                      key={school.id}
+                      onClick={() => handleSchoolClick(school.name)}
+                      className="w-full text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand"
+                    >
+                      {school.name}
                     </button>
                   ))
                 )}

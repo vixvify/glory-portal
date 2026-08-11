@@ -7,8 +7,6 @@ interface SearchViewProps {
   filteredMovies: Movie[];
   isSearching: boolean;
   handlePlayMovie: (movie: Movie) => void;
-  handleToggleFavorite: (movieId: string) => void;
-  favorites: Movie[];
   setSearchQuery: (query: string) => void;
 }
 
@@ -17,8 +15,6 @@ export default function SearchView({
   filteredMovies,
   isSearching,
   handlePlayMovie,
-  handleToggleFavorite,
-  favorites,
   setSearchQuery,
 }: SearchViewProps) {
   return (
@@ -55,8 +51,6 @@ export default function SearchView({
           <MovieGrid
             movies={filteredMovies}
             onPlayClick={handlePlayMovie}
-            favorites={favorites}
-            onToggleFavorite={handleToggleFavorite}
           />
         </div>
       )}
