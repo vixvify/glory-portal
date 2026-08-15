@@ -85,7 +85,7 @@ export default function ProfilePage() {
         setIsDeletingLocal(true);
         await deleteMovieMutation.mutateAsync(deleteMovieId);
         showToast(MOVIE_MESSAGES.TOAST.DELETE_MOVIE_SUCCESS, "success");
-      } catch (err: unknown) {
+      } catch {
         showToast(COMMON_MESSAGES.ERRORS.DELETE, "error");
       } finally {
         setIsDeletingLocal(false);
@@ -100,7 +100,7 @@ export default function ProfilePage() {
         setIsDeletingLocal(true);
         await deleteCrewMemberMutation.mutateAsync(deleteCrewId);
         showToast(CREW_MESSAGES.TOAST.DELETE_CREW_SUCCESS, "success");
-      } catch (err: unknown) {
+      } catch {
         showToast(COMMON_MESSAGES.ERRORS.DELETE, "error");
       } finally {
         setIsDeletingLocal(false);

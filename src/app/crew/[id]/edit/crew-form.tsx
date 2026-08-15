@@ -74,7 +74,7 @@ export const CrewForm: React.FC<CrewFormProps> = ({ editingCrew = null }) => {
       }
 
       router.push("/");
-    } catch (err: unknown) {
+    } catch {
       showToast(COMMON_MESSAGES.ERRORS.SAVE, "error");
     } finally {
       setIsSavingLocal(false);
