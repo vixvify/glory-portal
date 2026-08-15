@@ -39,7 +39,7 @@ export default function UniversityPage() {
         </div>
 
         <h1 className="text-2xl md:text-3xl font-bold text-white">
-          ผลงานจาก {universityName}
+          {universityName}
         </h1>
 
         {movies.length === 0 ? (
