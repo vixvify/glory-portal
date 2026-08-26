@@ -74,13 +74,11 @@ export default function HomeView({
           directPlay={true}
         />
 
-        {universityMovies.length > 0 && universityName && (
-          <MovieRow
-            title={`ผลงานจาก${universityName}`}
-            movies={universityMovies}
-            onPlayClick={handlePlayMovie}
-          />
-        )}
+        <MovieRow
+          title={universityName ? `ผลงานจาก${universityName}` : "ผลงานจากมหาวิทยาลัย"}
+          movies={universityMovies}
+          onPlayClick={handlePlayMovie}
+        />
 
         <MovieRow
           title="ชนะรางวัล"
@@ -102,53 +100,41 @@ export default function HomeView({
 
         <AdBanner />
 
-        {favorites.length > 0 && (
-          <MovieRow
-            title="รายการโปรดของคุณ"
-            movies={favorites}
-            onPlayClick={handlePlayMovie}
-          />
-        )}
+        <MovieRow
+          title="รายการโปรดของคุณ"
+          movies={favorites}
+          onPlayClick={handlePlayMovie}
+        />
 
-        {dramaMovies.length > 0 && (
-          <MovieRow
-            title="ดราม่าเรียกน้ำตา"
-            movies={dramaMovies}
-            onPlayClick={handlePlayMovie}
-          />
-        )}
+        <MovieRow
+          title="ดราม่าเรียกน้ำตา"
+          movies={dramaMovies}
+          onPlayClick={handlePlayMovie}
+        />
 
-        {thrillerHorrorMovies.length > 0 && (
-          <MovieRow
-            title="สั่นประสาท"
-            movies={thrillerHorrorMovies}
-            onPlayClick={handlePlayMovie}
-          />
-        )}
+        <MovieRow
+          title="สั่นประสาท"
+          movies={thrillerHorrorMovies}
+          onPlayClick={handlePlayMovie}
+        />
 
-        {comedyMovies.length > 0 && (
-          <MovieRow
-            title="ยิ้มได้ทั้งวัน"
-            movies={comedyMovies}
-            onPlayClick={handlePlayMovie}
-          />
-        )}
+        <MovieRow
+          title="ยิ้มได้ทั้งวัน"
+          movies={comedyMovies}
+          onPlayClick={handlePlayMovie}
+        />
 
-        {romanceMovies.length > 0 && (
-          <MovieRow
-            title="รักหวานฉ่ำ"
-            movies={romanceMovies}
-            onPlayClick={handlePlayMovie}
-          />
-        )}
+        <MovieRow
+          title="รักหวานฉ่ำ"
+          movies={romanceMovies}
+          onPlayClick={handlePlayMovie}
+        />
 
-        {btsVideos.length > 0 && (
-          <MovieBtsRow
-            title="เบื้องหลังการสร้าง"
-            btsVideos={btsVideos}
-            onPlayClick={handlePlayBtsVideo}
-          />
-        )}
+        <MovieBtsRow
+          title="เบื้องหลังการสร้าง"
+          btsVideos={btsVideos}
+          onPlayClick={handlePlayBtsVideo}
+        />
 
         <MovieRowPortrait
           title="ภาพยนตร์แนวตั้ง"
@@ -156,9 +142,9 @@ export default function HomeView({
           onPlayClick={handlePlayMovie}
         />
 
-        {actorList.length > 0 && <CrewRow title="นักแสดง" crew={actorList} />}
+        <CrewRow title="นักแสดง" crew={actorList} />
 
-        {staffList.length > 0 && <CrewRow title="ทีมงาน" crew={staffList} />}
+        <CrewRow title="ทีมงาน" crew={staffList} />
       </div>
 
       <PlayerModal

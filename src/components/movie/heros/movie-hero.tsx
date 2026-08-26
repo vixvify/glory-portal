@@ -9,6 +9,7 @@ import { Movie } from "@/core/domain/movie";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { mapContentWarnings } from "@/core/constants/movie-messages";
+import EmptyState from "@/components/ui/empty-state";
 
 interface Props {
   movies: Movie[];
@@ -54,7 +55,17 @@ export default function MovieHero({
 
 
 
-  if (!heroMovies.length) return null;
+  if (!heroMovies.length) {
+    return (
+      <section className="flex min-h-[50vh] items-center justify-center px-6 md:min-h-[65vh] md:px-16">
+        <EmptyState
+          title="ยังไม่มีภาพยนตร์แนะนำ"
+          description="ขณะนี้ยังไม่มีภาพยนตร์สำหรับแสดงบนหน้าแรก ลองกลับมาดูใหม่อีกครั้งภายหลัง"
+          className="max-w-2xl"
+        />
+      </section>
+    );
+  }
 
   const currentMovie = heroMovies[activeIndex];
   
