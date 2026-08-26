@@ -7,6 +7,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useScrollRow } from "@/hooks/system/use-scroll-row";
 import { Movie } from "@/core/domain/movie";
+import EmptyState from "@/components/ui/empty-state";
 
 export interface BtsVideoItem {
   id: string;
@@ -30,8 +31,6 @@ export default function MovieBtsRow({
   const { rowRef, showLeftArrow, showRightArrow, handleScroll } = useScrollRow(btsVideos);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
-  if (!btsVideos || btsVideos.length === 0) return null;
-
   const handleImageError = (id: string) => {
     setImageErrors((prev) => ({ ...prev, [id]: true }));
   };
@@ -42,7 +41,10 @@ export default function MovieBtsRow({
         {title}
       </h3>
 
-      <div className="relative">
+      {btsVideos.length === 0 ? (
+        <EmptyState title={`ยังไม่มี${title}`} />
+      ) : (
+        <div className="relative">
         {showLeftArrow && (
           <button
             onClick={() => handleScroll("left")}
@@ -114,7 +116,8 @@ export default function MovieBtsRow({
             <ChevronRightIcon className="text-3xl hover:scale-125 transition-transform" />
           </button>
         )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

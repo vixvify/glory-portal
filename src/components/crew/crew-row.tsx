@@ -7,6 +7,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import { CrewMember } from "@/core/domain/crew";
 import Link from "next/link";
 import Image from "next/image";
+import EmptyState from "@/components/ui/empty-state";
 
 interface CrewRowProps {
   title: string;
@@ -17,15 +18,16 @@ export default function CrewRow({ title, crew }: CrewRowProps) {
   const { rowRef, showLeftArrow, showRightArrow, handleScroll } =
     useScrollRow(crew);
 
-  if (crew.length === 0) return null;
-
   return (
     <div className="space-y-2 group/row relative">
       <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-zinc-100 tracking-wide hover:text-white cursor-pointer transition-colors duration-200 inline-block">
         {title}
       </h3>
 
-      <div className="relative">
+      {crew.length === 0 ? (
+        <EmptyState title={`ยังไม่มี${title}`} />
+      ) : (
+        <div className="relative">
         {showLeftArrow && (
           <button
             onClick={() => handleScroll("left")}
@@ -82,7 +84,8 @@ export default function CrewRow({ title, crew }: CrewRowProps) {
             <ChevronRightIcon className="text-3xl hover:scale-125 transition-transform" />
           </button>
         )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
