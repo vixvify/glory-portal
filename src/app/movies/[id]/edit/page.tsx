@@ -6,6 +6,12 @@ import Loading from "@/app/loading";
 import {
   useCategoriesQuery,
   useUniversitiesQuery,
+  useSchoolsQuery,
+  useLanguagesQuery,
+  useSubtitlesQuery,
+  useColorTypesQuery,
+  useContentWarningsQuery,
+  useAgeRatingsQuery,
   useCrewRolesQuery,
 } from "@/hooks/db/use-master-data";
 import { useCrewMembersQuery } from "@/hooks/db/use-crew-members";
@@ -18,8 +24,13 @@ export default function EditMoviePage() {
   );
   const { data: categories = [], isLoading: isCategoriesLoading } =
     useCategoriesQuery();
-  const { data: universities = [], isLoading: isUniversitiesLoading } =
-    useUniversitiesQuery();
+  const { data: universities = [], isLoading: isUniversitiesLoading } = useUniversitiesQuery();
+  const { data: schools = [], isLoading: isSchoolsLoading } = useSchoolsQuery();
+  const { data: languages = [], isLoading: isLanguagesLoading } = useLanguagesQuery();
+  const { data: subtitles = [], isLoading: isSubtitlesLoading } = useSubtitlesQuery();
+  const { data: colorTypes = [], isLoading: isColorTypesLoading } = useColorTypesQuery();
+  const { data: contentWarnings = [], isLoading: isContentWarningsLoading } = useContentWarningsQuery();
+  const { data: ageRatings = [], isLoading: isAgeRatingsLoading } = useAgeRatingsQuery();
 
   const { data: crewRoles = [], isLoading: isCrewRolesLoading } =
     useCrewRolesQuery();
@@ -30,7 +41,12 @@ export default function EditMoviePage() {
     isMovieLoading ||
     isCategoriesLoading ||
     isUniversitiesLoading ||
-
+    isSchoolsLoading ||
+    isLanguagesLoading ||
+    isSubtitlesLoading ||
+    isColorTypesLoading ||
+    isContentWarningsLoading ||
+    isAgeRatingsLoading ||
     isCrewRolesLoading ||
     isCrewLoading;
 
@@ -53,7 +69,12 @@ export default function EditMoviePage() {
       editingMovie={movie}
       categories={categories}
       universities={universities}
-
+      schools={schools}
+      languages={languages}
+      subtitles={subtitles}
+      colorTypes={colorTypes}
+      contentWarnings={contentWarnings}
+      ageRatings={ageRatings}
       crewRoles={crewRoles}
       availableCrew={availableCrew}
     />

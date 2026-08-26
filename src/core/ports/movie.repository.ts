@@ -1,5 +1,5 @@
-import { ApiResponse } from "@/core/ports/response";
-import { Movie, MovieFilterParams } from "../domain/movie";
+import type { ApiResponse } from "@/core/ports/response";
+import type { Movie, MovieFilterParams } from "../domain/movie";
 
 export interface MovieRepository {
   getMovies(params?: MovieFilterParams): Promise<ApiResponse<Movie[]>>;

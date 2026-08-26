@@ -22,4 +22,24 @@ export const PROFILE_MESSAGES = {
     CANCEL: "ยกเลิก",
     CONFIRM: "เสร็จสิ้น",
   },
+  CONFIRM: {
+    SAVE_PROFILE_TITLE: "ยืนยันการบันทึกข้อมูล",
+    SAVE_PROFILE_MSG: "คุณต้องการบันทึกการเปลี่ยนแปลงของข้อมูลโปรไฟล์ใช่หรือไม่?",
+    SAVE_PROFILE_BTN: "บันทึกข้อมูล",
+    UPDATE_AVATAR_TITLE: "ยืนยันการเปลี่ยนรูปโปรไฟล์",
+    UPDATE_AVATAR_MSG: "คุณต้องการเปลี่ยนรูปโปรไฟล์ใหม่ใช่หรือไม่?",
+    UPDATE_AVATAR_BTN: "เปลี่ยนรูปภาพ",
+    UPDATE_COVER_TITLE: "ยืนยันการเปลี่ยนรูปภาพปก",
+    UPDATE_COVER_MSG: "คุณต้องการเปลี่ยนรูปภาพปกใหม่ใช่หรือไม่?",
+    UPDATE_COVER_BTN: "เปลี่ยนรูปภาพ",
+  },
+  LOADING: {
+    SAVING: "กำลังบันทึก...",
+  },
+  COMMON: {
+    NO_AWARDS: "ไม่มีประวัติรางวัลเกียรติยศ",
+    NO_BIO: "ไม่มีข้อมูลประวัติผู้ใช้งาน",
+    NO_POSITIONS: "ไม่ได้ระบุตำแหน่งประจำตัว",
+    NO_SOCIALS: "ไม่ได้ระบุลิงก์โซเชียลมีเดีย",
+  },
 } as const;

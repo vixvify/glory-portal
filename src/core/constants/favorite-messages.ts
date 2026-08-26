@@ -9,4 +9,8 @@ export const FAVORITE_MESSAGES = {
     FAVORITE_UPDATE: "เกิดข้อผิดพลาดในการปรับปรุงรายการโปรด",
     FAVORITE_LIST_UPDATE: "เกิดข้อผิดพลาดในการปรับปรุงรายการ",
   },
+  COMMON: {
+    LOGIN_REQUIRED: "เข้าสู่ระบบเพื่อดูรายการของฉัน",
+    NO_FAVORITES: "ยังไม่มีรายการของฉัน",
+  },
 } as const;

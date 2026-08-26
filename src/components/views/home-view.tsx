@@ -36,7 +36,6 @@ export default function HomeView({
   recommendedMovies,
   popularMovies,
   awardsMovies,
-  // categories: _categories,
   staffList,
   actorList,
   universityMovies,
@@ -68,13 +67,10 @@ export default function HomeView({
       />
 
       <div className="relative z-20 px-6 md:px-16 space-y-10 md:space-y-12 -mt-6 md:-mt-10 pb-16">
-        
         <MovieRow
           title="รับชมต่อ"
           movies={recommendedMovies}
           onPlayClick={handlePlayMovie}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
           directPlay={true}
         />
 
@@ -82,32 +78,24 @@ export default function HomeView({
           title={universityName ? `ผลงานจาก${universityName}` : "ผลงานจากมหาวิทยาลัย"}
           movies={universityMovies}
           onPlayClick={handlePlayMovie}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
         />
 
         <MovieRow
           title="ชนะรางวัล"
           movies={awardsMovies}
           onPlayClick={handlePlayMovie}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
         />
 
         <MovieRow
           title="ถูกใจผู้ชม"
           movies={moviesByRating}
           onPlayClick={handlePlayMovie}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
         />
 
         <MovieRankRow
           title="ติดอันดับ"
           movies={popularMovies}
           onPlayClick={handlePlayMovie}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
         />
 
         <AdBanner />
@@ -116,40 +104,30 @@ export default function HomeView({
           title="รายการโปรดของคุณ"
           movies={favorites}
           onPlayClick={handlePlayMovie}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
         />
 
         <MovieRow
           title="ดราม่าเรียกน้ำตา"
           movies={dramaMovies}
           onPlayClick={handlePlayMovie}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
         />
 
         <MovieRow
           title="สั่นประสาท"
           movies={thrillerHorrorMovies}
           onPlayClick={handlePlayMovie}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
         />
 
         <MovieRow
           title="ยิ้มได้ทั้งวัน"
           movies={comedyMovies}
           onPlayClick={handlePlayMovie}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
         />
 
         <MovieRow
           title="รักหวานฉ่ำ"
           movies={romanceMovies}
           onPlayClick={handlePlayMovie}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
         />
 
         <MovieBtsRow
@@ -162,8 +140,6 @@ export default function HomeView({
           title="ภาพยนตร์แนวตั้ง"
           movies={portraitMovies}
           onPlayClick={handlePlayMovie}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
         />
 
         <CrewRow title="นักแสดง" crew={actorList} />

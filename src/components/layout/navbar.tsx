@@ -12,9 +12,9 @@ import { useAppStore } from "@/store/use-store";
 import {
   useCategoriesQuery,
   useUniversitiesQuery,
+  useSchoolsQuery,
 } from "@/hooks/db/use-master-data";
 import { useLogoutMutation } from "@/hooks/db/use-auth";
-import { useFavoritesQuery } from "@/hooks/db/use-favorites";
 import { useSearchPlaceholder } from "@/hooks/system/use-search-placeholder";
 
 export default function Navbar() {
@@ -24,11 +24,11 @@ export default function Navbar() {
 
   const { data: categories = [] } = useCategoriesQuery();
   const { data: universities = [] } = useUniversitiesQuery();
-  const { data: favorites = [] } = useFavoritesQuery(!!currentUser);
+  const { data: schools = [] } = useSchoolsQuery();
   const logoutMutation = useLogoutMutation();
 
   const [activeTab, setActiveTab] = useState<
-    "category" | "university" | "favorites"
+    "category" | "university" | "school"
   >("category");
 
   const onSignOut = () => {
@@ -51,6 +51,16 @@ export default function Navbar() {
 
   const handleUniversityClick = (uniName: string) => {
     router.push(`/movies/university/${encodeURIComponent(uniName)}`);
+    setShowMoviesMenu(false);
+    setSearchQuery("");
+  };
+
+  const handleSchoolClick = (schoolSearchKey: string | null) => {
+    if (schoolSearchKey === null) {
+      router.push("/movies/school");
+    } else {
+      router.push(`/movies/school/${encodeURIComponent(schoolSearchKey)}`);
+    }
     setShowMoviesMenu(false);
     setSearchQuery("");
   };
@@ -149,7 +159,8 @@ export default function Navbar() {
             className={`flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all duration-300 whitespace-nowrap border ${
               showMoviesMenu ||
               pathname.startsWith("/movies/category") ||
-              pathname.startsWith("/movies/university")
+              pathname.startsWith("/movies/university") ||
+              pathname.startsWith("/movies/school")
                 ? "bg-white/15 text-white border-white/20 font-semibold shadow-md"
                 : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/5"
             }`}
@@ -252,6 +263,13 @@ export default function Navbar() {
                 >
                   เพิ่มภาพยนตร์
                 </Link>
+                <Link
+                  href="/movies/favorites"
+                  onClick={() => setShowProfileMenu(false)}
+                  className="w-full block text-left px-3 py-2 text-xs text-zinc-300 hover:text-brand hover:bg-brand/10 rounded-md cursor-pointer transition-colors mb-1"
+                >
+                  รายการของฉัน
+                </Link>
                 <button
                   onClick={() => {
                     onSignOut();
@@ -274,12 +292,12 @@ export default function Navbar() {
       {showMoviesMenu && (
         <div
           ref={moviesMenuRef}
-          className="absolute left-6 md:left-[170px] top-full mt-1.5 w-64 bg-background border border-theme-border rounded-md p-4 shadow-2xl shadow-black/90 animate-fade-in z-50"
+          className="absolute left-6 md:left-[170px] top-full mt-1.5 w-80 bg-background border border-theme-border rounded-md p-4 shadow-2xl shadow-black/90 animate-fade-in z-50"
         >
           <div className="flex border-b border-white/5 mb-3 pb-2 gap-1">
             <button
               onClick={() => setActiveTab("category")}
-              className={`flex-1 text-center py-2 text-[10px] font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
+              className={`flex-1 text-center px-1 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === "category"
                   ? "bg-brand/15 text-brand border border-brand/25"
                   : "text-zinc-400 hover:text-white border border-transparent"
@@ -289,7 +307,7 @@ export default function Navbar() {
             </button>
             <button
               onClick={() => setActiveTab("university")}
-              className={`flex-1 text-center py-2 text-[10px] font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
+              className={`flex-1 text-center px-1 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === "university"
                   ? "bg-brand/15 text-brand border border-brand/25"
                   : "text-zinc-400 hover:text-white border border-transparent"
@@ -298,26 +316,20 @@ export default function Navbar() {
               มหาวิทยาลัย
             </button>
             <button
-              onClick={() => setActiveTab("favorites")}
-              className={`flex-1 text-center py-2 text-[10px] font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === "favorites"
+              onClick={() => setActiveTab("school")}
+              className={`flex-1 text-center px-1 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap ${
+                activeTab === "school"
                   ? "bg-brand/15 text-brand border border-brand/25"
                   : "text-zinc-400 hover:text-white border border-transparent"
               }`}
             >
-              รายการของฉัน
+              โรงเรียน
             </button>
           </div>
 
           <div className="max-h-60 overflow-y-auto pr-1 no-scrollbar space-y-1">
             {activeTab === "category" ? (
               <>
-                <button
-                  onClick={() => handleNavClick(null)}
-                  className="w-full text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand"
-                >
-                  หนังทั้งหมด
-                </button>
                 {categories.map((cat) => (
                   <button
                     key={cat.id}
@@ -337,52 +349,37 @@ export default function Navbar() {
                 ) : (
                   universities.map((uni) => (
                     <button
-                      key={uni}
-                      onClick={() => handleUniversityClick(uni)}
+                      key={uni.id}
+                      onClick={() => handleUniversityClick(uni.name)}
                       className="w-full text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand"
                     >
-                      {uni}
+                      {uni.name}
                     </button>
                   ))
                 )}
               </>
             ) : (
               <>
-                {!currentUser ? (
-                  <div className="text-center text-zinc-500 py-4 text-xs font-light">
-                    <p className="mb-2">กรุณาเข้าสู่ระบบเพื่อดูรายการของคุณ</p>
-                    <Button
-                      onClick={onSignInClick}
-                      size="sm"
-                      className="h-7 text-[10px] px-3"
-                    >
-                      เข้าสู่ระบบ
-                    </Button>
-                  </div>
-                ) : favorites.length === 0 ? (
-                  <p className="text-center text-zinc-550 py-4 text-xs font-light">
-                    ไม่มีรายการของฉันในขณะนี้
+                <button
+                  onClick={() => handleSchoolClick(null)}
+                  className="w-full text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand"
+                >
+                  โรงเรียนทั้งหมด
+                </button>
+                {schools.length === 0 ? (
+                  <p className="text-center text-zinc-500 py-3 text-xs font-light">
+                    ไม่มีข้อมูลโรงเรียน
                   </p>
                 ) : (
-                  <>
-                    <Link
-                      href="/movies/favorites"
-                      onClick={() => setShowMoviesMenu(false)}
-                      className="w-full block text-center py-2 mb-1.5 text-xs text-brand font-semibold hover:underline bg-brand/5 rounded-md"
+                  schools.map((school) => (
+                    <button
+                      key={school.id}
+                      onClick={() => handleSchoolClick(school.name)}
+                      className="w-full text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand"
                     >
-                      ดูรายการทั้งหมด ({favorites.length})
-                    </Link>
-                    {favorites.map((fav) => (
-                      <Link
-                        key={fav.id}
-                        href={`/movies/${fav.id}`}
-                        onClick={() => setShowMoviesMenu(false)}
-                        className="w-full block text-left px-3 py-2 text-xs rounded-md cursor-pointer transition-colors text-zinc-300 hover:bg-brand/10 hover:text-brand truncate"
-                      >
-                        {fav.title}
-                      </Link>
-                    ))}
-                  </>
+                      {school.name}
+                    </button>
+                  ))
                 )}
               </>
             )}

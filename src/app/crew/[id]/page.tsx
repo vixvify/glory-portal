@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useCallback } from "react";
+import { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -9,13 +9,9 @@ import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 import Loading from "@/app/loading";
 import { useCrewMemberQueryById } from "@/hooks/db/use-crew-members";
-import { useFavoritesQuery, useToggleFavoriteMutation } from "@/hooks/db/use-favorites";
-import { useAppStore } from "@/store/use-store";
 import { useMoviePlayer } from "@/hooks/system/use-movie-player";
-import { FAVORITE_MESSAGES } from "@/core/constants/favorite-messages";
 import MovieCard from "@/components/movie/cards/movie-card";
 import MovieCardPortrait from "@/components/movie/cards/movie-card-portrait";
-import { Toast } from "@/components/ui/toast";
 
 export default function CrewProfilePage() {
   const params = useParams<{ id: string }>();
@@ -28,36 +24,6 @@ export default function CrewProfilePage() {
   } = useCrewMemberQueryById(params.id);
 
   const { playMovie: handlePlayMovie } = useMoviePlayer();
-  const { currentUser, showToast } = useAppStore();
-  const { data: favorites = [] } = useFavoritesQuery(!!currentUser);
-  const toggleFavoriteMutation = useToggleFavoriteMutation();
-
-  const handleToggleFavorite = useCallback(
-    (movieId: string) => {
-      if (!currentUser) {
-        router.push("/auth/login");
-        return;
-      }
-      const isCurrentlyFavorite = favorites.some((m) => m.id === movieId);
-
-      toggleFavoriteMutation.mutate(
-        { movieId, isFavorite: isCurrentlyFavorite },
-        {
-          onSuccess: () => {
-            if (isCurrentlyFavorite) {
-              showToast(FAVORITE_MESSAGES.TOAST.REMOVE_FAVORITE_SUCCESS, "info");
-            } else {
-              showToast(FAVORITE_MESSAGES.TOAST.ADD_FAVORITE_SUCCESS, "success");
-            }
-          },
-          onError: () => {
-            showToast(FAVORITE_MESSAGES.ERRORS.FAVORITE_UPDATE, "error");
-          },
-        },
-      );
-    },
-    [currentUser, favorites, toggleFavoriteMutation, showToast, router],
-  );
 
   const groupedMovies = useMemo(() => {
     if (!crewMember?.movies) return {};
@@ -202,15 +168,11 @@ export default function CrewProfilePage() {
                           <MovieCardPortrait
                             movie={movie}
                             onPlayClick={handlePlayMovie}
-                            isFavorite={favorites.some((fav) => fav.id === movie.id)}
-                            onToggleFavorite={handleToggleFavorite}
                           />
                         ) : (
                           <MovieCard
                             movie={movie}
                             onPlayClick={handlePlayMovie}
-                            isFavorite={favorites.some((fav) => fav.id === movie.id)}
-                            onToggleFavorite={handleToggleFavorite}
                           />
                         )}
                       </Link>
@@ -228,7 +190,6 @@ export default function CrewProfilePage() {
           )}
         </div>
       </main>
-      <Toast />
     </div>
   );
 }

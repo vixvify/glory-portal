@@ -1,10 +1,10 @@
-import {
+import type {
   Movie,
   CreateMovie,
   UpdateMovie,
   MovieFilterParams,
 } from "../domain/movie";
-import { MovieRepository } from "../ports/movie.repository";
+import type { MovieRepository } from "../ports/movie.repository";
 import { parseSchema } from "@/lib/validation";
 import {
   createMovieSchema,
@@ -14,7 +14,11 @@ import {
 import { toFormData } from "@/utils/form-data";
 
 export class MovieService {
-  constructor(private readonly movieRepository: MovieRepository) {}
+  private readonly movieRepository: MovieRepository;
+
+  constructor(movieRepository: MovieRepository) {
+    this.movieRepository = movieRepository;
+  }
   async getMovies(params?: MovieFilterParams): Promise<Movie[]> {
     try {
       if (params) {

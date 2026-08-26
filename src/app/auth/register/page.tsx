@@ -21,7 +21,6 @@ import { Button } from "@/components/ui/button";
 import { useRegisterMutation } from "@/hooks/db/use-auth";
 import { ImageCropper } from "@/components/modal/image-cropper";
 import Link from "next/link";
-import { Toast } from "@/components/ui/toast";
 import { AUTH_MESSAGES } from "@/core/constants/auth-messages";
 
 type RegisterFormValues = {
@@ -128,8 +127,8 @@ export default function RegisterPage() {
         awards: activeAwards.length > 0 ? activeAwards : undefined,
       });
       router.push("/auth/login");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : AUTH_MESSAGES.ERRORS.REGISTER_FAILED);
+    } catch {
+      setError(AUTH_MESSAGES.ERRORS.REGISTER_FAILED);
     }
   };
 
@@ -482,7 +481,6 @@ export default function RegisterPage() {
           fileName="profile-picture.jpg"
         />
       )}
-      <Toast />
     </div>
   );
 }
